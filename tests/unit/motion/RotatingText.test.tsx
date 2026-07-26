@@ -1,39 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, render, screen } from "@testing-library/react";
 import { axe } from "jest-axe";
+import { mockMatchMedia } from "../../fixtures/matchMedia";
 import { RotatingText } from "@/components/motion/RotatingText";
-
-// jsdom doesn't implement matchMedia. This stands in for it, with a
-// `setMatches` escape hatch to simulate the user toggling their OS-level
-// reduced-motion preference mid-session.
-function mockMatchMedia(initialMatches: boolean) {
-  const listeners = new Set<(event: MediaQueryListEvent) => void>();
-  let matches = initialMatches;
-
-  const mediaQueryList = {
-    get matches() {
-      return matches;
-    },
-    media: "(prefers-reduced-motion: reduce)",
-    addEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) => {
-      listeners.add(listener);
-    },
-    removeEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) => {
-      listeners.delete(listener);
-    },
-  } as MediaQueryList;
-
-  vi.stubGlobal("matchMedia", () => mediaQueryList);
-
-  return {
-    setMatches(next: boolean) {
-      matches = next;
-      for (const listener of listeners) {
-        listener({ matches: next } as MediaQueryListEvent);
-      }
-    },
-  };
-}
 
 describe("RotatingText", () => {
   beforeEach(() => {
