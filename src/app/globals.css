@@ -1,0 +1,202 @@
+@import "tailwindcss";
+
+/* Font faces are self-hosted by next/font; these variables are set on <html>
+   in layout.tsx. @theme inline is required because Tailwind must reference
+   the runtime variable, not bake in a static value. */
+@theme inline {
+  --font-display: var(--font-instrument-serif);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@theme {
+  /* Color — docs/design-system.md. Text on gold is always --color-ink. */
+  --color-ink: #061031;
+  --color-gold: #FFC321;
+  --color-paper: #f3f5f9;
+  --color-sand: #d2bd80;
+  --color-oxblood: #300612;
+
+  /* Type scale — display is Instrument Serif, everything else Geist/Geist Mono.
+     Never write an arbitrary text-[Npx] value in a component; add a step here
+     instead. */
+  --text-display-1: 6rem;
+  --text-display-1--line-height: 1;
+  --text-display-1--letter-spacing: -0.02em;
+  --text-display-1--font-weight: 400;
+
+  --text-display-2: 4rem;
+  --text-display-2--line-height: 1.05;
+  --text-display-2--letter-spacing: -0.02em;
+  --text-display-2--font-weight: 400;
+
+  --text-display-3: 2.5rem;
+  --text-display-3--line-height: 1.1;
+  --text-display-3--letter-spacing: -0.01em;
+  --text-display-3--font-weight: 400;
+
+  --text-heading-1: 2rem;
+  --text-heading-1--line-height: 1.2;
+  --text-heading-1--letter-spacing: -0.01em;
+  --text-heading-1--font-weight: 600;
+
+  --text-heading-2: 1.5rem;
+  --text-heading-2--line-height: 1.25;
+  --text-heading-2--letter-spacing: -0.01em;
+  --text-heading-2--font-weight: 600;
+
+  --text-heading-3: 1.25rem;
+  --text-heading-3--line-height: 1.3;
+  --text-heading-3--letter-spacing: 0em;
+  --text-heading-3--font-weight: 600;
+
+  --text-body-l: 1.125rem;
+  --text-body-l--line-height: 1.6;
+  --text-body-l--letter-spacing: 0em;
+  --text-body-l--font-weight: 400;
+
+  --text-body-m: 1rem;
+  --text-body-m--line-height: 1.6;
+  --text-body-m--letter-spacing: 0em;
+  --text-body-m--font-weight: 400;
+
+  --text-body-s: 0.875rem;
+  --text-body-s--line-height: 1.5;
+  --text-body-s--letter-spacing: 0em;
+  --text-body-s--font-weight: 400;
+
+  --text-mono-s: 0.8125rem;
+  --text-mono-s--line-height: 1.4;
+  --text-mono-s--letter-spacing: 0.08em;
+  --text-mono-s--font-weight: 500;
+
+  --text-mono-xs: 0.6875rem;
+  --text-mono-xs--line-height: 1.4;
+  --text-mono-xs--letter-spacing: 0.1em;
+  --text-mono-xs--font-weight: 500;
+
+  /* Spacing has no named scale of its own: Tailwind v4 resolves w-*, min-w-*,
+     max-w-*, basis-* and size-* against --spacing before --container. A named
+     step here (e.g. --spacing-sm) would silently win over the built-in
+     --container-sm (24rem) any time one of those utilities used the same
+     name — max-w-sm would become 1rem instead of 24rem, no error, just a
+     collapsed layout. Use Tailwind's own numeric scale (p-4, gap-6, py-24, a
+     multiple of the base --spacing: 0.25rem below) for padding/gap/margin
+     instead; it can't collide because it's never a bare word.
+     Spacing steps in use: 1 (0.25rem) · 2 (0.5rem) · 3 (0.75rem) · 4 (1rem) ·
+     6 (1.5rem) · 10 (2.5rem) · 16 (4rem) · 24 (6rem) · 36 (9rem). */
+
+  /* Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-full: 9999px;
+
+  /* Container — the one central width constraint. max-w-content. */
+  --container-content: 80rem;
+
+  /* Partner logo band. Speed is chosen so a full loop reads as ambient
+     motion, not a race — see PartnerMarquee. */
+  --animate-marquee: marquee 45s linear infinite;
+}
+
+/* Tailwind v4's `hover:` is scoped to @media (hover: hover), so it already
+   never sticks after a tap — but that leaves no built-in way to say "show
+   this unconditionally on devices that can't hover at all." no-hover: fills
+   that gap for the pillar/benefit detail text and the board LinkedIn marker:
+   always visible below md and on touch, hover-or-focus-revealed on desktop
+   (docs/design-system.md: "hover enhances, hover never hides"). */
+@custom-variant no-hover (@media (hover: none));
+
+:root {
+  --focus-ring: var(--color-ink);
+}
+
+/* Full-bleed dark sections set data-surface="ink" on their wrapper so the
+   focus ring switches to gold, per the contrast rule (text on gold is ink,
+   but a gold ring on a dark background stays legible). */
+[data-surface="ink"] {
+  --focus-ring: var(--color-gold);
+}
+
+* {
+  scroll-margin-top: calc(var(--spacing) * 24); /* 6rem */
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--color-gold);
+  color: var(--color-ink);
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes reveal {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Scroll-entrance for the "Was uns einzigartig macht" pillars — CSS
+   scroll-driven animation, no JavaScript, no `motion` import (see
+   src/components/motion/Reveal.tsx). Transform and opacity only, per
+   docs/design-system.md's motion rule 5. Written as a plain utility class
+   rather than @utility so the two nested at-rules below are unambiguous
+   standard CSS: unsupported browsers and reduced-motion users both get the
+   plain, fully-visible base rule — content is never hidden, only ever
+   enhanced. */
+@layer utilities {
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal {
+        opacity: 0;
+        transform: translateY(1rem);
+        animation: reveal linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 30%;
+      }
+    }
+  }
+}
