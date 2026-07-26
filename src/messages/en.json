@@ -158,6 +158,7 @@
   "BoardGrid": {
     "eyebrow": "The board",
     "title": "Who runs the association",
+    "linkedin": "LinkedIn",
     "linkedinLabel": "Open {name}'s LinkedIn profile"
   },
   "ClosingCta": {

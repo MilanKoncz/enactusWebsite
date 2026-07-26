@@ -158,6 +158,7 @@
   "BoardGrid": {
     "eyebrow": "Der Vorstand",
     "title": "Wer den Verein führt",
+    "linkedin": "LinkedIn",
     "linkedinLabel": "LinkedIn-Profil von {name} öffnen"
   },
   "ClosingCta": {

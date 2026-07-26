@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
 export type RotatingTextProps = {
   terms: string[];
@@ -9,32 +10,9 @@ export type RotatingTextProps = {
   className?: string;
 };
 
-const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
-
-function subscribeToReducedMotion(onChange: () => void) {
-  const query = window.matchMedia(REDUCED_MOTION_QUERY);
-  query.addEventListener("change", onChange);
-  return () => query.removeEventListener("change", onChange);
-}
-
-function getReducedMotionSnapshot() {
-  return window.matchMedia(REDUCED_MOTION_QUERY).matches;
-}
-
-// Reduced-motion is a live property of the browser, external to React state
-// — useSyncExternalStore subscribes to it directly instead of mirroring it
-// into state from inside an effect (which would need a synchronous setState
-// call on mount, an anti-pattern react-hooks/set-state-in-effect flags for
-// good reason: it causes an extra render pass). The server snapshot is
-// `false` (no matchMedia during SSR) — matching the terms[0]-on-first-paint
-// guarantee below, since the rotation effect no-ops until this resolves.
 export function RotatingText({ terms, intervalMs = 3000, className }: RotatingTextProps) {
   const [index, setIndex] = useState(0);
-  const reducedMotion = useSyncExternalStore(
-    subscribeToReducedMotion,
-    getReducedMotionSnapshot,
-    () => false,
-  );
+  const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     if (reducedMotion || terms.length <= 1) return;
