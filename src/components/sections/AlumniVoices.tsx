@@ -60,7 +60,12 @@ export function AlumniVoices() {
         <div role="region" aria-label={t("regionLabel")} className="flex flex-col gap-6">
           <div
             ref={trackRef}
-            className="flex snap-x snap-mandatory gap-10 overflow-x-auto"
+            // contain-content: without it, this track's full unclipped
+            // width (three full-viewport-wide slides) still inflates the
+            // document's own scrollWidth even though overflow-x-auto
+            // correctly clips and scrolls it visually — see the identical
+            // note in PartnerMarquee.tsx.
+            className="flex snap-x snap-mandatory gap-10 overflow-x-auto contain-content"
           >
             {alumni.map((alumnus, index) => (
               <div

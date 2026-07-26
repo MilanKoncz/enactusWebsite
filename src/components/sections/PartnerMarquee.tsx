@@ -15,6 +15,10 @@ import { cn } from "@/lib/cn";
 // partners twice. The viewport itself stays overflow-hidden by default —
 // only reduced motion (where the animation is off entirely) switches it to
 // scrollable, so there's never a horizontal scrollbar while the loop runs.
+// `contain-content` is load-bearing, not decoration: without it, Chromium
+// still folds this track's full unclipped width into the document's own
+// scrollWidth even though overflow-hidden/auto correctly clips it visually
+// — a real horizontal scrollbar on the page with nothing to show for it.
 export function PartnerMarquee() {
   const t = useTranslations("PartnerMarquee");
   const tPlaceholder = useTranslations("Placeholder");
@@ -25,7 +29,7 @@ export function PartnerMarquee() {
     <Section className="py-16">
       <Container className="flex flex-col gap-6">
         <Eyebrow>{t("eyebrow")}</Eyebrow>
-        <div className="overflow-hidden motion-reduce:overflow-x-auto">
+        <div className="overflow-hidden contain-content motion-reduce:overflow-x-auto">
           <div className="flex w-max animate-marquee gap-16 hover:[animation-play-state:paused] focus-within:[animation-play-state:paused] motion-reduce:animate-none">
             {track.map((partner, index) => {
               const isDuplicate = index >= partners.length;
