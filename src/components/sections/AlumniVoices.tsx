@@ -60,11 +60,16 @@ export function AlumniVoices() {
         <div role="region" aria-label={t("regionLabel")} className="flex flex-col gap-6">
           <div
             ref={trackRef}
-            // contain-content: without it, this track's full unclipped
-            // width (three full-viewport-wide slides) still inflates the
-            // document's own scrollWidth even though overflow-x-auto
-            // correctly clips and scrolls it visually — see the identical
-            // note in PartnerMarquee.tsx.
+            // tabIndex: the slides carry no focusable content of their own
+            // (no links or buttons), so without this the scrollable region
+            // itself has no keyboard entry point at all — a real WCAG 2.1.1
+            // failure caught by axe's scrollable-region-focusable rule, not
+            // just a nicety. contain-content: without it, this track's full
+            // unclipped width (three full-viewport-wide slides) still
+            // inflates the document's own scrollWidth even though
+            // overflow-x-auto correctly clips and scrolls it visually — see
+            // the identical note in PartnerMarquee.tsx.
+            tabIndex={0}
             className="flex snap-x snap-mandatory gap-10 overflow-x-auto contain-content"
           >
             {alumni.map((alumnus, index) => (
