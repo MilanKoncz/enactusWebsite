@@ -1,0 +1,173 @@
+{
+  "Site": {
+    "name": "Enactus Mannheim",
+    "legalName": "Enactus Mannheim e.V.",
+    "claim": "Entrepreneurial. Action. Us."
+  },
+  "Routes": {
+    "home": "Home",
+    "prozess": "Process",
+    "projekte": "Projects",
+    "events": "Events",
+    "partner": "Partners",
+    "kontakt": "Contact",
+    "mitmachen": "Get involved",
+    "team": "Team",
+    "impressum": "Legal notice",
+    "datenschutz": "Privacy policy"
+  },
+  "SkipLink": {
+    "label": "Skip to content"
+  },
+  "Header": {
+    "navLabel": "Main navigation",
+    "home": "Go to homepage",
+    "cta": "Get involved",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "mobileMenuLabel": "Menu"
+  },
+  "LocaleSwitch": {
+    "label": "Switch language",
+    "de": "German",
+    "en": "English"
+  },
+  "Footer": {
+    "navLabel": "Footer",
+    "columns": {
+      "verein": "Association",
+      "netzwerk": "Network",
+      "rechtliches": "Legal"
+    },
+    "network": {
+      "enactusGermany": "Enactus Germany",
+      "enactusGlobal": "Enactus Global"
+    },
+    "social": {
+      "label": "Social media",
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn",
+      "facebook": "Facebook",
+      "spotify": "Spotify"
+    },
+    "externalHint": "Opens in a new tab",
+    "missingUrl": "URL missing",
+    "copyright": "© Enactus Mannheim e.V."
+  },
+  "ComingSoon": {
+    "eyebrow": "In progress",
+    "note": "This page is being built. More soon."
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "note": "This page doesn't exist (anymore).",
+    "backHome": "Go to homepage"
+  },
+  "Home": {
+    "note": "The website is being rebuilt right now. More soon.",
+    "teamLink": "Meet the team",
+    "dividers": {
+      "kpis": "The numbers",
+      "alumni": "Voices from the network",
+      "board": "Board"
+    }
+  },
+  "Hero": {
+    "prefix": "We are",
+    "rotating": ["BEGRIFF_1", "BEGRIFF_2", "BEGRIFF_3", "BEGRIFF_4"],
+    "cta": "Apply now",
+    "videoPlaceholderKind": "Video",
+    "videoPlaceholderLabel": "Stage pitch loop"
+  },
+  "PartnerMarquee": {
+    "eyebrow": "The companies behind us"
+  },
+  "Kpis": {
+    "eyebrow": "The numbers behind us",
+    "labels": {
+      "nationalChampionships": "National championships",
+      "spinoffs": "Spin-offs",
+      "funding": "Funding raised",
+      "projectIterations": "Project iterations",
+      "foundedYear": "Founded"
+    },
+    "asOf": "As of {date}"
+  },
+  "Pillars": {
+    "eyebrow": "What makes us different",
+    "esg": {
+      "title": "ESG character",
+      "lead": "Every project advances a UN Sustainable Development Goal, not just a business idea.",
+      "detail": "We choose projects by which SDG they move forward — impact is the entry ticket, not an afterthought."
+    },
+    "execution": {
+      "title": "Risk-free execution",
+      "lead": "You found a real company without carrying the personal risk of founding one.",
+      "detail": "The association carries liability, structure, and process — you bring the idea, the team, and the execution."
+    },
+    "network": {
+      "title": "International network",
+      "lead": "You become part of a network of universities and alumni that reaches far beyond Mannheim.",
+      "detail": "National and international competitions, partner companies, and an active alumni network open doors beyond your degree."
+    }
+  },
+  "Benefits": {
+    "eyebrow": "What you learn and gain",
+    "benefit-1": {
+      "title": "Responsibility",
+      "lead": "You take on real responsibility for a project from day one.",
+      "detail": "Not an internship that runs alongside you — you make operational decisions and own the results."
+    },
+    "benefit-2": {
+      "title": "Practical skills",
+      "lead": "You learn skills your degree rarely covers.",
+      "detail": "From bookkeeping to sales to legal basics — practical knowledge you need right away, not just theory."
+    },
+    "benefit-3": {
+      "title": "Network",
+      "lead": "You build a network that outlasts your studies.",
+      "detail": "Partner companies, alumni, and other Enactus teams worldwide become part of your professional network."
+    },
+    "benefit-4": {
+      "title": "Leadership",
+      "lead": "You take on leadership responsibility long before your first job asks for it.",
+      "detail": "Project lead, team lead, budget responsibility — roles that would otherwise take years of experience."
+    },
+    "benefit-5": {
+      "title": "Your résumé",
+      "lead": "You gain an experience that stands out on a résumé.",
+      "detail": "Co-running a real social business is a different thing from one more seminar."
+    },
+    "benefit-6": {
+      "title": "Community",
+      "lead": "You become part of a community working on the same causes.",
+      "detail": "Weekly collaboration with people who share the same conviction you do."
+    }
+  },
+  "AlumniVoices": {
+    "eyebrow": "Where it leads",
+    "title": "What becomes of our members",
+    "regionLabel": "Alumni statements",
+    "prev": "Previous statement",
+    "next": "Next statement",
+    "position": "{current} of {total}"
+  },
+  "BoardGrid": {
+    "eyebrow": "The board",
+    "title": "Who runs the association",
+    "linkedinLabel": "Open {name}'s LinkedIn profile"
+  },
+  "ClosingCta": {
+    "eyebrow": "Next step",
+    "title": "Become part of the next project",
+    "lead": "Apply if you actually want to build something — not just talk about it.",
+    "primaryCta": "Apply now",
+    "secondaryCta": "See the process"
+  },
+  "Placeholder": {
+    "missingLabel": "Not available yet",
+    "missingHint": "This information isn't available yet.",
+    "unverifiedLabel": "Unconfirmed",
+    "unverifiedHint": "This figure hasn't been confirmed by the board yet."
+  }
+}
