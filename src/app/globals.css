@@ -100,13 +100,14 @@
   --animate-marquee: marquee 45s linear infinite;
 }
 
-/* Tailwind v4's `hover:` is scoped to @media (hover: hover), so it already
-   never sticks after a tap — but that leaves no built-in way to say "show
-   this unconditionally on devices that can't hover at all." no-hover: fills
-   that gap for the pillar/benefit detail text and the board LinkedIn marker:
-   always visible below md and on touch, hover-or-focus-revealed on desktop
-   (docs/design-system.md: "hover enhances, hover never hides"). */
-@custom-variant no-hover (@media (hover: none));
+/* Gates the pillar/benefit detail text and the board LinkedIn marker's
+   hidden-by-default state: only a pointer-hover-capable device at md+ width
+   ever hides that content, so it stays visible unconditionally on touch and
+   on small screens — the two cases where a visitor could never trigger a
+   hover (docs/design-system.md: "hover enhances, hover never hides"). Content
+   is additionally always in the accessibility tree regardless of this CSS —
+   opacity, not display or aria-hidden, is what this variant ever touches. */
+@custom-variant desktop-hover (@media (hover: hover) and (min-width: 768px));
 
 :root {
   --focus-ring: var(--color-ink);

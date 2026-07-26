@@ -83,7 +83,8 @@
     "eyebrow": "Unternehmen, die uns tragen"
   },
   "Kpis": {
-    "eyebrow": "Zahlen, die uns tragen",
+    "eyebrow": "In Zahlen",
+    "title": "Zahlen, die für sich sprechen",
     "labels": {
       "nationalChampionships": "Nationale Meistertitel",
       "spinoffs": "Ausgründungen",
@@ -94,7 +95,8 @@
     "asOf": "Stand: {date}"
   },
   "Pillars": {
-    "eyebrow": "Was uns einzigartig macht",
+    "eyebrow": "Warum Enactus",
+    "title": "Was uns einzigartig macht",
     "esg": {
       "title": "ESG-Charakter",
       "lead": "Jedes Projekt zahlt auf ein UN-Nachhaltigkeitsziel ein, nicht nur auf eine Geschäftsidee.",
@@ -112,7 +114,8 @@
     }
   },
   "Benefits": {
-    "eyebrow": "Was ihr lernt und bekommt",
+    "eyebrow": "Mitgliedschaft",
+    "title": "Was ihr lernt und bekommt",
     "benefit-1": {
       "title": "Verantwortung",
       "lead": "Ihr übernehmt von Anfang an echte Verantwortung für ein Projekt.",

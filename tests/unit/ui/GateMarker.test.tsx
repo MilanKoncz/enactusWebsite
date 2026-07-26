@@ -28,6 +28,19 @@ describe("GateMarker", () => {
     expect(screen.getByText("Inno Gating").textContent).toBe("Inno Gating");
   });
 
+  it("renders as a plain div by default", () => {
+    const { container } = render(<GateMarker label="Inno Gating" />);
+    expect(container.querySelector("div")?.tagName).toBe("DIV");
+    expect(container.querySelector("h3")).not.toBeInTheDocument();
+  });
+
+  it("renders as the given heading level when as is set, so it can double as a section heading", () => {
+    render(<GateMarker label="Was uns einzigartig macht" as="h3" />);
+    expect(
+      screen.getByRole("heading", { level: 3, name: "Was uns einzigartig macht" }),
+    ).toBeInTheDocument();
+  });
+
   it("has no accessibility violations in either variant", async () => {
     const { container } = render(
       <>

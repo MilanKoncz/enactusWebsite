@@ -3,6 +3,7 @@ import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { Section } from "@/components/ui/Section";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { kpis, type KpiKey } from "@/content/kpis";
 
 type KpiFormat = "count" | "currency" | "year";
@@ -45,7 +46,7 @@ export function HomeKpis() {
   return (
     <Section>
       <Container className="flex flex-col gap-10">
-        <Eyebrow>{t("eyebrow")}</Eyebrow>
+        <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-5">
           {kpis.map((kpi) => {
             const formatted = formatValue(kpi.key, kpi.value);

@@ -5,6 +5,13 @@ import { renderWithIntl } from "../../fixtures/intl";
 import { HomeKpis } from "@/components/sections/HomeKpis";
 
 describe("HomeKpis", () => {
+  it("renders the section heading", () => {
+    renderWithIntl(<HomeKpis />);
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Zahlen, die für sich sprechen" }),
+    ).toBeInTheDocument();
+  });
+
   it("renders all five KPI labels", () => {
     renderWithIntl(<HomeKpis />);
     expect(screen.getByText("Nationale Meistertitel")).toBeInTheDocument();
