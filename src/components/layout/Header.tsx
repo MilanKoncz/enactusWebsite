@@ -8,7 +8,9 @@ import { Logo } from "@/components/layout/Logo";
 import { Nav } from "@/components/layout/Nav";
 import { LocaleSwitch } from "@/components/layout/LocaleSwitch";
 import { MobileMenu } from "@/components/layout/MobileMenu";
+import { useHeaderSurface } from "@/components/layout/HeaderSurface";
 import { Link } from "@/lib/navigation";
+import { cn } from "@/lib/cn";
 
 // Fixed (not sticky), so the scroll-compact resize genuinely cannot shift
 // page content — a sticky header still occupies flow space, and shrinking it
@@ -17,9 +19,19 @@ import { Link } from "@/lib/navigation";
 // "reserve space" and "detect scroll position" are the same element instead
 // of two independently-maintained numbers. h-24 (6rem) matches globals.css's
 // scroll-margin-top, so anchor jumps and the skip link land correctly.
+//
+// `overlaid` (from HeaderSurfaceContext, set by a hero section via
+// HeaderOverlay) is a second, independent axis from `compact`: compact
+// tracks scroll position on every route, overlaid tracks whether a dark
+// hero is currently behind the fixed header. Only the homepage ever sets
+// it; everywhere else it stays at its default `false` and the header
+// behaves exactly as before. data-surface="ink" while overlaid reuses the
+// existing focus-ring mechanism (globals.css), so the ring goes gold over
+// the dark hero without a separate code path.
 export function Header() {
   const t = useTranslations("Header");
   const [compact, setCompact] = useState(false);
+  const { overlaid } = useHeaderSurface();
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -36,7 +48,14 @@ export function Header() {
     <>
       <header
         data-compact={compact ? "true" : undefined}
-        className="fixed inset-x-0 top-0 z-40 border-b border-ink/0 bg-paper py-6 transition-[padding,border-color] duration-200 data-[compact=true]:border-ink/10 data-[compact=true]:py-3"
+        data-surface={overlaid ? "ink" : undefined}
+        className={cn(
+          "fixed inset-x-0 top-0 z-40 border-b py-6 transition-[padding,background-color,border-color,color] duration-200",
+          overlaid
+            ? "border-transparent bg-transparent text-paper"
+            : "border-ink/0 bg-paper text-ink data-[compact=true]:border-ink/10",
+          compact && "py-3",
+        )}
       >
         <Container className="flex items-center justify-between gap-6">
           <Link href="/" aria-label={t("home")}>

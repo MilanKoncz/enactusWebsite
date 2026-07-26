@@ -5,6 +5,7 @@ import { renderWithIntl } from "../../fixtures/intl";
 import { mockPathname } from "../../fixtures/navigation";
 import { mockIntersectionObserver } from "../../fixtures/observers";
 import { Header } from "@/components/layout/Header";
+import { HeaderSurfaceContext } from "@/components/layout/HeaderSurface";
 
 vi.mock("next/navigation", async () => (await import("../../fixtures/navigation")).nextNavigationMock);
 
@@ -52,6 +53,37 @@ describe("Header", () => {
     mockIntersectionObserver();
     mockPathname.mockReturnValue("/");
     const { container } = renderWithIntl(<Header />);
+    expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it("stays solid by default, outside any HeaderSurfaceProvider", () => {
+    mockIntersectionObserver();
+    mockPathname.mockReturnValue("/");
+    renderWithIntl(<Header />);
+    expect(screen.getByRole("banner")).not.toHaveAttribute("data-surface");
+  });
+
+  it("switches to the ink surface (transparent, gold focus ring) when overlaid", () => {
+    mockIntersectionObserver();
+    mockPathname.mockReturnValue("/");
+    renderWithIntl(
+      <HeaderSurfaceContext.Provider value={{ overlaid: true, setOverlaid: vi.fn() }}>
+        <Header />
+      </HeaderSurfaceContext.Provider>,
+    );
+    const banner = screen.getByRole("banner");
+    expect(banner).toHaveAttribute("data-surface", "ink");
+    expect(banner).toHaveClass("bg-transparent");
+  });
+
+  it("has no accessibility violations while overlaid", async () => {
+    mockIntersectionObserver();
+    mockPathname.mockReturnValue("/");
+    const { container } = renderWithIntl(
+      <HeaderSurfaceContext.Provider value={{ overlaid: true, setOverlaid: vi.fn() }}>
+        <Header />
+      </HeaderSurfaceContext.Provider>,
+    );
     expect(await axe(container)).toHaveNoViolations();
   });
 });
