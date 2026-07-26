@@ -14,8 +14,7 @@ gets fabricated to fill a gap — a row here and a `Placeholder` component inste
 | `content/navigation.ts` (`networkLinks`) | Enactus Germany-URL | — | Platzhalter aktiv (`href: null`) |
 | `content/navigation.ts` (`networkLinks`) | Enactus Global-URL | — | Platzhalter aktiv (`href: null`) |
 | `components/layout/Footer.tsx` | LinkedIn-Icon | — | `@icons-pack/react-simple-icons` enthält keine Marke für LinkedIn (Takedown-Request an Simple Icons) — Footer zeigt nur Text statt Icon für diesen einen Eintrag. Zu prüfen, sobald ein anderes Icon-Set oder das offizielle LinkedIn-Brand-Asset verfügbar ist. |
-| `messages/en.json` | Echte Übersetzung | — | Interface-Strings sind übersetzt; Homepage-Copy (`Home.note`) ist ein generischer Platzhaltersatz, keine echte Übersetzung von Inhalten, die es auf Deutsch noch nicht gibt |
-| `app/[locale]/(site)/page.tsx` | Homepage-Copy | — | Nur Titel, Claim, Platzhaltertext, Team-Link — keine erfundene Mission/Vision-Copy |
+| `app/[locale]/(site)/page.tsx` | Startseite | — | Alle acht Sections stehen (Hero, Partner, Kennzahlen, Säulen, Benefits, Alumni, Vorstand, CTA); Copy dort, wo sie nicht aus `content/` kommt, ist Entwurf — siehe die Zeilen zu `Hero.rotating`, `Benefits.*` und den Content-Dateien unten. Keine erfundene Mission/Vision-Copy über das Bestehende hinaus |
 | `app/[locale]/(site)/impressum`, `/datenschutz` | Rechtstexte | — | Nur Platzhalterseite. Laut `docs/engineering.md` geht der Datenschutz-Entwurf vor Launch an den Datenschutzbeauftragten von Enactus Germany, klar als Entwurf markiert |
 | `next.config.ts` / Redirect-Map | Ziel für alte URLs `/innolab`, `/faq` | — | Für die 301-Redirect-Map aus `docs/engineering.md` zu klären: ersetzt „Prozess" die InnoLab-Seite (dann Redirect `/innolab` → `/prozess`), oder braucht `/innolab` eine eigene Route? `/faq` hat aktuell ebenfalls kein Ziel |
 | `content/org.ts` | Vereinssitz, Vereinsregister-Nummer, allgemeine Kontakt-E-Mail, Vorstands-E-Mail | — | Platzhalter aktiv (`null`) |
@@ -37,7 +36,7 @@ gets fabricated to fill a gap — a row here and a `Placeholder` component inste
 | `content/media.ts` (`heroMedia`) | Hero-Video (Pitches auf der Bühne), Poster-Frame, mobiles Standbild | Video: 16:9, 1920×1080 als Zielmaß; Poster: gleiches Seitenverhältnis | Platzhalter aktiv (missing) — `sources: []`, `posterSrc`/`mobileImageSrc: null`, Fläche über `width`/`height` reserviert |
 | `messages/{de,en}.json` (`Benefits.*`) | Freigabe der sechs Benefit-Texte | — | Entwurfstext (Verantwortung, Praxiswissen, Netzwerk, Führung, Lebenslauf, Gemeinschaft) — plausible, aber nicht mit dem Vorstand abgestimmte Behauptungen; vor Launch gegenlesen lassen |
 | `messages/{de,en}.json` (`Hero.rotating`) | Die vier rotierenden Begriffe im Hero | — | Platzhalter aktiv (`BEGRIFF_1`–`BEGRIFF_4`), Wortwahl liegt beim Vorstand |
-| `messages/en.json` (`Pillars.*`, `Benefits.*`, `AlumniVoices.*`, `BoardGrid.*`, `ClosingCta.*`) | Echte Übersetzung statt Erstentwurf | — | Bereits als eigenständiges Englisch formuliert (keine reine Spiegelung des Deutschen), aber Teil derselben ausstehenden dedizierten Übersetzungsrunde wie `Home.note` |
+| `messages/en.json` (`Pillars.*`, `Benefits.*`, `AlumniVoices.*`, `BoardGrid.*`, `ClosingCta.*`) | Echte Übersetzung statt Erstentwurf | — | Bereits als eigenständiges Englisch formuliert (keine reine Spiegelung des Deutschen), aber Teil der noch ausstehenden dedizierten Übersetzungsrunde vor Launch |
 
 ## Accepted dependency advisories
 
