@@ -28,6 +28,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 // half the page. The gate-marker divider only ever appears inside a light
 // run, where no surface change already marks the seam (see
 // components/sections/GateDivider.tsx).
+//
+// The golden thread (components/motion/ThreadSegment.tsx) runs underneath
+// this same rhythm, from PartnerMarquee to ClosingCta — the hero stays the
+// one orchestrated moment with no competing motion, and the thread picks up
+// right where it ends. Its stops (threadRoute.ts) are named for and ordered
+// exactly like the sections below; the three GateDivider stops keep the
+// thread vertical and centered, so it becomes each gate's rule for a moment
+// instead of running beside it.
 export default async function HomePage({ params }: PageProps) {
   const locale = await requireLocale(params);
   const t = await getTranslations({ locale, namespace: "Home" });
@@ -36,13 +44,13 @@ export default async function HomePage({ params }: PageProps) {
     <>
       <HomeHero />
       <PartnerMarquee />
-      <GateDivider label={t("dividers.kpis")} />
+      <GateDivider label={t("dividers.kpis")} stop="gate-kpis" />
       <HomeKpis />
       <Pillars />
       <Benefits />
-      <GateDivider label={t("dividers.alumni")} />
+      <GateDivider label={t("dividers.alumni")} stop="gate-alumni" />
       <AlumniVoices />
-      <GateDivider label={t("dividers.board")} />
+      <GateDivider label={t("dividers.board")} stop="gate-board" />
       <BoardGrid />
       <ClosingCta />
     </>

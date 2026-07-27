@@ -4,6 +4,7 @@ import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { Section } from "@/components/ui/Section";
+import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { partners } from "@/content/partners";
 import { cn } from "@/lib/cn";
 
@@ -26,8 +27,9 @@ export function PartnerMarquee() {
   const track = [...partners, ...partners];
 
   return (
-    <Section className="py-16">
-      <Container className="flex flex-col gap-6">
+    <Section className="relative isolate py-16">
+      <ThreadSegment stop="partners" />
+      <Container className="relative flex flex-col gap-6">
         <Eyebrow>{t("eyebrow")}</Eyebrow>
         <div className="overflow-hidden contain-content motion-reduce:overflow-x-auto">
           <div className="flex w-max animate-marquee gap-16 hover:[animation-play-state:paused] focus-within:[animation-play-state:paused] motion-reduce:animate-none">

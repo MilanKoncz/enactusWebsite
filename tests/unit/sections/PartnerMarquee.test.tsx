@@ -25,7 +25,11 @@ describe("PartnerMarquee", () => {
 
   it("hides the duplicate half under reduced motion instead of scrolling through it twice", () => {
     const { container } = renderWithIntl(<PartnerMarquee />);
-    const hiddenWrappers = container.querySelectorAll('[aria-hidden="true"]');
+    // Scoped to the track viewport, not the whole section — the section also
+    // carries a decorative, aria-hidden golden-thread SVG (ThreadSegment)
+    // that this assertion isn't about.
+    const viewport = container.querySelector(".overflow-hidden");
+    const hiddenWrappers = viewport!.querySelectorAll('[aria-hidden="true"]');
     expect(hiddenWrappers.length).toBe(partners.length);
     for (const wrapper of hiddenWrappers) {
       expect(wrapper).toHaveClass("motion-reduce:hidden");

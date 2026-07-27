@@ -4,6 +4,7 @@ import { Container } from "@/components/ui/Container";
 import { HoverDetail } from "@/components/ui/HoverDetail";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { benefits } from "@/content/benefits";
 
 // Same hover/focus mechanic as Pillars (HoverDetail), denser grid, no gate
@@ -13,8 +14,9 @@ export function Benefits() {
   const t = useTranslations("Benefits");
 
   return (
-    <Section>
-      <Container className="flex flex-col gap-12">
+    <Section className="relative isolate">
+      <ThreadSegment stop="benefits" />
+      <Container className="relative flex flex-col gap-12">
         <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {benefits.map((benefit) => (

@@ -5,6 +5,7 @@ import { HoverDetail } from "@/components/ui/HoverDetail";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/motion/Reveal";
+import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { pillars } from "@/content/pillars";
 
 // Title and lead are always visible — only the supporting detail sentence
@@ -18,8 +19,9 @@ export function Pillars() {
   const t = useTranslations("Pillars");
 
   return (
-    <Section surface="ink">
-      <Container className="flex flex-col gap-12">
+    <Section surface="ink" className="relative isolate">
+      <ThreadSegment stop="pillars" />
+      <Container className="relative flex flex-col gap-12">
         <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
         <Reveal className="grid grid-cols-1 gap-10 md:grid-cols-3">
           {pillars.map((pillar) => (
