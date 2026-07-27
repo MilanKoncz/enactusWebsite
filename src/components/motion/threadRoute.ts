@@ -36,6 +36,16 @@ type Waypoints = {
  * also centered, also 2px, also gold); the swing toward and away from that
  * center happens in the tall section on either side, never in the divider
  * itself.
+ *
+ * Sides alternate between the four excursions the gate stops carve the page
+ * into, so the thread reads as one continuous line finding its way rather
+ * than a rule that always leans the same direction: partners enters from the
+ * left; kpis/pillars/benefits (the one excursion between gate-kpis and
+ * gate-alumni) swings right; alumni swings back left; board/cta (the final
+ * excursion, page ends before another gate closes it) swings right again.
+ * The right-swinging stops are exact mirrors of their left-swinging
+ * counterparts — mirror(x) = 100 - x — so the amplitude at each stop is
+ * identical to before, just reflected.
  */
 const ROUTES: Record<ThreadStop, Record<ThreadWidth, Waypoints>> = {
   partners: {
@@ -47,16 +57,16 @@ const ROUTES: Record<ThreadStop, Record<ThreadWidth, Waypoints>> = {
     narrow: { from: 50, bow: 50, to: 50 },
   },
   kpis: {
-    wide: { from: 50, bow: 30, to: 18 },
-    narrow: { from: 50, bow: 22, to: 10 },
+    wide: { from: 50, bow: 70, to: 82 },
+    narrow: { from: 50, bow: 78, to: 90 },
   },
   pillars: {
-    wide: { from: 18, bow: 26, to: 14 },
-    narrow: { from: 10, bow: 14, to: 7 },
+    wide: { from: 82, bow: 74, to: 86 },
+    narrow: { from: 90, bow: 86, to: 93 },
   },
   benefits: {
-    wide: { from: 14, bow: 22, to: 50 },
-    narrow: { from: 7, bow: 16, to: 50 },
+    wide: { from: 86, bow: 78, to: 50 },
+    narrow: { from: 93, bow: 84, to: 50 },
   },
   "gate-alumni": {
     wide: { from: 50, bow: 50, to: 50 },
@@ -71,12 +81,12 @@ const ROUTES: Record<ThreadStop, Record<ThreadWidth, Waypoints>> = {
     narrow: { from: 50, bow: 50, to: 50 },
   },
   board: {
-    wide: { from: 50, bow: 28, to: 16 },
-    narrow: { from: 50, bow: 20, to: 8 },
+    wide: { from: 50, bow: 72, to: 84 },
+    narrow: { from: 50, bow: 80, to: 92 },
   },
   cta: {
-    wide: { from: 16, bow: 24, to: 22 },
-    narrow: { from: 8, bow: 14, to: 12 },
+    wide: { from: 84, bow: 76, to: 78 },
+    narrow: { from: 92, bow: 86, to: 88 },
   },
 };
 
