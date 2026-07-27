@@ -74,4 +74,54 @@ test.describe("homepage", () => {
     await detail.scrollIntoViewIfNeeded();
     await expect(detail).toHaveCSS("opacity", "0.6");
   });
+
+  test("the golden thread is purely decorative: aria-hidden, and never a tab stop", async ({ page }) => {
+    await page.goto("/");
+    const segments = page.locator("svg[data-thread]");
+    const count = await segments.count();
+    expect(count).toBeGreaterThan(0);
+    for (let i = 0; i < count; i++) {
+      await expect(segments.nth(i)).toHaveAttribute("aria-hidden", "true");
+      await expect(segments.nth(i)).not.toHaveAttribute("tabindex");
+    }
+    // The full-page keyboard-traversal test above already proves nothing
+    // new entered the tab order; this only needs to prove the thread itself
+    // carries no tabindex.
+  });
+
+  test("keeps the board portraits in their normal state on a touch device, unaffected by pointer proximity", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!isMobile, "pointer-proximity is a hover-capable-desktop-only effect");
+    await page.goto("/");
+    const card = page.locator('[tabindex="0"]').filter({ hasText: "VORSTAND_1" }).first();
+    await card.scrollIntoViewIfNeeded();
+    await card.tap();
+    await expect(card).toHaveCSS("transform", "none");
+  });
+});
+
+test.describe("homepage under reduced motion", () => {
+  // Scoped to its own describe block, kept separate from the default-state
+  // checks above (axe/keyboard/overflow), which are specifically about the
+  // no-preference state — running those under reduced motion too would stop
+  // testing what actually ships to most visitors.
+  //
+  // page.emulateMedia(), not test.use({ reducedMotion: "reduce" }): the
+  // latter is the documented API, but in this project's Playwright install
+  // it silently fails to reach the fixture-provided page/context —
+  // window.matchMedia("(prefers-reduced-motion: reduce)") still reports
+  // false with it set. Confirmed with a minimal isolated repro (a single
+  // top-level test.use() outside any describe, nothing else in the file);
+  // calling browser.newContext({ reducedMotion }) directly, or
+  // page.emulateMedia() as below, both work correctly. If a future
+  // Playwright upgrade fixes the underlying issue, test.use() can replace
+  // this again.
+  test("draws the golden thread fully instead of animating it in", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const path = page.locator(".thread-path").first();
+    await expect(path).toHaveCSS("stroke-dashoffset", "0px");
+  });
 });
