@@ -30,7 +30,7 @@ export function LocaleSwitch({ className }: LocaleSwitchProps) {
           prefetch={false}
           aria-current={locale === activeLocale ? "true" : undefined}
           className={cn(
-            "text-mono-s font-mono uppercase",
+            "text-mono-s font-mono uppercase transition-opacity duration-[var(--duration-fast)] ease-signature hover:opacity-100 focus-visible:opacity-100",
             locale === activeLocale ? "opacity-100" : "opacity-60",
           )}
         >

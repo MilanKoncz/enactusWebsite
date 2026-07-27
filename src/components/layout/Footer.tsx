@@ -45,7 +45,7 @@ function ExternalLinkItem({
     );
   }
   return (
-    <a href={link.href} target="_blank" rel="noopener noreferrer" className="hover:underline">
+    <a href={link.href} target="_blank" rel="noopener noreferrer" className="link-underline">
       {label}
     </a>
   );
@@ -63,7 +63,11 @@ export function Footer() {
         <Container className="flex flex-col gap-12">
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
             <div className="flex flex-col gap-3 lg:col-span-1">
-              <Link href={routes.home} aria-label={tRoutes("home")}>
+              <Link
+                href={routes.home}
+                aria-label={tRoutes("home")}
+                className="transition-opacity duration-[var(--duration-fast)] ease-signature hover:opacity-80 focus-visible:opacity-80"
+              >
                 <Logo variant="full" className="border-paper text-paper" />
               </Link>
               <p className="text-body-s opacity-60">{tSite("claim")}</p>
@@ -77,7 +81,7 @@ export function Footer() {
                 <ul className="flex flex-col gap-2">
                   {footerColumns.verein.map((item) => (
                     <li key={item.key}>
-                      <Link href={item.href} className="hover:underline">
+                      <Link href={item.href} className="link-underline">
                         {tRoutes(item.key as RouteKey)}
                       </Link>
                     </li>
@@ -112,7 +116,7 @@ export function Footer() {
                 <ul className="flex flex-col gap-2">
                   {footerColumns.rechtliches.map((item) => (
                     <li key={item.key}>
-                      <Link href={item.href} className="hover:underline">
+                      <Link href={item.href} className="link-underline">
                         {tRoutes(item.key as RouteKey)}
                       </Link>
                     </li>

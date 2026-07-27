@@ -33,8 +33,14 @@ export function Nav({ variant = "desktop", onNavigate, className }: NavProps) {
             onClick={onNavigate}
             aria-current={isActive ? "page" : undefined}
             className={cn(
-              "border-b-2 pb-1 text-body-m font-medium",
-              isActive ? "border-gold" : "border-transparent",
+              // border-current, not border-ink: the header renders this same
+              // Nav in its transparent, text-paper state over the hero
+              // (HeaderOverlay), where an ink-colored hover rule would be
+              // nearly invisible against the dark backdrop.
+              "border-b-2 pb-1 text-body-m font-medium transition-colors duration-[var(--duration-fast)] ease-signature",
+              isActive
+                ? "border-gold"
+                : "border-transparent hover:border-current/30 focus-visible:border-current/30",
             )}
           >
             {t(item.key)}

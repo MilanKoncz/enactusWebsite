@@ -50,7 +50,7 @@ export function Header() {
         data-compact={compact ? "true" : undefined}
         data-surface={overlaid ? "ink" : undefined}
         className={cn(
-          "fixed inset-x-0 top-0 z-40 border-b py-6 transition-[padding,background-color,border-color,color] duration-200",
+          "fixed inset-x-0 top-0 z-40 border-b py-6 transition-[padding,background-color,border-color,color] duration-[var(--duration-calm)] ease-signature",
           overlaid
             ? "border-transparent bg-transparent text-paper"
             : "border-ink/0 bg-paper text-ink data-[compact=true]:border-ink/10",
@@ -58,7 +58,11 @@ export function Header() {
         )}
       >
         <Container className="flex items-center justify-between gap-6">
-          <Link href="/" aria-label={t("home")}>
+          <Link
+            href="/"
+            aria-label={t("home")}
+            className="transition-opacity duration-[var(--duration-fast)] ease-signature hover:opacity-80 focus-visible:opacity-80"
+          >
             <Logo variant="full" />
           </Link>
           <Nav variant="desktop" className="hidden lg:flex" />

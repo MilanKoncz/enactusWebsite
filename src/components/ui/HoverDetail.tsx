@@ -19,7 +19,7 @@ export function HoverDetail({ children, className }: HoverDetailProps) {
   return (
     <p
       className={cn(
-        "text-body-m opacity-60 transition-opacity duration-200",
+        "text-body-m opacity-60 transition-opacity duration-[var(--duration-fast)] ease-signature",
         "desktop-hover:opacity-0 desktop-hover:group-hover:opacity-100 desktop-hover:group-focus-within:opacity-100",
         className,
       )}
