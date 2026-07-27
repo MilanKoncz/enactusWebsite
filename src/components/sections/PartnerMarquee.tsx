@@ -32,7 +32,13 @@ export function PartnerMarquee() {
       <Container className="relative flex flex-col gap-6">
         <Eyebrow>{t("eyebrow")}</Eyebrow>
         <div className="overflow-hidden contain-content motion-reduce:overflow-x-auto">
-          <div className="flex w-max animate-marquee gap-16 hover:[animation-play-state:paused] focus-within:[animation-play-state:paused] motion-reduce:animate-none">
+          {/* No hover pause: stopping the loop under every incidental mouse
+              pass read as a bug, not a feature — a mouse user was never
+              going to interact with a logo here anyway. focus-within stays:
+              a keyboard user tabbing through the track needs it to hold
+              still to actually read what's focused. Reduced motion stops it
+              outright, unconditionally, further down. */}
+          <div className="flex w-max animate-marquee gap-16 focus-within:[animation-play-state:paused] motion-reduce:animate-none">
             {track.map((partner, index) => {
               const isDuplicate = index >= partners.length;
               return (
