@@ -49,13 +49,21 @@ export function HomeHero() {
             )}
           </>
         ) : (
-          <Placeholder
-            kind={t("videoPlaceholderKind")}
-            label={t("videoPlaceholderLabel")}
-            className="h-full w-full rounded-none border-0"
-          />
+          <>
+            {/* PLACEHOLDER, temporary: a gradient wash stands in for the real
+                hero video so the glass button variant has color/luminance
+                variation to blur and saturate against — a flat placeholder
+                box gave it nothing to show. Remove this div the moment
+                heroMedia.posterSrc is real; see ASSETS-TODO.md. */}
+            <div className="h-full w-full bg-[linear-gradient(135deg,var(--color-ink)_0%,var(--color-oxblood)_38%,var(--color-gold)_75%,var(--color-sand)_100%)]" />
+            <Placeholder
+              kind={t("videoPlaceholderKind")}
+              label={t("videoPlaceholderLabel")}
+              className="absolute inset-6 h-auto w-auto md:inset-10"
+            />
+          </>
         )}
-        <div className="absolute inset-0 bg-ink/80" />
+        <div className={`absolute inset-0 ${heroMedia.posterSrc ? "bg-ink/80" : "bg-ink/55"}`} />
       </div>
 
       <Container className="relative flex flex-col gap-8">
