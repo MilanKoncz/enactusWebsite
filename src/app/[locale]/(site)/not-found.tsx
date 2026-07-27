@@ -1,21 +1,32 @@
 import { getTranslations } from "next-intl/server";
 import { Section } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
-import { Button } from "@/components/ui/Button";
 import { routes } from "@/content/navigation";
+import { Link } from "@/lib/navigation";
 
 // Next.js's not-found.tsx convention doesn't receive route params, so this
 // relies on the request-scoped locale the [locale] layout already set via
 // setRequestLocale rather than an explicit locale override.
+//
+// "404" is the motif, not a warning: large Instrument Serif, the same
+// register as a homepage headline, not an alarm color or a filled button
+// telling the visitor what to do next. The heading itself stays the
+// meaningful text (t("title")) for anyone using a screen reader; "404" is a
+// decorative aria-hidden echo of it, not a replacement.
 export default async function NotFound() {
   const t = await getTranslations("NotFound");
 
   return (
     <Section>
-      <Container className="flex flex-col gap-4 py-12 text-center">
-        <h1 className="text-display-3 font-display">{t("title")}</h1>
-        <p className="text-body-l opacity-60">{t("note")}</p>
-        <Button href={routes.home}>{t("backHome")}</Button>
+      <Container className="flex min-h-[60vh] flex-col items-center justify-center gap-6 py-24 text-center">
+        <p aria-hidden="true" className="text-display-1 font-display leading-none opacity-90">
+          404
+        </p>
+        <h1 className="text-heading-2 font-sans">{t("title")}</h1>
+        <p className="max-w-md text-body-l opacity-60">{t("note")}</p>
+        <Link href={routes.home} className="link-underline text-body-m">
+          {t("backHome")}
+        </Link>
       </Container>
     </Section>
   );
