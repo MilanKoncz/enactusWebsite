@@ -13,6 +13,18 @@ import { alumni } from "@/content/alumni";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { cn } from "@/lib/cn";
 
+// Same lift/scale as Button (docs/design-system.md's Interaction section),
+// dropped onto a bare icon button: a hover/focus tint plus the identical
+// transform, so these read as siblings of Button rather than a plainer
+// control that happens to sit next to it. Exported so the styleguide's
+// Interaction section can demo the exact class string used here, not a
+// hand-copied approximation of it.
+export const NAV_BUTTON_CLASSES = cn(
+  "inline-flex items-center justify-center rounded-md p-2 transition-[background-color,transform] duration-[var(--duration-fast)] ease-signature",
+  "hover:-translate-y-px hover:scale-[1.02] hover:bg-ink/5 focus-visible:-translate-y-px focus-visible:scale-[1.02] active:translate-y-0 active:scale-[0.99] active:bg-ink/10",
+  "disabled:pointer-events-none disabled:opacity-30",
+);
+
 // "Durchklickbar" as a native scroll-snap track with buttons, not an
 // index-driven set of hidden/shown slides: every statement stays in the DOM
 // and in the accessibility tree at all times, and the track is scrollable
@@ -122,10 +134,7 @@ export function AlumniVoices() {
             onClick={() => scrollToIndex(Math.max(current - 1, 0))}
             disabled={current === 0}
             aria-label={t("prev")}
-            className={cn(
-              "inline-flex items-center justify-center rounded-md p-2",
-              "disabled:pointer-events-none disabled:opacity-30",
-            )}
+            className={NAV_BUTTON_CLASSES}
           >
             <ChevronLeft aria-hidden="true" className="size-5" />
           </button>
@@ -137,10 +146,7 @@ export function AlumniVoices() {
             onClick={() => scrollToIndex(Math.min(current + 1, alumni.length - 1))}
             disabled={current === alumni.length - 1}
             aria-label={t("next")}
-            className={cn(
-              "inline-flex items-center justify-center rounded-md p-2",
-              "disabled:pointer-events-none disabled:opacity-30",
-            )}
+            className={NAV_BUTTON_CLASSES}
           >
             <ChevronRight aria-hidden="true" className="size-5" />
           </button>

@@ -22,7 +22,16 @@ import { board } from "@/content/board";
 // reachable and legible exactly as before regardless of pointer state — the
 // effect is never the only way to reach any of that.
 const LINKEDIN_MARK_CLASSES =
-  "absolute left-2 top-2 rounded-sm bg-paper/90 px-2 py-0.5 text-mono-xs font-mono uppercase text-ink transition-opacity duration-200 desktop-hover:opacity-0 desktop-hover:group-hover:opacity-100 desktop-hover:group-focus-within:opacity-100";
+  "absolute left-2 top-2 rounded-sm bg-paper/90 px-2 py-0.5 text-mono-xs font-mono uppercase text-ink transition-opacity duration-[var(--duration-fast)] ease-signature desktop-hover:opacity-0 desktop-hover:group-hover:opacity-100 desktop-hover:group-focus-within:opacity-100";
+
+// Zoom lands on the crop itself (this Placeholder/photo), never on
+// data-portrait or the card around it — docs/design-system.md's Interaction
+// section: "no layout shift". data-portrait's own overflow-hidden (above) is
+// what turns the scale into a crop instead of the image spilling over its
+// neighbors. Exported for the same reason NAV_BUTTON_CLASSES is: the
+// styleguide demos the real class string.
+export const PORTRAIT_ZOOM_CLASSES =
+  "transition-transform duration-[var(--duration-calm)] ease-signature desktop-hover:group-hover:scale-[1.06] desktop-hover:group-focus-within:scale-[1.06]";
 
 export function BoardGrid() {
   const t = useTranslations("BoardGrid");
@@ -36,8 +45,13 @@ export function BoardGrid() {
         <ProximityGroup className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-5">
           {board.map((member) => (
             <div key={member.slug} tabIndex={0} className="group proximity-item flex flex-col gap-3">
-              <div data-portrait className="relative">
-                <Placeholder kind="Foto" label={member.name} ratio="3 / 4" />
+              <div data-portrait className="relative overflow-hidden rounded-md">
+                <Placeholder
+                  kind="Foto"
+                  label={member.name}
+                  ratio="3 / 4"
+                  className={PORTRAIT_ZOOM_CLASSES}
+                />
                 {member.linkedinUrl ? (
                   <a
                     href={member.linkedinUrl}
