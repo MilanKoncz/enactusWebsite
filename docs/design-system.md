@@ -117,6 +117,65 @@ Section eyebrows are mono, small, and restrained, but never below 4.5:1 contrast
 6. If an animation pushes LCP over 2.0s or introduces layout shift, it is removed,
    not optimised.
 
+## Interaction
+
+Two tokens carry every hover and active state in the codebase. No component
+reaches for its own duration or easing value.
+
+```css
+@theme {
+  /* Registered as a Tailwind theme token — used directly as `ease-signature`.
+     A slight overshoot, not ease-in-out: hover states should feel like they
+     have a little intent, not a mechanical fade. */
+  --ease-signature: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+:root {
+  /* Tailwind v4 has no named duration-* theme namespace (only the numeric
+     scale), so these stay plain variables, referenced as
+     duration-[var(--duration-fast)]. */
+  --duration-fast: 150ms; /* Hover: color, transform, opacity. */
+  --duration-calm: 400ms; /* State changes: a scroll-triggered toggle, an
+                              open/close — not a passive hover response. */
+}
+```
+
+Rules, no exceptions:
+
+- Transform, opacity, and filter only — motion rule 5 above holds for
+  interaction states, not just scroll-linked animation. Never `width`,
+  `height`, `top`, `left`.
+- No layout shift: a hover/active transform never changes an element's
+  footprint in its parent. Scale from the center, or scale a nested element
+  inside an `overflow-hidden` crop — never resize the box itself.
+- **Focus gets the same visual treatment as hover, not a lesser one.** A
+  keyboard user's state is never an afterthought next to a mouse user's.
+- Disabled entirely under `prefers-reduced-motion: reduce` — handled globally
+  in `globals.css`, not per component.
+
+Component specifics:
+
+- **Button** — hover: `scale(1.02)` plus a slight lift (`translateY(-1px)`).
+  Active: `scale(0.99)`, so a click reads as a physical press. Primary
+  (gold): a soft diagonal shine sweeps across the fill once on hover — subtle,
+  never a department-store gloss. Glass: `backdrop-blur` with a saturation
+  boost, a translucent border brighter than the fill, a hairline light edge on
+  top, a faint inner shadow underneath.
+- **Card** — hover/focus: the same lift as Button, plus the border
+  brightening from `ink/10` toward `ink/20`.
+- **Badge** — hover/focus: a barely-there lift only, no color change — color
+  already carries the status and shouldn't shift with the pointer.
+- **Prose links** — hover/focus: an underline that grows in from the left
+  (`.link-underline` in `globals.css`), never an instant `text-decoration`
+  toggle.
+- **Alumni prev/next buttons, board portraits** — buttons get the same lift as
+  Button; portraits zoom on the image crop itself (`scale` on the image inside
+  its `overflow-hidden` wrapper), never on the outer card, so neighboring
+  content never shifts.
+
+All of the above is demoed side by side in the styleguide's "Interaction"
+section — hover and tab through it there to compare states directly.
+
 ## Copy
 
 Words are design material, not decoration. Name things by what people control and

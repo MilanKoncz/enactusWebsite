@@ -98,6 +98,13 @@
   /* Partner logo band. Speed is chosen so a full loop reads as ambient
      motion, not a race — see PartnerMarquee. */
   --animate-marquee: marquee 45s linear infinite;
+
+  /* Interaction — docs/design-system.md. Registered under @theme (unlike
+     --duration-fast/--duration-calm below) because --ease-* is a real
+     Tailwind v4 theme namespace: this generates the `ease-signature` utility
+     directly. A slight overshoot, not ease-in-out — hover states read as
+     having a little intent, not a mechanical fade. */
+  --ease-signature: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* Gates the pillar/benefit detail text and the board LinkedIn marker's
@@ -119,6 +126,13 @@
      content uses, just without the matching right-hand padding. */
   --thread-stroke: var(--color-gold);
   --container-inset: max(1rem, calc((100% - var(--container-content)) / 2));
+
+  /* Interaction durations — docs/design-system.md. No named duration-*
+     Tailwind namespace exists, so these are referenced as
+     duration-[var(--duration-fast)] rather than a generated utility class
+     (contrast --ease-signature above, which is a real theme namespace). */
+  --duration-fast: 150ms;
+  --duration-calm: 400ms;
 }
 
 @media (min-width: 40rem) {
@@ -269,6 +283,49 @@ h6 {
         animation-range: entry 0% entry 100%;
       }
     }
+  }
+
+  /* Button.tsx's primary-variant shine (SHINE_CLASSES/.btn-shine). The host
+     rule below is deliberately asymmetric: the resting state transitions in
+     0s, so leaving hover/focus snaps the band back to its start position
+     invisibly, and only entering hover/focus animates it across the fill —
+     a single sweep per hover, never a back-and-forth loop. */
+  .btn-shine-host .btn-shine {
+    transform: translateX(-10%) skewX(-12deg);
+    transition: transform 0s;
+  }
+
+  .btn-shine-host:hover .btn-shine,
+  .btn-shine-host:focus-visible .btn-shine {
+    transform: translateX(420%) skewX(-12deg);
+    transition: transform var(--duration-calm) var(--ease-signature);
+  }
+
+  /* Prose links (Footer, NotFound's "back home") — an underline that grows
+     in from the left instead of an instant text-decoration toggle. The
+     pseudo-element, not text-decoration-line, is what makes the grow-in
+     animatable at all: text-decoration has no transitionable "length". */
+  .link-underline {
+    position: relative;
+    text-decoration: none;
+  }
+
+  .link-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.15em;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--duration-fast) var(--ease-signature);
+  }
+
+  .link-underline:hover::after,
+  .link-underline:focus-visible::after {
+    transform: scaleX(1);
   }
 
   /* Board-portrait proximity effect (ProximityGroup.tsx). --proximity is
