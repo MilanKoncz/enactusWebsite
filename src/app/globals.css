@@ -111,13 +111,23 @@
 
 :root {
   --focus-ring: var(--color-ink);
+
+  /* The golden thread (.thread-path, ThreadSegment.tsx) — plain gold on a
+     paper surface. */
+  --thread-stroke: var(--color-gold);
 }
 
 /* Full-bleed dark sections set data-surface="ink" on their wrapper so the
    focus ring switches to gold, per the contrast rule (text on gold is ink,
-   but a gold ring on a dark background stays legible). */
+   but a gold ring on a dark background stays legible). The thread lightens
+   for the same reason gold-on-paper doesn't need lightening but the ring
+   does: it's already the accent color, and on ink there's no darker text
+   underneath it competing for read — a slightly brighter tint is what
+   docs/design-system.md's "auf dunklen Sections ebenfalls Gold, aber
+   heller" means in practice. */
 [data-surface="ink"] {
   --focus-ring: var(--color-gold);
+  --thread-stroke: color-mix(in srgb, var(--color-gold) 100%, white 25%);
 }
 
 * {
@@ -175,6 +185,15 @@ h6 {
   }
 }
 
+@keyframes thread-draw {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 /* Scroll-entrance for the "Was uns einzigartig macht" pillars — CSS
    scroll-driven animation, no JavaScript, no `motion` import (see
    src/components/motion/Reveal.tsx). Transform and opacity only, per
@@ -197,6 +216,41 @@ h6 {
         animation: reveal linear both;
         animation-timeline: view();
         animation-range: entry 0% cover 30%;
+      }
+    }
+  }
+
+  /* The golden thread's per-section stroke (ThreadSegment.tsx). pathLength=100
+     on the <path> normalizes its length to 100 user units regardless of the
+     section's actual pixel size, so stroke-dasharray/-offset never need a
+     measured length. Same structure as .reveal above: the base rule is fully
+     drawn (stroke-dashoffset: 0), and only a browser that both supports
+     animation-timeline: view() AND has no reduced-motion preference ever
+     hides it first to draw it in — never unsupported-or-reduced-motion. */
+  .thread-path {
+    stroke-dashoffset: 0;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .thread-path {
+        stroke-dasharray: 100;
+        animation: thread-draw linear both;
+        animation-timeline: view();
+        /* Not the default (cover 0% cover 100%): that spans from before the
+           section is visible at all to after it has fully scrolled away —
+           for a section taller than the viewport, mostly dead scroll
+           distance the segment can't visibly keep pace with, so it reads as
+           a lagging fragment rather than a line that travels with the
+           reader (confirmed with mid-scroll screenshots before adding this
+           line). `entry` instead: 0% is the same start (leading edge
+           touches the viewport's bottom), but 100% is when the section has
+           fully entered — for a section taller than the viewport, that's
+           the single point where its top edge reaches the viewport's top,
+           i.e. exactly when the reader starts reading it. The segment
+           finishes right as its section becomes the one in view, instead of
+           continuing to complete somewhere in the middle of it. */
+        animation-range: entry 0% entry 100%;
       }
     }
   }
