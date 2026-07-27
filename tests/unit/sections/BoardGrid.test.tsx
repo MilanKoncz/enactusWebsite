@@ -1,7 +1,20 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { screen } from "@testing-library/react";
 import { axe } from "jest-axe";
 import { renderWithIntl } from "../../fixtures/intl";
+import { mockMatchMedia } from "../../fixtures/matchMedia";
+
+// jsdom has no matchMedia at all; ProximityGroup (wrapping the portrait grid)
+// reads it unconditionally on first render to decide whether to attach its
+// pointer listener, so every test needs the mock even though none of them
+// touch proximity behavior directly — see ProximityGroup.test.tsx for that.
+beforeEach(() => {
+  mockMatchMedia(false);
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 vi.mock("@/content/board", () => ({
   board: [

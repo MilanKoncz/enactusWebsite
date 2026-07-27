@@ -53,3 +53,20 @@ export function mockIntersectionObserver() {
     },
   };
 }
+
+/**
+ * jsdom has no ResizeObserver either. Same install-inside-the-test,
+ * unstubAllGlobals-in-afterEach convention as mockIntersectionObserver above
+ * — this one only needs to exist so components that construct one (like
+ * ProximityGroup) don't throw; nothing in this codebase currently asserts on
+ * a resize callback actually firing.
+ */
+export function mockResizeObserver() {
+  class MockResizeObserver implements ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+
+  vi.stubGlobal("ResizeObserver", MockResizeObserver);
+}

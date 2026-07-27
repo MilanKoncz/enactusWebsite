@@ -270,6 +270,36 @@ h6 {
       }
     }
   }
+
+  /* Board-portrait proximity effect (ProximityGroup.tsx). --proximity is
+     written directly onto each card's style by a single rAF-throttled
+     pointermove listener on the container — never through React state, so a
+     mouse sweep across the grid never triggers a re-render. The base value
+     (0) and this rule both being unconditional is what keeps every card in
+     its normal, un-lifted state whenever ProximityGroup doesn't attach a
+     listener at all (touch, reduced motion, or no matching pointer) — see
+     the identical gate on the two @media queries below, the second,
+     independent line of defense if the listener ever did run anyway. */
+  .proximity-item {
+    --proximity: 0;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    @media (prefers-reduced-motion: no-preference) {
+      .proximity-item {
+        transform: translate3d(0, calc(var(--proximity) * -0.5rem), 0);
+        transition: transform 150ms ease-out;
+      }
+
+      /* filter stays on the portrait only, never on the name/role text below
+         it — desaturating body copy would be a legibility regression, not an
+         effect. */
+      .proximity-item [data-portrait] {
+        filter: saturate(calc(0.82 + var(--proximity) * 0.38));
+        transition: filter 150ms ease-out;
+      }
+    }
+  }
 }
 
 /* AlumniVoices' editorial quote column (applied as `md:bleed-end`, never

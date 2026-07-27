@@ -1,0 +1,129 @@
+"use client";
+
+import { useEffect, useRef, type ReactNode } from "react";
+import { useMediaQuery } from "@/lib/useMediaQuery";
+
+export type ProximityGroupProps = {
+  children: ReactNode;
+  className?: string;
+};
+
+type CardCenter = {
+  element: HTMLElement;
+  x: number;
+  y: number;
+};
+
+// How far from a card's center the pointer still nudges it, as a multiple of
+// that card's own width — derived from the grid's actual layout rather than
+// a fixed pixel constant, so "the neighbors react abgeschwächt" holds
+// whether the grid is five columns wide (desktop) or three (a narrower
+// hover-capable window).
+const RADIUS_FACTOR = 1.6;
+
+// One pointermove listener on the container, not one per card: it only ever
+// writes the pointer position into a ref and asks for a single
+// requestAnimationFrame callback. All --proximity writes for a given frame
+// happen inside that one callback, so a mouse sweep across the grid touches
+// the DOM at most once per animation frame — never once per mousemove event,
+// and never through React state or a re-render.
+export function ProximityGroup({ children, className }: ProximityGroupProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const centersRef = useRef<CardCenter[]>([]);
+  const containerRectRef = useRef<DOMRect | null>(null);
+  const radiusRef = useRef(0);
+  const pointerRef = useRef<{ x: number; y: number } | null>(null);
+  const frameRef = useRef<number | null>(null);
+
+  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const hoverCapable = useMediaQuery("(hover: hover) and (pointer: fine)");
+
+  useEffect(() => {
+    const container = containerRef.current;
+    // Touch and reduced-motion visitors never get a listener at all — not
+    // just a listener that happens to write 0. That's the first of two
+    // independent gates; the second is the identical media query guarding
+    // .proximity-item's transform/filter rules in globals.css, so even a
+    // listener that somehow ran anyway couldn't move anything on those
+    // devices.
+    if (!container || reducedMotion || !hoverCapable) return;
+
+    function measure() {
+      if (!container) return;
+      const containerRect = container.getBoundingClientRect();
+      containerRectRef.current = containerRect;
+      const cards = Array.from(container.children) as HTMLElement[];
+      centersRef.current = cards.map((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          element,
+          x: rect.left - containerRect.left + rect.width / 2,
+          y: rect.top - containerRect.top + rect.height / 2,
+        };
+      });
+      radiusRef.current = cards[0] ? cards[0].getBoundingClientRect().width * RADIUS_FACTOR : 0;
+    }
+
+    // Reads and writes never interleave within a frame: applyProximity only
+    // reads from refs (already-cached geometry, no DOM) and only writes
+    // style properties — no layout thrashing regardless of how many cards
+    // there are.
+    function applyProximity() {
+      frameRef.current = null;
+      const pointer = pointerRef.current;
+      const radius = radiusRef.current;
+      for (const { element, x, y } of centersRef.current) {
+        const proximity =
+          pointer && radius > 0
+            ? Math.max(0, 1 - Math.hypot(pointer.x - x, pointer.y - y) / radius)
+            : 0;
+        element.style.setProperty("--proximity", String(proximity));
+      }
+    }
+
+    function requestFrame() {
+      if (frameRef.current !== null) return;
+      frameRef.current = requestAnimationFrame(applyProximity);
+    }
+
+    function handlePointerMove(event: PointerEvent) {
+      // No DOM read here: the container's rect is cached by measure() and
+      // only ever refreshed on mount or resize, so a pointermove event
+      // (which can fire dozens of times a second) costs nothing but a
+      // subtraction.
+      const rect = containerRectRef.current;
+      if (!rect) return;
+      pointerRef.current = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+      requestFrame();
+    }
+
+    function handlePointerLeave() {
+      pointerRef.current = null;
+      requestFrame();
+    }
+
+    measure();
+    const resizeObserver = new ResizeObserver(measure);
+    resizeObserver.observe(container);
+
+    container.addEventListener("pointermove", handlePointerMove);
+    container.addEventListener("pointerleave", handlePointerLeave);
+
+    return () => {
+      resizeObserver.disconnect();
+      container.removeEventListener("pointermove", handlePointerMove);
+      container.removeEventListener("pointerleave", handlePointerLeave);
+      if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
+      for (const { element } of centersRef.current) {
+        element.style.removeProperty("--proximity");
+      }
+      centersRef.current = [];
+    };
+  }, [reducedMotion, hoverCapable]);
+
+  return (
+    <div ref={containerRef} className={className}>
+      {children}
+    </div>
+  );
+}
