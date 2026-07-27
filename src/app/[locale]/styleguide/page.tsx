@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { requireLocale } from "@/i18n/requireLocale";
 import {
   blendOverBackground,
@@ -21,6 +22,8 @@ import { Placeholder } from "@/components/ui/Placeholder";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { NAV_BUTTON_CLASSES } from "@/components/sections/AlumniVoices";
+import { PORTRAIT_ZOOM_CLASSES } from "@/components/sections/BoardGrid";
 
 export const metadata: Metadata = {
   title: "Styleguide — internal reference",
@@ -352,6 +355,74 @@ export default async function StyleguidePage({
           <Badge status="paused">Pausiert</Badge>
           <Badge status="cancelled">Beendet</Badge>
         </div>
+      </section>
+
+      <section className="flex flex-col gap-6">
+        <h2 className="text-heading-2 font-sans">Interaction</h2>
+        <p className="text-body-m font-sans text-ink/60">
+          Every hover/active state in the codebase draws on two tokens (
+          <code>--ease-signature</code>, <code>--duration-fast</code>/
+          <code>--duration-calm</code>) — see the &quot;Interaction&quot; section in{" "}
+          <code>docs/design-system.md</code>. Hover and tab through each demo below;
+          focus gets the identical treatment as hover, never a lesser one.
+        </p>
+
+        <Demo label="Button — primary shine sweeps once per hover/focus, never loops">
+          <div className="flex flex-wrap items-center gap-3">
+            <Button variant="primary">Hover mich</Button>
+            <Button variant="secondary">Secondary</Button>
+            <Button variant="ghost">Ghost</Button>
+          </div>
+        </Demo>
+
+        <Demo label="Button — glass, over a gradient so blur/saturation is visible">
+          <div className="flex flex-wrap items-center gap-3 rounded-md bg-[linear-gradient(135deg,var(--color-ink)_0%,var(--color-oxblood)_38%,var(--color-gold)_75%,var(--color-sand)_100%)] p-6">
+            <Button variant="glass">Glass</Button>
+          </div>
+        </Demo>
+
+        <Demo label="Card — hover/focus lift + border brightening">
+          <Card tabIndex={0} className="max-w-sm">
+            <p className="text-heading-3 font-sans">Grameen Bike</p>
+            <p className="mt-2 text-body-s text-ink/60">Hover oder in die Karte tabben.</p>
+          </Card>
+        </Demo>
+
+        <Demo label="Badge — barely-there lift, no color change">
+          <div className="flex flex-wrap gap-3">
+            <Badge status="active">Aktiv</Badge>
+            <Badge status="spinoff">Ausgegründet</Badge>
+          </div>
+        </Demo>
+
+        <Demo label="Prose link — underline grows in from the left">
+          <p className="text-body-m">
+            Ein Satz mit einem{" "}
+            <a href="#" className="link-underline">
+              eingebetteten Link
+            </a>{" "}
+            darin.
+          </p>
+        </Demo>
+
+        <Demo label="Alumni prev/next buttons — same lift/scale as Button">
+          <div className="flex items-center gap-6">
+            <button type="button" aria-label="Vorherige" className={NAV_BUTTON_CLASSES}>
+              <ChevronLeft aria-hidden="true" className="size-5" />
+            </button>
+            <button type="button" aria-label="Nächste" className={NAV_BUTTON_CLASSES}>
+              <ChevronRight aria-hidden="true" className="size-5" />
+            </button>
+          </div>
+        </Demo>
+
+        <Demo label="Board portrait — zoom on the image crop, not the card (no layout shift)">
+          <div tabIndex={0} className="group w-40">
+            <div className="relative overflow-hidden rounded-md">
+              <Placeholder kind="Foto" label="VORSTAND_1" ratio="3 / 4" className={PORTRAIT_ZOOM_CLASSES} />
+            </div>
+          </div>
+        </Demo>
       </section>
 
       <section className="flex flex-col gap-6">
