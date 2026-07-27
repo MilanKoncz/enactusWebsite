@@ -113,8 +113,24 @@
   --focus-ring: var(--color-ink);
 
   /* The golden thread (.thread-path, ThreadSegment.tsx) — plain gold on a
-     paper surface. */
+     paper surface. --container-inset mirrors Container.tsx's own padding
+     steps (px-4 sm:px-6 lg:px-10), so a full-bleed element lined up against
+     it (.bleed-end) sits flush with the same left edge the Container's own
+     content uses, just without the matching right-hand padding. */
   --thread-stroke: var(--color-gold);
+  --container-inset: max(1rem, calc((100% - var(--container-content)) / 2));
+}
+
+@media (min-width: 40rem) {
+  :root {
+    --container-inset: max(1.5rem, calc((100% - var(--container-content)) / 2));
+  }
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --container-inset: max(2.5rem, calc((100% - var(--container-content)) / 2));
+  }
 }
 
 /* Full-bleed dark sections set data-surface="ink" on their wrapper so the
@@ -254,4 +270,23 @@ h6 {
       }
     }
   }
+}
+
+/* AlumniVoices' editorial quote column (applied as `md:bleed-end`, never
+   unprefixed): keeps the Container's own left inset, so the quote lines up
+   with the section heading above it, but drops the right-hand padding
+   entirely, so the portrait sitting next to it in the grid runs all the way
+   to the viewport edge instead of stopping at the text column's width.
+   Declared with @utility, not inside @layer utilities like the classes
+   above, specifically so `md:` variant prefixing works — a hand-written
+   class has no variant support on its own. Below `md`, the quote uses plain
+   px-4/sm:px-6 instead (see AlumniVoices.tsx): mixing that with an
+   unprefixed .bleed-end here would let a later lg:px-* utility re-win the
+   padding-inline-end this is meant to zero out, since physical and logical
+   padding properties are reconciled by cascade order, not by property
+   identity. Never combine this with an lg:px-* utility on the same
+   element. */
+@utility bleed-end {
+  padding-inline-start: var(--container-inset);
+  padding-inline-end: 0;
 }
