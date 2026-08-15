@@ -271,7 +271,103 @@
     "smilegreen": {
       "oneLiner": "Die kompromisslose Wechselkopfzahnbürste aus Naturkautschuk.",
       "description": "SmileGreen entwickelt eine Wechselkopfzahnbürste aus Naturkautschuk mit Borsten aus PHA-Biokunststoff. Sie ist innerhalb von vier Monaten zu 100 % kompostierbar und bietet über ein hygienisches Wechselkopfsystem eine nachhaltige Alternative zur Wegwerfzahnbürste."
+    },
+    "mealyo": {
+      "oneLiner": "ANREISSER_FEHLT",
+      "description": "BESCHREIBUNG_FEHLT"
+    },
+    "resoap": {
+      "oneLiner": "ANREISSER_FEHLT",
+      "description": "BESCHREIBUNG_FEHLT"
+    },
+    "impactwithus": {
+      "oneLiner": "ANREISSER_FEHLT",
+      "description": "BESCHREIBUNG_FEHLT"
+    },
+    "differgy": {
+      "oneLiner": "ANREISSER_FEHLT",
+      "description": "BESCHREIBUNG_FEHLT"
+    },
+    "safesteps": {
+      "oneLiner": "ANREISSER_FEHLT",
+      "description": "BESCHREIBUNG_FEHLT"
+    },
+    "vela": {
+      "oneLiner": "ANREISSER_FEHLT",
+      "description": "BESCHREIBUNG_FEHLT"
+    },
+    "sun-n-soil": {
+      "oneLiner": "ANREISSER_FEHLT",
+      "description": "BESCHREIBUNG_FEHLT"
+    },
+    "green-heat": {
+      "oneLiner": "ANREISSER_FEHLT",
+      "description": "BESCHREIBUNG_FEHLT"
+    },
+    "reverze": {
+      "oneLiner": "ANREISSER_FEHLT",
+      "description": "BESCHREIBUNG_FEHLT"
+    },
+    "afya": {
+      "oneLiner": "ANREISSER_FEHLT",
+      "description": "BESCHREIBUNG_FEHLT"
+    },
+    "mushroom": {
+      "oneLiner": "ANREISSER_FEHLT",
+      "description": "BESCHREIBUNG_FEHLT"
+    },
+    "moufense": {
+      "oneLiner": "ANREISSER_FEHLT",
+      "description": "BESCHREIBUNG_FEHLT"
+    },
+    "greenscape": {
+      "oneLiner": "ANREISSER_FEHLT",
+      "description": "BESCHREIBUNG_FEHLT"
     }
+  },
+  "ProjectStatus": {
+    "active": "Aktiv",
+    "spinoff": "Ausgegründet",
+    "cancelled": "Eingestellt",
+    "paused": "Pausiert"
+  },
+  "ProjectsPage": {
+    "eyebrow": "Projekte",
+    "title": "Kern unseres Vereins sind unsere Projekte.",
+    "active": {
+      "heading": "Aktuelle Projekte",
+      "expandLabel": "Mehr erfahren",
+      "collapseLabel": "Weniger anzeigen",
+      "leadHeading": "Projektleitung",
+      "leadMissingHint": "Die Projektleitung ist noch nicht öffentlich benannt.",
+      "photosHeading": "Fotos",
+      "externalLinkLabel": "Projektwebsite besuchen"
+    },
+    "stars": {
+      "eyebrow": "Unsere Stars",
+      "title": "Unsere Stars",
+      "lead": "Acht ehemalige Vorzeigeprojekte, die bei nationalen Enactus-Wettbewerben überzeugt haben.",
+      "noVideoHint": "Kein Video verfügbar.",
+      "playLabel": "Pitch von {name} ansehen"
+    },
+    "archiveLink": {
+      "label": "Alle bisherigen Projekte im Archiv ansehen"
+    },
+    "detail": {
+      "backLabel": "Zurück zu den Projekten",
+      "leadHeading": "Projektleitung",
+      "leadMissingHint": "Die Projektleitung ist noch nicht öffentlich benannt.",
+      "photosHeading": "Fotos",
+      "externalLinkLabel": "Projektwebsite besuchen",
+      "statusHeading": "Status"
+    }
+  },
+  "ProjectsArchivePage": {
+    "eyebrow": "Archiv",
+    "title": "Projekt-Archiv",
+    "lead": "Alle Projekte, die Enactus Mannheim seit der Gründung durchlaufen hat — inklusive der Ausgründungen.",
+    "yearMissingHint": "Das Jahr ist noch nicht bestätigt.",
+    "backLabel": "Zurück zu den aktuellen Projekten"
   },
   "Stars": {
     "STAR_1": {

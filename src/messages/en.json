@@ -271,7 +271,103 @@
     "smilegreen": {
       "oneLiner": "The uncompromising replaceable-head toothbrush made from natural rubber.",
       "description": "SmileGreen develops a replaceable-head toothbrush made from natural rubber with PHA bio-plastic bristles. It's 100% compostable within four months and, through a hygienic replaceable-head system, offers a sustainable alternative to the disposable toothbrush."
+    },
+    "mealyo": {
+      "oneLiner": "TEASER_MISSING",
+      "description": "DESCRIPTION_MISSING"
+    },
+    "resoap": {
+      "oneLiner": "TEASER_MISSING",
+      "description": "DESCRIPTION_MISSING"
+    },
+    "impactwithus": {
+      "oneLiner": "TEASER_MISSING",
+      "description": "DESCRIPTION_MISSING"
+    },
+    "differgy": {
+      "oneLiner": "TEASER_MISSING",
+      "description": "DESCRIPTION_MISSING"
+    },
+    "safesteps": {
+      "oneLiner": "TEASER_MISSING",
+      "description": "DESCRIPTION_MISSING"
+    },
+    "vela": {
+      "oneLiner": "TEASER_MISSING",
+      "description": "DESCRIPTION_MISSING"
+    },
+    "sun-n-soil": {
+      "oneLiner": "TEASER_MISSING",
+      "description": "DESCRIPTION_MISSING"
+    },
+    "green-heat": {
+      "oneLiner": "TEASER_MISSING",
+      "description": "DESCRIPTION_MISSING"
+    },
+    "reverze": {
+      "oneLiner": "TEASER_MISSING",
+      "description": "DESCRIPTION_MISSING"
+    },
+    "afya": {
+      "oneLiner": "TEASER_MISSING",
+      "description": "DESCRIPTION_MISSING"
+    },
+    "mushroom": {
+      "oneLiner": "TEASER_MISSING",
+      "description": "DESCRIPTION_MISSING"
+    },
+    "moufense": {
+      "oneLiner": "TEASER_MISSING",
+      "description": "DESCRIPTION_MISSING"
+    },
+    "greenscape": {
+      "oneLiner": "TEASER_MISSING",
+      "description": "DESCRIPTION_MISSING"
     }
+  },
+  "ProjectStatus": {
+    "active": "Active",
+    "spinoff": "Spun off",
+    "cancelled": "Discontinued",
+    "paused": "Paused"
+  },
+  "ProjectsPage": {
+    "eyebrow": "Projects",
+    "title": "Our projects are the heart of what we do.",
+    "active": {
+      "heading": "Current projects",
+      "expandLabel": "Learn more",
+      "collapseLabel": "Show less",
+      "leadHeading": "Project lead",
+      "leadMissingHint": "The project lead hasn't been named publicly yet.",
+      "photosHeading": "Photos",
+      "externalLinkLabel": "Visit project website"
+    },
+    "stars": {
+      "eyebrow": "Our stars",
+      "title": "Our stars",
+      "lead": "Eight former flagship projects that impressed at national Enactus competitions.",
+      "noVideoHint": "No video available.",
+      "playLabel": "Watch {name}'s pitch"
+    },
+    "archiveLink": {
+      "label": "See every past project in the archive"
+    },
+    "detail": {
+      "backLabel": "Back to projects",
+      "leadHeading": "Project lead",
+      "leadMissingHint": "The project lead hasn't been named publicly yet.",
+      "photosHeading": "Photos",
+      "externalLinkLabel": "Visit project website",
+      "statusHeading": "Status"
+    }
+  },
+  "ProjectsArchivePage": {
+    "eyebrow": "Archive",
+    "title": "Project archive",
+    "lead": "Every project Enactus Mannheim has run since its founding — including the spin-offs.",
+    "yearMissingHint": "The year hasn't been confirmed yet.",
+    "backLabel": "Back to current projects"
   },
   "Stars": {
     "STAR_1": {

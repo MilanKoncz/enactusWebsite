@@ -19,6 +19,11 @@ import { projectStageSchema } from "./process";
  * (sunNSoil, greenHeat, reverZe, afya, mushroom, greenscape) default to
  * "cancelled" — a deliberate placeholder default, not a confirmed fact, see
  * ASSETS-TODO.md. Differgy, Safesteps, and Vela's statuses are confirmed.
+ *
+ * `year` (shown on the /projekte/archiv grid) is null for every project —
+ * no start/end year has been confirmed for any of them yet, active or
+ * archived, see ASSETS-TODO.md. Never inferred from a project's position in
+ * this list.
  */
 
 const projectStatusSchema = z.enum(["active", "spinoff", "cancelled", "paused"]);
@@ -33,6 +38,7 @@ const projectSchema = z.object({
   description: z.string(),
   status: projectStatusSchema,
   stage: projectStageSchema,
+  year: z.number().int().min(2003).nullable(),
   leadName: z.string().nullable(),
   leadEmail: z.email().nullable(),
   leadLinkedinUrl: z.url().nullable(),
@@ -58,6 +64,7 @@ function project(input: {
     oneLiner: `Projects.${input.slug}.oneLiner`,
     description: `Projects.${input.slug}.description`,
     stage: null,
+    year: null,
     leadName: input.leadName ?? null,
     leadEmail: input.leadEmail ?? null,
     leadLinkedinUrl: input.leadLinkedinUrl ?? null,

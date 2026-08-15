@@ -12,7 +12,10 @@ export type ThreadStop =
   | "process-intro"
   | "process-timeline"
   | "process-guide"
-  | "process-cta";
+  | "process-cta"
+  | "projects-intro"
+  | "projects-active"
+  | "projects-stars";
 
 export type ThreadWidth = "wide" | "narrow";
 
@@ -134,6 +137,26 @@ const ROUTES: Record<ThreadStop, Record<ThreadWidth, Waypoints>> = {
     wide: { from: 50, bow: 60, to: 66 },
     narrow: { from: 50, bow: 66, to: 72 },
   },
+
+  // /projekte (Projects*.tsx). Its own separate run, same reasoning as the
+  // /prozess stops above: this page opens with its own intro, not the
+  // homepage's thread.
+  "projects-intro": {
+    wide: { from: 50, bow: 50, to: 50 },
+    narrow: { from: 50, bow: 50, to: 50 },
+  },
+  // Drifts left through the active-project card list, mirroring how `kpis`
+  // drifts right on the homepage — alternating direction per section is
+  // what keeps the thread reading as one line finding its way rather than
+  // a rule that always leans the same side (see the ROUTES doc comment).
+  "projects-active": {
+    wide: { from: 50, bow: 38, to: 30 },
+    narrow: { from: 50, bow: 34, to: 24 },
+  },
+  "projects-stars": {
+    wide: { from: 30, bow: 55, to: 70 },
+    narrow: { from: 24, bow: 52, to: 76 },
+  },
 };
 
 // Iteration order matches the sections' actual order on the homepage
@@ -162,6 +185,9 @@ export const PROCESS_STOPS: ThreadStop[] = [
   "process-guide",
   "process-cta",
 ];
+
+// Iteration order matches src/app/[locale]/(site)/projekte/page.tsx.
+export const PROJECTS_STOPS: ThreadStop[] = ["projects-intro", "projects-active", "projects-stars"];
 
 export function waypointsFor(stop: ThreadStop, width: ThreadWidth): Waypoints {
   return ROUTES[stop][width];

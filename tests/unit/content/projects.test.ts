@@ -67,6 +67,7 @@ describe("content/projects", () => {
   it("leaves unconfirmed fields null or empty rather than guessed", () => {
     for (const p of projects) {
       expect(p.stage).toBeNull();
+      expect(p.year).toBeNull();
       expect(p.externalUrl).toBeNull();
       expect(p.logo).toBeNull();
       expect(p.images).toEqual([]);
@@ -89,6 +90,7 @@ describe("content/projects", () => {
         description: "Projects.test-project.description",
         status: "on-hold",
         stage: null,
+        year: null,
         leadName: null,
         leadEmail: null,
         leadLinkedinUrl: null,
@@ -107,6 +109,7 @@ describe("content/projects", () => {
       description: "Projects.test.description",
       status: "active" as const,
       stage: null,
+      year: null,
       leadName: null,
       leadLinkedinUrl: null,
       externalUrl: null,
@@ -129,6 +132,7 @@ describe("content/projects", () => {
         description: "Projects.test.description",
         status: "active",
         stage: null,
+        year: null,
         leadName: null,
         leadEmail: null,
         leadLinkedinUrl: null,

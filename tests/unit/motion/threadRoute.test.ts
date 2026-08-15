@@ -2,14 +2,15 @@ import { describe, expect, it } from "vitest";
 import {
   HOME_STOPS,
   PROCESS_STOPS,
+  PROJECTS_STOPS,
   axisFor,
   pathFor,
   waypointsFor,
 } from "@/components/motion/threadRoute";
 
 const WIDTHS = ["wide", "narrow"] as const;
-const ROUTES = { home: HOME_STOPS, process: PROCESS_STOPS };
-const ALL_STOPS = [...HOME_STOPS, ...PROCESS_STOPS];
+const ROUTES = { home: HOME_STOPS, process: PROCESS_STOPS, projects: PROJECTS_STOPS };
+const ALL_STOPS = [...HOME_STOPS, ...PROCESS_STOPS, ...PROJECTS_STOPS];
 
 describe("threadRoute", () => {
   it("keeps every seam continuous between axis-matching neighbors, in both widths", () => {
