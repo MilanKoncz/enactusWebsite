@@ -34,4 +34,33 @@ export const networkStats: NetworkStats = networkStatsSchema.parse({
   asOf: "2026-08-15",
 });
 
-export { networkStatsSchema };
+/**
+ * Sibling Enactus teams linked from /events, alongside this stats block —
+ * the brief named five: München, Münster, Hamburg, Köln, Karlsruhe. Every
+ * URL below was fetched and confirmed live on 2026-08-15, each page
+ * self-identifying as that city's Enactus chapter — not guessed from a
+ * domain-naming pattern. None needed a placeholder.
+ */
+const teamKeySchema = z.enum(["muenchen", "muenster", "hamburg", "koeln", "karlsruhe"]);
+export type TeamKey = z.infer<typeof teamKeySchema>;
+
+const teamLinkSchema = z.object({
+  key: teamKeySchema,
+  name: z.string(),
+  url: z.url().nullable(),
+});
+export type TeamLink = z.infer<typeof teamLinkSchema>;
+
+function teamLink(key: TeamKey, name: string, url: string): TeamLink {
+  return teamLinkSchema.parse({ key, name, url });
+}
+
+export const teamLinks: TeamLink[] = [
+  teamLink("muenchen", "München", "https://enactus-muenchen.de/"),
+  teamLink("muenster", "Münster", "https://enactus-muenster.de/"),
+  teamLink("hamburg", "Hamburg", "https://enactus-hh.de/"),
+  teamLink("koeln", "Köln", "https://enactus-koeln.de/"),
+  teamLink("karlsruhe", "Karlsruhe", "https://enactus-karlsruhe.de/"),
+];
+
+export { networkStatsSchema, teamLinkSchema, teamKeySchema };

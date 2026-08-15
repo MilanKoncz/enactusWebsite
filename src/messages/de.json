@@ -369,6 +369,47 @@
     "yearMissingHint": "Das Jahr ist noch nicht bestätigt.",
     "backLabel": "Zurück zu den aktuellen Projekten"
   },
+  "EventsPage": {
+    "eyebrow": "Events",
+    "title": "Enactus Mannheim ist Teil von Enactus Germany und dem weltweiten Enactus-Netzwerk."
+  },
+  "EventFormats": {
+    "eyebrow": "Wie wir zusammenkommen",
+    "title": "Vier Formate",
+    "tablistLabel": "Veranstaltungsformate",
+    "detailMissingHint": "Der Beschreibungstext liegt noch nicht vor.",
+    "socials": {
+      "title": "Socials",
+      "detail": "BESCHREIBUNG_FEHLT"
+    },
+    "workshops": {
+      "title": "Workshops",
+      "detail": "BESCHREIBUNG_FEHLT"
+    },
+    "teamweekend": {
+      "title": "Teamwochenende",
+      "detail": "BESCHREIBUNG_FEHLT"
+    },
+    "journeys": {
+      "title": "Journeys",
+      "detail": "BESCHREIBUNG_FEHLT"
+    }
+  },
+  "JourneysSection": {
+    "eyebrow": "Journeys",
+    "title": "Unsere Reisen zu den Enactus-Wettbewerben"
+  },
+  "EventsNetwork": {
+    "eyebrow": "Netzwerk",
+    "title": "Teil eines großen Netzwerks",
+    "studentsGermanyLabel": "Studierende deutschlandweit",
+    "universitiesGermanyLabel": "Hochschulstandorte",
+    "countriesGlobalLabel": "Länder weltweit",
+    "approx": "rund {value}",
+    "atLeast": "über {value}",
+    "teamsHeading": "Weitere Enactus-Teams",
+    "teamLinkLabel": "Enactus {name} öffnet in neuem Tab"
+  },
   "Stars": {
     "STAR_1": {
       "description": "Blauherz entwickelte Hosen für Rollstuhlfahrer, die funktionale und modische Ansprüche verbinden. Das Projekt lief von 2016 bis zur Ausgründung 2019 und war 2019 zudem World-Cup-Finalist."

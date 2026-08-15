@@ -15,7 +15,11 @@ export type ThreadStop =
   | "process-cta"
   | "projects-intro"
   | "projects-active"
-  | "projects-stars";
+  | "projects-stars"
+  | "events-intro"
+  | "events-formats"
+  | "events-journeys"
+  | "events-network";
 
 export type ThreadWidth = "wide" | "narrow";
 
@@ -157,6 +161,29 @@ const ROUTES: Record<ThreadStop, Record<ThreadWidth, Waypoints>> = {
     wide: { from: 30, bow: 55, to: 70 },
     narrow: { from: 24, bow: 52, to: 76 },
   },
+
+  // /events (Events*.tsx). Its own separate run, same reasoning as
+  // /projekte and /prozess above.
+  "events-intro": {
+    wide: { from: 50, bow: 50, to: 50 },
+    narrow: { from: 50, bow: 50, to: 50 },
+  },
+  "events-formats": {
+    wide: { from: 50, bow: 62, to: 74 },
+    narrow: { from: 50, bow: 58, to: 66 },
+  },
+  // Swings back across center through the Journeys history — this section
+  // lays its own trip cards out horizontally, but that's a content-grid
+  // choice, not a reason for the thread itself to change axis; "x" stays
+  // the single named exception at process-timeline (see PROCESS_STOPS).
+  "events-journeys": {
+    wide: { from: 74, bow: 50, to: 26 },
+    narrow: { from: 66, bow: 50, to: 34 },
+  },
+  "events-network": {
+    wide: { from: 26, bow: 45, to: 50 },
+    narrow: { from: 34, bow: 45, to: 50 },
+  },
 };
 
 // Iteration order matches the sections' actual order on the homepage
@@ -188,6 +215,14 @@ export const PROCESS_STOPS: ThreadStop[] = [
 
 // Iteration order matches src/app/[locale]/(site)/projekte/page.tsx.
 export const PROJECTS_STOPS: ThreadStop[] = ["projects-intro", "projects-active", "projects-stars"];
+
+// Iteration order matches src/app/[locale]/(site)/events/page.tsx.
+export const EVENTS_STOPS: ThreadStop[] = [
+  "events-intro",
+  "events-formats",
+  "events-journeys",
+  "events-network",
+];
 
 export function waypointsFor(stop: ThreadStop, width: ThreadWidth): Waypoints {
   return ROUTES[stop][width];

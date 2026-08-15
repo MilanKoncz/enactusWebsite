@@ -369,6 +369,47 @@
     "yearMissingHint": "The year hasn't been confirmed yet.",
     "backLabel": "Back to current projects"
   },
+  "EventsPage": {
+    "eyebrow": "Events",
+    "title": "Enactus Mannheim is part of Enactus Germany and the worldwide Enactus network."
+  },
+  "EventFormats": {
+    "eyebrow": "How we come together",
+    "title": "Four formats",
+    "tablistLabel": "Event formats",
+    "detailMissingHint": "The description hasn't been written yet.",
+    "socials": {
+      "title": "Socials",
+      "detail": "DESCRIPTION_MISSING"
+    },
+    "workshops": {
+      "title": "Workshops",
+      "detail": "DESCRIPTION_MISSING"
+    },
+    "teamweekend": {
+      "title": "Team weekend",
+      "detail": "DESCRIPTION_MISSING"
+    },
+    "journeys": {
+      "title": "Journeys",
+      "detail": "DESCRIPTION_MISSING"
+    }
+  },
+  "JourneysSection": {
+    "eyebrow": "Journeys",
+    "title": "Our trips to Enactus competitions"
+  },
+  "EventsNetwork": {
+    "eyebrow": "Network",
+    "title": "Part of a large network",
+    "studentsGermanyLabel": "Students across Germany",
+    "universitiesGermanyLabel": "University locations",
+    "countriesGlobalLabel": "Countries worldwide",
+    "approx": "around {value}",
+    "atLeast": "over {value}",
+    "teamsHeading": "More Enactus teams",
+    "teamLinkLabel": "Enactus {name} opens in a new tab"
+  },
   "Stars": {
     "STAR_1": {
       "description": "Blauherz developed trousers for wheelchair users that combine functional and fashionable demands. The project ran from 2016 to its spin-off in 2019 and was also a 2019 World Cup finalist."

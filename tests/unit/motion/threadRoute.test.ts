@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  EVENTS_STOPS,
   HOME_STOPS,
   PROCESS_STOPS,
   PROJECTS_STOPS,
@@ -9,8 +10,13 @@ import {
 } from "@/components/motion/threadRoute";
 
 const WIDTHS = ["wide", "narrow"] as const;
-const ROUTES = { home: HOME_STOPS, process: PROCESS_STOPS, projects: PROJECTS_STOPS };
-const ALL_STOPS = [...HOME_STOPS, ...PROCESS_STOPS, ...PROJECTS_STOPS];
+const ROUTES = {
+  home: HOME_STOPS,
+  process: PROCESS_STOPS,
+  projects: PROJECTS_STOPS,
+  events: EVENTS_STOPS,
+};
+const ALL_STOPS = [...HOME_STOPS, ...PROCESS_STOPS, ...PROJECTS_STOPS, ...EVENTS_STOPS];
 
 describe("threadRoute", () => {
   it("keeps every seam continuous between axis-matching neighbors, in both widths", () => {
