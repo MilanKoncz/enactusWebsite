@@ -19,7 +19,12 @@ export type ThreadStop =
   | "events-intro"
   | "events-formats"
   | "events-journeys"
-  | "events-network";
+  | "events-network"
+  | "partner-intro"
+  | "partner-tiers"
+  | "partner-statements"
+  | "partner-membership"
+  | "partner-contact";
 
 export type ThreadWidth = "wide" | "narrow";
 
@@ -184,6 +189,32 @@ const ROUTES: Record<ThreadStop, Record<ThreadWidth, Waypoints>> = {
     wide: { from: 26, bow: 45, to: 50 },
     narrow: { from: 34, bow: 45, to: 50 },
   },
+
+  // /partner (Partner*.tsx). Its own separate run, same reasoning as the
+  // other route-specific stops above.
+  "partner-intro": {
+    wide: { from: 50, bow: 50, to: 50 },
+    narrow: { from: 50, bow: 50, to: 50 },
+  },
+  "partner-tiers": {
+    wide: { from: 50, bow: 64, to: 78 },
+    narrow: { from: 50, bow: 60, to: 70 },
+  },
+  "partner-statements": {
+    wide: { from: 78, bow: 50, to: 22 },
+    narrow: { from: 70, bow: 50, to: 30 },
+  },
+  "partner-membership": {
+    wide: { from: 22, bow: 40, to: 58 },
+    narrow: { from: 30, bow: 42, to: 54 },
+  },
+  // The one dark (ink) section on this page, matching ProcessCta's "one
+  // dark moment at the very end" — the thread settles rather than swinging
+  // hard, so it arrives calmly at the closing CTA instead of overshooting it.
+  "partner-contact": {
+    wide: { from: 58, bow: 50, to: 42 },
+    narrow: { from: 54, bow: 50, to: 46 },
+  },
 };
 
 // Iteration order matches the sections' actual order on the homepage
@@ -222,6 +253,15 @@ export const EVENTS_STOPS: ThreadStop[] = [
   "events-formats",
   "events-journeys",
   "events-network",
+];
+
+// Iteration order matches src/app/[locale]/(site)/partner/page.tsx.
+export const PARTNER_STOPS: ThreadStop[] = [
+  "partner-intro",
+  "partner-tiers",
+  "partner-statements",
+  "partner-membership",
+  "partner-contact",
 ];
 
 export function waypointsFor(stop: ThreadStop, width: ThreadWidth): Waypoints {

@@ -410,6 +410,99 @@
     "teamsHeading": "Weitere Enactus-Teams",
     "teamLinkLabel": "Enactus {name} öffnet in neuem Tab"
   },
+  "PartnerPage": {
+    "eyebrow": "Partner",
+    "title": "Ein Netzwerk. Eine Vision.",
+    "intro": "Mit unserem starken Netzwerk aus Partnern, Business Advisors, Fördermitgliedern und Alumni schaffen wir ein optimales Ökosystem, das zur erfolgreichen Entwicklung unserer nachhaltigen und innovativen Projekte beiträgt.",
+    "benefits": {
+      "heading": "Vorteile einer Partnerschaft",
+      "lead": "Gemeinsam mit unserem starken Partnernetzwerk kommen wir unserer Vision einen großen Schritt näher: To create a better, more sustainable future.",
+      "recruiting": {
+        "title": "Recruiting",
+        "text": "Unser Verein besteht aus hochqualifizierten Studierenden der Universität Mannheim, die sich neben ihrem Bachelor oder Master sozialunternehmerisch engagieren."
+      },
+      "image": {
+        "title": "Image",
+        "text": "Förderung von Projekten, die mit unternehmerischem Ansatz innovative Lösungen für gesellschaftliche, soziale und ökologische Probleme entwickeln."
+      },
+      "publicity": {
+        "title": "Publicity",
+        "text": "Wir bieten Ihnen bei Veranstaltungen auf nationaler sowie internationaler Ebene eine Bühne im Netzwerk der größten studentischen Entrepreneurship Initiative der Welt."
+      },
+      "philanthropy": {
+        "title": "Philanthropie",
+        "text": "Unsere Projekte stiften einen sozialen und ökologische Mehrwert für die Gesellschaft und richten sich nach den 17 Zielen für nachhaltige Entwicklung der Vereinten Nationen."
+      }
+    },
+    "tiers": {
+      "heading": "Modelle einer Partnerschaft",
+      "lead": "Um die Zusammenarbeit zwischen uns und unseren Partnern wirkungsvoll zu gestalten, bieten wir eine Vielzahl von individuellen Partnerschaftsmodellen.",
+      "knowledge": {
+        "title": "Knowledge Partner",
+        "description": "Unsere Knowledge Partner unterstützen uns mit hochklassiger Expertise in verschiedensten Bereichen. Während sie uns bei Herausforderungen in Projekt- und Vereinsarbeit beratend zur Seite stehen, vermitteln sie unserem Team in Workshops und Input-Vorträgen wichtige Fähigkeiten für unsere Arbeit."
+      },
+      "flagship": {
+        "title": "Flagship Partner",
+        "description": "Unsere Flagship Partner unterstützen uns regelmäßig mit finanziellen und ideellen Ressourcen. Durch sie erhalten unsere Mitglieder wertvolle Expertise bei der Projektarbeit im Verein. Gleichzeitig fördern sie mit finanziellen Ressourcen die Entwicklung und Implementierung innovativer Projektideen."
+      },
+      "sponsoring": {
+        "title": "Sponsoring Partner",
+        "description": "Unsere Sponsoring Partner unterstützen uns mit Geld- und Sachleistungen in der Projektarbeit. Mit ihrer Unterstützung können wir in die Entwicklung und den Ausbau unserer Innovationen investieren und laufende Kosten innerhalb unseres Vereins decken."
+      },
+      "advisor": {
+        "title": "Advisor",
+        "description": "Unsere Advisor:innen sind selbst in Start-ups oder führenden Unternehmen tätig und unterstützen uns in der Projektarbeit und unserem Innovationsprozess. Sie stehen unserem Team regelmäßig bei Herausforderungen und strategischer Planung zur Seite und unterstützen uns mit ihrer Expertise und ihrem Netzwerk."
+      },
+      "advisorEmptyHint": "Noch kein Advisor-Partner öffentlich bestätigt.",
+      "websiteLabel": "Website von {name} öffnet in neuem Tab"
+    },
+    "statements": {
+      "eyebrow": "Stimmen",
+      "heading": "Was sagen unsere Partner?"
+    },
+    "membership": {
+      "eyebrow": "Fördermitgliedschaft",
+      "title": "Als Förderer Impact stärken",
+      "lead": "Als Fördermitglied helfen Sie uns mit einem Beitrag von nur 2 Euro pro Monat dabei, die Entwicklung nachhaltiger und innovativer Projekte zu beschleunigen. Im Gegenzug profitieren Sie von regelmäßigen Updates aus unserem Verein.",
+      "supportsHeading": "Sie fördern",
+      "supports": [
+        "Die Umsetzung und Weiterentwicklung unserer Projekte",
+        "Die Weiterentwicklung von Studierenden in ihrer Passion für Social Entrepreneurship",
+        "Positiven Impact unserer Projekte"
+      ],
+      "benefitsHeading": "Sie profitieren",
+      "benefitsList": [
+        "Von regelmäßigen Projekt- und Vereinsupdates",
+        "Von steuerlich absetzbaren Beiträgen",
+        "Von monatlich kündbarer Mitgliedschaft"
+      ],
+      "note": "Interesse an einer Fördermitgliedschaft? Sprechen Sie uns über den Kontakt unten an."
+    },
+    "contact": {
+      "eyebrow": "Kontakt",
+      "title": "Werden Sie Partner",
+      "lead": "Sie möchten Enactus Mannheim als Partner oder Fördermitglied unterstützen? Wir freuen uns über Ihre Anfrage.",
+      "cta": "E-Mail schreiben"
+    }
+  },
+  "PartnerStatements": {
+    "moritz-knabe": {
+      "role": "Partner bei Horbach",
+      "quote": "ENACTUS ist für mich Unternehmertum mit Sinnhaftigkeit. Hier wird vorgelebt, die Welt zu einem besseren Ort zu machen."
+    },
+    "pauline-machtolf": {
+      "role": "Head of Business Development bei GoodJobs",
+      "quote": "Enactus Mannheim ist für mich immer wie heimkommen – zu einer tollen, generationenübergreifenden Familie."
+    },
+    "alexander-mueller": {
+      "role": "Doktorand am Lehrstuhl für Marketing und Innovation",
+      "quote": "Ich freue mich auf neue Projekte mit Enactus Mannheim und die Zusammenarbeit mit dem gesamten Team."
+    },
+    "cornelius-bossers": {
+      "role": "Vice President Global Sales Excellence bei Freudenberg",
+      "quote": "Wir gehören zur Zeit zu den Top 16 Enactus Teams weltweit. Passion, Entrepreneurial Spirit und viele tolle Projekte. Das ist Enactus Mannheim."
+    }
+  },
   "Stars": {
     "STAR_1": {
       "description": "Blauherz entwickelte Hosen für Rollstuhlfahrer, die funktionale und modische Ansprüche verbinden. Das Projekt lief von 2016 bis zur Ausgründung 2019 und war 2019 zudem World-Cup-Finalist."

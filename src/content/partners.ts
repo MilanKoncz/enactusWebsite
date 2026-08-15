@@ -8,9 +8,14 @@ import { z } from "zod";
  * (Knowledge/Flagship/Sponsoring) are this handover's wording, not a
  * guaranteed-stable structure. Logos were pulled from the old Webflow site's
  * CDN into `public/brand/partners/` — several source files were already
- * SVG, the rest are the rasters the old site itself used. `url` (each
- * partner's own website) was not part of this handover and stays null
- * rather than guessed.
+ * SVG, the rest are the rasters the old site itself used.
+ *
+ * `url` (each partner's own website) was fetched and confirmed 2026-08-15 —
+ * see ASSETS-TODO.md for the three exceptions: `horbach` and
+ * `eon-inhouse-consulting` block automated fetches (403) but were confirmed
+ * live via independent search results instead; `mcei` could not be
+ * confirmed at all (the domain is behind a maintenance-mode auth wall) and
+ * stays null.
  */
 
 const partnerSchema = z.object({
@@ -22,28 +27,49 @@ const partnerSchema = z.object({
 });
 export type Partner = z.infer<typeof partnerSchema>;
 
-function partner(input: { slug: string; name: string; logo: string; tier: string }): Partner {
-  return partnerSchema.parse({ ...input, url: null });
+function partner(input: { slug: string; name: string; logo: string; tier: string; url?: string }): Partner {
+  return partnerSchema.parse({ ...input, url: input.url ?? null });
 }
 
 export const partners: Partner[] = [
   // Knowledge
-  partner({ slug: "sza", name: "SZA", logo: "/brand/partners/sza.svg", tier: "Knowledge" }),
-  partner({ slug: "kpmg", name: "KPMG", logo: "/brand/partners/kpmg.svg", tier: "Knowledge" }),
+  partner({ slug: "sza", name: "SZA", logo: "/brand/partners/sza.svg", tier: "Knowledge", url: "https://www.sza.de/" }),
+  partner({
+    slug: "kpmg",
+    name: "KPMG",
+    logo: "/brand/partners/kpmg.svg",
+    tier: "Knowledge",
+    url: "https://kpmg.com/de/de.html",
+  }),
   partner({
     slug: "freudenberg",
     name: "Freudenberg",
     logo: "/brand/partners/freudenberg.png",
     tier: "Knowledge",
+    url: "https://www.freudenberg.com/",
   }),
-  partner({ slug: "horbach", name: "Horbach", logo: "/brand/partners/horbach.png", tier: "Knowledge" }),
+  partner({
+    slug: "horbach",
+    name: "Horbach",
+    logo: "/brand/partners/horbach.png",
+    tier: "Knowledge",
+    url: "https://www.horbach.de/",
+  }),
   partner({
     slug: "shub-mannheim",
     name: "SHUB Mannheim",
     logo: "/brand/partners/shub-mannheim.svg",
     tier: "Knowledge",
+    url: "https://www.shub-mannheim.de/",
   }),
-  partner({ slug: "mafinex", name: "MAFINEX", logo: "/brand/partners/mafinex.svg", tier: "Knowledge" }),
+  partner({
+    slug: "mafinex",
+    name: "MAFINEX",
+    logo: "/brand/partners/mafinex.svg",
+    tier: "Knowledge",
+    url: "https://mafinex.next-mannheim.de/",
+  }),
+  // No verifiable url — see the file comment and ASSETS-TODO.md.
   partner({ slug: "mcei", name: "MCEI", logo: "/brand/partners/mcei.png", tier: "Knowledge" }),
   // Flagship
   partner({
@@ -51,12 +77,14 @@ export const partners: Partner[] = [
     name: "ProCredit Bank",
     logo: "/brand/partners/procredit-bank.png",
     tier: "Flagship",
+    url: "https://www.procreditbank.de/",
   }),
   partner({
     slug: "eon-inhouse-consulting",
     name: "E.ON Inhouse Consulting",
     logo: "/brand/partners/eon-inhouse-consulting.jpg",
     tier: "Flagship",
+    url: "https://www.eon.com/en/about-us/business-units/eon-inhouse-consulting.html",
   }),
   // Sponsoring
   partner({
@@ -64,18 +92,21 @@ export const partners: Partner[] = [
     name: "Fuchs Petrolub",
     logo: "/brand/partners/fuchs-petrolub.png",
     tier: "Sponsoring",
+    url: "https://www.fuchs.com/de/",
   }),
   partner({
     slug: "heidelberg-materials",
     name: "Heidelberg Materials",
     logo: "/brand/partners/heidelberg-materials.svg",
     tier: "Sponsoring",
+    url: "https://www.heidelbergmaterials.com/",
   }),
   partner({
     slug: "absolventum",
     name: "Absolventum",
     logo: "/brand/partners/absolventum.png",
     tier: "Sponsoring",
+    url: "https://www.absolventum.de/",
   }),
 ];
 

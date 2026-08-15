@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   EVENTS_STOPS,
   HOME_STOPS,
+  PARTNER_STOPS,
   PROCESS_STOPS,
   PROJECTS_STOPS,
   axisFor,
@@ -15,8 +16,9 @@ const ROUTES = {
   process: PROCESS_STOPS,
   projects: PROJECTS_STOPS,
   events: EVENTS_STOPS,
+  partner: PARTNER_STOPS,
 };
-const ALL_STOPS = [...HOME_STOPS, ...PROCESS_STOPS, ...PROJECTS_STOPS, ...EVENTS_STOPS];
+const ALL_STOPS = [...HOME_STOPS, ...PROCESS_STOPS, ...PROJECTS_STOPS, ...EVENTS_STOPS, ...PARTNER_STOPS];
 
 describe("threadRoute", () => {
   it("keeps every seam continuous between axis-matching neighbors, in both widths", () => {

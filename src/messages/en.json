@@ -410,6 +410,99 @@
     "teamsHeading": "More Enactus teams",
     "teamLinkLabel": "Enactus {name} opens in a new tab"
   },
+  "PartnerPage": {
+    "eyebrow": "Partners",
+    "title": "One network. One vision.",
+    "intro": "With our strong network of partners, business advisors, supporting members, and alumni, we build the ecosystem our sustainable, innovative projects need to succeed.",
+    "benefits": {
+      "heading": "The benefits of a partnership",
+      "lead": "Together with our strong partner network, we move a big step closer to our vision: to create a better, more sustainable future.",
+      "recruiting": {
+        "title": "Recruiting",
+        "text": "Our club is made up of highly qualified University of Mannheim students who take on social-entrepreneurial work alongside their bachelor's or master's degree."
+      },
+      "image": {
+        "title": "Image",
+        "text": "Supporting projects that use an entrepreneurial approach to develop innovative solutions to social and ecological problems."
+      },
+      "publicity": {
+        "title": "Publicity",
+        "text": "We offer you a stage at national and international events, inside the network of the world's largest student entrepreneurship initiative."
+      },
+      "philanthropy": {
+        "title": "Philanthropy",
+        "text": "Our projects create social and ecological value for society and are guided by the UN's 17 Sustainable Development Goals."
+      }
+    },
+    "tiers": {
+      "heading": "Partnership models",
+      "lead": "To make working with our partners as effective as possible, we offer a range of individual partnership models.",
+      "knowledge": {
+        "title": "Knowledge Partner",
+        "description": "Our Knowledge Partners support us with top-tier expertise across many fields. They advise us on challenges in project and club work, and pass on key skills to our team through workshops and talks."
+      },
+      "flagship": {
+        "title": "Flagship Partner",
+        "description": "Our Flagship Partners support us regularly with financial and non-financial resources. Through them, our members gain valuable expertise for project work, while their funding drives the development and implementation of innovative project ideas."
+      },
+      "sponsoring": {
+        "title": "Sponsoring Partner",
+        "description": "Our Sponsoring Partners support us with money and in-kind contributions to project work. Their support lets us invest in developing and scaling our innovations and cover our club's running costs."
+      },
+      "advisor": {
+        "title": "Advisor",
+        "description": "Our advisors work in start-ups or leading companies themselves and support us in project work and our innovation process. They regularly stand by our team on challenges and strategic planning, contributing their expertise and network."
+      },
+      "advisorEmptyHint": "No Advisor partner confirmed publicly yet.",
+      "websiteLabel": "{name}'s website opens in a new tab"
+    },
+    "statements": {
+      "eyebrow": "Voices",
+      "heading": "What our partners say"
+    },
+    "membership": {
+      "eyebrow": "Supporting membership",
+      "title": "Strengthen our impact as a supporter",
+      "lead": "As a supporting member, your contribution of just 2 euros a month helps us speed up the development of sustainable, innovative projects. In return, you get regular updates from our club.",
+      "supportsHeading": "You support",
+      "supports": [
+        "The delivery and further development of our projects",
+        "Students developing their passion for social entrepreneurship",
+        "The positive impact of our projects"
+      ],
+      "benefitsHeading": "You benefit from",
+      "benefitsList": [
+        "Regular project and club updates",
+        "Tax-deductible contributions",
+        "A membership you can cancel monthly"
+      ],
+      "note": "Interested in a supporting membership? Reach out through the contact below."
+    },
+    "contact": {
+      "eyebrow": "Contact",
+      "title": "Become a partner",
+      "lead": "Interested in supporting Enactus Mannheim as a partner or supporting member? We'd love to hear from you.",
+      "cta": "Send an email"
+    }
+  },
+  "PartnerStatements": {
+    "moritz-knabe": {
+      "role": "Partner at Horbach",
+      "quote": "To me, ENACTUS is entrepreneurship with purpose — it shows what it looks like to make the world a better place."
+    },
+    "pauline-machtolf": {
+      "role": "Head of Business Development at GoodJobs",
+      "quote": "Enactus Mannheim always feels like coming home to a warm, cross-generational family."
+    },
+    "alexander-mueller": {
+      "role": "PhD candidate at the Chair of Marketing and Innovation",
+      "quote": "I'm looking forward to new projects with Enactus Mannheim and working together with the whole team."
+    },
+    "cornelius-bossers": {
+      "role": "Vice President Global Sales Excellence at Freudenberg",
+      "quote": "We're currently one of the top 16 Enactus teams worldwide — passion, entrepreneurial spirit, and great projects. That's Enactus Mannheim."
+    }
+  },
   "Stars": {
     "STAR_1": {
       "description": "Blauherz developed trousers for wheelchair users that combine functional and fashionable demands. The project ran from 2016 to its spin-off in 2019 and was also a 2019 World Cup finalist."

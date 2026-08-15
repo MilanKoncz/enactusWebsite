@@ -31,9 +31,12 @@ describe("content/partners", () => {
     }
   });
 
-  it("leaves url null — not part of this handover", () => {
+  it("has a confirmed url for every partner except MCEI", () => {
+    const bySlug = Object.fromEntries(partners.map((p) => [p.slug, p.url]));
+    expect(bySlug.mcei).toBeNull();
     for (const p of partners) {
-      expect(p.url).toBeNull();
+      if (p.slug === "mcei") continue;
+      expect(p.url).toMatch(/^https:\/\//);
     }
   });
 
