@@ -14,7 +14,6 @@ const routeKeySchema = z.enum([
   "partner",
   "kontakt",
   "mitmachen",
-  "team",
   "impressum",
   "datenschutz",
 ]);
@@ -31,7 +30,6 @@ export const routes = routesSchema.parse({
   partner: "/partner",
   kontakt: "/kontakt",
   mitmachen: "/mitmachen",
-  team: "/team",
   impressum: "/impressum",
   datenschutz: "/datenschutz",
 } satisfies Record<RouteKey, string>);
@@ -56,14 +54,14 @@ export const mainNav: NavItem[] = [
   navItem("kontakt"),
 ];
 
-// Team is linked from the footer and the homepage, never from the header nav.
+// No dedicated /team route: the Vorstand only appears on the homepage board
+// grid (see docs/engineering.md's old-URL redirect map — the old site's
+// /team now redirects to / instead of a same-named page here).
 export const footerColumns = {
-  verein: [navItem("team"), navItem("partner"), navItem("prozess")],
+  verein: [navItem("partner"), navItem("prozess")],
   rechtliches: [navItem("impressum"), navItem("datenschutz")],
 } as const;
 
-// href: null means "not confirmed yet" — renders as a Placeholder chip
-// instead of a real link. See ASSETS-TODO.md for the six rows this backs.
 // Keys are enums, not bare strings, so `t(`network.${key}`)` in Footer.tsx
 // stays statically checked against messages/de.json's Footer.network/social
 // namespaces — the same "typo fails the build" guarantee as routeKeySchema.
@@ -77,11 +75,14 @@ const networkLinkSchema = z.object({
 export type NetworkLink = z.infer<typeof networkLinkSchema>;
 
 export const networkLinks: NetworkLink[] = [
-  networkLinkSchema.parse({ key: "enactusGermany", href: null }),
-  networkLinkSchema.parse({ key: "enactusGlobal", href: null }),
+  networkLinkSchema.parse({ key: "enactusGermany", href: "https://enactus.de" }),
+  networkLinkSchema.parse({ key: "enactusGlobal", href: "https://enactus.org" }),
 ];
 
-const socialKeySchema = z.enum(["instagram", "linkedin", "facebook", "spotify"]);
+// No Spotify or YouTube account exists for the club — not omitted for lack
+// of a link, there is simply nothing to link to. Don't re-add either without
+// confirming a real account first.
+const socialKeySchema = z.enum(["instagram", "linkedin", "facebook"]);
 export type SocialKey = z.infer<typeof socialKeySchema>;
 
 const socialLinkSchema = z.object({
@@ -91,8 +92,7 @@ const socialLinkSchema = z.object({
 export type SocialLink = z.infer<typeof socialLinkSchema>;
 
 export const socialLinks: SocialLink[] = [
-  socialLinkSchema.parse({ key: "instagram", href: null }),
-  socialLinkSchema.parse({ key: "linkedin", href: null }),
-  socialLinkSchema.parse({ key: "facebook", href: null }),
-  socialLinkSchema.parse({ key: "spotify", href: null }),
+  socialLinkSchema.parse({ key: "instagram", href: "https://www.instagram.com/enactus_mannheim/" }),
+  socialLinkSchema.parse({ key: "linkedin", href: "https://www.linkedin.com/company/enactusmannheim/" }),
+  socialLinkSchema.parse({ key: "facebook", href: "https://www.facebook.com/unimannheim.enactus/" }),
 ];

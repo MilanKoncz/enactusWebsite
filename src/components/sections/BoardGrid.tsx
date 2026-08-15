@@ -33,8 +33,15 @@ const LINKEDIN_MARK_CLASSES =
 export const PORTRAIT_ZOOM_CLASSES =
   "transition-transform duration-[var(--duration-calm)] ease-signature desktop-hover:group-hover:scale-[1.06] desktop-hover:group-focus-within:scale-[1.06]";
 
+// member.slug is a validated string (content/board.ts), not a literal union,
+// so next-intl's typed message keys can't statically confirm it names a real
+// "Board.<slug>" entry — cast, the same way Footer.tsx casts `item.key` to
+// `RouteKey` for the same reason.
+type BoardBioKey = Parameters<ReturnType<typeof useTranslations<"Board">>>[0];
+
 export function BoardGrid() {
   const t = useTranslations("BoardGrid");
+  const tBoard = useTranslations("Board");
   const tPlaceholder = useTranslations("Placeholder");
 
   return (
@@ -68,11 +75,10 @@ export function BoardGrid() {
                   </PlaceholderMark>
                 )}
               </div>
-              <p className="text-body-m font-medium">
-                <PlaceholderMark hint={tPlaceholder("missingHint")}>{member.name}</PlaceholderMark>
-              </p>
-              <p className="text-body-s opacity-60">
-                <PlaceholderMark hint={tPlaceholder("missingHint")}>{member.role}</PlaceholderMark>
+              <p className="text-body-m font-medium">{member.name}</p>
+              <p className="text-body-s opacity-60">{member.role}</p>
+              <p className="text-body-s opacity-80">
+                {tBoard(`${member.slug}.bio` as BoardBioKey)}
               </p>
             </div>
           ))}

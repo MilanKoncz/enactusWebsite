@@ -6,16 +6,16 @@ import { PartnerMarquee } from "@/components/sections/PartnerMarquee";
 import { partners } from "@/content/partners";
 
 describe("PartnerMarquee", () => {
-  it("renders every partner's name once visibly", () => {
+  it("renders every partner's logo once visibly, labeled with its name", () => {
     renderWithIntl(<PartnerMarquee />);
     for (const partner of partners) {
-      expect(screen.getAllByText(partner.name).length).toBeGreaterThan(0);
+      expect(screen.getAllByAltText(partner.name).length).toBeGreaterThan(0);
     }
   });
 
   it("duplicates the track for a seamless loop, hiding the duplicate from assistive technology", () => {
     renderWithIntl(<PartnerMarquee />);
-    const firstPartnerOccurrences = screen.getAllByText(partners[0].name);
+    const firstPartnerOccurrences = screen.getAllByAltText(partners[0].name);
     expect(firstPartnerOccurrences).toHaveLength(2);
     const hiddenCopy = firstPartnerOccurrences.find(
       (el) => el.closest('[aria-hidden="true"]') !== null,

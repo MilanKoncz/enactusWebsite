@@ -11,11 +11,19 @@ describe("content/org", () => {
     expect(org.foundingYear).toEqual({ year: 2003, verified: false });
   });
 
-  it("leaves registered office, register entry, and contact emails null until confirmed", () => {
-    expect(org.registeredOffice).toBeNull();
-    expect(org.registerEntry).toBeNull();
+  it("has the registered office, register entry, and board contact email confirmed by the board", () => {
+    expect(org.registeredOffice).toBe("P4 9, 68161 Mannheim");
+    expect(org.registerEntry).toBe("Amtsgericht Mannheim – Vereinsregister – VR 700965");
+    expect(org.contactEmails.board).toBe("teamvorstand@unimannheim.enactus.team");
+  });
+
+  it("leaves the general contact email null until confirmed", () => {
     expect(org.contactEmails.general).toBeNull();
-    expect(org.contactEmails.board).toBeNull();
+  });
+
+  it("names the two confirmed legal representatives — the third seat is vacant", () => {
+    expect(org.legalRepresentatives.names).toEqual(["Thorben Ossig", "Anton Osuhovskiy"]);
+    expect(org.legalRepresentatives.verified).toBe(true);
   });
 
   it("re-exports navigation.ts's social links rather than duplicating them", () => {

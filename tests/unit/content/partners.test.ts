@@ -2,30 +2,38 @@ import { describe, expect, it } from "vitest";
 import { partners, partnerSchema } from "@/content/partners";
 
 describe("content/partners", () => {
-  it("has eight placeholder entries until real partnerships are confirmed", () => {
-    expect(partners.map((p) => p.slug)).toEqual([
-      "partner-1",
-      "partner-2",
-      "partner-3",
-      "partner-4",
-      "partner-5",
-      "partner-6",
-      "partner-7",
-      "partner-8",
+  it("has the twelve confirmed partners", () => {
+    expect(partners).toHaveLength(12);
+  });
+
+  it("groups partners into the three confirmed tiers", () => {
+    const byTier = Object.groupBy(partners, (p) => p.tier ?? "none");
+    expect(byTier.Knowledge?.map((p) => p.slug)).toEqual([
+      "sza",
+      "kpmg",
+      "freudenberg",
+      "horbach",
+      "shub-mannheim",
+      "mafinex",
+      "mcei",
+    ]);
+    expect(byTier.Flagship?.map((p) => p.slug)).toEqual(["procredit-bank", "eon-inhouse-consulting"]);
+    expect(byTier.Sponsoring?.map((p) => p.slug)).toEqual([
+      "fuchs-petrolub",
+      "heidelberg-materials",
+      "absolventum",
     ]);
   });
 
-  it("uses language-neutral placeholder tokens, not invented real partner names", () => {
-    for (const [index, partner] of partners.entries()) {
-      expect(partner.name).toBe(`PARTNER_${index + 1}`);
+  it("has a real logo path for every partner", () => {
+    for (const p of partners) {
+      expect(p.logo).toMatch(/^\/brand\/partners\//);
     }
   });
 
-  it("leaves logo, url, and tier null until confirmed", () => {
-    for (const partner of partners) {
-      expect(partner.logo).toBeNull();
-      expect(partner.url).toBeNull();
-      expect(partner.tier).toBeNull();
+  it("leaves url null — not part of this handover", () => {
+    for (const p of partners) {
+      expect(p.url).toBeNull();
     }
   });
 

@@ -63,7 +63,7 @@ export function Header() {
             aria-label={t("home")}
             className="transition-opacity duration-[var(--duration-fast)] ease-signature hover:opacity-80 focus-visible:opacity-80"
           >
-            <Logo variant="full" />
+            <Logo variant="full" surface={overlaid ? "ink" : "paper"} />
           </Link>
           <Nav variant="desktop" className="hidden lg:flex" />
           <div className="flex items-center gap-4">

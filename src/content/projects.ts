@@ -14,6 +14,11 @@ import { projectStageSchema } from "./process";
  * slug so key and copy can never drift apart. Everything else that isn't
  * confirmed (lead contact, external URL, logo, images, SDG focus) stays
  * null/empty rather than guessed.
+ *
+ * The six archive entries without an individually confirmed status
+ * (sunNSoil, greenHeat, reverZe, afya, mushroom, greenscape) default to
+ * "cancelled" — a deliberate placeholder default, not a confirmed fact, see
+ * ASSETS-TODO.md. Differgy, Safesteps, and Vela's statuses are confirmed.
  */
 
 const projectStatusSchema = z.enum(["active", "spinoff", "cancelled", "paused"]);
@@ -30,6 +35,7 @@ const projectSchema = z.object({
   stage: projectStageSchema,
   leadName: z.string().nullable(),
   leadEmail: z.email().nullable(),
+  leadLinkedinUrl: z.url().nullable(),
   externalUrl: z.url().nullable(),
   logo: z.string().nullable(),
   images: z.array(z.string()),
@@ -37,14 +43,24 @@ const projectSchema = z.object({
 });
 export type Project = z.infer<typeof projectSchema>;
 
-function project(input: { slug: string; name: string; status: ProjectStatus }): Project {
+function project(input: {
+  slug: string;
+  name: string;
+  status: ProjectStatus;
+  leadName?: string | null;
+  leadEmail?: string | null;
+  leadLinkedinUrl?: string | null;
+}): Project {
   return projectSchema.parse({
-    ...input,
+    slug: input.slug,
+    name: input.name,
+    status: input.status,
     oneLiner: `Projects.${input.slug}.oneLiner`,
     description: `Projects.${input.slug}.description`,
     stage: null,
-    leadName: null,
-    leadEmail: null,
+    leadName: input.leadName ?? null,
+    leadEmail: input.leadEmail ?? null,
+    leadLinkedinUrl: input.leadLinkedinUrl ?? null,
     externalUrl: null,
     logo: null,
     images: [],
@@ -53,15 +69,45 @@ function project(input: { slug: string; name: string; status: ProjectStatus }): 
 }
 
 export const projects: Project[] = [
-  project({ slug: "smilegreen", name: "SmileGreen", status: "active" }),
-  project({ slug: "mealyo", name: "Mealyo", status: "active" }),
+  project({
+    slug: "smilegreen",
+    name: "SmileGreen",
+    status: "active",
+    leadName: "Tim Köster",
+    leadEmail: "tim.koester@unimannheim.enactus.team",
+    leadLinkedinUrl: "https://www.linkedin.com/in/tim-köster-9a8847397",
+  }),
+  project({
+    slug: "mealyo",
+    name: "Mealyo",
+    status: "active",
+    leadName: "Justin Prodan",
+    leadEmail: "justin.prodan@unimannheim.enactus.team",
+    leadLinkedinUrl: "https://www.linkedin.com/in/justin-prodan",
+  }),
+  // Lead's first name (Heidi) is confirmed; surname and email are not — see
+  // ASSETS-TODO.md. leadName stays null rather than storing a bare first
+  // name a future consumer could render as a complete name.
   project({ slug: "resoap", name: "ReSoap", status: "active" }),
-  project({ slug: "impactwithus", name: "ImpactWithUs", status: "active" }),
-  // Archive. Only Differgy's outcome (spin-off) is confirmed; Safesteps and
-  // Vela are paused, not cancelled — they could still be reactivated.
+  project({
+    slug: "impactwithus",
+    name: "ImpactWithUs",
+    status: "active",
+    leadName: "Finn Brämig",
+    leadEmail: "finn.braemig@unimannheim.enactus.team",
+    leadLinkedinUrl: "https://www.linkedin.com/in/finn-niclas-braemig",
+  }),
+  // Archive.
   project({ slug: "differgy", name: "Differgy", status: "spinoff" }),
   project({ slug: "safesteps", name: "Safesteps", status: "paused" }),
   project({ slug: "vela", name: "Vela", status: "paused" }),
+  project({ slug: "sun-n-soil", name: "Sun n' Soil", status: "cancelled" }),
+  project({ slug: "green-heat", name: "Green Heat", status: "cancelled" }),
+  project({ slug: "reverze", name: "ReverZe", status: "cancelled" }),
+  project({ slug: "afya", name: "Afya", status: "cancelled" }),
+  project({ slug: "mushroom", name: "mushROOM", status: "cancelled" }),
+  project({ slug: "moufense", name: "Moufense", status: "cancelled" }),
+  project({ slug: "greenscape", name: "Greenscape", status: "cancelled" }),
 ];
 
 export { projectSchema, projectStatusSchema };

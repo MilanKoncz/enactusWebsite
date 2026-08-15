@@ -65,7 +65,7 @@ export function MobileMenu({ className }: MobileMenuProps) {
               onClick={close}
               className="transition-opacity duration-[var(--duration-fast)] ease-signature hover:opacity-80 focus-visible:opacity-80"
             >
-              <Logo variant="compact" className="border-paper text-paper" />
+              <Logo variant="compact" surface="ink" />
             </Link>
             <Dialog.Close asChild>
               <button type="button" aria-label={t("closeMenu")} className={MENU_BUTTON_CLASSES}>

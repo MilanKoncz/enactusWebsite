@@ -16,10 +16,14 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+// Slugs reuse two real entries from content/board.ts (thorben-ossig,
+// anton-osuhovskiy) purely so the "Board.<slug>.bio" translation lookup
+// resolves against the real message catalog — name/role/linkedinUrl below
+// are otherwise arbitrary test data, unrelated to those two people.
 vi.mock("@/content/board", () => ({
   board: [
     {
-      slug: "jane-doe",
+      slug: "thorben-ossig",
       name: "Jane Doe",
       role: "Vorstandsvorsitz",
       photo: null,
@@ -27,7 +31,7 @@ vi.mock("@/content/board", () => ({
       linkedinUrl: "https://www.linkedin.com/in/jane-doe",
     },
     {
-      slug: "john-doe",
+      slug: "anton-osuhovskiy",
       name: "John Doe",
       role: "Finanzen",
       photo: null,

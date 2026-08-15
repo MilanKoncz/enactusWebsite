@@ -22,9 +22,8 @@ describe("content/navigation", () => {
     }
   });
 
-  it("links Team from the footer's Verein column, not the header nav", () => {
-    expect(mainNav.some((item) => item.key === "team")).toBe(false);
-    expect(footerColumns.verein.some((item) => item.key === "team")).toBe(true);
+  it("lists Partner and Prozess under the footer's Verein column — no dedicated team route", () => {
+    expect(footerColumns.verein.map((item) => item.key)).toEqual(["partner", "prozess"]);
   });
 
   it("lists Impressum and Datenschutz under Rechtliches", () => {
@@ -34,15 +33,10 @@ describe("content/navigation", () => {
     ]);
   });
 
-  it("has all four social links and both network links unconfirmed (href null)", () => {
-    expect(socialLinks.map((link) => link.key)).toEqual([
-      "instagram",
-      "linkedin",
-      "facebook",
-      "spotify",
-    ]);
-    expect(socialLinks.every((link) => link.href === null)).toBe(true);
+  it("has the three confirmed social links and both network links, all with real URLs", () => {
+    expect(socialLinks.map((link) => link.key)).toEqual(["instagram", "linkedin", "facebook"]);
+    expect(socialLinks.every((link) => link.href !== null)).toBe(true);
     expect(networkLinks.map((link) => link.key)).toEqual(["enactusGermany", "enactusGlobal"]);
-    expect(networkLinks.every((link) => link.href === null)).toBe(true);
+    expect(networkLinks.every((link) => link.href !== null)).toBe(true);
   });
 });

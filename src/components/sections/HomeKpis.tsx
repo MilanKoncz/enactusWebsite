@@ -7,24 +7,24 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { kpis, type KpiKey } from "@/content/kpis";
 
-type KpiFormat = "count" | "currency" | "year";
+type KpiFormat = "count" | "currency" | "atLeastCount" | "atLeastCurrency" | "multiplier";
 
-// foundedYear must never pick up a thousands separator ("2003", not
-// "2.003") — the one KPI where grouping would misread the number entirely.
+// funding and projectIterations are lower bounds ("mehr als"), rendered with
+// a leading ">"; worldCupFinals is a multiplier, rendered with a trailing
+// "×" — see content/kpis.ts.
 const KPI_FORMAT: Record<KpiKey, KpiFormat> = {
   nationalChampionships: "count",
+  worldCupFinals: "multiplier",
   spinoffs: "count",
-  funding: "currency",
-  projectIterations: "count",
-  foundedYear: "year",
+  funding: "atLeastCurrency",
+  projectIterations: "atLeastCount",
 };
 
 // Five static figures, deliberately not animated (docs/design-system.md:
 // "one orchestrated moment beats ten scattered effects" — that moment is
-// the hero, not this). Every value is currently unverified, so each number
-// carries the quiet `unverified` PlaceholderMark rather than the loud
-// dashed-box treatment a page full of real, if unconfirmed, figures would
-// otherwise be buried under.
+// the hero, not this). Board-confirmed as of 2026-08-15; the `unverified`
+// PlaceholderMark path stays in place (rather than being deleted) for the
+// next figure that ships ahead of board sign-off.
 export function HomeKpis() {
   const t = useTranslations("Kpis");
   const tPlaceholder = useTranslations("Placeholder");
@@ -34,8 +34,12 @@ export function HomeKpis() {
     switch (KPI_FORMAT[key]) {
       case "currency":
         return format.number(value, { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
-      case "year":
-        return format.number(value, { useGrouping: false });
+      case "atLeastCurrency":
+        return `>${format.number(value, { style: "currency", currency: "EUR", maximumFractionDigits: 0 })}`;
+      case "atLeastCount":
+        return `>${format.number(value)}`;
+      case "multiplier":
+        return `${format.number(value)}×`;
       default:
         return format.number(value);
     }

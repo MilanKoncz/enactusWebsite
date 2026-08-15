@@ -1,18 +1,13 @@
 import { z } from "zod";
 
 /**
- * Current board (Vorstand) roster. Real names, roles, and photos are not
- * known yet — a board handover is never invented, so this holds five
- * placeholder seats (VORSTAND_1..VORSTAND_5) rather than an empty array, so
- * the board grid layout can be judged before the real roster exists (see
- * ASSETS-TODO.md). `role` is a free string rather than an enum: the actual
- * set of board roles isn't confirmed, and guessing one (e.g. assuming an
- * "HR" seat exists) would assert a structure the association may not have.
- * Bios live in messages/ under "Board.<slug>.bio"; this file only holds the
- * roster structure. `name` and `role` are language-neutral placeholder
- * tokens, not German copy, so they stay here rather than in messages/ — once
- * the board confirms a real roster, decide with them whether role names
- * belong in messages/ instead.
+ * Current board (Vorstand) roster, confirmed by the board 2026-08-15 (see
+ * ASSETS-TODO.md). `role` stays a free string rather than an enum: the
+ * actual set of board roles isn't a fixed structure worth encoding, and a
+ * future handover could reshuffle it. Bios live in messages/ under
+ * "Board.<slug>.bio"; this file only holds the roster structure. Portraits
+ * are not confirmed yet — every `photo` stays null until the board supplies
+ * them.
  */
 
 const boardMemberSchema = z.object({
@@ -25,17 +20,47 @@ const boardMemberSchema = z.object({
 });
 export type BoardMember = z.infer<typeof boardMemberSchema>;
 
-function placeholderMember(index: number): BoardMember {
-  return boardMemberSchema.parse({
-    slug: `vorstand-${index}`,
-    name: `VORSTAND_${index}`,
-    role: `POSITION_${index}`,
-    photo: null,
-    email: null,
-    linkedinUrl: null,
-  });
+function member(input: Omit<z.input<typeof boardMemberSchema>, "photo">): BoardMember {
+  return boardMemberSchema.parse({ ...input, photo: null });
 }
 
-export const board: BoardMember[] = [1, 2, 3, 4, 5].map(placeholderMember);
+export const board: BoardMember[] = [
+  member({
+    slug: "thorben-ossig",
+    name: "Thorben Ossig",
+    role: "Team-Lead",
+    email: "thorben.ossig@unimannheim.enactus.team",
+    linkedinUrl: "https://www.linkedin.com/in/thorben-o-06600a31a",
+  }),
+  member({
+    slug: "anton-osuhovskiy",
+    name: "Anton Osuhovskiy",
+    role: "Finance-Lead",
+    email: "anton.osuhovskiy@unimannheim.enactus.team",
+    // No LinkedIn profile given — a confirmed absence, not a gap to chase.
+    linkedinUrl: null,
+  }),
+  member({
+    slug: "tom-iizuka",
+    name: "Tom Iizuka",
+    role: "Operations-Lead",
+    email: "tom.iizuka@unimannheim.enactus.team",
+    linkedinUrl: "https://www.linkedin.com/in/tom-iizuka-678770399",
+  }),
+  member({
+    slug: "philip-strobl",
+    name: "Philip Strobl",
+    role: "Inno-Lead",
+    email: "philip.strobl@unimannheim.enactus.team",
+    linkedinUrl: "https://www.linkedin.com/in/philip-strobl-5015a4356",
+  }),
+  member({
+    slug: "risto-terhart",
+    name: "Risto Terhart",
+    role: "C&C Lead",
+    email: "risto.terhart@unimannheim.enactus.team",
+    linkedinUrl: "https://www.linkedin.com/in/risto-terhart-28ba56229",
+  }),
+];
 
 export { boardMemberSchema };

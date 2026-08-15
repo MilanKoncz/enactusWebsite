@@ -1,40 +1,32 @@
 import { z } from "zod";
 
 /**
- * Ordered steps of the member journey (what involvement looks like over
- * time — e.g. application through to alumni), shown on the recruiting or
- * about page. The exact steps aren't confirmed with the board yet, so the
- * key enum holds four generic placeholder phases rather than asserting a
- * specific journey structure — confirm the real steps with the board before
- * renaming them (see ASSETS-TODO.md). The key is a Zod enum, not a free
- * string, so that `t(\`${step.key}.title\`)` in components stays statically
- * checked against messages/{locale}.json (the same reasoning as
- * content/stars.ts). `title`/`description` are message keys under
- * messages/{locale}.json's "Journeys.<key>" namespace, not copy themselves.
+ * Group trips (Reisen) to Enactus National/World Cups, shown as a section on
+ * /events. Real destinations and years confirmed by the board 2026-08-15
+ * (see ASSETS-TODO.md), replacing the previous four generic placeholder
+ * slots. Ordered most recent first, matching how the board listed them.
  */
 
-const journeyKeySchema = z.enum(["phase-1", "phase-2", "phase-3", "phase-4"]);
-export type JourneyKey = z.infer<typeof journeyKeySchema>;
+const tripKeySchema = z.enum(["fss-2026", "fss-2025", "hws-2024", "fss-2024"]);
+export type TripKey = z.infer<typeof tripKeySchema>;
 
-const journeyStepSchema = z.object({
-  key: journeyKeySchema,
+const tripSchema = z.object({
+  key: tripKeySchema,
   order: z.number().int().min(1),
-  title: z.string(),
-  description: z.string(),
+  destination: z.string().nullable(),
+  year: z.number().int().nullable(),
 });
-export type JourneyStep = z.infer<typeof journeyStepSchema>;
+export type Trip = z.infer<typeof tripSchema>;
 
-function journeyStep(key: JourneyKey, order: number): JourneyStep {
-  return journeyStepSchema.parse({
-    key,
-    order,
-    title: `Journeys.${key}.title`,
-    description: `Journeys.${key}.description`,
-  });
+function trip(key: TripKey, order: number, destination: string, year: number): Trip {
+  return tripSchema.parse({ key, order, destination, year });
 }
 
-export const journeySteps: JourneyStep[] = journeyKeySchema.options.map((key, index) =>
-  journeyStep(key, index + 1),
-);
+export const trips: Trip[] = [
+  trip("fss-2026", 1, "St. Gallen", 2026),
+  trip("fss-2025", 2, "Berlin", 2025),
+  trip("hws-2024", 3, "München", 2024),
+  trip("fss-2024", 4, "Berlin", 2024),
+];
 
-export { journeyStepSchema, journeyKeySchema };
+export { tripSchema, tripKeySchema };

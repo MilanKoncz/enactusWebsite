@@ -1,43 +1,36 @@
 import { describe, expect, it } from "vitest";
-import { journeyKeySchema, journeySteps, journeyStepSchema } from "@/content/journeys";
+import { tripKeySchema, trips, tripSchema } from "@/content/journeys";
 
 describe("content/journeys", () => {
-  it("has four ordered placeholder phases until the journey is confirmed with the board", () => {
-    expect(journeySteps.map((s) => s.key)).toEqual(["phase-1", "phase-2", "phase-3", "phase-4"]);
-    expect(journeySteps.map((s) => s.order)).toEqual([1, 2, 3, 4]);
+  it("has the four confirmed trips, most recent first", () => {
+    expect(trips.map((t) => t.key)).toEqual(["fss-2026", "fss-2025", "hws-2024", "fss-2024"]);
+    expect(trips.map((t) => t.order)).toEqual([1, 2, 3, 4]);
   });
 
-  it("derives title and description message keys from the step's key", () => {
-    for (const step of journeySteps) {
-      expect(step.title).toBe(`Journeys.${step.key}.title`);
-      expect(step.description).toBe(`Journeys.${step.key}.description`);
+  it("has a real destination and year for every trip", () => {
+    expect(trips.map((t) => t.destination)).toEqual(["St. Gallen", "Berlin", "München", "Berlin"]);
+    expect(trips.map((t) => t.year)).toEqual([2026, 2025, 2024, 2024]);
+  });
+
+  it("validates every exported trip against the schema", () => {
+    for (const t of trips) {
+      expect(() => tripSchema.parse(t)).not.toThrow();
     }
   });
 
-  it("validates every exported step against the schema", () => {
-    for (const step of journeySteps) {
-      expect(() => journeyStepSchema.parse(step)).not.toThrow();
-    }
-  });
-
-  it("accepts a well-formed journey step", () => {
+  it("accepts a well-formed trip with a real destination and year", () => {
     expect(() =>
-      journeyStepSchema.parse({
-        key: "phase-1",
-        order: 1,
-        title: "Journeys.phase-1.title",
-        description: "Journeys.phase-1.description",
-      }),
+      tripSchema.parse({ key: "fss-2026", order: 1, destination: "St. Gallen", year: 2026 }),
     ).not.toThrow();
   });
 
-  it("rejects a journey step with an unknown key or non-positive order", () => {
-    const base = { title: "Journeys.phase-1.title", description: "Journeys.phase-1.description" };
-    expect(() => journeyStepSchema.parse({ ...base, key: "not-a-phase", order: 1 })).toThrow();
-    expect(() => journeyStepSchema.parse({ ...base, key: "phase-1", order: 0 })).toThrow();
+  it("rejects a trip with an unknown key or non-positive order", () => {
+    const base = { destination: null, year: null };
+    expect(() => tripSchema.parse({ ...base, key: "not-a-trip", order: 1 })).toThrow();
+    expect(() => tripSchema.parse({ ...base, key: "fss-2026", order: 0 })).toThrow();
   });
 
-  it("keeps the key enum in sync with the exported step list", () => {
-    expect(journeyKeySchema.options).toEqual(journeySteps.map((s) => s.key));
+  it("keeps the key enum in sync with the exported trip list", () => {
+    expect(tripKeySchema.options).toEqual(trips.map((t) => t.key));
   });
 });

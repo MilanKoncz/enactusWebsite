@@ -80,7 +80,7 @@ async function measureScroll(page) {
 }
 
 async function measureProximitySweep(page) {
-  const card = page.locator('[tabindex="0"]').filter({ hasText: "VORSTAND_1" }).first();
+  const card = page.locator('[tabindex="0"]').filter({ hasText: "Thorben Ossig" }).first();
   if ((await card.count()) === 0) return null;
   await card.scrollIntoViewIfNeeded();
   const box = await card.boundingBox();

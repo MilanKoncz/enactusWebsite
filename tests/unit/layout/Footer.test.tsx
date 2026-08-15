@@ -28,7 +28,6 @@ describe("Footer", () => {
 
   it("renders all three columns with correct internal hrefs", () => {
     renderWithIntl(<Footer />);
-    expect(screen.getByRole("link", { name: "Team" })).toHaveAttribute("href", "/team");
     expect(screen.getByRole("link", { name: "Partner" })).toHaveAttribute("href", "/partner");
     expect(screen.getByRole("link", { name: "Prozess" })).toHaveAttribute("href", "/prozess");
     expect(screen.getByRole("link", { name: "Impressum" })).toHaveAttribute("href", "/impressum");

@@ -2,28 +2,54 @@ import { describe, expect, it } from "vitest";
 import { board, boardMemberSchema } from "@/content/board";
 
 describe("content/board", () => {
-  it("has five placeholder seats until the next board handover populates it", () => {
+  it("has the five confirmed board seats in order", () => {
     expect(board.map((m) => m.slug)).toEqual([
-      "vorstand-1",
-      "vorstand-2",
-      "vorstand-3",
-      "vorstand-4",
-      "vorstand-5",
+      "thorben-ossig",
+      "anton-osuhovskiy",
+      "tom-iizuka",
+      "philip-strobl",
+      "risto-terhart",
     ]);
   });
 
-  it("uses language-neutral placeholder tokens, not invented real names", () => {
-    for (const [index, member] of board.entries()) {
-      expect(member.name).toBe(`VORSTAND_${index + 1}`);
-      expect(member.role).toBe(`POSITION_${index + 1}`);
+  it("has a real name and role for every member", () => {
+    expect(board.map((m) => m.name)).toEqual([
+      "Thorben Ossig",
+      "Anton Osuhovskiy",
+      "Tom Iizuka",
+      "Philip Strobl",
+      "Risto Terhart",
+    ]);
+    expect(board.map((m) => m.role)).toEqual([
+      "Team-Lead",
+      "Finance-Lead",
+      "Operations-Lead",
+      "Inno-Lead",
+      "C&C Lead",
+    ]);
+  });
+
+  it("has a confirmed email for every member", () => {
+    for (const member of board) {
+      expect(member.email).toMatch(/@unimannheim\.enactus\.team$/);
     }
   });
 
-  it("leaves photo, email, and linkedinUrl null until confirmed", () => {
+  it("leaves anton-osuhovskiy's LinkedIn null — confirmed absent, not missing", () => {
+    const anton = board.find((m) => m.slug === "anton-osuhovskiy")!;
+    expect(anton.linkedinUrl).toBeNull();
+  });
+
+  it("has a confirmed LinkedIn URL for every other member", () => {
+    for (const member of board) {
+      if (member.slug === "anton-osuhovskiy") continue;
+      expect(member.linkedinUrl).toMatch(/^https:\/\/www\.linkedin\.com\/in\//);
+    }
+  });
+
+  it("leaves every photo null until portraits are confirmed", () => {
     for (const member of board) {
       expect(member.photo).toBeNull();
-      expect(member.email).toBeNull();
-      expect(member.linkedinUrl).toBeNull();
     }
   });
 

@@ -1,29 +1,28 @@
 import { describe, expect, it } from "vitest";
 import { kpiSchema, kpis } from "@/content/kpis";
-import { org } from "@/content/org";
 
 describe("content/kpis", () => {
   it("has the five headline figures", () => {
     expect(kpis.map((k) => k.key)).toEqual([
       "nationalChampionships",
+      "worldCupFinals",
       "spinoffs",
       "funding",
       "projectIterations",
-      "foundedYear",
     ]);
   });
 
-  it("matches the figures given for the club", () => {
+  it("matches the figures confirmed by the board", () => {
     const byKey = Object.fromEntries(kpis.map((k) => [k.key, k.value]));
     expect(byKey.nationalChampionships).toBe(8);
+    expect(byKey.worldCupFinals).toBe(2);
     expect(byKey.spinoffs).toBe(5);
-    expect(byKey.funding).toBe(250_000);
-    expect(byKey.projectIterations).toBe(70);
-    expect(byKey.foundedYear).toBe(org.foundingYear.year);
+    expect(byKey.funding).toBe(150_000);
+    expect(byKey.projectIterations).toBe(65);
   });
 
-  it("starts every KPI unverified pending board confirmation", () => {
-    expect(kpis.every((k) => k.verified === false)).toBe(true);
+  it("marks every KPI as board-confirmed", () => {
+    expect(kpis.every((k) => k.verified === true)).toBe(true);
   });
 
   it("validates every exported KPI against the schema", () => {
@@ -34,7 +33,7 @@ describe("content/kpis", () => {
 
   it("rejects a KPI with an unknown key", () => {
     expect(() =>
-      kpiSchema.parse({ key: "membersCount", value: 42, verified: false, asOf: "2026-07-26" }),
+      kpiSchema.parse({ key: "foundedYear", value: 2003, verified: true, asOf: "2026-08-15" }),
     ).toThrow();
   });
 

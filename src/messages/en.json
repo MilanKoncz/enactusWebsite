@@ -12,7 +12,6 @@
     "partner": "Partners",
     "kontakt": "Contact",
     "mitmachen": "Get involved",
-    "team": "Team",
     "impressum": "Legal notice",
     "datenschutz": "Privacy policy"
   },
@@ -47,11 +46,11 @@
       "label": "Social media",
       "instagram": "Instagram",
       "linkedin": "LinkedIn",
-      "facebook": "Facebook",
-      "spotify": "Spotify"
+      "facebook": "Facebook"
     },
     "externalHint": "Opens in a new tab",
     "missingUrl": "URL missing",
+    "since": "Since {year}",
     "copyright": "© Enactus Mannheim e.V."
   },
   "ComingSoon": {
@@ -85,10 +84,10 @@
     "title": "Numbers that speak for themselves",
     "labels": {
       "nationalChampionships": "National championships",
-      "spinoffs": "Spin-offs",
+      "worldCupFinals": "World Cup finals",
+      "spinoffs": "Founded & handed over",
       "funding": "Funding raised",
-      "projectIterations": "Project iterations",
-      "foundedYear": "Founded"
+      "projectIterations": "Project iterations"
     },
     "asOf": "As of {date}"
   },
@@ -159,6 +158,23 @@
     "linkedin": "LinkedIn",
     "linkedinLabel": "Open {name}'s LinkedIn profile"
   },
+  "Board": {
+    "thorben-ossig": {
+      "bio": "Responsible for the board's strategy and its execution, and for contact with our Enactus Global network."
+    },
+    "anton-osuhovskiy": {
+      "bio": "Responsible for project controlling, accounting, and legal compliance for the project work and the association."
+    },
+    "tom-iizuka": {
+      "bio": "Responsible for the project portfolio and for building and deploying the association's resources for the projects' success."
+    },
+    "philip-strobl": {
+      "bio": "Responsible for the innovation process, giving members the best possible support with network and knowledge during idea iteration."
+    },
+    "risto-terhart": {
+      "bio": "Responsible for culture through socials and journeys, and for communication through marketing."
+    }
+  },
   "ClosingCta": {
     "eyebrow": "Next step",
     "title": "Become part of the next project",
@@ -166,10 +182,140 @@
     "primaryCta": "Apply now",
     "secondaryCta": "See the process"
   },
+  "Process": {
+    "eyebrow": "The process",
+    "title": "From idea to company",
+    "intro": "Eight stations take a project from its first pitch to spinning off as an independent company.",
+    "timeline": {
+      "regionLabel": "Process steps",
+      "milestoneLabel": "Milestone",
+      "phaseLabel": "Phase",
+      "criteriaLabel": "Gating criteria",
+      "benefitsLabel": "Benefits",
+      "criteriaHint": "This gating criterion hasn't been set by the board yet.",
+      "draftHint": "This text is a draft, not yet approved by the board."
+    },
+    "steps": {
+      "kickOff": {
+        "title": "Kick-off",
+        "short": "The team pitches its idea to the board and the InnoLab.",
+        "checklist": ["CRITERION_1", "CRITERION_2", "CRITERION_3"]
+      },
+      "ideation": {
+        "title": "Ideation phase (InnoLab)",
+        "short": "The team sharpens the idea, target group, and business model in the InnoLab.",
+        "checklist": [
+          "Close coaching from experienced InnoLab mentors.",
+          "Ideas get tested before any resources are committed.",
+          "Direct access to workshops on business modeling and market validation."
+        ]
+      },
+      "innoGating": {
+        "title": "Inno Gating",
+        "short": "The board decides whether the project moves into the MVP phase.",
+        "checklist": ["CRITERION_1", "CRITERION_2", "CRITERION_3"]
+      },
+      "mvp": {
+        "title": "MVP phase",
+        "short": "The team builds and tests a first working prototype.",
+        "checklist": [
+          "Budget for a first prototype from the association's funds.",
+          "Feedback from real users before launch.",
+          "Close exchange with the board ahead of Operations Gating."
+        ]
+      },
+      "operationsGating": {
+        "title": "Operations Gating",
+        "short": "The board decides whether the project moves into execution.",
+        "checklist": ["CRITERION_1", "CRITERION_2", "CRITERION_3"]
+      },
+      "implementation": {
+        "title": "Execution",
+        "short": "The team runs the project operationally as its own unit.",
+        "checklist": [
+          "Full operational responsibility for budget, team, and results.",
+          "Access to the association's partner network and infrastructure.",
+          "Regular coaching from the board and experienced alumni."
+        ]
+      },
+      "spinoff": {
+        "title": "Spin-off",
+        "short": "The project spins off as an independent company.",
+        "checklist": ["CRITERION_1", "CRITERION_2", "CRITERION_3"]
+      },
+      "startup": {
+        "title": "Startup",
+        "short": "The former project continues as an independent company.",
+        "checklist": [
+          "An independent company with its own legal form and team.",
+          "Continued access to the Enactus alumni network.",
+          "Visibility as a reference project in competitions and with partners."
+        ]
+      }
+    },
+    "guide": {
+      "eyebrow": "For reference",
+      "title": "Project Guide",
+      "lead": "The full process as a PDF, to read at your own pace.",
+      "cta": "Download the Project Guide",
+      "unavailableHint": "The Project Guide isn't available yet."
+    },
+    "cta": {
+      "eyebrow": "Get involved",
+      "title": "Ready for the first station?",
+      "lead": "Apply and start with your own idea at Kick-off.",
+      "primaryCta": "Apply now"
+    }
+  },
+  "Projects": {
+    "smilegreen": {
+      "oneLiner": "The uncompromising replaceable-head toothbrush made from natural rubber.",
+      "description": "SmileGreen develops a replaceable-head toothbrush made from natural rubber with PHA bio-plastic bristles. It's 100% compostable within four months and, through a hygienic replaceable-head system, offers a sustainable alternative to the disposable toothbrush."
+    }
+  },
+  "Stars": {
+    "STAR_1": {
+      "description": "Blauherz developed trousers for wheelchair users that combine functional and fashionable demands. The project ran from 2016 to its spin-off in 2019 and was also a 2019 World Cup finalist."
+    },
+    "STAR_2": {
+      "description": "Moufense is an anti-mosquito body lotion against malaria in Togo, its effectiveness confirmed by the Biogents institute in Regensburg. Distribution ran through the Kopeme Group; the project won the National Cup in 2021."
+    },
+    "STAR_3": {
+      "description": "effishent ran aquaponics in Togo — the symbiotic farming of fish and vegetables in a closed water cycle. The process was designed to be affordable for developing countries too."
+    },
+    "STAR_4": {
+      "description": "Sanagua gave the population of Arica, Chile, access to clean and affordable drinking water. The project was successfully spun off."
+    },
+    "STAR_5": {
+      "description": "Back on Track helped a former inmate into a full-time position running his own vegan food truck."
+    },
+    "STAR_6": {
+      "description": "Flat Mates reached the National Cup final round in 2013."
+    },
+    "STAR_7": {
+      "description": "Stadthonig was handed over to a partner."
+    },
+    "STAR_8": {
+      "description": "Sunte brought solar power and education to hospitals in Togo."
+    }
+  },
   "Placeholder": {
     "missingLabel": "Not available yet",
     "missingHint": "This information isn't available yet.",
     "unverifiedLabel": "Unconfirmed",
     "unverifiedHint": "This figure hasn't been confirmed by the board yet."
+  },
+  "Impressum": {
+    "eyebrow": "Legal",
+    "title": "Impressum",
+    "enNotice": "This legal notice (Impressum) is required under German law and is provided in German only — this is standard, legally safer practice for a German association.",
+    "operatorLabel": "Diensteanbieter",
+    "representativesLabel": "Vertreten durch",
+    "representativesHint": "Diese Namen sind noch nicht vom Vorstand bestätigt — die bisherige Datenschutzerklärung nennt einen anderen Vorstand.",
+    "registerLabel": "Registereintrag",
+    "contactLabel": "Kontakt",
+    "responsibleLabel": "Inhaltlich verantwortlich gemäß § 18 Abs. 2 MStV",
+    "responsibleSame": "Dieselben Personen wie unter „Vertreten durch“.",
+    "copyright": "© {year} Enactus Mannheim e.V. Alle Rechte vorbehalten."
   }
 }

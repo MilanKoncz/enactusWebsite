@@ -8,24 +8,42 @@ export type ThreadStop =
   | "alumni"
   | "gate-board"
   | "board"
-  | "cta";
+  | "cta"
+  | "process-intro"
+  | "process-timeline"
+  | "process-guide"
+  | "process-cta";
 
 export type ThreadWidth = "wide" | "narrow";
 
+// "y" (the default, every homepage stop) is a vertical run down a section:
+// `from`/`bow`/`to` are x-positions at the top edge, midpoint, and bottom
+// edge. "x" is the same S-curve transposed onto the horizontal axis — the
+// values become y-positions at the left edge, midpoint, and right edge of a
+// section that runs sideways instead of down. Only the /prozess timeline (in
+// its wide, horizontal layout) ever sets "x"; every other stop, and that same
+// timeline stop's own narrow/stacked layout, relies on the "y" default.
+export type ThreadAxis = "x" | "y";
+
 type Waypoints = {
-  /** x at the section's top edge, in percent of section width. */
+  /** At axis "y": x at the section's top edge. At axis "x": y at the
+      section's left edge, in percent. */
   from: number;
-  /** x at the section's vertical midpoint. */
+  /** At axis "y": x at the section's vertical midpoint. At axis "x": y at
+      the section's horizontal midpoint, in percent. */
   bow: number;
-  /** x at the section's bottom edge. */
+  /** At axis "y": x at the section's bottom edge. At axis "x": y at the
+      section's right edge, in percent. */
   to: number;
+  axis?: ThreadAxis;
 };
 
 /**
  * One waypoint triple per section, per width — see ThreadSegment.tsx for why
  * percent-of-section-width, not pixels, is what lets adjacent segments line
  * up exactly at their seams: `to` of one stop must equal `from` of the next,
- * in both widths. Enforced by threadRoute.test.ts, not just by convention.
+ * in both widths, among stops that share an axis (see the continuity test
+ * for the one named exception this creates).
  *
  * Amplitude is chosen per stop, not globally: preserveAspectRatio="none"
  * scales x and y independently, so the same x-swing reads as a sharp zigzag
@@ -88,12 +106,42 @@ const ROUTES: Record<ThreadStop, Record<ThreadWidth, Waypoints>> = {
     wide: { from: 84, bow: 76, to: 78 },
     narrow: { from: 92, bow: 86, to: 88 },
   },
+
+  // /prozess (ProcessTimeline.tsx). A short, separate run — this page opens
+  // with its own intro, not with the homepage's thread, so it starts back at
+  // a centered 50 rather than picking up wherever `cta` left off.
+  "process-intro": {
+    wide: { from: 50, bow: 50, to: 50 },
+    narrow: { from: 50, bow: 50, to: 50 },
+  },
+  // The one stop that changes axis by width: at "wide" the timeline itself
+  // is horizontal, so the thread becomes its spine and runs flat (axis "x",
+  // a centered 50 the entire way — the timeline's own station markers carry
+  // the visual interest, the thread just has to arrive and leave level). At
+  // "narrow" the timeline stacks vertically instead, so the thread reverts
+  // to the default "y" axis and becomes the rail the stations line up
+  // against, with a slight drift so it still reads as the same living line
+  // rather than a ruler-straight guide.
+  "process-timeline": {
+    wide: { from: 50, bow: 50, to: 50, axis: "x" },
+    narrow: { from: 50, bow: 20, to: 50 },
+  },
+  "process-guide": {
+    wide: { from: 50, bow: 50, to: 50 },
+    narrow: { from: 50, bow: 50, to: 50 },
+  },
+  "process-cta": {
+    wide: { from: 50, bow: 60, to: 66 },
+    narrow: { from: 50, bow: 66, to: 72 },
+  },
 };
 
-// Iteration order matches the stops' actual order on the homepage
+// Iteration order matches the sections' actual order on the homepage
 // (src/app/[locale]/(site)/page.tsx) — the order the continuity test walks
-// pairwise to check every seam.
-export const THREAD_STOPS: ThreadStop[] = [
+// pairwise to check every seam. THREAD_STOPS is kept as an alias: nothing
+// outside this module still needs the un-prefixed name, but the homepage
+// predates the /prozess stops and this keeps that history legible.
+export const HOME_STOPS: ThreadStop[] = [
   "partners",
   "gate-kpis",
   "kpis",
@@ -105,16 +153,34 @@ export const THREAD_STOPS: ThreadStop[] = [
   "board",
   "cta",
 ];
+export const THREAD_STOPS = HOME_STOPS;
+
+// Iteration order matches src/app/[locale]/(site)/prozess/page.tsx.
+export const PROCESS_STOPS: ThreadStop[] = [
+  "process-intro",
+  "process-timeline",
+  "process-guide",
+  "process-cta",
+];
 
 export function waypointsFor(stop: ThreadStop, width: ThreadWidth): Waypoints {
   return ROUTES[stop][width];
 }
 
-// Two cubic Béziers back to back, each with a vertical tangent at its shared
-// endpoint (y=0, y=50, y=100): a straight vertical run into and out of the
-// midpoint keeps both the seam with the neighboring segment and the bow at
-// this segment's own midpoint free of any visible kink.
+export function axisFor(stop: ThreadStop, width: ThreadWidth): ThreadAxis {
+  return ROUTES[stop][width].axis ?? "y";
+}
+
+// Two cubic Béziers back to back, each with a vertical (axis "y") or
+// horizontal (axis "x") tangent at its shared endpoint: a straight run into
+// and out of the midpoint keeps both the seam with the neighboring segment
+// and the bow at this segment's own midpoint free of any visible kink. The
+// axis "x" branch is exactly the axis "y" one with x and y swapped in every
+// coordinate pair — same curve, transposed.
 export function pathFor(stop: ThreadStop, width: ThreadWidth): string {
-  const { from, bow, to } = waypointsFor(stop, width);
+  const { from, bow, to, axis = "y" } = waypointsFor(stop, width);
+  if (axis === "x") {
+    return `M 0,${from} C 20,${from} 30,${bow} 50,${bow} C 70,${bow} 80,${to} 100,${to}`;
+  }
   return `M ${from},0 C ${from},20 ${bow},30 ${bow},50 C ${bow},70 ${to},80 ${to},100`;
 }

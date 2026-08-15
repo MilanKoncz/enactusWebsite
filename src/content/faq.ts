@@ -1,15 +1,18 @@
 import { z } from "zod";
 
 /**
- * FAQ entries for the /faq page. Questions and answers are copy and live in
- * messages/{locale}.json under "Faq.<key>.question" / "Faq.<key>.answer";
- * this file only orders the entries and groups them. The key is a Zod enum,
- * not a free string, so that `t(\`${entry.key}.question\`)` in components
- * stays statically checked against messages/{locale}.json (the same
- * reasoning as content/stars.ts). `category` is a free string rather than an
- * enum since the real grouping isn't confirmed yet. Real questions aren't
- * drafted yet, so this holds eight generic placeholder entries rather than
- * asserting specific questions (see ASSETS-TODO.md).
+ * FAQ entries shown on /kontakt (FAQ list on the left, contact form on the
+ * right) — confirmed with the board 2026-07-29, see ASSETS-TODO.md. There is
+ * no separate /faq route; the old site's /faq URL redirects there instead.
+ * Questions and answers are copy and live in messages/{locale}.json under
+ * "Faq.<key>.question" / "Faq.<key>.answer"; this file only orders the
+ * entries and groups them. The key is a Zod enum, not a free string, so that
+ * `t(\`${entry.key}.question\`)` in components stays statically checked
+ * against messages/{locale}.json (the same reasoning as content/stars.ts).
+ * `category` is a free string rather than an enum since the real grouping
+ * isn't confirmed yet. Real questions aren't drafted yet, so this holds
+ * eight generic placeholder entries rather than asserting specific
+ * questions.
  */
 
 const faqKeySchema = z.enum([

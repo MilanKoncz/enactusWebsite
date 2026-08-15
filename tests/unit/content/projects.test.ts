@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { projectSchema, projectStatusSchema, projects } from "@/content/projects";
 
 describe("content/projects", () => {
-  it("lists the four active projects and the three archived ones", () => {
+  it("lists the four active projects and the archive", () => {
     expect(projects.filter((p) => p.status === "active").map((p) => p.slug)).toEqual([
       "smilegreen",
       "mealyo",
@@ -13,14 +13,49 @@ describe("content/projects", () => {
       "differgy",
       "safesteps",
       "vela",
+      "sun-n-soil",
+      "green-heat",
+      "reverze",
+      "afya",
+      "mushroom",
+      "moufense",
+      "greenscape",
     ]);
   });
 
-  it("marks Differgy as a spinoff and Safesteps/Vela as paused, not cancelled", () => {
+  it("marks the confirmed archive statuses correctly", () => {
     const bySlug = Object.fromEntries(projects.map((p) => [p.slug, p.status]));
     expect(bySlug.differgy).toBe("spinoff");
     expect(bySlug.safesteps).toBe("paused");
     expect(bySlug.vela).toBe("paused");
+    expect(bySlug.moufense).toBe("cancelled");
+  });
+
+  it("defaults the six unconfirmed archive projects to cancelled", () => {
+    const bySlug = Object.fromEntries(projects.map((p) => [p.slug, p.status]));
+    for (const slug of ["sun-n-soil", "green-heat", "reverze", "afya", "mushroom", "greenscape"]) {
+      expect(bySlug[slug]).toBe("cancelled");
+    }
+  });
+
+  it("has real lead contacts for three of the four active projects", () => {
+    const smilegreen = projects.find((p) => p.slug === "smilegreen")!;
+    expect(smilegreen.leadName).toBe("Tim Köster");
+    expect(smilegreen.leadEmail).toBe("tim.koester@unimannheim.enactus.team");
+    expect(smilegreen.leadLinkedinUrl).toMatch(/^https:\/\/www\.linkedin\.com\/in\//);
+
+    const mealyo = projects.find((p) => p.slug === "mealyo")!;
+    expect(mealyo.leadName).toBe("Justin Prodan");
+
+    const impactwithus = projects.find((p) => p.slug === "impactwithus")!;
+    expect(impactwithus.leadName).toBe("Finn Brämig");
+  });
+
+  it("leaves ReSoap's lead contact null — only a first name is confirmed", () => {
+    const resoap = projects.find((p) => p.slug === "resoap")!;
+    expect(resoap.leadName).toBeNull();
+    expect(resoap.leadEmail).toBeNull();
+    expect(resoap.leadLinkedinUrl).toBeNull();
   });
 
   it("derives oneLiner and description message keys from the slug", () => {
@@ -32,8 +67,6 @@ describe("content/projects", () => {
   it("leaves unconfirmed fields null or empty rather than guessed", () => {
     for (const p of projects) {
       expect(p.stage).toBeNull();
-      expect(p.leadName).toBeNull();
-      expect(p.leadEmail).toBeNull();
       expect(p.externalUrl).toBeNull();
       expect(p.logo).toBeNull();
       expect(p.images).toEqual([]);
@@ -58,6 +91,7 @@ describe("content/projects", () => {
         stage: null,
         leadName: null,
         leadEmail: null,
+        leadLinkedinUrl: null,
         externalUrl: null,
         logo: null,
         images: [],
@@ -74,6 +108,7 @@ describe("content/projects", () => {
       status: "active" as const,
       stage: null,
       leadName: null,
+      leadLinkedinUrl: null,
       externalUrl: null,
       logo: null,
       images: [],
@@ -96,6 +131,7 @@ describe("content/projects", () => {
         stage: null,
         leadName: null,
         leadEmail: null,
+        leadLinkedinUrl: null,
         externalUrl: null,
         logo: null,
         images: [],

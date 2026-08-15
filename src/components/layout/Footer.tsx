@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 import { ExternalLink as ExternalLinkIcon } from "lucide-react";
-import { SiFacebook, SiInstagram, SiSpotify } from "@icons-pack/react-simple-icons";
+import { SiFacebook, SiInstagram } from "@icons-pack/react-simple-icons";
 import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
@@ -16,16 +16,16 @@ import {
   type SocialKey,
   type SocialLink,
 } from "@/content/navigation";
+import { org } from "@/content/org";
 import { Link } from "@/lib/navigation";
 
 // Simple Icons dropped LinkedIn's mark after a takedown request — there is no
 // LinkedIn export in @icons-pack/react-simple-icons to use. Its link falls
-// back to a text-only treatment; Instagram/Facebook/Spotify get real icons.
+// back to a text-only treatment; Instagram/Facebook get real icons.
 // See ASSETS-TODO.md.
 const SOCIAL_ICONS: Partial<Record<SocialKey, ComponentType<{ className?: string; "aria-hidden"?: boolean }>>> = {
   instagram: SiInstagram,
   facebook: SiFacebook,
-  spotify: SiSpotify,
 };
 
 function ExternalLinkItem({
@@ -68,9 +68,18 @@ export function Footer() {
                 aria-label={tRoutes("home")}
                 className="transition-opacity duration-[var(--duration-fast)] ease-signature hover:opacity-80 focus-visible:opacity-80"
               >
-                <Logo variant="full" className="border-paper text-paper" />
+                <Logo variant="full" surface="ink" />
               </Link>
               <p className="text-body-s opacity-60">{tSite("claim")}</p>
+              <p className="text-body-s opacity-60">
+                {org.foundingYear.verified ? (
+                  t("since", { year: org.foundingYear.year })
+                ) : (
+                  <PlaceholderMark variant="unverified" hint={tPlaceholder("unverifiedHint")}>
+                    {t("since", { year: org.foundingYear.year })}
+                  </PlaceholderMark>
+                )}
+              </p>
             </div>
 
             <nav aria-label={t("navLabel")} className="contents">

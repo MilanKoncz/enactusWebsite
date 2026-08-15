@@ -13,6 +13,20 @@ import { socialLinks } from "./navigation";
 
 const emailSchema = z.email().nullable();
 
+// The people legally representing the association (Impressum "Vertreten
+// durch" and, identically here, § 18 Abs. 2 MStV's content-responsible
+// person). Kept separate from content/board.ts's five-seat public "Vorstand"
+// roster on purpose: the legally representing board (Vorstand im Sinne des
+// Vereinsrechts) is a subset of the five-seat public-facing roster, and the
+// two lists can diverge — see ASSETS-TODO.md. Confirmed 2026-08-15: only two
+// of the three legally representing seats are currently held (Thorben Ossig,
+// Anton Osuhovskiy); the third is formally vacant, so `names` has two
+// entries rather than three — that's the confirmed fact, not a gap.
+const legalRepresentativesSchema = z.object({
+  names: z.array(z.string()),
+  verified: z.boolean(),
+});
+
 const orgSchema = z.object({
   legalName: z.string(),
   shortName: z.string(),
@@ -22,6 +36,7 @@ const orgSchema = z.object({
   }),
   registeredOffice: z.string().nullable(),
   registerEntry: z.string().nullable(),
+  legalRepresentatives: legalRepresentativesSchema,
   contactEmails: z.object({
     general: emailSchema,
     board: emailSchema,
@@ -32,13 +47,23 @@ export type Org = z.infer<typeof orgSchema>;
 export const org: Org = orgSchema.parse({
   legalName: "Enactus Mannheim e.V.",
   shortName: "Enactus Mannheim",
-  // Matches the "seit 2003" figure in kpis.ts — unconfirmed, see ASSETS-TODO.md.
+  // Shown "seit {year}" in the footer rather than as a KPI — unconfirmed,
+  // see ASSETS-TODO.md.
   foundingYear: { year: 2003, verified: false },
-  registeredOffice: null,
-  registerEntry: null,
+  registeredOffice: "P4 9, 68161 Mannheim",
+  registerEntry: "Amtsgericht Mannheim – Vereinsregister – VR 700965",
+  // Board-confirmed 2026-08-15 — see the field comment above for the vacant
+  // third seat.
+  legalRepresentatives: {
+    names: ["Thorben Ossig", "Anton Osuhovskiy"],
+    verified: true,
+  },
   contactEmails: {
     general: null,
-    board: null,
+    // "teamvorstand" — given specifically as the Impressum/legal contact
+    // address, not confirmed as the general public inbox Footer/Kontakt
+    // still need (content/navigation.ts, ASSETS-TODO.md).
+    board: "teamvorstand@unimannheim.enactus.team",
   },
 });
 

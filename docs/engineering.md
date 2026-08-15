@@ -55,9 +55,11 @@ protection checklist.
 
 - `generateMetadata` per route and locale, with OG images.
 - `hreflang` alternates between locales.
-- **301 redirects from the old Webflow URLs** in `next.config.ts`: `/team`,
-  `/projekte`, `/innolab`, `/mitmachen`, `/faq`, `/kontakt`, `/partner`, and the
-  individual project pages. Losing these throws away years of ranking.
+- **301 redirects from the old Webflow URLs** in `next.config.ts`: `/team`
+  (→ `/`, since there's no dedicated team route on this site — the Vorstand
+  only appears on the homepage), `/projekte`, `/innolab`, `/mitmachen`,
+  `/faq`, `/kontakt`, `/partner`, and the individual project pages. Losing
+  these throws away years of ranking.
 - `sitemap.ts` and `robots.ts` generated from the route tree.
 
 ## i18n

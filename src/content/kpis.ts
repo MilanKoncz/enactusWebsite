@@ -1,21 +1,22 @@
 import { z } from "zod";
-import { org } from "./org";
 
 /**
- * The five headline numbers used on the homepage and about page. Every
- * entry carries verified/asOf so an unconfirmed figure can be flagged in
- * the UI instead of presented with the same confidence as a checked one —
- * all five start unverified per the board handover, see ASSETS-TODO.md.
- * Labels, units, and phrasing ("seit 2003", "8 Meistertitel") live in
- * messages/; this file holds only the key, the raw number, and provenance.
+ * The five headline numbers used on the homepage and about page, confirmed
+ * by the board 2026-08-15 (see ASSETS-TODO.md). `funding` and
+ * `projectIterations` are lower bounds ("mehr als") rather than exact counts
+ * — HomeKpis.tsx renders those two with a leading ">" and `worldCupFinals`
+ * with a trailing "×", so this file only ever holds the raw number, never
+ * formatted text. The founding year used to live here too; it now shows
+ * "seit {year}" in the footer instead (content/org.ts, Footer.tsx) since a
+ * one-off fact reads oddly next to four genuine headline stats.
  */
 
 const kpiKeySchema = z.enum([
   "nationalChampionships",
+  "worldCupFinals",
   "spinoffs",
   "funding",
   "projectIterations",
-  "foundedYear",
 ]);
 export type KpiKey = z.infer<typeof kpiKeySchema>;
 
@@ -32,17 +33,16 @@ function kpi(input: z.input<typeof kpiSchema>): Kpi {
 }
 
 export const kpis: Kpi[] = [
-  kpi({ key: "nationalChampionships", value: 8, verified: false, asOf: "2026-07-26" }),
-  kpi({ key: "spinoffs", value: 5, verified: false, asOf: "2026-07-26" }),
-  kpi({ key: "funding", value: 250_000, verified: false, asOf: "2026-07-26" }),
-  kpi({ key: "projectIterations", value: 70, verified: false, asOf: "2026-07-26" }),
-  // Same fact as org.foundingYear.year — read from there so the two can't disagree.
-  kpi({
-    key: "foundedYear",
-    value: org.foundingYear.year,
-    verified: org.foundingYear.verified,
-    asOf: "2026-07-26",
-  }),
+  kpi({ key: "nationalChampionships", value: 8, verified: true, asOf: "2026-08-15" }),
+  kpi({ key: "worldCupFinals", value: 2, verified: true, asOf: "2026-08-15" }),
+  // "5 Gegründet & Übergeben": named and evidenced (Blauherz, Differgy,
+  // Sanagua, Stadthonig, Sunte). The board's internal working number is 9 —
+  // see ASSETS-TODO.md for why this KPI stays at 5 until the other four are named.
+  kpi({ key: "spinoffs", value: 5, verified: true, asOf: "2026-08-15" }),
+  // ">150.000 €" — see the file comment on the ">" formatting.
+  kpi({ key: "funding", value: 150_000, verified: true, asOf: "2026-08-15" }),
+  // ">65" — see the file comment.
+  kpi({ key: "projectIterations", value: 65, verified: true, asOf: "2026-08-15" }),
 ];
 
 export { kpiSchema, kpiKeySchema };

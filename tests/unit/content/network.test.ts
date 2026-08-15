@@ -7,9 +7,12 @@ describe("content/network", () => {
       studentsGermany: 1700,
       universitiesGermany: 30,
       countriesGlobal: 34,
-      studentsGlobal: 42000,
       verified: true,
     });
+  });
+
+  it("deliberately has no global student count field", () => {
+    expect(networkStats).not.toHaveProperty("studentsGlobal");
   });
 
   it("validates the exported network stats", () => {

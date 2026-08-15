@@ -1,43 +1,103 @@
 import { describe, expect, it } from "vitest";
-import { projectStageSchema, stageKeySchema, stages, stageSchema } from "@/content/process";
+import {
+  projectGuideSchema,
+  projectStageSchema,
+  stageKeySchema,
+  stepKindSchema,
+  stepSchema,
+  steps,
+} from "@/content/process";
 
 describe("content/process", () => {
-  it("lists the four gate stages in order", () => {
-    expect(stages.map((s) => s.key)).toEqual(["ideation", "innoGating", "operationsGating", "spinoff"]);
-    expect(stages.map((s) => s.order)).toEqual([1, 2, 3, 4]);
+  it("lists the eight process steps in order", () => {
+    expect(steps.map((s) => s.key)).toEqual([
+      "kickOff",
+      "ideation",
+      "innoGating",
+      "mvp",
+      "operationsGating",
+      "implementation",
+      "spinoff",
+      "startup",
+    ]);
+    expect(steps.map((s) => s.order)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
   });
 
-  it("marks only the two gates confirmed by docs/design-system.md as confirmed", () => {
-    const confirmed = stages.filter((s) => s.confirmed).map((s) => s.key);
-    expect(confirmed).toEqual(["innoGating", "operationsGating"]);
+  it("alternates milestone and phase, starting and ending on a milestone-then-phase pair", () => {
+    expect(steps.map((s) => s.kind)).toEqual([
+      "milestone",
+      "phase",
+      "milestone",
+      "phase",
+      "milestone",
+      "phase",
+      "milestone",
+      "phase",
+    ]);
   });
 
-  it("accepts a well-formed stage", () => {
+  it("marks the exact four board-given milestones as milestones", () => {
+    const milestones = steps.filter((s) => s.kind === "milestone").map((s) => s.key);
+    expect(milestones).toEqual(["kickOff", "innoGating", "operationsGating", "spinoff"]);
+  });
+
+  it("treats every step's own name and position as board-confirmed", () => {
+    expect(steps.every((s) => s.confirmed)).toBe(true);
+  });
+
+  it("gives every step a distinct icon", () => {
+    const icons = steps.map((s) => s.icon);
+    expect(new Set(icons).size).toBe(icons.length);
+  });
+
+  it("accepts a well-formed step", () => {
     expect(() =>
-      stageSchema.parse({
-        key: "ideation",
+      stepSchema.parse({
+        key: "kickOff",
+        kind: "milestone",
         order: 1,
-        confirmed: false,
-        title: "Process.ideation.title",
-        description: "Process.ideation.description",
+        confirmed: true,
+        icon: "flag",
+        title: "Process.steps.kickOff.title",
+        short: "Process.steps.kickOff.short",
       }),
     ).not.toThrow();
   });
 
-  it("rejects a stage with an unknown key", () => {
+  it("rejects a step with an unknown key", () => {
     expect(() =>
-      stageSchema.parse({
+      stepSchema.parse({
         key: "scaling",
-        order: 5,
+        kind: "phase",
+        order: 9,
         confirmed: false,
-        title: "Process.scaling.title",
-        description: "Process.scaling.description",
+        icon: "flag",
+        title: "Process.steps.scaling.title",
+        short: "Process.steps.scaling.short",
       }),
     ).toThrow();
   });
 
-  it("rejects a stage missing required fields", () => {
-    expect(() => stageSchema.parse({ key: "ideation" })).toThrow();
+  it("rejects a step with an unknown icon", () => {
+    expect(() =>
+      stepSchema.parse({
+        key: "kickOff",
+        kind: "milestone",
+        order: 1,
+        confirmed: true,
+        icon: "not-a-real-icon",
+        title: "Process.steps.kickOff.title",
+        short: "Process.steps.kickOff.short",
+      }),
+    ).toThrow();
+  });
+
+  it("rejects a step missing required fields", () => {
+    expect(() => stepSchema.parse({ key: "kickOff" })).toThrow();
+  });
+
+  it("rejects a kind outside milestone/phase", () => {
+    expect(() => stepKindSchema.parse("gate")).toThrow();
   });
 
   it("allows a null project stage but rejects an unknown one", () => {
@@ -46,7 +106,36 @@ describe("content/process", () => {
     expect(() => projectStageSchema.parse("unconfirmed-stage")).toThrow();
   });
 
-  it("keeps the stage key enum in sync with the exported stage list", () => {
-    expect(stageKeySchema.options).toEqual(stages.map((s) => s.key));
+  it("keeps the stage key enum in sync with the exported step list", () => {
+    expect(stageKeySchema.options).toEqual(steps.map((s) => s.key));
+  });
+
+  it("defaults the project guide to unavailable, with no href", () => {
+    expect(projectGuideSchema.parse({
+      available: false,
+      href: null,
+      fileSizeLabel: null,
+      updatedAt: null,
+    })).toEqual({ available: false, href: null, fileSizeLabel: null, updatedAt: null });
+  });
+
+  it("requires an href once the project guide becomes available", () => {
+    expect(() =>
+      projectGuideSchema.parse({
+        available: true,
+        href: null,
+        fileSizeLabel: null,
+        updatedAt: null,
+      }),
+    ).toThrow();
+
+    expect(() =>
+      projectGuideSchema.parse({
+        available: true,
+        href: "/downloads/project-guide.pdf",
+        fileSizeLabel: "2.4 MB",
+        updatedAt: "2026-07-27",
+      }),
+    ).not.toThrow();
   });
 });

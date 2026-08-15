@@ -95,7 +95,7 @@ test.describe("homepage", () => {
   }) => {
     test.skip(!isMobile, "pointer-proximity is a hover-capable-desktop-only effect");
     await page.goto("/");
-    const card = page.locator('[tabindex="0"]').filter({ hasText: "VORSTAND_1" }).first();
+    const card = page.locator('[tabindex="0"]').filter({ hasText: "Thorben Ossig" }).first();
     await card.scrollIntoViewIfNeeded();
     await card.tap();
     await expect(card).toHaveCSS("transform", "none");

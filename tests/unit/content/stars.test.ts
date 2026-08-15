@@ -15,11 +15,40 @@ describe("content/stars", () => {
     ]);
   });
 
-  it("leaves logo, status, and youtubeId null until confirmed", () => {
+  it("has a real name for every star", () => {
+    expect(stars.map((s) => s.name)).toEqual([
+      "Blauherz",
+      "Moufense",
+      "effishent",
+      "Sanagua",
+      "Back on Track",
+      "Flat Mates",
+      "Stadthonig",
+      "Sunte",
+    ]);
+  });
+
+  it("marks six stars as board-confirmed and two as not yet confirmed", () => {
+    const byKey = Object.fromEntries(stars.map((s) => [s.key, s.verified]));
+    expect(byKey.STAR_7).toBe(false);
+    expect(byKey.STAR_8).toBe(false);
+    for (const key of ["STAR_1", "STAR_2", "STAR_3", "STAR_4", "STAR_5", "STAR_6"]) {
+      expect(byKey[key]).toBe(true);
+    }
+  });
+
+  it("leaves logo null until confirmed", () => {
     for (const s of stars) {
       expect(s.logo).toBeNull();
-      expect(s.status).toBeNull();
-      expect(s.youtubeId).toBeNull();
+    }
+  });
+
+  it("has YouTube IDs only for Moufense and Flat Mates", () => {
+    const byKey = Object.fromEntries(stars.map((s) => [s.key, s.youtubeId]));
+    expect(byKey.STAR_2).toBe("9Ord09u363s");
+    expect(byKey.STAR_6).toBe("cY6dSD79fqo");
+    for (const key of ["STAR_1", "STAR_3", "STAR_4", "STAR_5", "STAR_7", "STAR_8"]) {
+      expect(byKey[key]).toBeNull();
     }
   });
 
@@ -37,9 +66,11 @@ describe("content/stars", () => {
     expect(() =>
       starSchema.parse({
         key: "STAR_9",
+        name: "Test",
         logo: null,
         description: "Stars.STAR_9.description",
         status: null,
+        verified: true,
         youtubeId: null,
       }),
     ).toThrow();
@@ -49,9 +80,11 @@ describe("content/stars", () => {
     expect(() =>
       starSchema.parse({
         key: "STAR_1",
+        name: "Test",
         logo: null,
         description: "Stars.STAR_1.description",
         status: null,
+        verified: true,
         youtubeId: "not-a-valid-id!!",
       }),
     ).toThrow();
@@ -61,9 +94,11 @@ describe("content/stars", () => {
     expect(() =>
       starSchema.parse({
         key: "STAR_1",
+        name: "Test",
         logo: null,
         description: "Stars.STAR_1.description",
         status: "on-hold",
+        verified: true,
         youtubeId: null,
       }),
     ).toThrow();

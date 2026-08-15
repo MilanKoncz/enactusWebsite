@@ -15,33 +15,32 @@ describe("HomeKpis", () => {
   it("renders all five KPI labels", () => {
     renderWithIntl(<HomeKpis />);
     expect(screen.getByText("Nationale Meistertitel")).toBeInTheDocument();
-    expect(screen.getByText("Ausgründungen")).toBeInTheDocument();
+    expect(screen.getByText("World-Cup-Finale")).toBeInTheDocument();
+    expect(screen.getByText("Gegründet & Übergeben")).toBeInTheDocument();
     expect(screen.getByText("Eingeworbenes Funding")).toBeInTheDocument();
     expect(screen.getByText("Projektiterationen")).toBeInTheDocument();
-    expect(screen.getByText("Gegründet")).toBeInTheDocument();
   });
 
-  it("formats the founding year without a thousands separator", () => {
+  it("renders the world-cup-finals figure with a multiplier suffix", () => {
     renderWithIntl(<HomeKpis />);
-    expect(screen.getByText("2003")).toBeInTheDocument();
-    expect(screen.queryByText("2.003")).not.toBeInTheDocument();
+    expect(screen.getByText("2×")).toBeInTheDocument();
   });
 
-  it("formats funding as a grouped euro amount", () => {
+  it("renders funding and project iterations as lower bounds", () => {
     renderWithIntl(<HomeKpis />);
-    const funding = screen.getByText(/250\.000/);
+    const funding = screen.getByText(/>150\.000/);
     expect(funding.textContent).toContain("€");
+    expect(screen.getByText(">65")).toBeInTheDocument();
   });
 
-  it("marks every currently-unverified figure with the quiet unverified treatment", () => {
+  it("has no unverified figures left — every KPI is board-confirmed", () => {
     const { container } = renderWithIntl(<HomeKpis />);
-    const marks = container.querySelectorAll(".border-dotted");
-    expect(marks).toHaveLength(5);
+    expect(container.querySelectorAll(".border-dotted")).toHaveLength(0);
   });
 
   it("renders a single as-of line for the whole row, not one per figure", () => {
     renderWithIntl(<HomeKpis />);
-    expect(screen.getByText("Stand: Juli 2026")).toBeInTheDocument();
+    expect(screen.getByText("Stand: August 2026")).toBeInTheDocument();
   });
 
   it("has no accessibility violations", async () => {
