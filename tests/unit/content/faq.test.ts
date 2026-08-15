@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { faqEntries, faqEntrySchema, faqKeySchema } from "@/content/faq";
 
 describe("content/faq", () => {
-  it("has eight ordered placeholder entries until real questions are drafted", () => {
+  it("has eight ordered entries", () => {
     expect(faqEntries.map((e) => e.key)).toEqual([
       "frage-1",
       "frage-2",
@@ -16,10 +16,11 @@ describe("content/faq", () => {
     expect(faqEntries.map((e) => e.order)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
   });
 
-  it("leaves category null until a real grouping is confirmed", () => {
-    for (const entry of faqEntries) {
-      expect(entry.category).toBeNull();
-    }
+  it("groups the eight entries into the three confirmed categories", () => {
+    const byCategory = Object.groupBy(faqEntries, (e) => e.category ?? "none");
+    expect(byCategory.Allgemein?.map((e) => e.key)).toEqual(["frage-1", "frage-2", "frage-3"]);
+    expect(byCategory.Bewerbung?.map((e) => e.key)).toEqual(["frage-4", "frage-5", "frage-6"]);
+    expect(byCategory.Projekte?.map((e) => e.key)).toEqual(["frage-7", "frage-8"]);
   });
 
   it("validates every exported entry against the schema", () => {
@@ -30,7 +31,7 @@ describe("content/faq", () => {
 
   it("accepts a well-formed FAQ entry", () => {
     expect(() =>
-      faqEntrySchema.parse({ key: "frage-1", order: 1, category: null }),
+      faqEntrySchema.parse({ key: "frage-1", order: 1, category: "Allgemein" }),
     ).not.toThrow();
   });
 

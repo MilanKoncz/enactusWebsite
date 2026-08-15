@@ -24,7 +24,8 @@ export type ThreadStop =
   | "partner-tiers"
   | "partner-statements"
   | "partner-membership"
-  | "partner-contact";
+  | "partner-contact"
+  | "kontakt-content";
 
 export type ThreadWidth = "wide" | "narrow";
 
@@ -215,6 +216,13 @@ const ROUTES: Record<ThreadStop, Record<ThreadWidth, Waypoints>> = {
     wide: { from: 58, bow: 50, to: 42 },
     narrow: { from: 54, bow: 50, to: 46 },
   },
+
+  // /kontakt (KontaktContent.tsx) — a single section, so a single centered
+  // run rather than a multi-stop route like the other pages.
+  "kontakt-content": {
+    wide: { from: 50, bow: 50, to: 50 },
+    narrow: { from: 50, bow: 50, to: 50 },
+  },
 };
 
 // Iteration order matches the sections' actual order on the homepage
@@ -263,6 +271,9 @@ export const PARTNER_STOPS: ThreadStop[] = [
   "partner-membership",
   "partner-contact",
 ];
+
+// Single-stop route — see src/app/[locale]/(site)/kontakt/page.tsx.
+export const KONTAKT_STOPS: ThreadStop[] = ["kontakt-content"];
 
 export function waypointsFor(stop: ThreadStop, width: ThreadWidth): Waypoints {
   return ROUTES[stop][width];
