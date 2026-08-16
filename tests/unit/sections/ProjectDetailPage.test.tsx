@@ -45,13 +45,22 @@ describe("ProjectDetailPage", () => {
     expect(screen.getAllByText("Franka Zanolli").length).toBeGreaterThan(0);
   });
 
-  it("shows the process stage and the SDG focus", () => {
+  it("shows the process stage and the SDG focus, each goal linked to sdgs.un.org", () => {
     renderWithIntl(<ProjectDetailPage project={smilegreen} />);
     expect(screen.getByText("Prozessstufe")).toBeInTheDocument();
     expect(screen.getByText("MVP-Phase")).toBeInTheDocument();
     expect(screen.getByText("SDG-Fokus")).toBeInTheDocument();
-    for (const goal of [3, 12, 13]) {
-      expect(screen.getByTitle(`UN-Nachhaltigkeitsziel ${goal}`)).toBeInTheDocument();
+
+    const goalNames: Record<number, string> = {
+      3: "Gesundheit und Wohlergehen",
+      12: "Nachhaltiger Konsum und nachhaltige Produktion",
+      13: "Maßnahmen zum Klimaschutz",
+    };
+    for (const [goal, name] of Object.entries(goalNames)) {
+      const link = screen.getByText(`SDG ${goal} — ${name}`).closest("a");
+      expect(link).toHaveAttribute("href", "https://sdgs.un.org/goals");
+      expect(link).toHaveAttribute("target", "_blank");
+      expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
     }
   });
 

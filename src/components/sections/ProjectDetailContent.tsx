@@ -4,6 +4,7 @@ import { cn } from "@/lib/cn";
 import { ImageLightbox } from "@/components/ui/ImageLightbox";
 import { Placeholder } from "@/components/ui/Placeholder";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
+import { sdgIconSrc, SDG_GOALS_URL } from "@/content/sdg";
 import type { Project, ProjectLead } from "@/content/projects";
 
 // Only the four labels that /projekte and /projekte/[slug] word differently
@@ -34,6 +35,7 @@ const PHOTO_COUNT = 3;
 // BoardGrid.tsx's BoardBioKey.
 type ProjectCopyKey = Parameters<ReturnType<typeof useTranslations<"Projects">>>[0];
 type StageCopyKey = Parameters<ReturnType<typeof useTranslations<"Process.steps">>>[0];
+type SdgGoalCopyKey = Parameters<ReturnType<typeof useTranslations<"Sdg.goals">>>[0];
 
 function ProjectLeadCard({ lead }: { lead: ProjectLead }) {
   return (
@@ -82,6 +84,8 @@ export function ProjectDetailContent({ project, labels, className }: ProjectDeta
   const tShared = useTranslations("ProjectDetail");
   const tStage = useTranslations("Process.steps");
   const tPlaceholder = useTranslations("Placeholder");
+  const tSdg = useTranslations("Sdg");
+  const tSdgGoals = useTranslations("Sdg.goals");
 
   const photoSlots = Array.from({ length: Math.max(PHOTO_COUNT, project.images.length) });
 
@@ -100,16 +104,33 @@ export function ProjectDetailContent({ project, labels, className }: ProjectDeta
             </div>
           )}
           {project.sdgs.length > 0 && (
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-2">
               <p className="font-mono text-mono-xs uppercase opacity-60">{tShared("sdgHeading")}</p>
-              <ul className="flex flex-wrap gap-x-3 gap-y-1">
-                {project.sdgs.map((goal) => (
-                  <li key={goal} className="text-body-m">
-                    <abbr title={tShared("sdgItemLabel", { number: goal })} className="no-underline">
-                      SDG {goal}
-                    </abbr>
-                  </li>
-                ))}
+              <ul className="flex flex-col gap-2">
+                {project.sdgs.map((goal) => {
+                  const name = tSdgGoals(String(goal) as SdgGoalCopyKey);
+                  return (
+                    <li key={goal} className="flex items-center gap-3">
+                      {/* The official icon, unmodified — no crop, no recolor, no
+                          distortion, per the UN's own usage guidelines. Decorative
+                          (empty alt): the link right next to it already states the
+                          same number and name as real text, so the icon would
+                          otherwise be announced a second time for no new information. */}
+                      <span className="relative size-10 shrink-0">
+                        <Image src={sdgIconSrc(goal)} alt="" fill sizes="40px" className="object-contain" />
+                      </span>
+                      <a
+                        href={SDG_GOALS_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={tSdg("linkLabel", { number: goal, name })}
+                        className="link-underline text-body-m"
+                      >
+                        SDG {goal} — {name}
+                      </a>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}
