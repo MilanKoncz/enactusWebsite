@@ -21,9 +21,21 @@ async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole("checkbox", { name: /Datenschutzerklärung/ }));
 }
 
+function mockFetchOk() {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 })),
+  );
+}
+
+function mockFetchFailure() {
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 500 })));
+}
+
 describe("ApplicationForm", () => {
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it("renders every field named in the /mitmachen brief", () => {
@@ -69,6 +81,7 @@ describe("ApplicationForm", () => {
   it("silently blocks a submission that arrives faster than a human could fill it in", async () => {
     let now = 1_700_000_000_000;
     vi.spyOn(Date, "now").mockImplementation(() => now);
+    mockFetchOk();
     const user = userEvent.setup();
     renderWithIntl(<ApplicationForm />);
 
@@ -79,11 +92,13 @@ describe("ApplicationForm", () => {
 
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Bewerbung absenden" })).toBeInTheDocument();
+    expect(fetch).not.toHaveBeenCalled();
   });
 
-  it("shows an honest stub notice on a valid, sufficiently-timed submit — never a fake success", async () => {
+  it("posts to /api/bewerbung and shows a real success notice on a valid, sufficiently-timed submit", async () => {
     let now = 1_700_000_000_000;
     vi.spyOn(Date, "now").mockImplementation(() => now);
+    mockFetchOk();
     const user = userEvent.setup();
     renderWithIntl(<ApplicationForm />);
 
@@ -92,10 +107,30 @@ describe("ApplicationForm", () => {
     await user.click(screen.getByRole("button", { name: "Bewerbung absenden" }));
 
     const notice = await screen.findByRole("status");
-    expect(notice).toHaveTextContent("teamvorstand@unimannheim.enactus.team");
-    expect(
-      screen.getByRole("link", { name: "teamvorstand@unimannheim.enactus.team" }),
-    ).toHaveAttribute("href", "mailto:teamvorstand@unimannheim.enactus.team");
+    expect(notice).toHaveTextContent("Danke für deine Bewerbung");
+    expect(fetch).toHaveBeenCalledWith(
+      "/api/bewerbung",
+      expect.objectContaining({ method: "POST" }),
+    );
+    const requestInit = vi.mocked(fetch).mock.calls[0]?.[1];
+    const body = JSON.parse(requestInit?.body as string);
+    expect(body).toMatchObject({ firstName: "Jane", locale: "de" });
+    expect(typeof body.formRenderedAt).toBe("number");
+  });
+
+  it("shows an error and keeps the form filled in when the request fails", async () => {
+    let now = 1_700_000_000_000;
+    vi.spyOn(Date, "now").mockImplementation(() => now);
+    mockFetchFailure();
+    const user = userEvent.setup();
+    renderWithIntl(<ApplicationForm />);
+
+    await fillRequiredFields(user);
+    now += MIN_FILL_MS + 500;
+    await user.click(screen.getByRole("button", { name: "Bewerbung absenden" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("teamvorstand@unimannheim.enactus.team");
+    expect(screen.getByLabelText("Vorname")).toHaveValue("Jane");
   });
 
   it("has no accessibility violations", async () => {

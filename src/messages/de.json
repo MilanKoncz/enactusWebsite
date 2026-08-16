@@ -509,7 +509,9 @@
       "messageLabel": "Nachricht",
       "messageError": "Bitte schreib uns mindestens 10 Zeichen.",
       "submitLabel": "Nachricht senden",
-      "submitStubNotice": "Dieses Formular ist noch nicht angebunden — der Versand kommt mit dem Backend. Schreib uns bis dahin direkt an {email}."
+      "submitPending": "Wird gesendet …",
+      "submitSuccess": "Danke für deine Nachricht! Wir melden uns so schnell wie möglich bei dir.",
+      "submitError": "Deine Nachricht konnte nicht gesendet werden. Bitte versuch es noch einmal oder schreib uns direkt an {email}."
     }
   },
   "Faq": {
@@ -640,18 +642,24 @@
       "title": "Datenbank",
       "body": [
         "Bewerbungen, Kontaktanfragen und Anmeldungen zur Erinnerungsliste speichern wir in einer Postgres-Datenbank bei Neon, Region „eu-central-1“ (Frankfurt am Main).",
-        "Wir speichern nur, was für die jeweilige Anfrage nötig ist, und löschen die Daten, sobald der Zweck entfällt (Art. 5 Abs. 1 lit. e DSGVO)."
+        "Wir speichern nur, was für die jeweilige Anfrage nötig ist, und löschen die Daten, sobald der Zweck entfällt (Art. 5 Abs. 1 lit. e DSGVO). Eine automatische, tägliche Löschroutine setzt die unten genannten Fristen durch — sie sind also keine bloße Absichtserklärung.",
+        "Zum Schutz vor automatisierten Massen-Einsendungen zählen wir Anfragen je IP-Adresse; die IP-Adresse speichern wir dafür ausschließlich als Einweg-Hash (SHA-256), nie im Klartext, und löschen den Zähler nach kurzer Zeit automatisch wieder."
       ],
-      "retentionLabel": "Genaue Aufbewahrungsdauer",
-      "retentionMissingHint": "Die genaue Aufbewahrungsdauer ist noch nicht vom Vorstand festgelegt."
+      "retentionHeading": "Aufbewahrungsfristen",
+      "retentionUnconfirmedHint": "Diese Frist ist festgelegt, aber vom Vorstand noch nicht endgültig bestätigt.",
+      "retentionApplicationsLabel": "Bewerbungen",
+      "retentionApplications": "{months} Monate nach Ende des jeweiligen Bewerbungsfensters",
+      "retentionContactLabel": "Kontaktanfragen",
+      "retentionContact": "{months} Monate",
+      "retentionReminderLabel": "Erinnerungsliste",
+      "retentionReminder": "Bestätigte Anmeldungen: bis zur Abmeldung. Unbestätigte Anmeldungen: {days} Tage"
     },
     "email": {
       "title": "E-Mail-Versand",
-      "notActiveLabel": "Noch nicht aktiv",
-      "notActiveNote": "Dieser Abschnitt beschreibt den geplanten Aufbau. Aktuell ist kein Formular an Resend angebunden — es werden noch keine Daten über diesen Weg verschickt.",
       "body": [
-        "Sobald die Formulare angebunden sind, verschicken wir E-Mails (Bewerbungsbestätigung, Kontaktantwort, Erinnerungs-Opt-in) über Resend, mit Versand aus der EU-Region.",
-        "Die Rechtsgrundlage ist dieselbe wie für die jeweilige Anfrage — siehe die Abschnitte zum Bewerbungs-, Kontakt- und Erinnerungsformular."
+        "E-Mails (Bewerbungsbestätigung, Kontakt-Weiterleitung, Erinnerungs-Opt-in) verschicken wir über Resend, mit Versand aus der Region „eu-west-1“ (Irland) — der einzigen EU-Region, die Resend anbietet.",
+        "Die Rechtsgrundlage ist dieselbe wie für die jeweilige Anfrage — siehe die Abschnitte zum Bewerbungs-, Kontakt- und Erinnerungsformular.",
+        "Klick- und Öffnungs-Tracking sowie eine Tracking-Subdomain sind bei Resend für unseren Versand bewusst deaktiviert — wir verfolgen nicht, ob oder wann du eine E-Mail öffnest oder auf einen Link darin klickst."
       ]
     },
     "analytics": {
@@ -694,7 +702,7 @@
       "legalBasisLabel": "Rechtsgrundlage",
       "legalBasis": "Art. 6 Abs. 1 lit. a DSGVO (deine Einwilligung über die Pflicht-Checkbox) in Verbindung mit Art. 6 Abs. 1 lit. b DSGVO analog (Anbahnung der Mitgliedschaft).",
       "accessLabel": "Zugriff",
-      "access": "Der Vorstand und die IT-Verantwortlichen des Vereins. Bewerbungen werden zunächst in unserer Datenbank gespeichert und danach als PDF an it@unimannheim.enactus.team gesendet (siehe „E-Mail-Versand“, aktuell noch nicht aktiv).",
+      "access": "Der Vorstand und die IT-Verantwortlichen des Vereins. Bewerbungen werden zunächst in unserer Datenbank gespeichert und danach als PDF an info@unimannheim.enactus.team gesendet (siehe „E-Mail-Versand“). Du erhältst zusätzlich eine kurze Bestätigung an die von dir angegebene E-Mail-Adresse.",
       "antiSpam": "Ein verstecktes Feld (Honeypot) und eine Prüfung der Ausfüllzeit helfen uns, automatisierte Spam-Einsendungen zu erkennen — beides ist keine Angabe über dich, sondern eine rein technische Prüfung."
     },
     "reminder": {
@@ -702,7 +710,7 @@
       "body": [
         "Solange das Bewerbungsfenster geschlossen ist, kannst du dich für eine E-Mail-Erinnerung eintragen, sobald es öffnet.",
         "Wir speichern deine E-Mail-Adresse, ein Bestätigungs-Token, ob du bestätigt hast, den Zeitpunkt der Bestätigung und deine IP-Adresse als Nachweis deiner Einwilligung (Double-Opt-in). Erst nach deiner Bestätigung verschicken wir Erinnerungen.",
-        "Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Jede E-Mail enthält einen funktionierenden Ein-Klick-Abmeldelink."
+        "Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Jede E-Mail enthält einen funktionierenden Ein-Klick-Abmeldelink — Bestätigungs- und Abmeldelink verwenden dabei zwei getrennte, unabhängige Tokens, damit ein weitergeleiteter Bestätigungslink niemals gleichzeitig als Abmeldelink funktioniert."
       ]
     },
     "contact": {
@@ -710,7 +718,7 @@
       "body": [
         "Über /kontakt kannst du uns Name, E-Mail-Adresse, optional einen Betreff und deine Nachricht schicken.",
         "Zweck ist die Bearbeitung deiner Anfrage; Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO — unser berechtigtes Interesse, Anfragen zu beantworten.",
-        "Das Formular ist aktuell noch nicht angebunden (siehe „E-Mail-Versand“) — beim Absenden wird noch nichts an uns übertragen; bis dahin zeigt dir die Seite stattdessen unsere Kontakt-E-Mail-Adresse an."
+        "Deine Nachricht wird zunächst in unserer Datenbank gespeichert und anschließend per E-Mail an uns weitergeleitet."
       ]
     },
     "rights": {
@@ -831,7 +839,9 @@
         "consentSuffix": ".",
         "consentError": "Bitte bestätige die Einwilligung.",
         "submitLabel": "Erinnerung aktivieren",
-        "submitStubNotice": "Diese Anmeldung ist noch nicht angebunden — der Versand kommt mit dem Backend."
+        "submitPending": "Wird aktiviert …",
+        "submitSuccess": "Fast geschafft — bitte bestätige die E-Mail, die wir dir gerade geschickt haben.",
+        "submitError": "Die Anmeldung hat nicht geklappt. Bitte versuch es noch einmal."
       },
       "form": {
         "heading": "Bewerbungsformular",
@@ -867,7 +877,9 @@
         "consentSuffix": "gelesen und bin mit der Verarbeitung meiner Angaben einverstanden.",
         "consentError": "Bitte bestätige die Einwilligung.",
         "submitLabel": "Bewerbung absenden",
-        "submitStubNotice": "Dieses Formular ist noch nicht angebunden — der Versand kommt mit dem Backend. Schreib uns bis dahin direkt an {email}, wenn du dich schon jetzt bewerben möchtest."
+        "submitPending": "Wird gesendet …",
+        "submitSuccess": "Danke für deine Bewerbung! Wir haben sie erhalten und melden uns bei dir.",
+        "submitError": "Deine Bewerbung konnte nicht gesendet werden. Bitte versuch es noch einmal oder schreib uns direkt an {email}."
       }
     },
     "cta": {
@@ -876,6 +888,19 @@
       "lead": "Alles, was du dafür brauchst, findest du oben auf dieser Seite.",
       "primaryCta": "Zur Bewerbung",
       "secondaryCta": "Prozess kennenlernen"
+    }
+  },
+  "Mail": {
+    "applicationConfirmation": {
+      "subject": "Deine Bewerbung ist bei uns angekommen",
+      "body": "Hallo {firstName},\n\nvielen Dank für deine Bewerbung bei Enactus Mannheim! Wir haben sie erhalten und melden uns, sobald wir sie geprüft haben.\n\nDein Enactus-Mannheim-Team"
+    },
+    "reminderConfirmation": {
+      "subject": "Bitte bestätige deine Erinnerung",
+      "body": "Hallo,\n\nbitte bestätige mit einem Klick, dass wir dich per E-Mail erinnern dürfen, sobald das Bewerbungsfenster öffnet:\n\n{confirmUrl}\n\nWenn du das nicht warst, kannst du diese E-Mail einfach ignorieren.\n\nJederzeit abmelden: {unsubscribeUrl}"
+    },
+    "contactNotification": {
+      "subject": "Neue Kontaktanfrage von {name}"
     }
   }
 }

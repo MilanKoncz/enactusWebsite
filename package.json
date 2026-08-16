@@ -12,6 +12,9 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "perf:home": "node scripts/measure-home.mjs",
+    "db:migrate": "node --env-file=.env.local scripts/migrate.mjs",
+    "db:verify": "node --env-file=.env.local scripts/db-verify.mjs",
+    "db:cleanup": "node --env-file=.env.local scripts/db-cleanup.mjs",
     "check": "npm run typecheck && npm run lint && npm run test"
   },
   "dependencies": {

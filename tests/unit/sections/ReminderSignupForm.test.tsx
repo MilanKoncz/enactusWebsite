@@ -1,11 +1,27 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "jest-axe";
 import { renderWithIntl } from "../../fixtures/intl";
 import { ReminderSignupForm } from "@/components/sections/ReminderSignupForm";
 
+function mockFetchOk() {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 })),
+  );
+}
+
+function mockFetchFailure() {
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 500 })));
+}
+
 describe("ReminderSignupForm", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
   it("renders an email field, a consent checkbox, and a submit button", () => {
     renderWithIntl(<ReminderSignupForm />);
     expect(screen.getByLabelText("E-Mail")).toBeInTheDocument();
@@ -24,7 +40,8 @@ describe("ReminderSignupForm", () => {
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
-  it("shows an honest stub notice on a valid submit, not a fake confirmation", async () => {
+  it("posts to /api/reminder and shows a real confirmation notice on a valid submit", async () => {
+    mockFetchOk();
     const user = userEvent.setup();
     renderWithIntl(<ReminderSignupForm />);
 
@@ -32,9 +49,24 @@ describe("ReminderSignupForm", () => {
     await user.click(screen.getByRole("checkbox"));
     await user.click(screen.getByRole("button", { name: "Erinnerung aktivieren" }));
 
-    expect(await screen.findByRole("status")).toHaveTextContent(
-      "Diese Anmeldung ist noch nicht angebunden",
-    );
+    expect(await screen.findByRole("status")).toHaveTextContent("bestätige die E-Mail");
+    expect(fetch).toHaveBeenCalledWith("/api/reminder", expect.objectContaining({ method: "POST" }));
+    const requestInit = vi.mocked(fetch).mock.calls[0]?.[1];
+    const body = JSON.parse(requestInit?.body as string);
+    expect(body).toMatchObject({ email: "jane@example.com", consent: true, locale: "de" });
+  });
+
+  it("shows an error and does not reset the form when the request fails", async () => {
+    mockFetchFailure();
+    const user = userEvent.setup();
+    renderWithIntl(<ReminderSignupForm />);
+
+    await user.type(screen.getByLabelText("E-Mail"), "jane@example.com");
+    await user.click(screen.getByRole("checkbox"));
+    await user.click(screen.getByRole("button", { name: "Erinnerung aktivieren" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("hat nicht geklappt");
+    expect(screen.getByLabelText("E-Mail")).toHaveValue("jane@example.com");
   });
 
   it("links the consent text to the privacy policy", () => {

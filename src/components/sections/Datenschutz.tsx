@@ -6,6 +6,7 @@ import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { org } from "@/content/org";
 import { privacyReviewStatus } from "@/content/privacy";
+import { retention } from "@/content/retention";
 
 // No blanket opacity on the body wrapper: legal text should stay at full
 // contrast, and — more importantly — CSS opacity compounds multiplicatively
@@ -121,18 +122,27 @@ export function Datenschutz() {
             {(t.raw("database.body") as string[]).map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>
             ))}
-            <p>
-              {t("database.retentionLabel")}:{" "}
-              <PlaceholderMark hint={t("database.retentionMissingHint")}>
-                {tPlaceholder("missingLabel")}
-              </PlaceholderMark>
-            </p>
+            <div className="flex flex-col gap-2">
+              <p className="text-mono-s font-mono uppercase opacity-60">{t("database.retentionHeading")}</p>
+              <Fact label={t("database.retentionApplicationsLabel")}>
+                <PlaceholderMark variant="unverified" hint={t("database.retentionUnconfirmedHint")}>
+                  {t("database.retentionApplications", { months: retention.applications.months })}
+                </PlaceholderMark>
+              </Fact>
+              <Fact label={t("database.retentionContactLabel")}>
+                <PlaceholderMark variant="unverified" hint={t("database.retentionUnconfirmedHint")}>
+                  {t("database.retentionContact", { months: retention.contactMessages.months })}
+                </PlaceholderMark>
+              </Fact>
+              <Fact label={t("database.retentionReminderLabel")}>
+                <PlaceholderMark variant="unverified" hint={t("database.retentionUnconfirmedHint")}>
+                  {t("database.retentionReminder", { days: retention.reminderSignupsUnconfirmed.days })}
+                </PlaceholderMark>
+              </Fact>
+            </div>
           </LegalSection>
 
           <LegalSection title={t("email.title")}>
-            <span className="w-fit">
-              <PlaceholderMark hint={t("email.notActiveNote")}>{t("email.notActiveLabel")}</PlaceholderMark>
-            </span>
             {(t.raw("email.body") as string[]).map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>
             ))}

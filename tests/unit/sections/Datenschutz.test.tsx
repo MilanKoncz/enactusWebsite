@@ -34,9 +34,22 @@ describe("Datenschutz", () => {
     ).toBeInTheDocument();
   });
 
-  it("marks the Resend email section as not yet active", () => {
+  it("describes Resend as an active processor in the EU-West-1 (Ireland) region, with tracking off", () => {
     renderWithIntl(<Datenschutz />);
-    expect(screen.getByText("Noch nicht aktiv")).toBeInTheDocument();
+    expect(screen.getByText(/eu-west-1.*Irland/)).toBeInTheDocument();
+    expect(screen.getByText(/Klick- und Öffnungs-Tracking.*deaktiviert/)).toBeInTheDocument();
+  });
+
+  it("states the retention periods, each marked as pending board confirmation", () => {
+    renderWithIntl(<Datenschutz />);
+    expect(screen.getByText(/6 Monate nach Ende des jeweiligen Bewerbungsfensters/)).toBeInTheDocument();
+    expect(screen.getByText("12 Monate")).toBeInTheDocument();
+    expect(screen.getByText(/Unbestätigte Anmeldungen: 30 Tage/)).toBeInTheDocument();
+  });
+
+  it("states IP addresses used for rate limiting are stored only as a hash", () => {
+    renderWithIntl(<Datenschutz />);
+    expect(screen.getByText(/ausschließlich als Einweg-Hash \(SHA-256\)/)).toBeInTheDocument();
   });
 
   it("states the application form has no file upload, only structured fields", () => {
@@ -55,6 +68,18 @@ describe("Datenschutz", () => {
     renderWithIntl(<Datenschutz />);
     expect(screen.getByText(/Double-Opt-in/)).toBeInTheDocument();
     expect(screen.getByText(/deine IP-Adresse als Nachweis deiner Einwilligung/)).toBeInTheDocument();
+  });
+
+  it("names the real application recipient, not the outdated it@ address", () => {
+    renderWithIntl(<Datenschutz />);
+    expect(screen.getByText(/info@unimannheim\.enactus\.team/)).toBeInTheDocument();
+    expect(screen.queryByText(/it@unimannheim\.enactus\.team/)).not.toBeInTheDocument();
+  });
+
+  it("states the contact form is live and forwards messages, not that it's unconnected", () => {
+    renderWithIntl(<Datenschutz />);
+    expect(screen.queryByText(/noch nicht angebunden/)).not.toBeInTheDocument();
+    expect(screen.getByText(/anschließend per E-Mail an uns weitergeleitet/)).toBeInTheDocument();
   });
 
   it("names the supervisory authority for a complaint", () => {

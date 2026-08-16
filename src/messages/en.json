@@ -509,7 +509,9 @@
       "messageLabel": "Message",
       "messageError": "Please write at least 10 characters.",
       "submitLabel": "Send message",
-      "submitStubNotice": "This form isn't connected yet — sending arrives with the backend. Until then, write to us directly at {email}."
+      "submitPending": "Sending …",
+      "submitSuccess": "Thanks for your message! We'll get back to you as soon as we can.",
+      "submitError": "Your message couldn't be sent. Please try again, or write to us directly at {email}."
     }
   },
   "Faq": {
@@ -639,19 +641,25 @@
     "database": {
       "title": "Database",
       "body": [
-        "We store applications, contact messages, and reminder-list sign-ups in a Postgres database hosted by Neon, region „eu-central-1“ (Frankfurt am Main).",
-        "We store only what a given request needs, and delete it once its purpose no longer applies (Art. 5(1)(e) GDPR)."
+        "We store applications, contact messages, and reminder-list sign-ups in a Postgres database hosted by Neon, region \"eu-central-1\" (Frankfurt am Main).",
+        "We store only what a given request needs, and delete it once its purpose no longer applies (Art. 5(1)(e) GDPR). A daily automated cleanup job enforces the retention periods listed below — they aren't just a stated intention.",
+        "To protect against automated bulk submissions, we count requests per IP address; for that purpose we store the IP address only as a one-way hash (SHA-256), never in plain text, and delete the counter again automatically after a short time."
       ],
-      "retentionLabel": "Exact retention period",
-      "retentionMissingHint": "The exact retention period hasn't been set by the board yet."
+      "retentionHeading": "Retention periods",
+      "retentionUnconfirmedHint": "This period is set, but not yet given final sign-off by the board.",
+      "retentionApplicationsLabel": "Applications",
+      "retentionApplications": "{months} months after the respective application window closes",
+      "retentionContactLabel": "Contact messages",
+      "retentionContact": "{months} months",
+      "retentionReminderLabel": "Reminder list",
+      "retentionReminder": "Confirmed sign-ups: until you unsubscribe. Unconfirmed sign-ups: {days} days"
     },
     "email": {
       "title": "Email delivery",
-      "notActiveLabel": "Not yet active",
-      "notActiveNote": "This section describes the planned setup. No form is connected to Resend yet — no data is sent through this channel at present.",
       "body": [
-        "Once the forms are connected, we'll send emails (application confirmation, contact reply, reminder opt-in) through Resend, from its EU region.",
-        "The legal basis matches whichever request the email belongs to — see the application, contact, and reminder sections below."
+        "We send emails (application confirmation, contact forwarding, reminder opt-in) through Resend, from its \"eu-west-1\" region (Ireland) — the only EU region Resend offers.",
+        "The legal basis matches whichever request the email belongs to — see the application, contact, and reminder sections below.",
+        "Click and open tracking, and a tracking subdomain, are deliberately switched off for our sending on Resend — we don't track whether or when you open an email or click a link inside one."
       ]
     },
     "analytics": {
@@ -694,7 +702,7 @@
       "legalBasisLabel": "Legal basis",
       "legalBasis": "Art. 6(1)(a) GDPR (your consent via the required checkbox), combined with Art. 6(1)(b) GDPR by analogy (taking steps toward membership).",
       "accessLabel": "Access",
-      "access": "The board and the association's IT lead. Applications are written to our database first, then sent as a PDF to it@unimannheim.enactus.team (see \"Email delivery\", not yet active).",
+      "access": "The board and the association's IT lead. Applications are written to our database first, then sent as a PDF to info@unimannheim.enactus.team (see \"Email delivery\"). You also receive a short confirmation at the email address you provided.",
       "antiSpam": "A hidden field (honeypot) and a submission-timing check help us catch automated spam — neither collects anything about you; both are purely technical checks."
     },
     "reminder": {
@@ -702,7 +710,7 @@
       "body": [
         "While the application window is closed, you can sign up for an email reminder for when it opens.",
         "We store your email address, a confirmation token, whether you've confirmed, the time of confirmation, and your IP address as proof of consent (double opt-in). We only send reminders once you've confirmed.",
-        "The legal basis is your consent (Art. 6(1)(a) GDPR). Every email carries a working one-click unsubscribe link."
+        "The legal basis is your consent (Art. 6(1)(a) GDPR). Every email carries a working one-click unsubscribe link — the confirmation link and the unsubscribe link use two separate, independent tokens, so a forwarded confirmation link can never also work as an unsubscribe link."
       ]
     },
     "contact": {
@@ -710,7 +718,7 @@
       "body": [
         "Through /kontakt you can send us your name, email address, an optional subject, and your message.",
         "The purpose is handling your inquiry; the legal basis is Art. 6(1)(f) GDPR — our legitimate interest in responding to inquiries.",
-        "The form isn't connected yet (see \"Email delivery\") — submitting it doesn't send us anything at present; until then, the page shows our contact email address instead."
+        "Your message is stored in our database first, then forwarded to us by email."
       ]
     },
     "rights": {
@@ -831,7 +839,9 @@
         "consentSuffix": ".",
         "consentError": "Please confirm your consent.",
         "submitLabel": "Turn on reminder",
-        "submitStubNotice": "This sign-up isn't connected yet — sending arrives with the backend."
+        "submitPending": "Turning on …",
+        "submitSuccess": "Almost there — please confirm the email we just sent you.",
+        "submitError": "The sign-up didn't go through. Please try again."
       },
       "form": {
         "heading": "Application form",
@@ -867,7 +877,9 @@
         "consentSuffix": "and agree to the processing of my information.",
         "consentError": "Please confirm your consent.",
         "submitLabel": "Submit application",
-        "submitStubNotice": "This form isn't connected yet — sending arrives with the backend. Until then, write to us directly at {email} if you'd like to apply now."
+        "submitPending": "Sending …",
+        "submitSuccess": "Thanks for applying! We've received your application and will get back to you.",
+        "submitError": "Your application couldn't be sent. Please try again, or write to us directly at {email}."
       }
     },
     "cta": {
@@ -876,6 +888,19 @@
       "lead": "Everything you need for it is right above, on this page.",
       "primaryCta": "Go to the application",
       "secondaryCta": "See the process"
+    }
+  },
+  "Mail": {
+    "applicationConfirmation": {
+      "subject": "Your application has reached us",
+      "body": "Hi {firstName},\n\nthanks for applying to Enactus Mannheim! We've received your application and will get back to you once we've reviewed it.\n\nYour Enactus Mannheim team"
+    },
+    "reminderConfirmation": {
+      "subject": "Please confirm your reminder",
+      "body": "Hi,\n\nplease confirm with one click that we may email you once the application window opens:\n\n{confirmUrl}\n\nIf this wasn't you, you can simply ignore this email.\n\nUnsubscribe any time: {unsubscribeUrl}"
+    },
+    "contactNotification": {
+      "subject": "New contact message from {name}"
     }
   }
 }

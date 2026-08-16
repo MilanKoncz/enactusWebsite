@@ -3,26 +3,25 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { contactFormSchema, type ContactFormValues } from "@/lib/contactFormSchema";
+import { postJson } from "@/lib/submitForm";
 
 const CONTACT_EMAIL = "teamvorstand@unimannheim.enactus.team";
 
-// STUB: no API route exists yet — it lands together with the backend (see
-// docs/engineering.md and this repo's AUFGABE brief for /kontakt). Every
-// field above is validated for real via contactFormSchema; only the actual
-// network call is missing. On a valid submit this resets the form and shows
-// an honest notice instead of a fake success message, and falls back to a
-// direct mailto link — this project's design copy rule against apologizing
-// still holds, but pretending a message was sent when it wasn't would be
-// worse than not sending one. No honeypot/timing check either: those guard
-// a real submission endpoint (docs/engineering.md has one for /mitmachen)
-// and belong with the API route, not a form that goes nowhere yet.
+type SubmitState = "idle" | "pending" | "success" | "error";
+
+// Every field is validated for real via contactFormSchema, client-side, and
+// the exact same schema is re-run server-side in /api/kontakt. On success
+// the form resets and shows a plain confirmation; on failure it stays
+// filled in and shows an error with a direct mailto fallback, so nothing
+// typed is lost.
 export function ContactForm() {
   const t = useTranslations("KontaktPage.form");
-  const [submitted, setSubmitted] = useState(false);
+  const locale = useLocale();
+  const [state, setState] = useState<SubmitState>("idle");
   const {
     register,
     handleSubmit,
@@ -32,22 +31,24 @@ export function ContactForm() {
     resolver: zodResolver(contactFormSchema),
   });
 
-  function onSubmit(data: ContactFormValues) {
-    void data;
-    setSubmitted(true);
-    reset();
+  async function onSubmit(data: ContactFormValues) {
+    setState("pending");
+    const result = await postJson("/api/kontakt", { ...data, locale });
+    if (result.ok) {
+      setState("success");
+      reset();
+    } else {
+      setState("error");
+    }
   }
 
-  if (submitted) {
+  if (state === "success") {
     return (
       <div
         role="status"
         className="flex flex-col gap-3 rounded-md border-l-2 border-dashed border-gold py-1 pl-4"
       >
-        <p className="text-body-m">{t("submitStubNotice", { email: CONTACT_EMAIL })}</p>
-        <a href={`mailto:${CONTACT_EMAIL}`} className="link-underline w-fit text-body-m font-medium">
-          {CONTACT_EMAIL}
-        </a>
+        <p className="text-body-m">{t("submitSuccess")}</p>
       </div>
     );
   }
@@ -79,8 +80,13 @@ export function ContactForm() {
         error={errors.message && t("messageError")}
         {...register("message")}
       />
-      <Button type="submit" className="self-start">
-        {t("submitLabel")}
+      {state === "error" && (
+        <p role="alert" className="text-body-s text-oxblood">
+          {t("submitError", { email: CONTACT_EMAIL })}
+        </p>
+      )}
+      <Button type="submit" className="self-start" loading={state === "pending"}>
+        {state === "pending" ? t("submitPending") : t("submitLabel")}
       </Button>
     </form>
   );

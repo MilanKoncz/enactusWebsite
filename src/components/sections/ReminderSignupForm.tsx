@@ -3,21 +3,24 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { Link } from "@/lib/navigation";
 import { reminderSignupSchema, type ReminderSignupValues } from "@/lib/reminderSignupSchema";
+import { postJson } from "@/lib/submitForm";
 
-// STUB: no API route exists yet — the double opt-in flow lands with the
-// backend in Phase 4 (docs/engineering.md). Every field above is validated
-// for real via reminderSignupSchema; only the actual network call is
-// missing. Same honest-stub contract as ContactForm.tsx: on a valid submit
-// this resets the form and shows a plain notice instead of a fake
-// confirmation, since no confirmation email can actually go out yet.
+type SubmitState = "idle" | "pending" | "success" | "error";
+
+// Every field is validated for real via reminderSignupSchema, client-side,
+// and the exact same schema is re-run server-side in /api/reminder. A
+// successful submit never means "you're subscribed" — it only means the
+// confirmation email is on its way; the double opt-in itself only completes
+// once that link is clicked (/api/reminder/bestaetigen).
 export function ReminderSignupForm() {
   const t = useTranslations("MitmachenPage.application.reminder");
-  const [submitted, setSubmitted] = useState(false);
+  const locale = useLocale();
+  const [state, setState] = useState<SubmitState>("idle");
   const {
     register,
     handleSubmit,
@@ -27,16 +30,21 @@ export function ReminderSignupForm() {
     resolver: zodResolver(reminderSignupSchema),
   });
 
-  function onSubmit(data: ReminderSignupValues) {
-    void data;
-    setSubmitted(true);
-    reset();
+  async function onSubmit(data: ReminderSignupValues) {
+    setState("pending");
+    const result = await postJson("/api/reminder", { ...data, locale });
+    if (result.ok) {
+      setState("success");
+      reset();
+    } else {
+      setState("error");
+    }
   }
 
-  if (submitted) {
+  if (state === "success") {
     return (
       <div role="status" className="flex flex-col gap-2 rounded-md border-l-2 border-dashed border-gold py-1 pl-4">
-        <p className="text-body-m">{t("submitStubNotice")}</p>
+        <p className="text-body-m">{t("submitSuccess")}</p>
       </div>
     );
   }
@@ -75,8 +83,13 @@ export function ReminderSignupForm() {
           </p>
         )}
       </div>
-      <Button type="submit" className="self-start">
-        {t("submitLabel")}
+      {state === "error" && (
+        <p role="alert" className="text-body-s text-oxblood">
+          {t("submitError")}
+        </p>
+      )}
+      <Button type="submit" className="self-start" loading={state === "pending"}>
+        {state === "pending" ? t("submitPending") : t("submitLabel")}
       </Button>
     </form>
   );

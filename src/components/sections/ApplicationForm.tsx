@@ -5,7 +5,7 @@ import type { FormEvent } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { Link } from "@/lib/navigation";
@@ -14,34 +14,35 @@ import {
   type ApplicationFormInput,
   type ApplicationFormValues,
 } from "@/lib/applicationFormSchema";
+import { MIN_FILL_MS } from "@/lib/antiSpam";
+import { postJson } from "@/lib/submitForm";
 import { board } from "@/content/board";
 import { projects } from "@/content/projects";
 
 const CONTACT_EMAIL = "teamvorstand@unimannheim.enactus.team";
 
-// A human takes at least this long to notice the form and fill in the first
-// field; a submission before then is almost certainly a bot that skipped
-// straight to submit. Checked alongside the honeypot (`website`, validated
-// empty by applicationFormSchema) — two independent signals, neither shown
-// to the visitor, so a real applicant never sees an error for either one.
-export const MIN_FILL_MS = 3000;
+export { MIN_FILL_MS };
 
 const desiredAreaOptions = [
   ...projects.filter((project) => project.status === "active").map((project) => project.name),
   ...Array.from(new Set(board.map((member) => member.role))),
 ];
 
-// STUB: no API route, database write, PDF render, or Resend send exist yet
-// — that's Phase 4 (docs/engineering.md). Every field is validated for real
-// via applicationFormSchema; only the actual network call is missing. Same
-// honest-stub contract as ContactForm.tsx: a valid submit shows a plain
-// notice that nothing was sent yet, with a direct email fallback, instead of
-// pretending an application went out. Honeypot and timing check both fail
-// silently — a bot gets no error to learn from, and a real applicant should
-// never be able to trigger either one.
+type SubmitState = "idle" | "pending" | "success" | "error";
+
+// Every field is validated for real via applicationFormSchema, client-side,
+// and the exact same schema is re-run server-side in /api/bewerbung — this
+// component never trusts its own validation as the last word. Honeypot and
+// timing check both fail silently (no state change at all): a bot gets no
+// error to learn from, and a real applicant should never be able to trigger
+// either one. `formRenderedAt` rides along outside react-hook-form's own
+// state, added at submit time, so the API route can re-check the same
+// minimum-fill-time signal — a client-only check is trivial to bypass by
+// calling the route directly.
 export function ApplicationForm() {
   const t = useTranslations("MitmachenPage.application.form");
-  const [submitted, setSubmitted] = useState(false);
+  const locale = useLocale();
+  const [state, setState] = useState<SubmitState>("idle");
   // Set in an effect, not the useRef initializer: reading the clock is an
   // impure call, and doing that directly during render (as a useRef
   // initializer runs) is flagged by react-hooks/purity even though the
@@ -62,14 +63,19 @@ export function ApplicationForm() {
   // Honeypot enforcement lives entirely in applicationFormSchema (`website`
   // must be empty) — handleSubmit simply won't call this for a filled one.
   // The timing check reads `mountedAt.current` and only gates the actual
-  // "mark as submitted" step, not validation itself — a too-fast submit of
-  // a genuinely invalid form still has to show the normal field errors, not
-  // silently do nothing.
-  function onSubmit(data: ApplicationFormValues) {
-    void data;
+  // submit, not validation itself — a too-fast submit of a genuinely
+  // invalid form still has to show the normal field errors, not silently do
+  // nothing.
+  async function onSubmit(data: ApplicationFormValues) {
     if (mountedAt.current === null || Date.now() - mountedAt.current < MIN_FILL_MS) return;
-    setSubmitted(true);
-    reset();
+    setState("pending");
+    const result = await postJson("/api/bewerbung", { ...data, locale, formRenderedAt: mountedAt.current });
+    if (result.ok) {
+      setState("success");
+      reset();
+    } else {
+      setState("error");
+    }
   }
 
   // A plain function reference assigned to the form's `onSubmit` prop, not
@@ -82,13 +88,10 @@ export function ApplicationForm() {
     void handleSubmit(onSubmit)(event);
   }
 
-  if (submitted) {
+  if (state === "success") {
     return (
       <div role="status" className="flex flex-col gap-3 rounded-md border-l-2 border-dashed border-gold py-1 pl-4">
-        <p className="text-body-m">{t("submitStubNotice", { email: CONTACT_EMAIL })}</p>
-        <a href={`mailto:${CONTACT_EMAIL}`} className="link-underline w-fit text-body-m font-medium">
-          {CONTACT_EMAIL}
-        </a>
+        <p className="text-body-m">{t("submitSuccess")}</p>
       </div>
     );
   }
@@ -210,8 +213,14 @@ export function ApplicationForm() {
         )}
       </div>
 
-      <Button type="submit" className="self-start">
-        {t("submitLabel")}
+      {state === "error" && (
+        <p role="alert" className="text-body-s text-oxblood">
+          {t("submitError", { email: CONTACT_EMAIL })}
+        </p>
+      )}
+
+      <Button type="submit" className="self-start" loading={state === "pending"}>
+        {state === "pending" ? t("submitPending") : t("submitLabel")}
       </Button>
     </form>
   );
