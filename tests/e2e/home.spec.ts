@@ -160,7 +160,31 @@ test.describe("homepage", () => {
     expect(await page.locator("header img").first().getAttribute("src")).toBe(first);
   });
 
-  test("names every board member's LinkedIn link without needing a hover", async ({ page }) => {
+  test("names every board member's LinkedIn link, revealed on hover on a pointer that can hover", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, "covered by the touch-always-visible check below instead");
+    await page.goto("/");
+    const link = page.getByRole("link", { name: /LinkedIn-Profil von Thorben Ossig/ });
+    await link.scrollIntoViewIfNeeded();
+    // Always reachable by its accessible name regardless of visual state —
+    // BoardGrid.tsx's deliberate, scoped exception to "hover enhances,
+    // hover never hides" hides the mark visually until hover on a pointer
+    // that supports it (.linkedin-mark, globals.css), it never removes the
+    // link itself.
+    await expect(link).toBeAttached();
+    await expect(link).toHaveCSS("opacity", "0");
+
+    await link.hover();
+    await expect(link).toHaveCSS("opacity", "1");
+  });
+
+  test("keeps the board member LinkedIn mark permanently visible on a touch device", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!isMobile, "this is specifically the touch/no-hover case");
     await page.goto("/");
     const link = page.getByRole("link", { name: /LinkedIn-Profil von Thorben Ossig/ });
     await link.scrollIntoViewIfNeeded();

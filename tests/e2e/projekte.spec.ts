@@ -24,7 +24,12 @@ test.describe("/projekte", () => {
 
   test("expanding a project card reveals its detail without a page navigation", async ({ page }) => {
     await page.goto("/projekte");
-    const button = page.getByRole("button", { name: /SmileGreen/ });
+    // The em dash + expand/collapse label is the toggle's own sr-only
+    // suffix (ProjectsActive.tsx) — needed to disambiguate from the
+    // photo lightbox triggers, which are also named "SmileGreen …" now
+    // (ImageLightbox's "<alt> vergrößern" label) and also carry
+    // aria-expanded, since a Radix Dialog.Trigger sets that too.
+    const button = page.getByRole("button", { name: /SmileGreen — / });
     await button.scrollIntoViewIfNeeded();
 
     await expect(button).toHaveAttribute("aria-expanded", "false");
@@ -38,8 +43,8 @@ test.describe("/projekte", () => {
     page,
   }) => {
     await page.goto("/projekte");
-    const first = page.getByRole("button", { name: /SmileGreen/ });
-    const second = page.getByRole("button", { name: /Mealyo/ });
+    const first = page.getByRole("button", { name: /SmileGreen — / });
+    const second = page.getByRole("button", { name: /Mealyo — / });
 
     await first.click();
     await expect(first).toHaveAttribute("aria-expanded", "true");
