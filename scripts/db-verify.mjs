@@ -31,10 +31,10 @@ async function verifyApplications() {
   const [inserted] = await sql`
     insert into applications (
       first_name, last_name, email, study_program, semester, university,
-      motivation, desired_areas, availability_hours, consent_at, locale
+      motivation, desired_areas, availability_hours, consent_at, locale, recruiting_semester
     ) values (
       'Verify', 'Script', ${email}, 'Testfach', 3, 'Testuniversität',
-      'Verification run, not a real application.', ${["SmileGreen", "Team-Lead"]}, 5, now(), 'de'
+      'Verification run, not a real application.', ${["SmileGreen", "Team-Lead"]}, 5, now(), 'de', 'HWS26'
     )
     returning *
   `;
@@ -44,6 +44,7 @@ async function verifyApplications() {
   check("email round-trips", read.email, email);
   check("desired_areas round-trips as an array", read.desired_areas, ["SmileGreen", "Team-Lead"]);
   check("mail_status defaults to pending", read.mail_status, "pending");
+  check("recruiting_semester round-trips", read.recruiting_semester, "HWS26");
 
   await sql`update applications set mail_status = 'sent', mailed_at = now() where id = ${inserted.id}`;
   const [afterUpdate] = await sql`select mail_status from applications where id = ${inserted.id}`;

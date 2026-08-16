@@ -3,10 +3,11 @@ import { screen } from "@testing-library/react";
 import { axe } from "jest-axe";
 import { renderWithIntl } from "../../fixtures/intl";
 import { MitmachenApplication } from "@/components/sections/MitmachenApplication";
-import { recruitingWindow } from "@/content/recruiting";
+import { recruitingWindows } from "@/content/recruiting";
 
-const opensMs = new Date(recruitingWindow.opensAt!).getTime();
-const closesMs = new Date(recruitingWindow.closesAt!).getTime();
+const [hws26] = recruitingWindows;
+const opensMs = new Date(hws26.start).getTime();
+const closesMs = new Date(hws26.end).getTime();
 
 function freezeNowAt(ms: number) {
   vi.spyOn(Date, "now").mockImplementation(() => ms);

@@ -52,6 +52,10 @@ export type ApplicationInput = {
   availabilityHours: number;
   heardAboutUs?: string;
   locale: Locale;
+  // The recruiting cycle (content/recruiting.ts) this application belongs
+  // to — see lib/recruitingSemester.ts. Distinct from `semester` above,
+  // which is the applicant's own semester of study.
+  recruitingSemester: string;
 };
 
 export type Application = ApplicationInput & {
@@ -84,6 +88,7 @@ function toApplication(row: Record<string, unknown>): Application {
     mailStatus: row.mail_status as MailStatus,
     mailError: (row.mail_error as string | null) ?? null,
     mailedAt: (row.mailed_at as Date | null) ?? null,
+    recruitingSemester: row.recruiting_semester as string,
   };
 }
 
@@ -96,12 +101,13 @@ export async function insertApplication(input: ApplicationInput): Promise<Applic
     insert into applications (
       first_name, last_name, email, study_program, semester, university,
       prior_involvement, languages_skills, motivation, desired_areas,
-      availability_hours, heard_about_us, consent_at, locale
+      availability_hours, heard_about_us, consent_at, locale, recruiting_semester
     ) values (
       ${input.firstName}, ${input.lastName}, ${input.email}, ${input.studyProgram},
       ${input.semester}, ${input.university}, ${input.priorInvolvement ?? null},
       ${input.languagesSkills ?? null}, ${input.motivation}, ${input.desiredAreas},
-      ${input.availabilityHours}, ${input.heardAboutUs ?? null}, now(), ${input.locale}
+      ${input.availabilityHours}, ${input.heardAboutUs ?? null}, now(), ${input.locale},
+      ${input.recruitingSemester}
     )
     returning *
   `;
@@ -120,6 +126,53 @@ export async function markApplicationMailFailed(id: string, error: string): Prom
     update applications set mail_status = 'failed', mail_error = ${error}
     where id = ${id}
   `;
+}
+
+// Powers /admin/bewerbungen. Every field the admin list and CSV export need
+// and nothing else the board doesn't ask to see there (motivation, desired
+// areas, etc. stay out of both) — data minimisation applies to internal
+// tooling too, not just what's collected from a visitor.
+export type ApplicationSummary = {
+  id: string;
+  createdAt: Date;
+  firstName: string;
+  lastName: string;
+  email: string;
+  studyProgram: string;
+  mailStatus: MailStatus;
+  recruitingSemester: string;
+};
+
+function toApplicationSummary(row: Record<string, unknown>): ApplicationSummary {
+  return {
+    id: row.id as string,
+    createdAt: row.created_at as Date,
+    firstName: row.first_name as string,
+    lastName: row.last_name as string,
+    email: row.email as string,
+    studyProgram: row.study_program as string,
+    mailStatus: row.mail_status as MailStatus,
+    recruitingSemester: row.recruiting_semester as string,
+  };
+}
+
+export async function listApplications(): Promise<ApplicationSummary[]> {
+  const rows = await sql()`
+    select id, created_at, first_name, last_name, email, study_program, mail_status, recruiting_semester
+    from applications
+    order by created_at desc
+  `;
+  return (rows as Record<string, unknown>[]).map(toApplicationSummary);
+}
+
+export async function listApplicationsBySemester(recruitingSemester: string): Promise<ApplicationSummary[]> {
+  const rows = await sql()`
+    select id, created_at, first_name, last_name, email, study_program, mail_status, recruiting_semester
+    from applications
+    where recruiting_semester = ${recruitingSemester}
+    order by created_at desc
+  `;
+  return (rows as Record<string, unknown>[]).map(toApplicationSummary);
 }
 
 export async function deleteExpiredApplications(cutoff: Date | null): Promise<number> {

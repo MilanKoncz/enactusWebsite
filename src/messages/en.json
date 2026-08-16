@@ -996,5 +996,32 @@
     "contactNotification": {
       "subject": "New contact message from {name}"
     }
+  },
+  "AdminBewerbungen": {
+    "eyebrow": "Admin",
+    "title": "Applications",
+    "logout": "Log out",
+    "downloadCsv": "Download as CSV",
+    "noApplications": "No applications yet.",
+    "columns": {
+      "name": "Name",
+      "email": "Email",
+      "studyProgram": "Field of study",
+      "createdAt": "Received",
+      "mailStatus": "Mail status"
+    },
+    "mailStatus": {
+      "pending": "pending",
+      "sent": "sent",
+      "failed": "failed"
+    },
+    "login": {
+      "eyebrow": "Admin",
+      "title": "Sign in",
+      "passwordLabel": "Password",
+      "submit": "Sign in",
+      "error": "Wrong password.",
+      "rateLimited": "Too many attempts. Please try again later."
+    }
   }
 }

@@ -9,6 +9,7 @@ import { ApplicationPdfDocument } from "@/lib/applicationPdf";
 import { checkRateLimit } from "@/lib/rateLimit";
 import { clientIp } from "@/lib/requestIp";
 import { MIN_FILL_MS } from "@/lib/antiSpam";
+import { resolveApplicationSemester } from "@/lib/recruitingSemester";
 
 /**
  * The load-bearing ordering, per docs/engineering.md: validate, then write
@@ -63,6 +64,7 @@ export async function POST(request: NextRequest) {
       availabilityHours: data.availabilityHours,
       heardAboutUs: data.heardAboutUs,
       locale: data.locale,
+      recruitingSemester: resolveApplicationSemester(new Date()),
     });
   } catch (error) {
     console.error("Failed to persist application", error);

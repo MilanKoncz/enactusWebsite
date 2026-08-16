@@ -24,6 +24,7 @@ const baseApplication: Application = {
   mailStatus: "pending",
   mailError: null,
   mailedAt: null,
+  recruitingSemester: "HWS26",
 };
 
 describe("ApplicationPdfDocument", () => {

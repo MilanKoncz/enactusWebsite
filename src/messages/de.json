@@ -996,5 +996,32 @@
     "contactNotification": {
       "subject": "Neue Kontaktanfrage von {name}"
     }
+  },
+  "AdminBewerbungen": {
+    "eyebrow": "Admin",
+    "title": "Bewerbungen",
+    "logout": "Abmelden",
+    "downloadCsv": "Als CSV herunterladen",
+    "noApplications": "Noch keine Bewerbungen.",
+    "columns": {
+      "name": "Name",
+      "email": "E-Mail",
+      "studyProgram": "Studiengang",
+      "createdAt": "Eingangsdatum",
+      "mailStatus": "Mailstatus"
+    },
+    "mailStatus": {
+      "pending": "ausstehend",
+      "sent": "gesendet",
+      "failed": "fehlgeschlagen"
+    },
+    "login": {
+      "eyebrow": "Admin",
+      "title": "Anmelden",
+      "passwordLabel": "Passwort",
+      "submit": "Anmelden",
+      "error": "Falsches Passwort.",
+      "rateLimited": "Zu viele Versuche. Bitte später erneut versuchen."
+    }
   }
 }

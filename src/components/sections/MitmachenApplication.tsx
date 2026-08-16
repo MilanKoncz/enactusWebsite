@@ -7,8 +7,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ApplicationForm } from "./ApplicationForm";
 import { ReminderSignupForm } from "./ReminderSignupForm";
 import { useNow } from "@/lib/useNow";
-import { recruitingPhaseAt } from "@/lib/recruitingStatus";
-import { recruitingWindow } from "@/content/recruiting";
+import { recruitingPhaseAt, currentOrNextRecruitingWindow } from "@/lib/recruitingStatus";
 
 function remainingParts(targetMs: number, nowMs: number) {
   const totalSeconds = Math.floor(Math.max(0, targetMs - nowMs) / 1000);
@@ -42,9 +41,10 @@ export function MitmachenApplication() {
   const locale = useLocale();
   const now = useNow();
   const phase = recruitingPhaseAt(now);
+  const window = currentOrNextRecruitingWindow(now);
 
-  const opensAt = recruitingWindow.opensAt ? new Date(recruitingWindow.opensAt) : null;
-  const closesAt = recruitingWindow.closesAt ? new Date(recruitingWindow.closesAt) : null;
+  const opensAt = window ? new Date(window.start) : null;
+  const closesAt = window ? new Date(window.end) : null;
   const dateFormatter = new Intl.DateTimeFormat(locale, { dateStyle: "long", timeStyle: "short" });
   const remaining = opensAt ? remainingParts(opensAt.getTime(), now) : null;
 

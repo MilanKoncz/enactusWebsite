@@ -44,6 +44,14 @@ the full list and current values.
   automatically once this variable is set as a project env var (see
   "Scheduled cleanup" below); with it unset, the route rejects every
   request rather than running unauthenticated.
+- `ADMIN_PASSWORD` — gates `/admin/bewerbungen`, the board's application
+  list. Compared in constant time (`lib/adminAuth.ts`), behind the same
+  rate limiting as the public forms. Also the HMAC key that signs the
+  page's session cookie — there is no separate session secret, since the
+  page has no account system to protect beyond this one shared password.
+  **Must be set in Vercel** (all environments the admin page should be
+  reachable from) — with it unset, `/api/admin/login` rejects every
+  request rather than falling open.
 - `VERCEL_ENV` — **not** in `.env.example`: this is a Vercel System
   Environment Variable, only ever set by Vercel itself, never by hand. It
   gates indexing (`docs/engineering.md`'s SEO section,
@@ -125,6 +133,23 @@ Setting the variables in `.env.local` only fixes local runs. Preview and
 Production read Vercel's project environment variables, and each Vercel
 environment is configured separately — a key present in Development does
 nothing for the deployed site.
+
+## Admin application list
+
+`/admin/bewerbungen` (German URL, no locale prefix, like every other page —
+also reachable at `/en/admin/bewerbungen`) lists every application, grouped
+by recruiting semester (`applications.recruiting_semester`,
+`migrations/0002_add_recruiting_semester.sql`), newest group first. Each
+group has a "Als CSV herunterladen" link (`GET
+/api/admin/bewerbungen/csv?semester=...`), UTF-8 with a BOM so Excel
+renders umlauts correctly.
+
+Gated by `ADMIN_PASSWORD` (above) — no account system, one shared password.
+A correct password sets a signed, httpOnly, 8-hour session cookie
+(`lib/adminAuth.ts`); `/api/admin/login` is rate-limited the same way the
+public forms are. The page carries `noindex` metadata and is excluded from
+both `robots.ts` and `sitemap.ts` — it should never appear in search
+results regardless.
 
 ## Scheduled cleanup
 

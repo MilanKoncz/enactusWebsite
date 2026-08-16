@@ -9,7 +9,7 @@ import {
 } from "@/lib/db";
 import { applicationRetentionCutoff } from "@/lib/retentionCutoff";
 import { retention } from "@/content/retention";
-import { recruitingWindow } from "@/content/recruiting";
+import { recruitingWindows } from "@/content/recruiting";
 
 /**
  * Enforces content/retention.ts, on a schedule — a stated retention period
@@ -43,9 +43,9 @@ export async function GET(request: NextRequest) {
   }
 
   const now = new Date();
-  const closesAt = recruitingWindow.closesAt ? new Date(recruitingWindow.closesAt) : null;
+  const windowEnds = recruitingWindows.map((window) => new Date(window.end));
 
-  const applicationsCutoff = applicationRetentionCutoff(now, closesAt);
+  const applicationsCutoff = applicationRetentionCutoff(now, windowEnds);
   const contactMessagesCutoff = new Date(now);
   contactMessagesCutoff.setUTCMonth(contactMessagesCutoff.getUTCMonth() - retention.contactMessages.months);
   const reminderUnconfirmedCutoff = new Date(now);

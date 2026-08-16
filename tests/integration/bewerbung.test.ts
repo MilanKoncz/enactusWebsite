@@ -53,6 +53,7 @@ const STORED_APPLICATION = {
   mailStatus: "pending" as const,
   mailError: null,
   mailedAt: null,
+  recruitingSemester: "HWS26",
 };
 
 function validPayload(overrides: Record<string, unknown> = {}) {
