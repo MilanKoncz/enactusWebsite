@@ -3,6 +3,7 @@ import {
   EVENTS_STOPS,
   HOME_STOPS,
   KONTAKT_STOPS,
+  MITMACHEN_STOPS,
   PARTNER_STOPS,
   PROCESS_STOPS,
   PROJECTS_STOPS,
@@ -19,6 +20,7 @@ const ROUTES = {
   events: EVENTS_STOPS,
   partner: PARTNER_STOPS,
   kontakt: KONTAKT_STOPS,
+  mitmachen: MITMACHEN_STOPS,
 };
 const ALL_STOPS = [
   ...HOME_STOPS,
@@ -27,6 +29,7 @@ const ALL_STOPS = [
   ...EVENTS_STOPS,
   ...PARTNER_STOPS,
   ...KONTAKT_STOPS,
+  ...MITMACHEN_STOPS,
 ];
 
 describe("threadRoute", () => {

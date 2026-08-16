@@ -5,12 +5,21 @@ import { renderWithIntl } from "../../fixtures/intl";
 import { ProjectsArchive } from "@/components/sections/ProjectsArchive";
 import { projects } from "@/content/projects";
 
+const archivedProjects = projects.filter((project) => project.status !== "active");
+
 describe("ProjectsArchive", () => {
-  it("renders every project, active and archived, linking to its own detail page", () => {
+  it("renders every non-active project, linking to its own detail page", () => {
     renderWithIntl(<ProjectsArchive />);
-    for (const project of projects) {
+    for (const project of archivedProjects) {
       const link = screen.getByRole("link", { name: new RegExp(project.name) });
       expect(link).toHaveAttribute("href", `/projekte/${project.slug}`);
+    }
+  });
+
+  it("excludes the active projects — they already appear on /projekte", () => {
+    renderWithIntl(<ProjectsArchive />);
+    for (const project of projects.filter((p) => p.status === "active")) {
+      expect(screen.queryByRole("link", { name: new RegExp(project.name) })).not.toBeInTheDocument();
     }
   });
 
@@ -23,7 +32,7 @@ describe("ProjectsArchive", () => {
 
   it("marks a project's missing year as a placeholder", () => {
     renderWithIntl(<ProjectsArchive />);
-    expect(screen.getAllByText("Angabe fehlt").length).toBe(projects.length);
+    expect(screen.getAllByText("Angabe fehlt").length).toBe(archivedProjects.length);
   });
 
   it("links back to the main projects page", () => {

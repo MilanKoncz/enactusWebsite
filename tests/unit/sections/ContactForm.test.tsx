@@ -1,11 +1,27 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "jest-axe";
 import { renderWithIntl } from "../../fixtures/intl";
 import { ContactForm } from "@/components/sections/ContactForm";
 
+function mockFetchOk() {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 })),
+  );
+}
+
+function mockFetchFailure() {
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 500 })));
+}
+
 describe("ContactForm", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
   it("renders name, email, subject, and message fields plus a submit button", () => {
     renderWithIntl(<ContactForm />);
     expect(screen.getByLabelText("Name")).toBeInTheDocument();
@@ -29,11 +45,12 @@ describe("ContactForm", () => {
     expect(await screen.findByText("Bitte gib deinen Namen ein (mindestens 2 Zeichen).")).toBeInTheDocument();
     expect(screen.getByText("Bitte gib eine gültige E-Mail-Adresse ein.")).toBeInTheDocument();
     expect(screen.getByText("Bitte schreib uns mindestens 10 Zeichen.")).toBeInTheDocument();
-    // The stub notice never appears — validation failed, nothing was "sent".
+    // Nothing was sent — validation failed before any request went out.
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
-  it("never calls a network endpoint on a valid submit — it's a clearly marked stub", async () => {
+  it("posts to /api/kontakt and shows a real success notice on a valid submit", async () => {
+    mockFetchOk();
     const user = userEvent.setup();
     renderWithIntl(<ContactForm />);
 
@@ -43,10 +60,25 @@ describe("ContactForm", () => {
     await user.click(screen.getByRole("button", { name: "Nachricht senden" }));
 
     const notice = await screen.findByRole("status");
-    expect(notice).toHaveTextContent("teamvorstand@unimannheim.enactus.team");
-    expect(
-      screen.getByRole("link", { name: "teamvorstand@unimannheim.enactus.team" }),
-    ).toHaveAttribute("href", "mailto:teamvorstand@unimannheim.enactus.team");
+    expect(notice).toHaveTextContent("Danke für deine Nachricht");
+    expect(fetch).toHaveBeenCalledWith("/api/kontakt", expect.objectContaining({ method: "POST" }));
+    const requestInit = vi.mocked(fetch).mock.calls[0]?.[1];
+    const body = JSON.parse(requestInit?.body as string);
+    expect(body).toMatchObject({ name: "Jane Doe", email: "jane@example.com", locale: "de" });
+  });
+
+  it("shows an error and keeps the form filled in when the request fails", async () => {
+    mockFetchFailure();
+    const user = userEvent.setup();
+    renderWithIntl(<ContactForm />);
+
+    await user.type(screen.getByLabelText("Name"), "Jane Doe");
+    await user.type(screen.getByLabelText("E-Mail"), "jane@example.com");
+    await user.type(screen.getByLabelText("Nachricht"), "Wir würden gerne mit euch sprechen.");
+    await user.click(screen.getByRole("button", { name: "Nachricht senden" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("teamvorstand@unimannheim.enactus.team");
+    expect(screen.getByLabelText("Name")).toHaveValue("Jane Doe");
   });
 
   it("has no accessibility violations", async () => {

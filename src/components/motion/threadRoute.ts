@@ -25,7 +25,11 @@ export type ThreadStop =
   | "partner-statements"
   | "partner-membership"
   | "partner-contact"
-  | "kontakt-content";
+  | "kontakt-content"
+  | "mitmachen-fit"
+  | "mitmachen-timeline"
+  | "mitmachen-application"
+  | "mitmachen-cta";
 
 export type ThreadWidth = "wide" | "narrow";
 
@@ -223,6 +227,30 @@ const ROUTES: Record<ThreadStop, Record<ThreadWidth, Waypoints>> = {
     wide: { from: 50, bow: 50, to: 50 },
     narrow: { from: 50, bow: 50, to: 50 },
   },
+
+  // /mitmachen (Mitmachen*.tsx). Its own separate run, same reasoning as the
+  // other route-specific stops above. Opens flat and centered like every
+  // other page's own intro stop — there's no separate intro section here
+  // (the brief skips a hero for this page), so the expectations/offers grid
+  // plays that opening role instead.
+  "mitmachen-fit": {
+    wide: { from: 50, bow: 50, to: 50 },
+    narrow: { from: 50, bow: 50, to: 50 },
+  },
+  "mitmachen-timeline": {
+    wide: { from: 50, bow: 60, to: 70 },
+    narrow: { from: 50, bow: 56, to: 64 },
+  },
+  "mitmachen-application": {
+    wide: { from: 70, bow: 56, to: 42 },
+    narrow: { from: 64, bow: 54, to: 46 },
+  },
+  // The one dark (ink) section on this page — settles calmly into the
+  // closing CTA rather than swinging hard, same reasoning as partner-contact.
+  "mitmachen-cta": {
+    wide: { from: 42, bow: 48, to: 50 },
+    narrow: { from: 46, bow: 48, to: 50 },
+  },
 };
 
 // Iteration order matches the sections' actual order on the homepage
@@ -274,6 +302,14 @@ export const PARTNER_STOPS: ThreadStop[] = [
 
 // Single-stop route — see src/app/[locale]/(site)/kontakt/page.tsx.
 export const KONTAKT_STOPS: ThreadStop[] = ["kontakt-content"];
+
+// Iteration order matches src/app/[locale]/(site)/mitmachen/page.tsx.
+export const MITMACHEN_STOPS: ThreadStop[] = [
+  "mitmachen-fit",
+  "mitmachen-timeline",
+  "mitmachen-application",
+  "mitmachen-cta",
+];
 
 export function waypointsFor(stop: ThreadStop, width: ThreadWidth): Waypoints {
   return ROUTES[stop][width];

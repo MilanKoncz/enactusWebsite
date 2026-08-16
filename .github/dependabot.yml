@@ -9,3 +9,10 @@ updates:
         update-types:
           - "patch"
           - "minor"
+    # Major upgrades (typescript, eslint, jest-axe, @types/node as of
+    # 2026-08-16) land as noisy, high-risk PRs right before the 1 September
+    # launch. Ignored until after launch — remove this once the post-launch
+    # major-upgrade pass is scheduled.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]

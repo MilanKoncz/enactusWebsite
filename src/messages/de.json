@@ -509,7 +509,9 @@
       "messageLabel": "Nachricht",
       "messageError": "Bitte schreib uns mindestens 10 Zeichen.",
       "submitLabel": "Nachricht senden",
-      "submitStubNotice": "Dieses Formular ist noch nicht angebunden — der Versand kommt mit dem Backend. Schreib uns bis dahin direkt an {email}."
+      "submitPending": "Wird gesendet …",
+      "submitSuccess": "Danke für deine Nachricht! Wir melden uns so schnell wie möglich bei dir.",
+      "submitError": "Deine Nachricht konnte nicht gesendet werden. Bitte versuch es noch einmal oder schreib uns direkt an {email}."
     }
   },
   "Faq": {
@@ -609,5 +611,374 @@
     "responsibleLabel": "Inhaltlich verantwortlich gemäß § 18 Abs. 2 MStV",
     "responsibleSame": "Dieselben Personen wie unter „Vertreten durch“.",
     "copyright": "© {year} Enactus Mannheim e.V. Alle Rechte vorbehalten."
+  },
+  "Datenschutz": {
+    "eyebrow": "Rechtliches",
+    "title": "Datenschutzerklärung",
+    "effectiveDate": "Stand: August 2026",
+    "draftNotice": "Entwurf — diese Erklärung ist noch nicht vom Datenschutzbeauftragten von Enactus Germany geprüft und freigegeben.",
+    "reviewedNotice": "Zuletzt geprüft am {date} durch den Datenschutzbeauftragten von Enactus Germany.",
+    "scope": {
+      "title": "Geltungsbereich",
+      "body": [
+        "Diese Erklärung beschreibt, welche personenbezogenen Daten wir beim Besuch dieser Website verarbeiten, zu welchem Zweck, auf welcher Rechtsgrundlage und wie lange wir sie speichern.",
+        "Sie gilt für sämtliche Unterseiten dieser Website einschließlich des Bewerbungsformulars, der Erinnerungsliste und des Kontaktformulars. Für verlinkte Websites Dritter — etwa die Seiten unserer Projekte, Partner oder von Enactus Germany — gelten deren eigene Datenschutzerklärungen."
+      ]
+    },
+    "responsible": {
+      "title": "Verantwortlicher",
+      "intro": "Verantwortlich für die Datenverarbeitung auf dieser Website ist:",
+      "contactLabel": "E-Mail",
+      "representativesLabel": "Vertretungsberechtigter Vorstand",
+      "registerLabel": "Registergericht",
+      "noDpo": "Ein betrieblicher Datenschutzbeauftragter ist für Enactus Mannheim e. V. nicht bestellt; die gesetzlichen Voraussetzungen hierfür liegen nicht vor."
+    },
+    "hosting": {
+      "title": "Hosting und Server-Protokolle",
+      "intro": "Diese Website wird von Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA, gehostet und über den Standort Frankfurt am Main (Region „fra1“) ausgeliefert.",
+      "fieldsIntro": "Beim Aufruf einer Seite werden technisch notwendige Zugriffsdaten verarbeitet:",
+      "fields": [
+        "IP-Adresse des anfragenden Geräts",
+        "Datum und Uhrzeit des Zugriffs",
+        "aufgerufene Adresse und übertragene Datenmenge",
+        "Statusmeldung des Servers",
+        "verweisende Seite, sofern übermittelt",
+        "Browsertyp, Browserversion und Betriebssystem"
+      ],
+      "purpose": "Diese Daten sind für die Auslieferung der Website technisch erforderlich und dienen der Betriebssicherheit sowie der Abwehr von Angriffen. Eine Zusammenführung mit anderen Datenquellen findet nicht statt.",
+      "legalBasisLabel": "Rechtsgrundlage",
+      "legalBasis": "Art. 6 Abs. 1 lit. f DSGVO. Unser berechtigtes Interesse liegt in der sicheren, stabilen und funktionsfähigen Bereitstellung der Website.",
+      "retentionLabel": "Speicherdauer",
+      "retention": "Die Protokolle werden von Vercel nach kurzer Zeit automatisch gelöscht; wir werten sie nicht personenbezogen aus und legen keine dauerhaften Kopien an."
+    },
+    "database": {
+      "title": "Datenbank",
+      "body": [
+        "Bewerbungen, Kontaktanfragen und Anmeldungen zur Erinnerungsliste speichern wir in einer Postgres-Datenbank des Anbieters Neon Inc., USA. Die Datenbank wird in der Region „eu-central-1“ (Frankfurt am Main) betrieben; die Daten liegen damit innerhalb der Europäischen Union.",
+        "Wir erheben ausschließlich Angaben, die für den jeweiligen Zweck erforderlich sind, und löschen sie, sobald dieser Zweck entfällt (Art. 5 Abs. 1 lit. c und e DSGVO). Die konkreten Fristen finden sich im Abschnitt „Speicherdauer“."
+      ]
+    },
+    "email": {
+      "title": "E-Mail-Versand",
+      "body": [
+        "Für den Versand automatisch erzeugter E-Mails — Bewerbungsbestätigung, Weiterleitung von Kontaktanfragen, Bestätigungsmail der Erinnerungsliste — nutzen wir den Dienst Resend (Plus Five Five, Inc., USA). Der Versand erfolgt über die Region Irland („eu-west-1“) und damit innerhalb der Europäischen Union.",
+        "Übermittelt werden die E-Mail-Adresse der empfangenden Person sowie der Inhalt der jeweiligen Nachricht.",
+        "Unsere E-Mails enthalten kein Öffnungs-Tracking, kein Klick-Tracking und keine Zählpixel. Die entsprechenden Funktionen des Dienstes sind bewusst deaktiviert. Links in unseren E-Mails führen direkt zum Ziel und werden nicht über einen Zwischendienst umgeleitet."
+      ],
+      "legalBasisLabel": "Rechtsgrundlage",
+      "legalBasis": "Dieselbe wie für die jeweils zugrunde liegende Anfrage — siehe die Abschnitte zum Bewerbungs-, Erinnerungs- und Kontaktformular."
+    },
+    "analytics": {
+      "title": "Reichweitenmessung",
+      "body": [
+        "Wir nutzen Vercel Analytics zur anonymen Auswertung der Seitenaufrufe. Der Dienst setzt keine Cookies, speichert keine Kennungen auf deinem Gerät und erstellt keine geräteübergreifenden Profile. Erhoben werden ausschließlich aggregierte Angaben wie aufgerufene Seite, ungefähre Herkunftsregion auf Länderebene, Gerätetyp und verweisende Seite.",
+        "Ein Rückschluss auf einzelne Personen ist uns damit nicht möglich. Weil keine Informationen auf deinem Endgerät gespeichert oder ausgelesen werden, ist keine Einwilligung nach § 25 TDDDG erforderlich — deshalb zeigt diese Website auch keinen Cookie-Banner."
+      ],
+      "legalBasisLabel": "Rechtsgrundlage",
+      "legalBasis": "Art. 6 Abs. 1 lit. f DSGVO. Unser berechtigtes Interesse liegt darin, zu verstehen, welche Inhalte genutzt werden, um die Website verbessern zu können."
+    },
+    "externalContent": {
+      "title": "Schriftarten und externe Inhalte",
+      "fontsBody": "Sämtliche Schriftarten sind lokal auf unserem Server eingebunden. Es findet keine Verbindung zu Google Fonts oder einem anderen externen Schriftanbieter statt; deine IP-Adresse wird hierfür nicht an Dritte übermittelt.",
+      "videoLabel": "Videoeinbindungen",
+      "videoBody": [
+        "Projekt-Pitches und ähnliche Videos binden wir über eine Klick-zum-Laden-Vorschau ein. Vor deinem Klick wird keine Verbindung zu YouTube aufgebaut, es werden keine Daten übertragen und keine Cookies gesetzt. Angezeigt wird lediglich ein von unserem Server ausgeliefertes Vorschaubild.",
+        "Erst wenn du das Vorschaubild anklickst, lädt der eingebettete Player über die Domain youtube-nocookie.com. Ab diesem Zeitpunkt verarbeitet Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland, deine Daten nach eigener Verantwortung; es gilt die Datenschutzerklärung von Google. Auf Art und Umfang dieser Verarbeitung haben wir keinen Einfluss."
+      ],
+      "legalBasisLabel": "Rechtsgrundlage",
+      "legalBasis": "Art. 6 Abs. 1 lit. a DSGVO. Deine Einwilligung erteilst du durch den bewussten Klick auf das Vorschaubild."
+    },
+    "application": {
+      "title": "Bewerbungsformular",
+      "intro": "Über die Seite „Mitmachen“ kannst du dich um eine Mitgliedschaft bewerben. Erhoben werden:",
+      "fieldsHeading": "Erhobene Angaben",
+      "fields": [
+        "Vorname, Nachname, E-Mail-Adresse",
+        "Studiengang, Fachsemester, Hochschule",
+        "Bisheriges Engagement / Berufserfahrung (Freitext)",
+        "Sprachen und weitere Kenntnisse (Freitext)",
+        "Motivation (Freitext)",
+        "gewünschter Einsatzbereich",
+        "Verfügbarkeit in Stunden pro Woche",
+        "Angabe, wie du auf uns aufmerksam geworden bist",
+        "Zeitpunkt deiner Einwilligung"
+      ],
+      "noUpload": "Es gibt keinen Datei-Upload. Angaben, die üblicherweise in einem Lebenslauf stehen, erheben wir ausschließlich als strukturierte Formularfelder. Wir bitten dich, keine Angaben zu besonderen Kategorien personenbezogener Daten nach Art. 9 DSGVO zu machen — etwa zu Gesundheit, religiöser oder weltanschaulicher Überzeugung, politischer Meinung oder sexueller Orientierung. Solche Angaben sind für die Auswahl nicht erforderlich.",
+      "purposeLabel": "Zweck",
+      "purpose": "Prüfung und Bearbeitung deiner Bewerbung sowie Kontaktaufnahme im Rahmen des Auswahlverfahrens.",
+      "legalBasisLabel": "Rechtsgrundlage",
+      "legalBasis": "Art. 6 Abs. 1 lit. b DSGVO. Die Verarbeitung erfolgt zur Durchführung vorvertraglicher Maßnahmen auf deine Anfrage hin.",
+      "accessLabel": "Empfänger",
+      "access": "Der Vorstand sowie die für die Bewerbungsbearbeitung zuständigen Personen des Vereins. Deine Bewerbung wird zunächst in unserer Datenbank gespeichert und anschließend als PDF an info@unimannheim.enactus.team übermittelt.",
+      "necessityLabel": "Erforderlichkeit",
+      "necessity": "Die Bereitstellung der Daten ist weder gesetzlich noch vertraglich vorgeschrieben. Ohne die als Pflichtfelder gekennzeichneten Angaben können wir deine Bewerbung jedoch nicht bearbeiten."
+    },
+    "reminder": {
+      "title": "Erinnerungsliste",
+      "body": [
+        "Solange das Bewerbungsfenster geschlossen ist, kannst du dich benachrichtigen lassen, sobald es öffnet.",
+        "Wir speichern deine E-Mail-Adresse, den Zeitpunkt der Anmeldung, den Zeitpunkt deiner Bestätigung, die dabei verwendete IP-Adresse sowie zwei zufällig erzeugte Kennungen für Bestätigung und Abmeldung.",
+        "Die Anmeldung erfolgt im Double-Opt-in-Verfahren: Nach dem Absenden erhältst du eine E-Mail mit einem Bestätigungslink. Erst nach deiner Bestätigung nehmen wir dich in die Liste auf. Zeitpunkt und IP-Adresse der Bestätigung speichern wir als Nachweis deiner Einwilligung; ohne diesen Nachweis könnten wir die Rechtmäßigkeit des Versands nicht belegen."
+      ],
+      "legalBasisLabel": "Rechtsgrundlage",
+      "legalBasis": "Art. 6 Abs. 1 lit. a DSGVO für den Versand, Art. 6 Abs. 1 lit. f DSGVO für die Speicherung des Einwilligungsnachweises.",
+      "withdrawalLabel": "Widerruf",
+      "withdrawal": "Jede E-Mail enthält einen Abmeldelink, der ohne weitere Angaben funktioniert. Der Widerruf wirkt für die Zukunft und berührt die Rechtmäßigkeit der bis dahin erfolgten Verarbeitung nicht."
+    },
+    "contact": {
+      "title": "Kontaktformular",
+      "body": [
+        "Über die Seite „Kontakt“ kannst du uns eine Nachricht senden. Erhoben werden Name, E-Mail-Adresse, optional ein Betreff sowie der Inhalt deiner Nachricht."
+      ],
+      "purposeLabel": "Zweck",
+      "purpose": "Bearbeitung und Beantwortung deiner Anfrage.",
+      "legalBasisLabel": "Rechtsgrundlage",
+      "legalBasis": "Art. 6 Abs. 1 lit. f DSGVO. Unser berechtigtes Interesse liegt in der Beantwortung von Anfragen. Zielt deine Anfrage auf den Abschluss oder die Anbahnung einer Mitgliedschaft oder Partnerschaft, ist zusätzlich Art. 6 Abs. 1 lit. b DSGVO einschlägig.",
+      "alternative": "Du kannst uns selbstverständlich auch ohne das Formular per E-Mail erreichen."
+    },
+    "antiSpam": {
+      "title": "Schutz vor Missbrauch",
+      "intro": "Um automatisierte Masseneinsendungen abzuwehren, setzen wir folgende Maßnahmen ein:",
+      "measures": [
+        "ein für dich unsichtbares Formularfeld, das nur von automatisierten Programmen ausgefüllt wird",
+        "eine Prüfung der Zeit zwischen Aufruf und Absenden des Formulars",
+        "eine Begrenzung der Anzahl von Einsendungen je Absender innerhalb eines Zeitfensters"
+      ],
+      "ipHandling": "Für die Begrenzung speichern wir deine IP-Adresse ausschließlich als kryptografischen Hashwert, aus dem sich die ursprüngliche Adresse nicht zurückrechnen lässt. Diese Werte werden nach Ablauf des jeweiligen Zeitfensters automatisch gelöscht.",
+      "noCaptcha": "Ein Captcha setzen wir bewusst nicht ein — es wäre eine Barriere für Menschen mit Behinderung und würde zusätzliche Daten an Dritte übermitteln.",
+      "legalBasisLabel": "Rechtsgrundlage",
+      "legalBasis": "Art. 6 Abs. 1 lit. f DSGVO. Unser berechtigtes Interesse liegt im Schutz unserer Systeme vor missbräuchlicher Nutzung."
+    },
+    "retention": {
+      "title": "Speicherdauer",
+      "tableCaption": "Aufbewahrungsfristen nach Datenart",
+      "columns": ["Daten", "Dauer"],
+      "applicationsLabel": "Bewerbungen",
+      "applicationsValue": "{months} Monate nach Ende des jeweiligen Bewerbungszeitraums",
+      "contactLabel": "Kontaktanfragen",
+      "contactValue": "{months} Monate nach abschließender Bearbeitung",
+      "reminderConfirmedLabel": "Bestätigte Anmeldungen zur Erinnerungsliste",
+      "reminderConfirmedValue": "bis zum Widerruf",
+      "reminderUnconfirmedLabel": "Unbestätigte Anmeldungen zur Erinnerungsliste",
+      "reminderUnconfirmedValue": "{days} Tage nach Anmeldung",
+      "rateLimitLabel": "Hashwerte zur Missbrauchsabwehr",
+      "rateLimitValue": "bis zum Ablauf des Zeitfensters",
+      "serverLogsLabel": "Server-Protokolle",
+      "serverLogsValue": "nach Vorgabe von Vercel, kurzfristig",
+      "note": "Gesetzliche Aufbewahrungspflichten bleiben unberührt. Sofern solche Pflichten einer Löschung entgegenstehen, schränken wir die Verarbeitung stattdessen ein."
+    },
+    "processors": {
+      "title": "Auftragsverarbeiter und Empfänger",
+      "intro": "Wir geben personenbezogene Daten nicht zu Werbezwecken weiter und verkaufen sie nicht. Eine Übermittlung erfolgt ausschließlich an die folgenden Dienstleister, die für uns als Auftragsverarbeiter nach Art. 28 DSGVO tätig sind:",
+      "tableCaption": "Eingesetzte Auftragsverarbeiter",
+      "columns": ["Dienst", "Zweck", "Verarbeitungsort"],
+      "rows": [
+        ["Vercel Inc., USA", "Hosting, Auslieferung, Reichweitenmessung", "Frankfurt am Main"],
+        ["Neon Inc., USA", "Datenbank", "Frankfurt am Main"],
+        ["Plus Five Five, Inc. (Resend), USA", "E-Mail-Versand", "Irland"]
+      ],
+      "dpaNote": "Mit allen genannten Anbietern bestehen Verträge zur Auftragsverarbeitung.",
+      "transferLabel": "Drittlandbezug",
+      "transfer": "Die genannten Unternehmen haben ihren Sitz in den Vereinigten Staaten. Die Verarbeitung findet zwar innerhalb der Europäischen Union statt, ein Zugriff aus den USA — etwa im Rahmen von Wartung und Support — lässt sich jedoch nicht vollständig ausschließen. Für diesen Fall haben wir mit den Anbietern die Standardvertragsklauseln der Europäischen Kommission nach Art. 46 Abs. 2 lit. c DSGVO vereinbart."
+    },
+    "automatedDecisions": {
+      "title": "Keine automatisierte Entscheidungsfindung",
+      "body": "Eine automatisierte Entscheidungsfindung einschließlich Profiling nach Art. 22 DSGVO findet nicht statt. Über Bewerbungen entscheiden ausschließlich Menschen."
+    },
+    "encryption": {
+      "title": "Verschlüsselung",
+      "body": "Diese Website wird ausschließlich über eine verschlüsselte Verbindung (TLS) ausgeliefert. Du erkennst das am Schlosssymbol in der Adresszeile deines Browsers. Damit sind alle Angaben, die du über unsere Formulare übermittelst, auf dem Transportweg vor dem Mitlesen durch Dritte geschützt."
+    },
+    "rights": {
+      "title": "Deine Rechte",
+      "intro": "Dir stehen gegenüber uns die folgenden Rechte zu:",
+      "list": [
+        "Auskunft darüber, ob und welche Daten wir zu dir verarbeiten (Art. 15 DSGVO)",
+        "Berichtigung unrichtiger oder unvollständiger Daten (Art. 16 DSGVO)",
+        "Löschung deiner Daten (Art. 17 DSGVO)",
+        "Einschränkung der Verarbeitung (Art. 18 DSGVO)",
+        "Datenübertragbarkeit in einem gängigen Format (Art. 20 DSGVO)",
+        "Widerspruch gegen Verarbeitungen, die auf einem berechtigten Interesse beruhen (Art. 21 DSGVO)",
+        "Widerruf einer erteilten Einwilligung mit Wirkung für die Zukunft (Art. 7 Abs. 3 DSGVO)"
+      ],
+      "contactPrompt": "Zur Ausübung genügt eine formlose Nachricht an:"
+    },
+    "complaints": {
+      "title": "Beschwerderecht",
+      "body": "Unabhängig davon steht dir das Recht zu, dich bei einer Datenschutz-Aufsichtsbehörde zu beschweren. Für uns zuständig ist:",
+      "authorityName": "Der Landesbeauftragte für den Datenschutz und die Informationsfreiheit Baden-Württemberg",
+      "authorityAddress": ["Lautenschlagerstraße 20", "70173 Stuttgart"],
+      "note": "Du kannst dich auch an die Aufsichtsbehörde deines Wohnsitzes oder deines Arbeitsplatzes wenden."
+    },
+    "changes": {
+      "title": "Änderungen dieser Datenschutzerklärung",
+      "body": "Wir passen diese Erklärung an, wenn sich die Rechtslage, unsere Dienste oder die Art der Datenverarbeitung ändern. Es gilt jeweils die auf dieser Seite veröffentlichte Fassung. Das Datum der letzten Änderung findest du am Anfang dieser Erklärung."
+    }
+  },
+  "MitmachenPage": {
+    "fit": {
+      "eyebrow": "Mitmachen",
+      "title": "Bring dich ein.",
+      "lead": "Was wir erwarten, was du bekommst — und warum du nicht alles davon mitbringen musst.",
+      "expectationsHeading": "Was wir von dir erwarten",
+      "offersHeading": "Was du bekommst",
+      "expectations": {
+        "agency": {
+          "title": "Agency",
+          "lead": "Die Fähigkeit, eine Situation einzuschätzen, zu entscheiden und zu handeln.",
+          "detail": "Wir erwarten nicht, dass du alle Antworten kennst — sondern dass du anfängst, wenn eine Entscheidung ansteht, statt auf Anweisung zu warten."
+        },
+        "time": {
+          "title": "Echte Zeit",
+          "lead": "Ein spürbarer Zeitaufwand neben dem Studium, gerade in intensiven Projektphasen.",
+          "detail": "Wie viel genau hängt von deiner Rolle ab — sprich das offen im Bewerbungsgespräch an."
+        },
+        "ownership": {
+          "title": "Verantwortung",
+          "lead": "Du übernimmst einen Bereich und stehst für dessen Ergebnis gerade.",
+          "detail": "Kein Praktikum, das nebenherläuft — du entscheidest operativ mit."
+        },
+        "teamwork": {
+          "title": "Teamfähigkeit",
+          "lead": "Du arbeitest eng mit anderen zusammen und nimmst Feedback offen an.",
+          "detail": "Projekte laufen im Team, nicht im Alleingang — auch Kritik gehört dazu."
+        }
+      },
+      "offers": {
+        "responsibility": {
+          "title": "Verantwortung ab Tag eins",
+          "lead": "Du übernimmst echte Aufgaben, nicht Zuarbeit.",
+          "detail": "Du triffst operative Entscheidungen und verantwortest die Ergebnisse selbst."
+        },
+        "network": {
+          "title": "Netzwerk",
+          "lead": "Zugang zu Partnerunternehmen, Alumni und anderen Enactus-Teams weltweit.",
+          "detail": "Ein Netzwerk, das über dein Studium hinaus trägt."
+        },
+        "mentoring": {
+          "title": "Coaching",
+          "lead": "Regelmäßiger Austausch mit Vorstand und erfahrenen Alumni.",
+          "detail": "Du bist bei Entscheidungen nicht allein — Erfahrung aus dem Team steht dir zur Seite."
+        },
+        "growth": {
+          "title": "Praxiswissen",
+          "lead": "Skills, die im Studium selten drankommen — von Vertrieb bis Recht.",
+          "detail": "Wissen, das sofort gebraucht wird, nicht nur Theorie."
+        }
+      },
+      "fitNote": {
+        "lead": "Du musst nicht alles davon mitbringen.",
+        "detail": "Rund 80 % Übereinstimmung reicht für eine gute Passung — jedes Skillset hilft uns weiter."
+      }
+    },
+    "timeline": {
+      "eyebrow": "Ablauf",
+      "title": "Wie es nach deiner Bewerbung weitergeht",
+      "regionLabel": "Bewerbungsprozess",
+      "steps": {
+        "application": {
+          "title": "Bewerbung",
+          "short": "Du schickst uns dein Formular über dieses Fenster."
+        },
+        "interview": {
+          "title": "Kennenlerngespräch",
+          "short": "Wir lernen uns in einem persönlichen Gespräch gegenseitig kennen."
+        },
+        "response": {
+          "title": "Rückmeldung",
+          "short": "Du bekommst von uns Bescheid, wie es weitergeht."
+        }
+      }
+    },
+    "application": {
+      "eyebrow": "Bewerbung",
+      "title": "Jetzt bewerben",
+      "lead": "Sobald das Bewerbungsfenster offen ist, kannst du dich hier direkt bewerben.",
+      "notOpen": {
+        "beforeHeading": "Das Bewerbungsfenster ist noch geschlossen",
+        "beforeLead": "Bewerbungen sind vom {opensDate} bis {closesDate} möglich. Lass dich per E-Mail erinnern, sobald es losgeht.",
+        "afterHeading": "Das Bewerbungsfenster ist für diesen Zyklus geschlossen",
+        "afterLead": "Melde dich für die Erinnerung an, um von der nächsten Bewerbungsphase zu erfahren.",
+        "countdown": {
+          "days": "Tage",
+          "hours": "Std",
+          "minutes": "Min",
+          "seconds": "Sek",
+          "srLabel": "Bewerbungen öffnen am {date}."
+        }
+      },
+      "reminder": {
+        "heading": "Per E-Mail erinnern lassen",
+        "lead": "Wir schicken dir eine E-Mail, sobald das Bewerbungsfenster öffnet.",
+        "emailLabel": "E-Mail",
+        "emailError": "Bitte gib eine gültige E-Mail-Adresse ein.",
+        "consentPrefix": "Ich bin damit einverstanden, per E-Mail erinnert zu werden, sobald das Bewerbungsfenster öffnet. Mehr dazu in der",
+        "consentLinkLabel": "Datenschutzerklärung",
+        "consentSuffix": ".",
+        "consentError": "Bitte bestätige die Einwilligung.",
+        "submitLabel": "Erinnerung aktivieren",
+        "submitPending": "Wird aktiviert …",
+        "submitSuccess": "Fast geschafft — bitte bestätige die E-Mail, die wir dir gerade geschickt haben.",
+        "submitError": "Die Anmeldung hat nicht geklappt. Bitte versuch es noch einmal."
+      },
+      "form": {
+        "heading": "Bewerbungsformular",
+        "firstNameLabel": "Vorname",
+        "firstNameError": "Bitte gib deinen Vornamen ein.",
+        "lastNameLabel": "Nachname",
+        "lastNameError": "Bitte gib deinen Nachnamen ein.",
+        "emailLabel": "E-Mail",
+        "emailError": "Bitte gib eine gültige E-Mail-Adresse ein.",
+        "studyProgramLabel": "Studiengang",
+        "studyProgramError": "Bitte gib deinen Studiengang ein.",
+        "semesterLabel": "Fachsemester",
+        "semesterError": "Bitte gib ein gültiges Fachsemester ein.",
+        "universityLabel": "Hochschule",
+        "universityError": "Bitte gib deine Hochschule ein.",
+        "priorInvolvementLabel": "Bisheriges Engagement / Berufserfahrung",
+        "priorInvolvementHint": "Optional, max. 600 Zeichen.",
+        "priorInvolvementError": "Bitte kürze auf maximal 600 Zeichen.",
+        "languagesSkillsLabel": "Sprachen und weitere Kenntnisse",
+        "languagesSkillsHint": "Optional, max. 300 Zeichen.",
+        "languagesSkillsError": "Bitte kürze auf maximal 300 Zeichen.",
+        "motivationLabel": "Motivation",
+        "motivationHint": "Was reizt dich an Enactus Mannheim, und welches Projekt oder welchen Bereich stellst du dir vor? Max. 1500 Zeichen.",
+        "motivationError": "Bitte schreib uns mindestens 20 Zeichen.",
+        "desiredAreasLabel": "Wunschbereich",
+        "desiredAreasHint": "Mehrfachauswahl möglich.",
+        "desiredAreasError": "Bitte wähle mindestens einen Bereich aus.",
+        "availabilityLabel": "Verfügbarkeit in Stunden pro Woche",
+        "availabilityError": "Bitte gib eine gültige Stundenzahl ein.",
+        "heardAboutLabel": "Wie bist du auf uns aufmerksam geworden?",
+        "consentPrefix": "Ich habe die",
+        "consentLinkLabel": "Datenschutzerklärung",
+        "consentSuffix": "gelesen und bin mit der Verarbeitung meiner Angaben einverstanden.",
+        "consentError": "Bitte bestätige die Einwilligung.",
+        "submitLabel": "Bewerbung absenden",
+        "submitPending": "Wird gesendet …",
+        "submitSuccess": "Danke für deine Bewerbung! Wir haben sie erhalten und melden uns bei dir.",
+        "submitError": "Deine Bewerbung konnte nicht gesendet werden. Bitte versuch es noch einmal oder schreib uns direkt an {email}."
+      }
+    },
+    "cta": {
+      "eyebrow": "Bereit?",
+      "title": "Der erste Schritt ist die Bewerbung.",
+      "lead": "Alles, was du dafür brauchst, findest du oben auf dieser Seite.",
+      "primaryCta": "Zur Bewerbung",
+      "secondaryCta": "Prozess kennenlernen"
+    }
+  },
+  "Mail": {
+    "applicationConfirmation": {
+      "subject": "Deine Bewerbung ist bei uns angekommen",
+      "body": "Hallo {firstName},\n\nvielen Dank für deine Bewerbung bei Enactus Mannheim! Wir haben sie erhalten und melden uns, sobald wir sie geprüft haben.\n\nDein Enactus-Mannheim-Team"
+    },
+    "reminderConfirmation": {
+      "subject": "Bitte bestätige deine Erinnerung",
+      "body": "Hallo,\n\nbitte bestätige mit einem Klick, dass wir dich per E-Mail erinnern dürfen, sobald das Bewerbungsfenster öffnet:\n\n{confirmUrl}\n\nWenn du das nicht warst, kannst du diese E-Mail einfach ignorieren.\n\nJederzeit abmelden: {unsubscribeUrl}"
+    },
+    "contactNotification": {
+      "subject": "Neue Kontaktanfrage von {name}"
+    }
   }
 }

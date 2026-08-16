@@ -12,6 +12,9 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "perf:home": "node scripts/measure-home.mjs",
+    "db:migrate": "node --env-file=.env.local scripts/migrate.mjs",
+    "db:verify": "node --env-file=.env.local scripts/db-verify.mjs",
+    "db:cleanup": "node --env-file=.env.local scripts/db-cleanup.mjs",
     "check": "npm run typecheck && npm run lint && npm run test"
   },
   "dependencies": {
@@ -30,6 +33,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-hook-form": "^7.83.0",
+    "react-icons": "^5.7.0",
     "resend": "^6.18.0",
     "tailwind-merge": "^3.6.0",
     "zod": "^4.4.3"

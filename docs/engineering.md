@@ -7,7 +7,7 @@ Forms, data, privacy, performance, SEO, and testing detail.
 1. Validate with the shared Zod schema, client and server.
 2. **Write to Postgres first**, before anything else in the request.
 3. Render a formatted PDF with `@react-pdf/renderer`.
-4. Email it via Resend to `it@unimannheim.enactus.team`.
+4. Email it via Resend to `info@unimannheim.enactus.team`.
 5. If the mail fails, the application is already persisted — log the error and
    still report success to the applicant, because their data is safe.
 6. Honeypot field plus a submission timing check. No CAPTCHA: it is an
@@ -61,6 +61,18 @@ protection checklist.
   `/faq`, `/kontakt`, `/partner`, and the individual project pages. Losing
   these throws away years of ranking.
 - `sitemap.ts` and `robots.ts` generated from the route tree.
+- **Only the confirmed production domain gets indexed.** `robots.ts` checks
+  the request's Host header and `VERCEL_ENV` (via
+  `lib/productionDeployment.ts`) and disallows everything unless both the
+  environment is `production` *and* the host is `enactus-mannheim.com` or
+  `www.enactus-mannheim.com` — this catches Vercel preview builds, the
+  auto-generated `*.vercel.app` alias, and local development alike.
+  `proxy.ts` backs this up with an `X-Robots-Tag: noindex` response header
+  in the same non-production cases, since a URL that's `disallow`ed in
+  `robots.txt` can still appear in search results (without a snippet) if
+  something else links to it. Both checks run server-side, where Vercel
+  populates `VERCEL_ENV` automatically — no project setting to remember to
+  turn on, unlike the `NEXT_PUBLIC_` variant.
 
 ## i18n
 

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { siteUrl } from "@/lib/siteUrl";
+import { localizedPath } from "@/lib/localizedPath";
 import { routes } from "@/content/navigation";
 import { projects } from "@/content/projects";
 
@@ -12,14 +13,6 @@ import { projects } from "@/content/projects";
 const EXTRA_PATHS = ["/projekte/archiv", ...projects.map((project) => `/projekte/${project.slug}`)];
 
 const LOCALES = ["de", "en"] as const;
-type Locale = (typeof LOCALES)[number];
-
-// German is the default locale with no URL prefix (docs/engineering.md); "/"
-// itself never gets a trailing "/en" appended to nothing.
-function localizedPath(path: string, locale: Locale): string {
-  if (locale === "de") return path;
-  return path === "/" ? "/en" : `/en${path}`;
-}
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = siteUrl();

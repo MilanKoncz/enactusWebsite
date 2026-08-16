@@ -509,7 +509,9 @@
       "messageLabel": "Message",
       "messageError": "Please write at least 10 characters.",
       "submitLabel": "Send message",
-      "submitStubNotice": "This form isn't connected yet — sending arrives with the backend. Until then, write to us directly at {email}."
+      "submitPending": "Sending …",
+      "submitSuccess": "Thanks for your message! We'll get back to you as soon as we can.",
+      "submitError": "Your message couldn't be sent. Please try again, or write to us directly at {email}."
     }
   },
   "Faq": {
@@ -609,5 +611,374 @@
     "responsibleLabel": "Inhaltlich verantwortlich gemäß § 18 Abs. 2 MStV",
     "responsibleSame": "Dieselben Personen wie unter „Vertreten durch“.",
     "copyright": "© {year} Enactus Mannheim e.V. Alle Rechte vorbehalten."
+  },
+  "Datenschutz": {
+    "eyebrow": "Legal",
+    "title": "Privacy policy",
+    "effectiveDate": "Last updated: August 2026",
+    "draftNotice": "Draft — this policy has not yet been reviewed and approved by Enactus Germany's data protection officer.",
+    "reviewedNotice": "Last reviewed on {date} by Enactus Germany's data protection officer.",
+    "scope": {
+      "title": "Scope",
+      "body": [
+        "This policy describes which personal data we process when you visit this website, for what purpose, on what legal basis, and for how long we keep it.",
+        "It applies to every page on this website, including the application form, the reminder list, and the contact form. Linked third-party websites — for instance our projects, partners, or Enactus Germany — have their own privacy policies."
+      ]
+    },
+    "responsible": {
+      "title": "Controller",
+      "intro": "The controller responsible for data processing on this website is:",
+      "contactLabel": "Email",
+      "representativesLabel": "Authorized board (Vertretungsberechtigter Vorstand)",
+      "registerLabel": "Register court",
+      "noDpo": "Enactus Mannheim e. V. has not appointed an in-house data protection officer; the statutory conditions requiring one are not met."
+    },
+    "hosting": {
+      "title": "Hosting and server logs",
+      "intro": "This website is hosted by Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA, and served from the Frankfurt am Main location (region \"fra1\").",
+      "fieldsIntro": "Loading a page processes technically necessary access data:",
+      "fields": [
+        "IP address of the requesting device",
+        "date and time of access",
+        "the address requested and the amount of data transferred",
+        "the server's status message",
+        "the referring page, where transmitted",
+        "browser type, browser version, and operating system"
+      ],
+      "purpose": "This data is technically required to deliver the website and serves operational security and defence against attacks. We do not combine it with any other data source.",
+      "legalBasisLabel": "Legal basis",
+      "legalBasis": "Art. 6(1)(f) GDPR. Our legitimate interest lies in providing the website securely, stably, and reliably.",
+      "retentionLabel": "Retention",
+      "retention": "Vercel deletes these logs automatically after a short time; we do not evaluate them on a personal basis and keep no permanent copies."
+    },
+    "database": {
+      "title": "Database",
+      "body": [
+        "We store applications, contact messages, and reminder-list sign-ups in a Postgres database from provider Neon Inc., USA. The database runs in the \"eu-central-1\" region (Frankfurt am Main), so the data stays within the European Union.",
+        "We collect only what a given purpose requires, and delete it once that purpose no longer applies (Art. 5(1)(c) and (e) GDPR). The specific periods are in the \"Retention\" section."
+      ]
+    },
+    "email": {
+      "title": "Email delivery",
+      "body": [
+        "For automatically generated emails — application confirmation, forwarding of contact inquiries, reminder-list confirmation — we use Resend (Plus Five Five, Inc., USA). Sending happens from the Ireland region (\"eu-west-1\"), within the European Union.",
+        "We transmit the recipient's email address and the content of the respective message.",
+        "Our emails carry no open tracking, no click tracking, and no tracking pixels. Those features are deliberately switched off on our account. Links in our emails go straight to their destination and are never redirected through an intermediary service."
+      ],
+      "legalBasisLabel": "Legal basis",
+      "legalBasis": "The same basis as the underlying request — see the application, reminder-list, and contact-form sections."
+    },
+    "analytics": {
+      "title": "Analytics",
+      "body": [
+        "We use Vercel Analytics for anonymous evaluation of page views. The service sets no cookies, stores no identifiers on your device, and builds no cross-device profiles. We only collect aggregated figures such as the page viewed, an approximate country-level region, device type, and referring page.",
+        "This gives us no way to identify individual people. Because no information is stored on or read from your device, no consent under § 25 TDDDG (the German cookie-consent law) is required — that's why this website shows no cookie banner."
+      ],
+      "legalBasisLabel": "Legal basis",
+      "legalBasis": "Art. 6(1)(f) GDPR. Our legitimate interest lies in understanding which content is used, so we can improve the website."
+    },
+    "externalContent": {
+      "title": "Fonts and external content",
+      "fontsBody": "Every font is embedded locally on our own server. There is no connection to Google Fonts or any other external font provider; your IP address is never transmitted to a third party for this.",
+      "videoLabel": "Video embeds",
+      "videoBody": [
+        "We embed project pitches and similar videos behind a click-to-load preview. Before you click, no connection to YouTube is made, no data is transmitted, and no cookies are set. Only a preview image served from our own server is shown.",
+        "Only once you click the preview image does the embedded player load from the youtube-nocookie.com domain. From that point on, Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Ireland, processes your data under its own responsibility; Google's privacy policy applies. We have no influence over the nature or extent of that processing."
+      ],
+      "legalBasisLabel": "Legal basis",
+      "legalBasis": "Art. 6(1)(a) GDPR. You give your consent by deliberately clicking the preview image."
+    },
+    "application": {
+      "title": "Application form",
+      "intro": "Through the \"Mitmachen\" page you can apply for membership. We collect:",
+      "fieldsHeading": "Information collected",
+      "fields": [
+        "first name, last name, email address",
+        "degree program, semester, university",
+        "previous involvement / work experience (free text)",
+        "languages and other skills (free text)",
+        "motivation (free text)",
+        "desired area of involvement",
+        "availability in hours per week",
+        "how you heard about us",
+        "the time you gave consent"
+      ],
+      "noUpload": "There is no file upload. Information that would usually sit in a CV is collected exclusively through structured form fields. We ask you not to provide any special category personal data under Art. 9 GDPR — for instance about health, religious or philosophical belief, political opinion, or sexual orientation. Such information is not required for selection.",
+      "purposeLabel": "Purpose",
+      "purpose": "Reviewing and processing your application, and getting in touch as part of the selection process.",
+      "legalBasisLabel": "Legal basis",
+      "legalBasis": "Art. 6(1)(b) GDPR. Processing takes place to carry out pre-contractual measures at your request.",
+      "accessLabel": "Recipients",
+      "access": "The board and the people responsible for processing applications within the association. Your application is stored in our database first, then sent as a PDF to info@unimannheim.enactus.team.",
+      "necessityLabel": "Whether you have to provide it",
+      "necessity": "Providing this data is neither legally nor contractually required. Without the fields marked as mandatory, however, we cannot process your application."
+    },
+    "reminder": {
+      "title": "Reminder list",
+      "body": [
+        "While the application window is closed, you can sign up to be notified once it opens.",
+        "We store your email address, the time you signed up, the time you confirmed, the IP address used for that confirmation, and two randomly generated tokens for confirmation and unsubscribing.",
+        "Sign-up uses the double opt-in procedure: after submitting, you receive an email with a confirmation link. We only add you to the list once you confirm. We store the time and IP address of your confirmation as proof of your consent; without that proof, we could not demonstrate the sending was lawful."
+      ],
+      "legalBasisLabel": "Legal basis",
+      "legalBasis": "Art. 6(1)(a) GDPR for sending, Art. 6(1)(f) GDPR for storing the proof of consent.",
+      "withdrawalLabel": "Withdrawal",
+      "withdrawal": "Every email contains an unsubscribe link that works without any further input. Withdrawal takes effect for the future and does not affect the lawfulness of processing carried out before it."
+    },
+    "contact": {
+      "title": "Contact form",
+      "body": [
+        "Through the \"Kontakt\" page you can send us a message. We collect your name, email address, an optional subject, and the content of your message."
+      ],
+      "purposeLabel": "Purpose",
+      "purpose": "Handling and answering your inquiry.",
+      "legalBasisLabel": "Legal basis",
+      "legalBasis": "Art. 6(1)(f) GDPR. Our legitimate interest lies in answering inquiries. If your inquiry aims at forming or pursuing a membership or partnership, Art. 6(1)(b) GDPR also applies.",
+      "alternative": "You are of course also welcome to reach us by email directly, without the form."
+    },
+    "antiSpam": {
+      "title": "Protection against abuse",
+      "intro": "To defend against automated bulk submissions, we use the following measures:",
+      "measures": [
+        "a form field invisible to you, filled in only by automated programs",
+        "a check of the time between loading and submitting the form",
+        "a limit on the number of submissions per sender within a time window"
+      ],
+      "ipHandling": "For that limit, we store your IP address only as a cryptographic hash, from which the original address cannot be recomputed. These values are deleted automatically once the respective time window elapses.",
+      "noCaptcha": "We deliberately do not use a CAPTCHA — it would be a barrier for people with disabilities and would transmit additional data to third parties.",
+      "legalBasisLabel": "Legal basis",
+      "legalBasis": "Art. 6(1)(f) GDPR. Our legitimate interest lies in protecting our systems from abusive use."
+    },
+    "retention": {
+      "title": "Retention periods",
+      "tableCaption": "Retention periods by data type",
+      "columns": ["Data", "Duration"],
+      "applicationsLabel": "Applications",
+      "applicationsValue": "{months} months after the respective application period ends",
+      "contactLabel": "Contact inquiries",
+      "contactValue": "{months} months after final processing",
+      "reminderConfirmedLabel": "Confirmed reminder-list sign-ups",
+      "reminderConfirmedValue": "until withdrawn",
+      "reminderUnconfirmedLabel": "Unconfirmed reminder-list sign-ups",
+      "reminderUnconfirmedValue": "{days} days after sign-up",
+      "rateLimitLabel": "Hash values for abuse prevention",
+      "rateLimitValue": "until the time window elapses",
+      "serverLogsLabel": "Server logs",
+      "serverLogsValue": "per Vercel's own policy, short-term",
+      "note": "Statutory retention obligations remain unaffected. Where such an obligation prevents deletion, we restrict processing instead."
+    },
+    "processors": {
+      "title": "Processors and recipients",
+      "intro": "We do not pass on personal data for advertising purposes and do not sell it. Data is transmitted only to the following service providers, who act as our processors under Art. 28 GDPR:",
+      "tableCaption": "Processors we use",
+      "columns": ["Service", "Purpose", "Processing location"],
+      "rows": [
+        ["Vercel Inc., USA", "Hosting, delivery, analytics", "Frankfurt am Main"],
+        ["Neon Inc., USA", "Database", "Frankfurt am Main"],
+        ["Plus Five Five, Inc. (Resend), USA", "Email delivery", "Ireland"]
+      ],
+      "dpaNote": "We have data-processing agreements in place with every provider listed.",
+      "transferLabel": "Third-country transfers",
+      "transfer": "The companies listed are based in the United States. Processing itself takes place within the European Union, but access from the USA — for maintenance and support, for instance — cannot be fully ruled out. For that case, we have agreed the European Commission's Standard Contractual Clauses under Art. 46(2)(c) GDPR with these providers."
+    },
+    "automatedDecisions": {
+      "title": "No automated decision-making",
+      "body": "No automated decision-making, including profiling under Art. 22 GDPR, takes place. Decisions about applications are made exclusively by people."
+    },
+    "encryption": {
+      "title": "Encryption",
+      "body": "This website is delivered exclusively over an encrypted (TLS) connection. You can recognize this by the lock icon in your browser's address bar. This protects everything you submit through our forms from being read by third parties in transit."
+    },
+    "rights": {
+      "title": "Your rights",
+      "intro": "You have the following rights against us:",
+      "list": [
+        "Access to whether and which data we process about you (Art. 15 GDPR)",
+        "Rectification of inaccurate or incomplete data (Art. 16 GDPR)",
+        "Erasure of your data (Art. 17 GDPR)",
+        "Restriction of processing (Art. 18 GDPR)",
+        "Data portability in a common format (Art. 20 GDPR)",
+        "Objection to processing based on a legitimate interest (Art. 21 GDPR)",
+        "Withdrawal of a given consent with effect for the future (Art. 7(3) GDPR)"
+      ],
+      "contactPrompt": "An informal message is enough to exercise these rights:"
+    },
+    "complaints": {
+      "title": "Right to complain",
+      "body": "Independently of the above, you have the right to lodge a complaint with a data protection supervisory authority. The authority responsible for us is:",
+      "authorityName": "Der Landesbeauftragte für den Datenschutz und die Informationsfreiheit Baden-Württemberg",
+      "authorityAddress": ["Lautenschlagerstraße 20", "70173 Stuttgart"],
+      "note": "You can also contact the supervisory authority where you live or work."
+    },
+    "changes": {
+      "title": "Changes to this privacy policy",
+      "body": "We update this policy whenever the legal situation, our services, or the nature of our data processing changes. The version published on this page always applies. The date of the last change is at the top of this policy."
+    }
+  },
+  "MitmachenPage": {
+    "fit": {
+      "eyebrow": "Get involved",
+      "title": "Bring yourself in.",
+      "lead": "What we expect, what you get — and why you don't need to bring all of it.",
+      "expectationsHeading": "What we expect from you",
+      "offersHeading": "What you get",
+      "expectations": {
+        "agency": {
+          "title": "Agency",
+          "lead": "The ability to assess a situation, decide, and act.",
+          "detail": "We don't expect you to know every answer — just to start when a decision is needed, instead of waiting to be told."
+        },
+        "time": {
+          "title": "Real time",
+          "lead": "A noticeable time commitment alongside your studies, especially during intense project phases.",
+          "detail": "Exactly how much depends on your role — bring it up openly in the interview."
+        },
+        "ownership": {
+          "title": "Ownership",
+          "lead": "You own an area and stand behind its outcome.",
+          "detail": "Not an internship that runs alongside you — you make operational decisions."
+        },
+        "teamwork": {
+          "title": "Teamwork",
+          "lead": "You work closely with others and take feedback openly.",
+          "detail": "Projects run as a team, not solo — that includes criticism too."
+        }
+      },
+      "offers": {
+        "responsibility": {
+          "title": "Responsibility from day one",
+          "lead": "You take on real work, not busywork.",
+          "detail": "You make operational decisions and own the results yourself."
+        },
+        "network": {
+          "title": "Network",
+          "lead": "Access to partner companies, alumni, and other Enactus teams worldwide.",
+          "detail": "A network that outlasts your studies."
+        },
+        "mentoring": {
+          "title": "Coaching",
+          "lead": "Regular exchange with the board and experienced alumni.",
+          "detail": "You're not alone with decisions — the team's experience backs you up."
+        },
+        "growth": {
+          "title": "Practical skills",
+          "lead": "Skills your degree rarely covers — from sales to legal basics.",
+          "detail": "Knowledge you need right away, not just theory."
+        }
+      },
+      "fitNote": {
+        "lead": "You don't need to bring all of this.",
+        "detail": "Around 80% overlap is a good fit — every skill set helps us."
+      }
+    },
+    "timeline": {
+      "eyebrow": "What happens next",
+      "title": "What happens after you apply",
+      "regionLabel": "Application process",
+      "steps": {
+        "application": {
+          "title": "Application",
+          "short": "You send us your form during the application window."
+        },
+        "interview": {
+          "title": "Interview",
+          "short": "We get to know each other in a personal conversation."
+        },
+        "response": {
+          "title": "Response",
+          "short": "We let you know how things go from there."
+        }
+      }
+    },
+    "application": {
+      "eyebrow": "Application",
+      "title": "Apply now",
+      "lead": "Once the application window is open, you can apply right here.",
+      "notOpen": {
+        "beforeHeading": "The application window isn't open yet",
+        "beforeLead": "Applications are open from {opensDate} to {closesDate}. Get an email reminder for when it starts.",
+        "afterHeading": "The application window is closed for this cycle",
+        "afterLead": "Sign up for a reminder to hear about the next application phase.",
+        "countdown": {
+          "days": "Days",
+          "hours": "Hrs",
+          "minutes": "Min",
+          "seconds": "Sec",
+          "srLabel": "Applications open on {date}."
+        }
+      },
+      "reminder": {
+        "heading": "Get an email reminder",
+        "lead": "We'll email you as soon as the application window opens.",
+        "emailLabel": "Email",
+        "emailError": "Please enter a valid email address.",
+        "consentPrefix": "I agree to be reminded by email once the application window opens. More in the",
+        "consentLinkLabel": "privacy policy",
+        "consentSuffix": ".",
+        "consentError": "Please confirm your consent.",
+        "submitLabel": "Turn on reminder",
+        "submitPending": "Turning on …",
+        "submitSuccess": "Almost there — please confirm the email we just sent you.",
+        "submitError": "The sign-up didn't go through. Please try again."
+      },
+      "form": {
+        "heading": "Application form",
+        "firstNameLabel": "First name",
+        "firstNameError": "Please enter your first name.",
+        "lastNameLabel": "Last name",
+        "lastNameError": "Please enter your last name.",
+        "emailLabel": "Email",
+        "emailError": "Please enter a valid email address.",
+        "studyProgramLabel": "Degree program",
+        "studyProgramError": "Please enter your degree program.",
+        "semesterLabel": "Semester",
+        "semesterError": "Please enter a valid semester.",
+        "universityLabel": "University",
+        "universityError": "Please enter your university.",
+        "priorInvolvementLabel": "Previous involvement / work experience",
+        "priorInvolvementHint": "Optional, max. 600 characters.",
+        "priorInvolvementError": "Please shorten this to 600 characters or fewer.",
+        "languagesSkillsLabel": "Languages and other skills",
+        "languagesSkillsHint": "Optional, max. 300 characters.",
+        "languagesSkillsError": "Please shorten this to 300 characters or fewer.",
+        "motivationLabel": "Motivation",
+        "motivationHint": "What draws you to Enactus Mannheim, and which project or area do you have in mind? Max. 1500 characters.",
+        "motivationError": "Please write at least 20 characters.",
+        "desiredAreasLabel": "Area of interest",
+        "desiredAreasHint": "You can select more than one.",
+        "desiredAreasError": "Please select at least one area.",
+        "availabilityLabel": "Availability in hours per week",
+        "availabilityError": "Please enter a valid number of hours.",
+        "heardAboutLabel": "How did you hear about us?",
+        "consentPrefix": "I have read the",
+        "consentLinkLabel": "privacy policy",
+        "consentSuffix": "and agree to the processing of my information.",
+        "consentError": "Please confirm your consent.",
+        "submitLabel": "Submit application",
+        "submitPending": "Sending …",
+        "submitSuccess": "Thanks for applying! We've received your application and will get back to you.",
+        "submitError": "Your application couldn't be sent. Please try again, or write to us directly at {email}."
+      }
+    },
+    "cta": {
+      "eyebrow": "Ready?",
+      "title": "The first step is the application.",
+      "lead": "Everything you need for it is right above, on this page.",
+      "primaryCta": "Go to the application",
+      "secondaryCta": "See the process"
+    }
+  },
+  "Mail": {
+    "applicationConfirmation": {
+      "subject": "Your application has reached us",
+      "body": "Hi {firstName},\n\nthanks for applying to Enactus Mannheim! We've received your application and will get back to you once we've reviewed it.\n\nYour Enactus Mannheim team"
+    },
+    "reminderConfirmation": {
+      "subject": "Please confirm your reminder",
+      "body": "Hi,\n\nplease confirm with one click that we may email you once the application window opens:\n\n{confirmUrl}\n\nIf this wasn't you, you can simply ignore this email.\n\nUnsubscribe any time: {unsubscribeUrl}"
+    },
+    "contactNotification": {
+      "subject": "New contact message from {name}"
+    }
   }
 }

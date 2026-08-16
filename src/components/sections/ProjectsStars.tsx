@@ -38,7 +38,7 @@ export function ProjectsStars() {
                   playLabel={t("playLabel", { name: star.name })}
                 />
               ) : (
-                <p className="text-body-s italic opacity-50">{t("noVideoHint")}</p>
+                <p className="text-body-s italic opacity-70">{t("noVideoHint")}</p>
               )}
             </li>
           ))}
