@@ -728,5 +728,154 @@
       "contactPrompt": "Wende dich dazu an:",
       "complaint": "Du kannst dich außerdem jederzeit bei einer Datenschutz-Aufsichtsbehörde beschweren — zuständig für Enactus Mannheim ist die Landesbeauftragte für den Datenschutz und die Informationsfreiheit Baden-Württemberg (LfDI Baden-Württemberg)."
     }
+  },
+  "MitmachenPage": {
+    "fit": {
+      "eyebrow": "Mitmachen",
+      "title": "Bring dich ein.",
+      "lead": "Was wir erwarten, was du bekommst — und warum du nicht alles davon mitbringen musst.",
+      "expectationsHeading": "Was wir von dir erwarten",
+      "offersHeading": "Was du bekommst",
+      "expectations": {
+        "agency": {
+          "title": "Agency",
+          "lead": "Die Fähigkeit, eine Situation einzuschätzen, zu entscheiden und zu handeln.",
+          "detail": "Wir erwarten nicht, dass du alle Antworten kennst — sondern dass du anfängst, wenn eine Entscheidung ansteht, statt auf Anweisung zu warten."
+        },
+        "time": {
+          "title": "Echte Zeit",
+          "lead": "Ein spürbarer Zeitaufwand neben dem Studium, gerade in intensiven Projektphasen.",
+          "detail": "Wie viel genau hängt von deiner Rolle ab — sprich das offen im Bewerbungsgespräch an."
+        },
+        "ownership": {
+          "title": "Verantwortung",
+          "lead": "Du übernimmst einen Bereich und stehst für dessen Ergebnis gerade.",
+          "detail": "Kein Praktikum, das nebenherläuft — du entscheidest operativ mit."
+        },
+        "teamwork": {
+          "title": "Teamfähigkeit",
+          "lead": "Du arbeitest eng mit anderen zusammen und nimmst Feedback offen an.",
+          "detail": "Projekte laufen im Team, nicht im Alleingang — auch Kritik gehört dazu."
+        }
+      },
+      "offers": {
+        "responsibility": {
+          "title": "Verantwortung ab Tag eins",
+          "lead": "Du übernimmst echte Aufgaben, nicht Zuarbeit.",
+          "detail": "Du triffst operative Entscheidungen und verantwortest die Ergebnisse selbst."
+        },
+        "network": {
+          "title": "Netzwerk",
+          "lead": "Zugang zu Partnerunternehmen, Alumni und anderen Enactus-Teams weltweit.",
+          "detail": "Ein Netzwerk, das über dein Studium hinaus trägt."
+        },
+        "mentoring": {
+          "title": "Coaching",
+          "lead": "Regelmäßiger Austausch mit Vorstand und erfahrenen Alumni.",
+          "detail": "Du bist bei Entscheidungen nicht allein — Erfahrung aus dem Team steht dir zur Seite."
+        },
+        "growth": {
+          "title": "Praxiswissen",
+          "lead": "Skills, die im Studium selten drankommen — von Vertrieb bis Recht.",
+          "detail": "Wissen, das sofort gebraucht wird, nicht nur Theorie."
+        }
+      },
+      "fitNote": {
+        "lead": "Du musst nicht alles davon mitbringen.",
+        "detail": "Rund 80 % Übereinstimmung reicht für eine gute Passung — jedes Skillset hilft uns weiter."
+      }
+    },
+    "timeline": {
+      "eyebrow": "Ablauf",
+      "title": "Wie es nach deiner Bewerbung weitergeht",
+      "regionLabel": "Bewerbungsprozess",
+      "steps": {
+        "application": {
+          "title": "Bewerbung",
+          "short": "Du schickst uns dein Formular über dieses Fenster."
+        },
+        "interview": {
+          "title": "Kennenlerngespräch",
+          "short": "Wir lernen uns in einem persönlichen Gespräch gegenseitig kennen."
+        },
+        "response": {
+          "title": "Rückmeldung",
+          "short": "Du bekommst von uns Bescheid, wie es weitergeht."
+        }
+      }
+    },
+    "application": {
+      "eyebrow": "Bewerbung",
+      "title": "Jetzt bewerben",
+      "lead": "Sobald das Bewerbungsfenster offen ist, kannst du dich hier direkt bewerben.",
+      "notOpen": {
+        "beforeHeading": "Das Bewerbungsfenster ist noch geschlossen",
+        "beforeLead": "Bewerbungen sind vom {opensDate} bis {closesDate} möglich. Lass dich per E-Mail erinnern, sobald es losgeht.",
+        "afterHeading": "Das Bewerbungsfenster ist für diesen Zyklus geschlossen",
+        "afterLead": "Melde dich für die Erinnerung an, um von der nächsten Bewerbungsphase zu erfahren.",
+        "countdown": {
+          "days": "Tage",
+          "hours": "Std",
+          "minutes": "Min",
+          "seconds": "Sek",
+          "srLabel": "Bewerbungen öffnen am {date}."
+        }
+      },
+      "reminder": {
+        "heading": "Per E-Mail erinnern lassen",
+        "lead": "Wir schicken dir eine E-Mail, sobald das Bewerbungsfenster öffnet.",
+        "emailLabel": "E-Mail",
+        "emailError": "Bitte gib eine gültige E-Mail-Adresse ein.",
+        "consentPrefix": "Ich bin damit einverstanden, per E-Mail erinnert zu werden, sobald das Bewerbungsfenster öffnet. Mehr dazu in der",
+        "consentLinkLabel": "Datenschutzerklärung",
+        "consentSuffix": ".",
+        "consentError": "Bitte bestätige die Einwilligung.",
+        "submitLabel": "Erinnerung aktivieren",
+        "submitStubNotice": "Diese Anmeldung ist noch nicht angebunden — der Versand kommt mit dem Backend."
+      },
+      "form": {
+        "heading": "Bewerbungsformular",
+        "firstNameLabel": "Vorname",
+        "firstNameError": "Bitte gib deinen Vornamen ein.",
+        "lastNameLabel": "Nachname",
+        "lastNameError": "Bitte gib deinen Nachnamen ein.",
+        "emailLabel": "E-Mail",
+        "emailError": "Bitte gib eine gültige E-Mail-Adresse ein.",
+        "studyProgramLabel": "Studiengang",
+        "studyProgramError": "Bitte gib deinen Studiengang ein.",
+        "semesterLabel": "Fachsemester",
+        "semesterError": "Bitte gib ein gültiges Fachsemester ein.",
+        "universityLabel": "Hochschule",
+        "universityError": "Bitte gib deine Hochschule ein.",
+        "priorInvolvementLabel": "Bisheriges Engagement / Berufserfahrung",
+        "priorInvolvementHint": "Optional, max. 600 Zeichen.",
+        "priorInvolvementError": "Bitte kürze auf maximal 600 Zeichen.",
+        "languagesSkillsLabel": "Sprachen und weitere Kenntnisse",
+        "languagesSkillsHint": "Optional, max. 300 Zeichen.",
+        "languagesSkillsError": "Bitte kürze auf maximal 300 Zeichen.",
+        "motivationLabel": "Motivation",
+        "motivationHint": "Was reizt dich an Enactus Mannheim, und welches Projekt oder welchen Bereich stellst du dir vor? Max. 1500 Zeichen.",
+        "motivationError": "Bitte schreib uns mindestens 20 Zeichen.",
+        "desiredAreasLabel": "Wunschbereich",
+        "desiredAreasHint": "Mehrfachauswahl möglich.",
+        "desiredAreasError": "Bitte wähle mindestens einen Bereich aus.",
+        "availabilityLabel": "Verfügbarkeit in Stunden pro Woche",
+        "availabilityError": "Bitte gib eine gültige Stundenzahl ein.",
+        "heardAboutLabel": "Wie bist du auf uns aufmerksam geworden?",
+        "consentPrefix": "Ich habe die",
+        "consentLinkLabel": "Datenschutzerklärung",
+        "consentSuffix": "gelesen und bin mit der Verarbeitung meiner Angaben einverstanden.",
+        "consentError": "Bitte bestätige die Einwilligung.",
+        "submitLabel": "Bewerbung absenden",
+        "submitStubNotice": "Dieses Formular ist noch nicht angebunden — der Versand kommt mit dem Backend. Schreib uns bis dahin direkt an {email}, wenn du dich schon jetzt bewerben möchtest."
+      }
+    },
+    "cta": {
+      "eyebrow": "Bereit?",
+      "title": "Der erste Schritt ist die Bewerbung.",
+      "lead": "Alles, was du dafür brauchst, findest du oben auf dieser Seite.",
+      "primaryCta": "Zur Bewerbung",
+      "secondaryCta": "Prozess kennenlernen"
+    }
   }
 }

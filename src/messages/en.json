@@ -728,5 +728,154 @@
       "contactPrompt": "Reach us at:",
       "complaint": "You can also lodge a complaint with a data protection supervisory authority at any time — the authority responsible for Enactus Mannheim is the State Commissioner for Data Protection and Freedom of Information Baden-Württemberg (LfDI Baden-Württemberg)."
     }
+  },
+  "MitmachenPage": {
+    "fit": {
+      "eyebrow": "Get involved",
+      "title": "Bring yourself in.",
+      "lead": "What we expect, what you get — and why you don't need to bring all of it.",
+      "expectationsHeading": "What we expect from you",
+      "offersHeading": "What you get",
+      "expectations": {
+        "agency": {
+          "title": "Agency",
+          "lead": "The ability to assess a situation, decide, and act.",
+          "detail": "We don't expect you to know every answer — just to start when a decision is needed, instead of waiting to be told."
+        },
+        "time": {
+          "title": "Real time",
+          "lead": "A noticeable time commitment alongside your studies, especially during intense project phases.",
+          "detail": "Exactly how much depends on your role — bring it up openly in the interview."
+        },
+        "ownership": {
+          "title": "Ownership",
+          "lead": "You own an area and stand behind its outcome.",
+          "detail": "Not an internship that runs alongside you — you make operational decisions."
+        },
+        "teamwork": {
+          "title": "Teamwork",
+          "lead": "You work closely with others and take feedback openly.",
+          "detail": "Projects run as a team, not solo — that includes criticism too."
+        }
+      },
+      "offers": {
+        "responsibility": {
+          "title": "Responsibility from day one",
+          "lead": "You take on real work, not busywork.",
+          "detail": "You make operational decisions and own the results yourself."
+        },
+        "network": {
+          "title": "Network",
+          "lead": "Access to partner companies, alumni, and other Enactus teams worldwide.",
+          "detail": "A network that outlasts your studies."
+        },
+        "mentoring": {
+          "title": "Coaching",
+          "lead": "Regular exchange with the board and experienced alumni.",
+          "detail": "You're not alone with decisions — the team's experience backs you up."
+        },
+        "growth": {
+          "title": "Practical skills",
+          "lead": "Skills your degree rarely covers — from sales to legal basics.",
+          "detail": "Knowledge you need right away, not just theory."
+        }
+      },
+      "fitNote": {
+        "lead": "You don't need to bring all of this.",
+        "detail": "Around 80% overlap is a good fit — every skill set helps us."
+      }
+    },
+    "timeline": {
+      "eyebrow": "What happens next",
+      "title": "What happens after you apply",
+      "regionLabel": "Application process",
+      "steps": {
+        "application": {
+          "title": "Application",
+          "short": "You send us your form during the application window."
+        },
+        "interview": {
+          "title": "Interview",
+          "short": "We get to know each other in a personal conversation."
+        },
+        "response": {
+          "title": "Response",
+          "short": "We let you know how things go from there."
+        }
+      }
+    },
+    "application": {
+      "eyebrow": "Application",
+      "title": "Apply now",
+      "lead": "Once the application window is open, you can apply right here.",
+      "notOpen": {
+        "beforeHeading": "The application window isn't open yet",
+        "beforeLead": "Applications are open from {opensDate} to {closesDate}. Get an email reminder for when it starts.",
+        "afterHeading": "The application window is closed for this cycle",
+        "afterLead": "Sign up for a reminder to hear about the next application phase.",
+        "countdown": {
+          "days": "Days",
+          "hours": "Hrs",
+          "minutes": "Min",
+          "seconds": "Sec",
+          "srLabel": "Applications open on {date}."
+        }
+      },
+      "reminder": {
+        "heading": "Get an email reminder",
+        "lead": "We'll email you as soon as the application window opens.",
+        "emailLabel": "Email",
+        "emailError": "Please enter a valid email address.",
+        "consentPrefix": "I agree to be reminded by email once the application window opens. More in the",
+        "consentLinkLabel": "privacy policy",
+        "consentSuffix": ".",
+        "consentError": "Please confirm your consent.",
+        "submitLabel": "Turn on reminder",
+        "submitStubNotice": "This sign-up isn't connected yet — sending arrives with the backend."
+      },
+      "form": {
+        "heading": "Application form",
+        "firstNameLabel": "First name",
+        "firstNameError": "Please enter your first name.",
+        "lastNameLabel": "Last name",
+        "lastNameError": "Please enter your last name.",
+        "emailLabel": "Email",
+        "emailError": "Please enter a valid email address.",
+        "studyProgramLabel": "Degree program",
+        "studyProgramError": "Please enter your degree program.",
+        "semesterLabel": "Semester",
+        "semesterError": "Please enter a valid semester.",
+        "universityLabel": "University",
+        "universityError": "Please enter your university.",
+        "priorInvolvementLabel": "Previous involvement / work experience",
+        "priorInvolvementHint": "Optional, max. 600 characters.",
+        "priorInvolvementError": "Please shorten this to 600 characters or fewer.",
+        "languagesSkillsLabel": "Languages and other skills",
+        "languagesSkillsHint": "Optional, max. 300 characters.",
+        "languagesSkillsError": "Please shorten this to 300 characters or fewer.",
+        "motivationLabel": "Motivation",
+        "motivationHint": "What draws you to Enactus Mannheim, and which project or area do you have in mind? Max. 1500 characters.",
+        "motivationError": "Please write at least 20 characters.",
+        "desiredAreasLabel": "Area of interest",
+        "desiredAreasHint": "You can select more than one.",
+        "desiredAreasError": "Please select at least one area.",
+        "availabilityLabel": "Availability in hours per week",
+        "availabilityError": "Please enter a valid number of hours.",
+        "heardAboutLabel": "How did you hear about us?",
+        "consentPrefix": "I have read the",
+        "consentLinkLabel": "privacy policy",
+        "consentSuffix": "and agree to the processing of my information.",
+        "consentError": "Please confirm your consent.",
+        "submitLabel": "Submit application",
+        "submitStubNotice": "This form isn't connected yet — sending arrives with the backend. Until then, write to us directly at {email} if you'd like to apply now."
+      }
+    },
+    "cta": {
+      "eyebrow": "Ready?",
+      "title": "The first step is the application.",
+      "lead": "Everything you need for it is right above, on this page.",
+      "primaryCta": "Go to the application",
+      "secondaryCta": "See the process"
+    }
   }
 }
