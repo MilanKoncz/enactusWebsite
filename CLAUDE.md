@@ -39,6 +39,13 @@ correct semantics, `prefers-reduced-motion` respected. Baseline, not an achievem
 
 **Ask when ambiguous.** Do not pick an interpretation and build a page on it.
 
+**Push after every commit.** Unpushed work has been left behind twice already in
+this project.
+
+**Ask in chat and wait.** On any real decision or ambiguity, ask directly in the
+chat and wait for the answer — never guess, never work around it, never write a
+`HANDOFF.md` instead. `HANDOFF.md` is only for explicitly unattended runs.
+
 ## Stack
 
 Next.js 15+ App Router · React 19 · TypeScript strict · Tailwind CSS **v4** ·
