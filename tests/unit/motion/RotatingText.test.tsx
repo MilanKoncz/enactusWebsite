@@ -4,6 +4,13 @@ import { axe } from "jest-axe";
 import { mockMatchMedia } from "../../fixtures/matchMedia";
 import { RotatingText } from "@/components/motion/RotatingText";
 
+const TIMING = { typingMs: 10, deletingMs: 5, holdMs: 20, pauseMs: 5 };
+
+function visibleText(container: HTMLElement): string {
+  const layer = container.querySelectorAll('[aria-hidden="true"].col-start-1')[1];
+  return layer?.firstChild?.textContent ?? "";
+}
+
 describe("RotatingText", () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -14,65 +21,87 @@ describe("RotatingText", () => {
     vi.unstubAllGlobals();
   });
 
-  it("shows the first term visibly on first render", () => {
+  it("starts empty and types the first term one character at a time", () => {
     mockMatchMedia(false);
-    render(<RotatingText terms={["BEGRIFF_1", "BEGRIFF_2"]} />);
-    const terms = screen.getAllByText("BEGRIFF_1");
-    const visibleTerm = terms.find((el) => el.getAttribute("aria-hidden") === "true");
-    expect(visibleTerm).toHaveClass("opacity-100");
-  });
+    const { container } = render(<RotatingText terms={["AB", "CD"]} {...TIMING} />);
+    expect(visibleText(container)).toBe("");
 
-  it("rotates to the next term after the interval elapses", () => {
-    mockMatchMedia(false);
-    render(<RotatingText terms={["BEGRIFF_1", "BEGRIFF_2"]} intervalMs={1000} />);
     act(() => {
-      vi.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(TIMING.typingMs);
     });
-    expect(screen.getByText("BEGRIFF_2")).toHaveClass("opacity-100");
-  });
+    expect(visibleText(container)).toBe("A");
 
-  it("wraps back to the first term after the last one", () => {
-    mockMatchMedia(false);
-    render(<RotatingText terms={["BEGRIFF_1", "BEGRIFF_2"]} intervalMs={1000} />);
     act(() => {
-      vi.advanceTimersByTime(2000);
+      vi.advanceTimersByTime(TIMING.typingMs);
     });
-    const terms = screen.getAllByText("BEGRIFF_1");
-    const visibleTerm = terms.find((el) => el.getAttribute("aria-hidden") === "true");
-    expect(visibleTerm).toHaveClass("opacity-100");
+    expect(visibleText(container)).toBe("AB");
   });
 
-  it("never rotates when the user prefers reduced motion", () => {
+  it("holds the fully typed term, then deletes it character by character", () => {
+    mockMatchMedia(false);
+    const { container } = render(<RotatingText terms={["AB", "CD"]} {...TIMING} />);
+
+    act(() => {
+      vi.advanceTimersByTime(TIMING.typingMs * 2); // fully typed: "AB"
+    });
+    expect(visibleText(container)).toBe("AB");
+
+    act(() => {
+      vi.advanceTimersByTime(TIMING.holdMs); // hold elapses, deleting starts
+      vi.advanceTimersByTime(TIMING.deletingMs);
+    });
+    expect(visibleText(container)).toBe("A");
+
+    act(() => {
+      vi.advanceTimersByTime(TIMING.deletingMs);
+    });
+    expect(visibleText(container)).toBe("");
+  });
+
+  it("moves on to the next term after fully deleting the previous one", () => {
+    mockMatchMedia(false);
+    const { container } = render(<RotatingText terms={["AB", "CD"]} {...TIMING} />);
+
+    act(() => {
+      vi.advanceTimersByTime(TIMING.typingMs * 2); // type "AB"
+      vi.advanceTimersByTime(TIMING.holdMs); // hold
+      vi.advanceTimersByTime(TIMING.deletingMs * 2); // delete "AB"
+      vi.advanceTimersByTime(TIMING.pauseMs); // pause before next term
+      vi.advanceTimersByTime(TIMING.typingMs); // type first char of "CD"
+    });
+    expect(visibleText(container)).toBe("C");
+  });
+
+  it("never starts the typing loop when the user prefers reduced motion, showing the first term fully and statically", () => {
     mockMatchMedia(true);
-    render(<RotatingText terms={["BEGRIFF_1", "BEGRIFF_2"]} intervalMs={1000} />);
+    const { container } = render(<RotatingText terms={["AB", "CD"]} {...TIMING} />);
     act(() => {
-      vi.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(TIMING.typingMs * 20);
     });
-    expect(screen.getByText("BEGRIFF_2")).toHaveClass("opacity-0");
-    const terms = screen.getAllByText("BEGRIFF_1");
-    const visibleTerm = terms.find((el) => el.getAttribute("aria-hidden") === "true");
-    expect(visibleTerm).toHaveClass("opacity-100");
+    expect(visibleText(container)).toBe("AB");
   });
 
-  it("hides the rotating terms from assistive technology and exposes exactly one stable sentence instead", () => {
+  it("sizes the box to the longest term via an invisible same-cell sizer, so typing never shifts layout", () => {
     mockMatchMedia(false);
-    render(<RotatingText terms={["BEGRIFF_1", "BEGRIFF_2"]} />);
-    const hiddenTerms = screen
-      .getAllByText(/^BEGRIFF_/)
-      .filter((el) => el.getAttribute("aria-hidden") === "true");
-    expect(hiddenTerms).toHaveLength(2);
+    const { container } = render(<RotatingText terms={["A", "LONGEST"]} {...TIMING} />);
+    const sizer = container.querySelector(".invisible");
+    expect(sizer).toHaveTextContent("LONGEST");
+  });
 
-    const srOnly = screen.getAllByText("BEGRIFF_1").find((el) => el.className.includes("sr-only"));
+  it("hides the animated layers from assistive technology and exposes exactly one stable sentence instead", () => {
+    mockMatchMedia(false);
+    render(<RotatingText terms={["AB", "CD"]} {...TIMING} />);
+    const srOnly = screen.getByText("AB", { selector: ".sr-only" });
     expect(srOnly).toBeInTheDocument();
   });
 
   it("keeps the screen-reader sentence on the first term even after rotating visually", () => {
     mockMatchMedia(false);
-    render(<RotatingText terms={["BEGRIFF_1", "BEGRIFF_2"]} intervalMs={1000} />);
+    render(<RotatingText terms={["AB", "CD"]} {...TIMING} />);
     act(() => {
-      vi.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(TIMING.typingMs * 2 + TIMING.holdMs + TIMING.deletingMs * 2 + TIMING.pauseMs);
     });
-    const srOnly = screen.getAllByText("BEGRIFF_1").find((el) => el.className.includes("sr-only"));
+    const srOnly = screen.getByText("AB", { selector: ".sr-only" });
     expect(srOnly).toBeInTheDocument();
   });
 
@@ -81,7 +110,7 @@ describe("RotatingText", () => {
     // tests in this file would otherwise hang the await below forever.
     vi.useRealTimers();
     mockMatchMedia(false);
-    const { container } = render(<RotatingText terms={["BEGRIFF_1", "BEGRIFF_2"]} />);
+    const { container } = render(<RotatingText terms={["AB", "CD"]} />);
     expect(await axe(container)).toHaveNoViolations();
   });
 });

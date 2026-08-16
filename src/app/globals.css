@@ -96,8 +96,27 @@
   --container-content: 80rem;
 
   /* Partner logo band. Speed is chosen so a full loop reads as ambient
-     motion, not a race — see PartnerMarquee. */
-  --animate-marquee: marquee 45s linear infinite;
+     motion, not a race — see PartnerMarquee. `reverse` plays the same
+     -50% keyframe backward (board feedback: reverse the band's direction) —
+     cheaper and less error-prone than authoring a second keyframe, and the
+     duplicated-track trick that makes the loop seamless works identically
+     played in either direction. */
+  --animate-marquee: marquee 45s linear infinite reverse;
+
+  /* Hero typewriter caret (RotatingText) — a steady blink, independent of
+     however long the current term takes to type. Ends each cycle at
+     opacity 0 (see @keyframes caret-blink) so a frozen frame under
+     prefers-reduced-motion — globals.css's blanket animation override below
+     forces every animation to a single, near-instant iteration — settles on
+     "caret hidden" rather than "caret stuck visibly mid-blink". */
+  --animate-caret-blink: caret-blink 1s steps(1) infinite;
+
+  /* Benefits' tool halfcircle (ToolOrbit) — a slow, small rigid sway, never
+     a full spin (docs/design-system.md motion rule 5: transform only). The
+     counter-sway keyframe is this one played with inverted values so each
+     logo cancels the stage's rotation and stays upright through the motion. */
+  --animate-orbit-sway: orbit-sway 6s ease-in-out infinite alternate;
+  --animate-orbit-counter-sway: orbit-counter-sway 6s ease-in-out infinite alternate;
 
   /* Interaction — docs/design-system.md. Registered under @theme (unlike
      --duration-fast/--duration-calm below) because --ease-* is a real
@@ -205,6 +224,35 @@ h6 {
 @keyframes marquee {
   to {
     transform: translateX(-50%);
+  }
+}
+
+@keyframes caret-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes orbit-sway {
+  from {
+    transform: rotate(-8deg);
+  }
+  to {
+    transform: rotate(8deg);
+  }
+}
+
+@keyframes orbit-counter-sway {
+  from {
+    transform: rotate(8deg);
+  }
+  to {
+    transform: rotate(-8deg);
   }
 }
 

@@ -5,6 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { Placeholder } from "@/components/ui/Placeholder";
 import { Section } from "@/components/ui/Section";
 import { HeaderOverlay } from "@/components/layout/HeaderOverlay";
+import { Logo } from "@/components/layout/Logo";
 import { RotatingText } from "@/components/motion/RotatingText";
 import { heroMedia } from "@/content/media";
 
@@ -66,11 +67,17 @@ export function HomeHero() {
         <div className={`absolute inset-0 ${heroMedia.posterSrc ? "bg-ink/80" : "bg-ink/55"}`} />
       </div>
 
-      <Container className="relative flex flex-col gap-8">
-        <h1 className="text-display-3 font-display md:text-display-2 lg:text-display-1">
+      <Container className="relative flex flex-col items-center gap-8 text-center">
+        {/* The logo carries the hero (board feedback: "great Enactus logo
+            as the central element"), so the headline underneath drops to
+            roughly 40% of its previous size (text-display-1 at lg was
+            6rem; text-display-3 is 2.5rem, ~42%) instead of scaling up
+            across breakpoints the way it used to. */}
+        <Logo variant="full" surface="ink" className="h-28 w-auto sm:h-32 md:h-40 lg:h-48" />
+        <h1 className="text-display-3 font-display">
           {t("prefix")} <RotatingText terms={rotating} />
         </h1>
-        <Button href="/mitmachen" variant="glass" size="lg" className="self-start">
+        <Button href="/mitmachen" variant="glass" size="lg">
           {t("cta")}
         </Button>
       </Container>
