@@ -58,8 +58,8 @@ export const mainNav: NavItem[] = [
 // grid (see docs/engineering.md's old-URL redirect map — the old site's
 // /team now redirects to / instead of a same-named page here).
 export const footerColumns = {
-  verein: [navItem("partner"), navItem("prozess")],
-  rechtliches: [navItem("impressum"), navItem("datenschutz")],
+  association: [navItem("partner"), navItem("prozess")],
+  legal: [navItem("impressum"), navItem("datenschutz")],
 } as const;
 
 // Keys are enums, not bare strings, so `t(`network.${key}`)` in Footer.tsx

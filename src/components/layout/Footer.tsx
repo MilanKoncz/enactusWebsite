@@ -88,10 +88,10 @@ export function Footer() {
             <nav aria-label={t("navLabel")} className="contents">
               <div className="flex flex-col gap-3">
                 <h2 className="text-mono-s font-mono uppercase opacity-60">
-                  {t("columns.verein")}
+                  {t("columns.association")}
                 </h2>
                 <ul className="flex flex-col gap-2">
-                  {footerColumns.verein.map((item) => (
+                  {footerColumns.association.map((item) => (
                     <li key={item.key}>
                       <Link href={item.href} className="link-underline">
                         {tRoutes(item.key as RouteKey)}
@@ -103,7 +103,7 @@ export function Footer() {
 
               <div className="flex flex-col gap-3">
                 <h2 className="text-mono-s font-mono uppercase opacity-60">
-                  {t("columns.netzwerk")}
+                  {t("columns.network")}
                 </h2>
                 <ul className="flex flex-col gap-2">
                   {networkLinks.map((link) => (
@@ -123,10 +123,10 @@ export function Footer() {
 
               <div className="flex flex-col gap-3">
                 <h2 className="text-mono-s font-mono uppercase opacity-60">
-                  {t("columns.rechtliches")}
+                  {t("columns.legal")}
                 </h2>
                 <ul className="flex flex-col gap-2">
-                  {footerColumns.rechtliches.map((item) => (
+                  {footerColumns.legal.map((item) => (
                     <li key={item.key}>
                       <Link href={item.href} className="link-underline">
                         {tRoutes(item.key as RouteKey)}

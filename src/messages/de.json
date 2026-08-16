@@ -34,9 +34,9 @@
   "Footer": {
     "navLabel": "Fußzeile",
     "columns": {
-      "verein": "Verein",
-      "netzwerk": "Netzwerk",
-      "rechtliches": "Rechtliches"
+      "association": "Verein",
+      "network": "Netzwerk",
+      "legal": "Rechtliches"
     },
     "network": {
       "enactusGermany": "Enactus Germany",
@@ -504,35 +504,35 @@
   },
   "Faq": {
     "unverifiedHint": "Diese Antwort ist noch nicht vom Vorstand freigegeben.",
-    "frage-1": {
+    "question-1": {
       "question": "Was ist Enactus Mannheim eigentlich?",
       "answer": "Enactus Mannheim ist ein studentischer Verein, der eigene Sozialunternehmen von der Idee bis zur Ausgründung begleitet – von der Projektarbeit bis zur Vereinsführung liegt die Verantwortung bei den Mitgliedern selbst."
     },
-    "frage-2": {
+    "question-2": {
       "question": "Wie viel Zeit sollte ich pro Woche einplanen?",
       "answer": "Das hängt von deiner Rolle und der Projektphase ab, aber realistisch ist ein spürbarer Zeitaufwand neben dem Studium – in intensiven Phasen auch deutlich mehr als bei einem klassischen Hochschulverein. Wer nur gelegentlich vorbeischauen möchte, wird hier nicht glücklich."
     },
-    "frage-3": {
+    "question-3": {
       "question": "Ist das mit Studium, Nebenjob oder anderem Engagement vereinbar?",
       "answer": "Viele Mitglieder bekommen das hin, aber es braucht echtes Zeitmanagement. Sprich das offen im Bewerbungsgespräch an, damit ihr gemeinsam einschätzen könnt, ob es passt."
     },
-    "frage-4": {
+    "question-4": {
       "question": "Wer kann sich bei Enactus Mannheim bewerben?",
       "answer": "Grundsätzlich alle Studierenden der Universität Mannheim, unabhängig von Fach oder Semester. Wichtiger als Vorerfahrung ist echtes Interesse an Verantwortung und sozialunternehmerischer Arbeit."
     },
-    "frage-5": {
+    "question-5": {
       "question": "Wie läuft der Bewerbungsprozess ab?",
       "answer": "Du bewirbst dich über das Formular auf /mitmachen, sobald das Bewerbungsfenster offen ist. Danach folgt in der Regel ein persönliches Gespräch, in dem wir uns gegenseitig kennenlernen."
     },
-    "frage-6": {
+    "question-6": {
       "question": "Brauche ich schon Erfahrung in Business oder Social Entrepreneurship?",
       "answer": "Nein. Die meisten Mitglieder lernen das Handwerk erst im Verein. Was zählt, ist die Bereitschaft, dich einzuarbeiten und Verantwortung zu übernehmen – nicht ein fertiger Lebenslauf."
     },
-    "frage-7": {
+    "question-7": {
       "question": "Wie wird entschieden, an welchem Projekt ich mitarbeite?",
       "answer": "Nach der Aufnahme lernst du die laufenden Projekte kennen und ordnest dich nach Interesse und freien Kapazitäten zu. Die genaue Zuteilung besprecht ihr im Team – ein Wunschkonzert ist es nicht immer."
     },
-    "frage-8": {
+    "question-8": {
       "question": "Was passiert, wenn ein Projekt scheitert?",
       "answer": "Das gehört zum Prozess dazu: Jedes Projekt durchläuft Gates, an denen ehrlich entschieden wird, ob es weitergeht. Ein gestopptes Projekt ist kein persönliches Scheitern, sondern Teil davon, wie wir arbeiten – mehr dazu auf /prozess."
     }

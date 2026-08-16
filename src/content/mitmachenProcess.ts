@@ -5,7 +5,7 @@ import { z } from "zod";
  * distinct from process.ts's 8-station project stage-gate timeline (that one
  * describes what happens to a *project*; this one describes what happens to
  * a *candidate*). "application" and "interview" are confirmed by
- * messages/{locale}.json's Faq.frage-5 answer ("Du bewirbst dich über das
+ * messages/{locale}.json's Faq.question-5 answer ("Du bewirbst dich über das
  * Formular... Danach folgt in der Regel ein persönliches Gespräch");
  * "response" states the self-evident close of any application process
  * (you hear back) rather than an invented specific claim — no date or

@@ -22,12 +22,12 @@ describe("content/navigation", () => {
     }
   });
 
-  it("lists Partner and Prozess under the footer's Verein column — no dedicated team route", () => {
-    expect(footerColumns.verein.map((item) => item.key)).toEqual(["partner", "prozess"]);
+  it("lists Partner and Prozess under the footer's association column — no dedicated team route", () => {
+    expect(footerColumns.association.map((item) => item.key)).toEqual(["partner", "prozess"]);
   });
 
-  it("lists Impressum and Datenschutz under Rechtliches", () => {
-    expect(footerColumns.rechtliches.map((item) => item.key)).toEqual([
+  it("lists Impressum and Datenschutz under the legal column", () => {
+    expect(footerColumns.legal.map((item) => item.key)).toEqual([
       "impressum",
       "datenschutz",
     ]);

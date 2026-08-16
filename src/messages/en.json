@@ -34,9 +34,9 @@
   "Footer": {
     "navLabel": "Footer",
     "columns": {
-      "verein": "Association",
-      "netzwerk": "Network",
-      "rechtliches": "Legal"
+      "association": "Association",
+      "network": "Network",
+      "legal": "Legal"
     },
     "network": {
       "enactusGermany": "Enactus Germany",
@@ -504,35 +504,35 @@
   },
   "Faq": {
     "unverifiedHint": "This answer hasn't been signed off by the board yet.",
-    "frage-1": {
+    "question-1": {
       "question": "What actually is Enactus Mannheim?",
       "answer": "Enactus Mannheim is a student-run club that takes its own social ventures from idea to spin-off — responsibility for the project work and for running the club itself sits with the members."
     },
-    "frage-2": {
+    "question-2": {
       "question": "How much time should I plan for each week?",
       "answer": "It depends on your role and the project phase, but expect a real time commitment alongside your studies — noticeably more during intense phases than at a typical student club. If you're looking to drop by occasionally, this isn't the right fit."
     },
-    "frage-3": {
+    "question-3": {
       "question": "Can I combine this with my studies, a part-time job, or other commitments?",
       "answer": "Plenty of members make it work, but it takes real time management. Bring it up openly in the interview so you can figure out together whether it fits."
     },
-    "frage-4": {
+    "question-4": {
       "question": "Who can apply to Enactus Mannheim?",
       "answer": "Any student at the University of Mannheim, regardless of subject or semester. Genuine interest in responsibility and social-entrepreneurial work matters more than prior experience."
     },
-    "frage-5": {
+    "question-5": {
       "question": "How does the application process work?",
       "answer": "You apply through the form on /mitmachen while the application window is open. That's usually followed by a personal interview where we get to know each other."
     },
-    "frage-6": {
+    "question-6": {
       "question": "Do I already need business or social-entrepreneurship experience?",
       "answer": "No. Most members learn the craft inside the club. What matters is your willingness to get up to speed and take on responsibility, not a polished résumé."
     },
-    "frage-7": {
+    "question-7": {
       "question": "How is it decided which project I work on?",
       "answer": "After joining, you get to know the running projects and match yourself to one based on interest and open capacity. The team works out the exact assignment together — it's not always your first choice."
     },
-    "frage-8": {
+    "question-8": {
       "question": "What happens if a project fails?",
       "answer": "That's built into how we work: every project passes through gates where we honestly decide whether it continues. A project being stopped isn't a personal failure, it's part of the process — more on /prozess."
     }

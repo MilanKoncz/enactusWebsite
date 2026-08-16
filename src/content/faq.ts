@@ -21,14 +21,14 @@ import { z } from "zod";
  */
 
 const faqKeySchema = z.enum([
-  "frage-1",
-  "frage-2",
-  "frage-3",
-  "frage-4",
-  "frage-5",
-  "frage-6",
-  "frage-7",
-  "frage-8",
+  "question-1",
+  "question-2",
+  "question-3",
+  "question-4",
+  "question-5",
+  "question-6",
+  "question-7",
+  "question-8",
 ]);
 export type FaqKey = z.infer<typeof faqKeySchema>;
 
@@ -44,14 +44,14 @@ function faqEntry(key: FaqKey, order: number, category: string): FaqEntry {
 }
 
 export const faqEntries: FaqEntry[] = [
-  faqEntry("frage-1", 1, "Allgemein"),
-  faqEntry("frage-2", 2, "Allgemein"),
-  faqEntry("frage-3", 3, "Allgemein"),
-  faqEntry("frage-4", 4, "Bewerbung"),
-  faqEntry("frage-5", 5, "Bewerbung"),
-  faqEntry("frage-6", 6, "Bewerbung"),
-  faqEntry("frage-7", 7, "Projekte"),
-  faqEntry("frage-8", 8, "Projekte"),
+  faqEntry("question-1", 1, "Allgemein"),
+  faqEntry("question-2", 2, "Allgemein"),
+  faqEntry("question-3", 3, "Allgemein"),
+  faqEntry("question-4", 4, "Bewerbung"),
+  faqEntry("question-5", 5, "Bewerbung"),
+  faqEntry("question-6", 6, "Bewerbung"),
+  faqEntry("question-7", 7, "Projekte"),
+  faqEntry("question-8", 8, "Projekte"),
 ];
 
 export { faqEntrySchema, faqKeySchema };
