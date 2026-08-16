@@ -18,7 +18,7 @@ decoration.
 ```css
 @theme {
   --color-ink:     #061031; /* Navy. Primary text, dark sections.     */
-  --color-gold:    #FFC321; /* Signature accent. Never a text color.  */
+  --color-gold:    #FFC321; /* Signature accent. Text colour on ink only. */
   --color-paper:   #f3f5f9; /* Page background.                       */
   --color-sand:    #d2bd80; /* Warm nuance, dark backgrounds only.    */
   --color-oxblood: #300612; /* Rare. Deep emphasis on dark.           */
@@ -32,7 +32,11 @@ We use the local value until the board decides otherwise.
 
 - Text on gold is always `--color-ink`. White on gold is ~1.8:1 and fails at
   every size.
-- Gold is never a text color on paper (~1.6:1).
+- Gold is never a text color on paper (1.47:1). On ink it measures 11.6:1 and
+  is allowed — sparingly, for one emphasised word, never for a run of copy.
+  The hero's rotating term is the reference case; where a dark section has a
+  photo or video behind it, measure against the brightest frame the scrim can
+  let through, not against the token (the hero's worst case is 6.4:1).
 - Sand is legible only on ink, never on paper.
 - Muted text on paper: ink at 60% opacity minimum. Subtlety comes from size and
   weight, not from illegibility.

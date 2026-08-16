@@ -55,8 +55,14 @@ export function HomeHero() {
             6rem; text-display-3 is 2.5rem, ~42%) instead of scaling up
             across breakpoints the way it used to. */}
         <Logo variant="full" surface="ink" className="h-28 w-auto sm:h-32 md:h-40 lg:h-48" />
+        {/* Gold as a text colour is only ever legible on ink, never on paper
+            (docs/design-system.md). Here it measures 11.6:1 against the ink
+            surface and 6.4:1 against the worst case the video can produce —
+            a fully white frame behind the 80% ink scrim — so it clears AA at
+            both ends. Only the rotating term takes it; the prefix stays
+            white, which is what makes the term read as the emphasis. */}
         <h1 className="text-display-3 font-display">
-          {t("prefix")} <RotatingText terms={rotating} />
+          {t("prefix")} <RotatingText terms={rotating} className="text-gold" />
         </h1>
         <Button href="/mitmachen" variant="glass" size="lg">
           {t("cta")}

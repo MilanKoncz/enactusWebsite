@@ -71,7 +71,7 @@
   },
   "Hero": {
     "prefix": "Wir sind",
-    "rotating": ["BEGRIFF_1", "BEGRIFF_2", "BEGRIFF_3"],
+    "rotating": ["Entrepreneurship", "Community", "Sustainability", "Impact"],
     "cta": "Jetzt bewerben"
   },
   "PartnerMarquee": {

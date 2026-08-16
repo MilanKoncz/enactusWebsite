@@ -17,7 +17,16 @@ describe("HomeHero", () => {
     renderWithIntl(<HomeHero />);
     const headings = screen.getAllByRole("heading", { level: 1 });
     expect(headings).toHaveLength(1);
-    expect(headings[0]).toHaveTextContent("Wir sind BEGRIFF_1");
+    expect(headings[0]).toHaveTextContent("Wir sind Entrepreneurship");
+  });
+
+  it("sets the rotating term in gold and leaves the prefix alone", () => {
+    mockIntersectionObserver();
+    mockMatchMedia(false);
+    renderWithIntl(<HomeHero />);
+    const heading = screen.getByRole("heading", { level: 1 });
+    expect(heading).not.toHaveClass("text-gold");
+    expect(heading.querySelector(".text-gold")).toBeInTheDocument();
   });
 
   it("renders the apply CTA as a link to /mitmachen", () => {
