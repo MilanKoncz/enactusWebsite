@@ -51,6 +51,15 @@ describe("Footer", () => {
     expect(screen.getByText("Enactus Global")).toBeInTheDocument();
   });
 
+  it("renders a real icon next to every social link, including LinkedIn", () => {
+    renderWithIntl(<Footer />);
+    const socialGroup = screen.getByRole("group", { name: "Social Media" });
+    for (const name of ["Instagram", "LinkedIn", "Facebook"]) {
+      const link = within(socialGroup).getByRole("link", { name });
+      expect(link.parentElement?.querySelector("svg")).toBeInTheDocument();
+    }
+  });
+
   it("has no accessibility violations", async () => {
     const { container } = renderWithIntl(<Footer />);
     expect(await axe(container)).toHaveNoViolations();

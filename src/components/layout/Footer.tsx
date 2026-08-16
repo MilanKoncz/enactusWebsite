@@ -1,6 +1,7 @@
 import type { ComponentType } from "react";
 import { ExternalLink as ExternalLinkIcon } from "lucide-react";
 import { SiFacebook, SiInstagram } from "@icons-pack/react-simple-icons";
+import { FaLinkedin } from "react-icons/fa";
 import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
@@ -19,12 +20,14 @@ import {
 import { org } from "@/content/org";
 import { Link } from "@/lib/navigation";
 
-// Simple Icons dropped LinkedIn's mark after a takedown request — there is no
-// LinkedIn export in @icons-pack/react-simple-icons to use. Its link falls
-// back to a text-only treatment; Instagram/Facebook get real icons.
-// See ASSETS-TODO.md.
+// Simple Icons dropped LinkedIn's mark after a takedown request, in both
+// @icons-pack/react-simple-icons and the upstream simple-icons package it
+// wraps — there is no LinkedIn export to use from that set. react-icons'
+// bundled Font Awesome brand icon fills the gap for this one entry only;
+// Instagram/Facebook keep their Simple Icons mark, unchanged.
 const SOCIAL_ICONS: Partial<Record<SocialKey, ComponentType<{ className?: string; "aria-hidden"?: boolean }>>> = {
   instagram: SiInstagram,
+  linkedin: FaLinkedin,
   facebook: SiFacebook,
 };
 
