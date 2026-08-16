@@ -126,6 +126,33 @@ test.describe("homepage", () => {
     expect(videoRequests).toEqual([]);
   });
 
+  // Read as raw HTML, never through a rendered page: the point is that the
+  // header's surface is already settled before any JavaScript runs. The
+  // German route used to prerender the dark-on-light wordmark and swap it
+  // after hydration, because next/navigation reported the proxy's internal
+  // "/de" rather than "/".
+  for (const { path, label } of [
+    { path: "/", label: "German" },
+    { path: "/en", label: "English" },
+  ]) {
+    test(`prerenders the ${label} homepage header with the on-dark logo, before hydration`, async ({
+      request,
+      baseURL,
+    }) => {
+      const html = await (await request.get(`${baseURL}${path}`)).text();
+      const header = html.slice(0, html.indexOf("</header>"));
+      expect(header).toContain("enactus-mannheim-logo-full-on-dark.png");
+      expect(header).not.toContain("enactus-mannheim-logo-full.png");
+    });
+  }
+
+  test("never swaps the header logo after hydration", async ({ page }) => {
+    await page.goto("/");
+    const first = await page.locator("header img").first().getAttribute("src");
+    await page.waitForTimeout(1000);
+    expect(await page.locator("header img").first().getAttribute("src")).toBe(first);
+  });
+
   test("names every board member's LinkedIn link without needing a hover", async ({ page }) => {
     await page.goto("/");
     const link = page.getByRole("link", { name: /LinkedIn-Profil von Thorben Ossig/ });
