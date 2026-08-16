@@ -8,6 +8,7 @@ import {
   WCAG_AA_NORMAL_TEXT,
 } from "@/lib/contrast";
 import { colorTokens } from "@/lib/design-tokens";
+import { PILLAR_OVERLAY_OPACITY } from "@/components/sections/Pillars";
 
 function readCssColorTokens(): Record<string, string> {
   const css = readFileSync(resolve(process.cwd(), "src/app/globals.css"), "utf-8");
@@ -65,5 +66,15 @@ describe("design tokens: color contrast", () => {
 
   it("gold text on paper fails AA — gold is never a text color", () => {
     expect(passesAA(contrastRatio(gold, paper))).toBe(false);
+  });
+
+  it("paper text over a pillar's photo overlay still passes AA, even against a worst-case near-white photo", () => {
+    // "#ffffff" stands in for the brightest patch any pillar photo could
+    // ever show behind the text — the actual photos (an SDG-wheel graphic,
+    // a project photo, a stage photo) are all darker than pure white
+    // somewhere, so this is deliberately harder than the real case, not a
+    // realistic average.
+    const worstCaseBackground = blendOverBackground(ink, PILLAR_OVERLAY_OPACITY, "#ffffff");
+    expect(passesAA(contrastRatio(paper, worstCaseBackground))).toBe(true);
   });
 });

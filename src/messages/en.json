@@ -96,7 +96,7 @@
     "title": "What makes us different",
     "esg": {
       "title": "ESG character",
-      "lead": "Every project advances a UN Sustainable Development Goal, not just a business idea.",
+      "lead": "Every project advances a <sdgLink>UN Sustainable Development Goal</sdgLink>, not just a business idea.",
       "detail": "We choose projects by which SDG they move forward — impact is the entry ticket, not an afterthought."
     },
     "execution": {

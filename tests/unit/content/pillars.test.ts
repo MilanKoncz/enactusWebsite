@@ -24,4 +24,10 @@ describe("content/pillars", () => {
   it("keeps the key enum in sync with the exported pillar list", () => {
     expect(pillarKeySchema.options).toEqual(pillars.map((p) => p.key));
   });
+
+  it("has a real background photo for every pillar", () => {
+    for (const p of pillars) {
+      expect(p.image).toMatch(/^\/brand\/pillars\//);
+    }
+  });
 });

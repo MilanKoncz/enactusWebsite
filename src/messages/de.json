@@ -96,7 +96,7 @@
     "title": "Was uns einzigartig macht",
     "esg": {
       "title": "ESG-Charakter",
-      "lead": "Jedes Projekt zahlt auf ein UN-Nachhaltigkeitsziel ein, nicht nur auf eine Geschäftsidee.",
+      "lead": "Jedes Projekt zahlt auf ein <sdgLink>UN-Nachhaltigkeitsziel</sdgLink> ein, nicht nur auf eine Geschäftsidee.",
       "detail": "Wir wählen Projekte danach aus, welches SDG sie voranbringen — Wirkung ist die Eintrittskarte, nicht ein Zusatz am Ende."
     },
     "execution": {
