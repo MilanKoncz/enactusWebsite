@@ -18,7 +18,7 @@ export function Benefits() {
       <ThreadSegment stop="benefits" />
       <Container className="relative flex flex-col gap-12">
         <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           {benefits.map((benefit) => (
             <Card key={benefit.key} tabIndex={0} className="group flex flex-col gap-3">
               <h3 className="text-heading-3 font-sans">{t(`${benefit.key}.title`)}</h3>

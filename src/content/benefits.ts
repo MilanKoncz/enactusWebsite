@@ -1,25 +1,19 @@
 import { z } from "zod";
 
 /**
- * The benefits grid on the homepage ("was man lernt und bekommt"). The exact
- * six benefits aren't confirmed with the board yet, so the key enum holds
- * generic placeholder slots rather than asserting specific claims — confirm
- * the real benefits with the board before renaming them (see
- * ASSETS-TODO.md). The key is a Zod enum, not a free string, so that
- * `t(\`${benefit.key}.title\`)` in components stays statically checked
- * against messages/{locale}.json (the same reasoning as content/stars.ts).
- * `title` and `detail` are copy and live in messages/{locale}.json under
- * "Benefits.<key>"; this file only holds the key and display order.
+ * The benefits grid on the homepage ("was ihr lernt und bekommt"). Reduced
+ * from six generic placeholder slots to these four board-confirmed benefits
+ * 2026-08-16 — semantic keys, not "benefit-1".."benefit-4", now that the
+ * content itself is real rather than a placeholder (same reasoning as
+ * content/pillars.ts's "esg"/"execution"/"network"). The key is a Zod enum,
+ * not a free string, so that `t(\`${benefit.key}.title\`)` in components
+ * stays statically checked against messages/{locale}.json (the same
+ * reasoning as content/stars.ts). `title`, `lead`, and `detail` are copy and
+ * live in messages/{locale}.json under "Benefits.<key>"; this file only
+ * holds the key and display order.
  */
 
-const benefitKeySchema = z.enum([
-  "benefit-1",
-  "benefit-2",
-  "benefit-3",
-  "benefit-4",
-  "benefit-5",
-  "benefit-6",
-]);
+const benefitKeySchema = z.enum(["responsibility", "teamwork", "alumniAdvisors", "community"]);
 export type BenefitKey = z.infer<typeof benefitKeySchema>;
 
 const benefitSchema = z.object({

@@ -13,16 +13,24 @@ describe("Benefits", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders all six benefit titles as h3s", () => {
+  it("renders all four benefit titles as h3s", () => {
     renderWithIntl(<Benefits />);
     const headings = screen.getAllByRole("heading", { level: 3 });
     expect(headings).toHaveLength(benefits.length);
+    expect(headings.map((h) => h.textContent)).toEqual([
+      "Verantwortung",
+      "Teamarbeit",
+      "Alumni und Advisor",
+      "Enactus Community",
+    ]);
   });
 
   it("always renders each benefit's lead sentence", () => {
     renderWithIntl(<Benefits />);
     expect(
-      screen.getByText("Ihr übernehmt von Anfang an echte Verantwortung für ein Projekt."),
+      screen.getByText(
+        "Bei uns erstellst du nicht nur ein Pitchdeck oder schreibst fünf Partner an, sondern verantwortest Projekte, Events und Finanzen mit eigenem Entscheidungsspielraum.",
+      ),
     ).toBeInTheDocument();
   });
 
@@ -30,7 +38,7 @@ describe("Benefits", () => {
     renderWithIntl(<Benefits />);
     expect(
       screen.getByText(
-        "Kein Praktikum, das nebenherläuft — ihr entscheidet operativ mit und verantwortet Ergebnisse.",
+        "Eine wertvolle Ergänzung für deinen Lebenslauf und ein Weg, deinen Agency-Skill zu verbessern.",
       ),
     ).toBeInTheDocument();
   });

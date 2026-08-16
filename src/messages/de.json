@@ -113,35 +113,25 @@
   "Benefits": {
     "eyebrow": "Mitgliedschaft",
     "title": "Was ihr lernt und bekommt",
-    "benefit-1": {
+    "responsibility": {
       "title": "Verantwortung",
-      "lead": "Ihr übernehmt von Anfang an echte Verantwortung für ein Projekt.",
-      "detail": "Kein Praktikum, das nebenherläuft — ihr entscheidet operativ mit und verantwortet Ergebnisse."
+      "lead": "Bei uns erstellst du nicht nur ein Pitchdeck oder schreibst fünf Partner an, sondern verantwortest Projekte, Events und Finanzen mit eigenem Entscheidungsspielraum.",
+      "detail": "Eine wertvolle Ergänzung für deinen Lebenslauf und ein Weg, deinen Agency-Skill zu verbessern."
     },
-    "benefit-2": {
-      "title": "Praxiswissen",
-      "lead": "Ihr lernt Skills, die im Studium selten drankommen.",
-      "detail": "Von Buchhaltung über Vertrieb bis Recht — Praxiswissen, das sofort gebraucht wird, nicht nur Theorie."
+    "teamwork": {
+      "title": "Teamarbeit",
+      "lead": "Wie in jedem Startup-Projekt arbeiten auch wir in Teams, mit emotionalen Höhen und Tiefen im Projektverlauf.",
+      "detail": "Bei uns lernst du, über diese Herausforderungen hinwegzustehen, stressige Phasen gemeinsam zu meistern, Konflikte zu lösen und gemeinsam zu feiern. Der wertvollste Softskill."
     },
-    "benefit-3": {
-      "title": "Netzwerk",
-      "lead": "Ihr baut ein Netzwerk auf, das über euer Studium hinaus trägt.",
-      "detail": "Partnerunternehmen, Alumni und andere Enactus-Teams weltweit werden Teil eures beruflichen Netzwerks."
+    "alumniAdvisors": {
+      "title": "Alumni und Advisor",
+      "lead": "Hinter dir stehen hunderte Alumni, die neue Projekte weiterhin gerne unterstützen, sowie unsere Business Advisor, die unsere Projekte regelmäßig beraten.",
+      "detail": "Ihre Erfahrung reicht von eigenen Startups über große Beratungen bis zu bekannten Konzernen."
     },
-    "benefit-4": {
-      "title": "Führung",
-      "lead": "Ihr übernehmt Führungsverantwortung, lange bevor der erste Job das verlangt.",
-      "detail": "Projektleitung, Teamführung, Budgetverantwortung — Rollen, die sonst Jahre Berufserfahrung brauchen."
-    },
-    "benefit-5": {
-      "title": "Lebenslauf",
-      "lead": "Ihr bekommt eine Erfahrung, die im Lebenslauf auffällt.",
-      "detail": "Ein selbst mitverantwortetes Social Business ist etwas anderes als ein weiteres Seminar."
-    },
-    "benefit-6": {
-      "title": "Gemeinschaft",
-      "lead": "Ihr werdet Teil einer Gemeinschaft, die an denselben Themen arbeitet.",
-      "detail": "Wöchentliche Zusammenarbeit mit Leuten, die dieselbe Überzeugung teilen wie ihr."
+    "community": {
+      "title": "Enactus Community",
+      "lead": "Du wirst nicht nur Teil einer lokalen Studenteninitiative, sondern Mitglied einer weltweiten Enactus-Community aus engagierten Enactees, die dich für die gute Sache unterstützen.",
+      "detail": "Egal worum es geht und wann immer du es brauchst. Einmal Enactee, immer Enactee."
     }
   },
   "AlumniVoices": {

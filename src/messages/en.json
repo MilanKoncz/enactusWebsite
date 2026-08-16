@@ -113,35 +113,25 @@
   "Benefits": {
     "eyebrow": "Membership",
     "title": "What you learn and gain",
-    "benefit-1": {
+    "responsibility": {
       "title": "Responsibility",
-      "lead": "You take on real responsibility for a project from day one.",
-      "detail": "Not an internship that runs alongside you — you make operational decisions and own the results."
+      "lead": "With us, you don't just build a pitch deck or email five partners — you take ownership of projects, events, and finances with real decision-making power of your own.",
+      "detail": "A genuine addition to your résumé, and a way to sharpen your agency skills."
     },
-    "benefit-2": {
-      "title": "Practical skills",
-      "lead": "You learn skills your degree rarely covers.",
-      "detail": "From bookkeeping to sales to legal basics — practical knowledge you need right away, not just theory."
+    "teamwork": {
+      "title": "Teamwork",
+      "lead": "Like any startup project, we work in teams, with the emotional highs and lows that come with a project's course.",
+      "detail": "With us, you learn to push through those challenges, get through stressful phases together, resolve conflict, and celebrate together. The most valuable soft skill there is."
     },
-    "benefit-3": {
-      "title": "Network",
-      "lead": "You build a network that outlasts your studies.",
-      "detail": "Partner companies, alumni, and other Enactus teams worldwide become part of your professional network."
+    "alumniAdvisors": {
+      "title": "Alumni and advisors",
+      "lead": "Hundreds of alumni stand behind you, still happy to support new projects, alongside our business advisors, who regularly advise our projects.",
+      "detail": "Their experience ranges from their own startups to major consultancies to well-known corporations."
     },
-    "benefit-4": {
-      "title": "Leadership",
-      "lead": "You take on leadership responsibility long before your first job asks for it.",
-      "detail": "Project lead, team lead, budget responsibility — roles that would otherwise take years of experience."
-    },
-    "benefit-5": {
-      "title": "Your résumé",
-      "lead": "You gain an experience that stands out on a résumé.",
-      "detail": "Co-running a real social business is a different thing from one more seminar."
-    },
-    "benefit-6": {
-      "title": "Community",
-      "lead": "You become part of a community working on the same causes.",
-      "detail": "Weekly collaboration with people who share the same conviction you do."
+    "community": {
+      "title": "Enactus community",
+      "lead": "You don't just become part of a local student initiative — you become a member of a worldwide Enactus community of committed Enactees who support you for the cause.",
+      "detail": "Whatever it's about, whenever you need it. Once an Enactee, always an Enactee."
     }
   },
   "AlumniVoices": {
