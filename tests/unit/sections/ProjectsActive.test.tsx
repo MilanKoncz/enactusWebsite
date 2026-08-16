@@ -43,7 +43,7 @@ describe("ProjectsActive", () => {
     expect(button).toHaveAttribute("aria-expanded", "true");
     expect(
       screen.getByText(
-        "SmileGreen entwickelt eine Wechselkopfzahnbürste aus Naturkautschuk mit Borsten aus PHA-Biokunststoff. Sie ist innerhalb von vier Monaten zu 100 % kompostierbar und bietet über ein hygienisches Wechselkopfsystem eine nachhaltige Alternative zur Wegwerfzahnbürste.",
+        "Wir entwickeln eine kompromisslos nachhaltige Zahnbürste, die gleichzeitig zu 100 % hygienisch ist. Durch unsere Materialkomposition aus einem zu einem Hochleistungselastomer transformierten Naturkautschuk, PHA und Bio-PE bieten wir die Lösung, die nachhaltiges Zähneputzen hygienisch macht.",
       ),
     ).toBeInTheDocument();
     // Appears twice: once as the lead photo placeholder's label, once as the

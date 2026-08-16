@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/Badge";
 import { Container } from "@/components/ui/Container";
@@ -36,7 +37,13 @@ export function ProjectsArchive() {
                 href={`/projekte/${project.slug}`}
                 className="flex flex-col gap-3 rounded-md border border-ink/10 bg-paper p-4 transition-[border-color,transform] duration-[var(--duration-fast)] ease-signature hover:-translate-y-px hover:border-ink/20 focus-visible:-translate-y-px focus-visible:border-ink/20"
               >
-                <Placeholder kind="Logo" label={project.name} ratio="1 / 1" className="p-2" />
+                {project.logo ? (
+                  <span className="relative block w-full aspect-square">
+                    <Image src={project.logo} alt="" fill sizes="25vw" className="object-contain p-2" />
+                  </span>
+                ) : (
+                  <Placeholder kind="Logo" label={project.name} ratio="1 / 1" className="p-2" />
+                )}
                 <p className="text-body-m font-medium">{project.name}</p>
                 {project.year ? (
                   <p className="font-mono text-mono-xs opacity-60">{project.year}</p>

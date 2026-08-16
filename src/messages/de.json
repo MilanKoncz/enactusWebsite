@@ -257,20 +257,20 @@
   },
   "Projects": {
     "smilegreen": {
-      "oneLiner": "Die kompromisslose Wechselkopfzahnbürste aus Naturkautschuk.",
-      "description": "SmileGreen entwickelt eine Wechselkopfzahnbürste aus Naturkautschuk mit Borsten aus PHA-Biokunststoff. Sie ist innerhalb von vier Monaten zu 100 % kompostierbar und bietet über ein hygienisches Wechselkopfsystem eine nachhaltige Alternative zur Wegwerfzahnbürste."
+      "oneLiner": "Wir entwickeln eine kompromisslos nachhaltige Zahnbürste, die gleichzeitig zu 100 % hygienisch ist.",
+      "description": "Wir entwickeln eine kompromisslos nachhaltige Zahnbürste, die gleichzeitig zu 100 % hygienisch ist. Durch unsere Materialkomposition aus einem zu einem Hochleistungselastomer transformierten Naturkautschuk, PHA und Bio-PE bieten wir die Lösung, die nachhaltiges Zähneputzen hygienisch macht."
     },
     "mealyo": {
-      "oneLiner": "ANREISSER_FEHLT",
-      "description": "BESCHREIBUNG_FEHLT"
+      "oneLiner": "Mealyo entwickelt eine App, die Lebensmittelverschwendung reduziert, indem der eigene Lebensmittelvorrat digitalisiert wird.",
+      "description": "Mealyo entwickelt eine App, die Lebensmittelverschwendung reduziert, indem der eigene Lebensmittelvorrat digitalisiert wird. Einfach den Kassenbon einscannen und fertig. Wenn Lebensmittel drohen schlecht zu werden, schlägt die App Rezepte für deren Verbrauch vor."
     },
     "resoap": {
       "oneLiner": "ANREISSER_FEHLT",
       "description": "BESCHREIBUNG_FEHLT"
     },
     "impactwithus": {
-      "oneLiner": "ANREISSER_FEHLT",
-      "description": "BESCHREIBUNG_FEHLT"
+      "oneLiner": "ImpactWithUs ist eine Social-Media-Beratung für NGOs, die durch höhere Sichtbarkeit die Spendeneinnahmen steigert.",
+      "description": "ImpactWithUs ist eine Social-Media-Beratung für NGOs, die durch höhere Sichtbarkeit die Spendeneinnahmen steigert. Für bestehende Kunden bietet IWU Social-Media-Workshops, Beratung und Content-Management an."
     },
     "differgy": {
       "oneLiner": "ANREISSER_FEHLT",
@@ -349,6 +349,12 @@
       "externalLinkLabel": "Projektwebsite besuchen",
       "statusHeading": "Status"
     }
+  },
+  "ProjectDetail": {
+    "stageHeading": "Prozessstufe",
+    "sdgHeading": "SDG-Fokus",
+    "sdgItemLabel": "UN-Nachhaltigkeitsziel {number}",
+    "linkedinLabel": "Projekt auf LinkedIn"
   },
   "ProjectsArchivePage": {
     "eyebrow": "Archiv",

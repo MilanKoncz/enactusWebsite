@@ -257,20 +257,20 @@
   },
   "Projects": {
     "smilegreen": {
-      "oneLiner": "The uncompromising replaceable-head toothbrush made from natural rubber.",
-      "description": "SmileGreen develops a replaceable-head toothbrush made from natural rubber with PHA bio-plastic bristles. It's 100% compostable within four months and, through a hygienic replaceable-head system, offers a sustainable alternative to the disposable toothbrush."
+      "oneLiner": "An uncompromisingly sustainable toothbrush that is 100 % hygienic at the same time.",
+      "description": "We are developing an uncompromisingly sustainable toothbrush that is 100 % hygienic at the same time. Our material composition — natural rubber transformed into a high-performance elastomer, PHA and bio-PE — is what makes sustainable brushing hygienic."
     },
     "mealyo": {
-      "oneLiner": "TEASER_MISSING",
-      "description": "DESCRIPTION_MISSING"
+      "oneLiner": "An app that cuts food waste by digitising the food you already have at home.",
+      "description": "Mealyo is building an app that cuts food waste by digitising the food you already have at home. Scan your receipt and you're done. When something is about to spoil, the app suggests recipes that use it up."
     },
     "resoap": {
       "oneLiner": "TEASER_MISSING",
       "description": "DESCRIPTION_MISSING"
     },
     "impactwithus": {
-      "oneLiner": "TEASER_MISSING",
-      "description": "DESCRIPTION_MISSING"
+      "oneLiner": "Social media consulting for NGOs that raises donation income through greater visibility.",
+      "description": "ImpactWithUs is a social media consultancy for NGOs that raises donation income through greater visibility. For existing clients, IWU runs social media workshops, advisory work and content management."
     },
     "differgy": {
       "oneLiner": "TEASER_MISSING",
@@ -349,6 +349,12 @@
       "externalLinkLabel": "Visit project website",
       "statusHeading": "Status"
     }
+  },
+  "ProjectDetail": {
+    "stageHeading": "Process stage",
+    "sdgHeading": "SDG focus",
+    "sdgItemLabel": "UN Sustainable Development Goal {number}",
+    "linkedinLabel": "Project on LinkedIn"
   },
   "ProjectsArchivePage": {
     "eyebrow": "Archive",

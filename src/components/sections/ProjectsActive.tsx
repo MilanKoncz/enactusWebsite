@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -51,7 +52,13 @@ function ProjectCard({ project, isOpen, onToggle }: ProjectCardProps) {
         onClick={onToggle}
         className="flex w-full items-center gap-4 rounded-md p-6 text-left transition-[background-color,transform] duration-[var(--duration-fast)] ease-signature hover:-translate-y-px hover:bg-ink/5 focus-visible:-translate-y-px focus-visible:bg-ink/5"
       >
-        <Placeholder kind="Logo" label={project.name} ratio="1 / 1" className="size-14 shrink-0 p-2" />
+        {project.logo ? (
+          <span className="relative size-14 shrink-0">
+            <Image src={project.logo} alt="" fill sizes="56px" className="object-contain" />
+          </span>
+        ) : (
+          <Placeholder kind="Logo" label={project.name} ratio="1 / 1" className="size-14 shrink-0 p-2" />
+        )}
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <p className="text-body-l font-medium">
             {project.name}
