@@ -7,7 +7,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ProximityGroup } from "@/components/motion/ProximityGroup";
 import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { board } from "@/content/board";
-
+import Image from "next/image";
 // No LinkedIn brand icon: neither @icons-pack/react-simple-icons (dropped
 // after a takedown, see Footer.tsx) nor lucide-react ship one, so this uses
 // the same text-only fallback Footer already established. Same
@@ -51,26 +51,40 @@ export function BoardGrid() {
         <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
         <ProximityGroup className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-5">
           {board.map((member) => (
-            <div key={member.slug} tabIndex={0} className="group proximity-item flex flex-col gap-3">
-              <div data-portrait className="relative overflow-hidden rounded-md">
-                <Placeholder
-                  kind="Foto"
-                  label={member.name}
-                  ratio="3 / 4"
-                  className={PORTRAIT_ZOOM_CLASSES}
-                />
+            <div
+              key={member.slug}
+              tabIndex={0}
+              className="group proximity-item flex flex-col gap-3">
+              <div data-portrait className="relative overflow-hidden rounded-md aspect-3/4 w-full">
+                {member.photo ? (
+                  <Image
+                    src={member.photo}
+                    alt={member.name}
+                    fill
+                    className={PORTRAIT_ZOOM_CLASSES}
+                  />
+                ) : (
+                  <Placeholder
+                    kind="Foto"
+                    label={member.name}
+                    ratio="3 / 4"
+                    className={PORTRAIT_ZOOM_CLASSES}
+                  />
+                )}
+
                 {member.linkedinUrl ? (
                   <a
                     href={member.linkedinUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={t("linkedinLabel", { name: member.name })}
-                    className={LINKEDIN_MARK_CLASSES}
-                  >
+                    className={LINKEDIN_MARK_CLASSES}>
                     {t("linkedin")}
                   </a>
                 ) : (
-                  <PlaceholderMark hint={tPlaceholder("missingHint")} className={LINKEDIN_MARK_CLASSES}>
+                  <PlaceholderMark
+                    hint={tPlaceholder("missingHint")}
+                    className={LINKEDIN_MARK_CLASSES}>
                     {t("linkedin")}
                   </PlaceholderMark>
                 )}

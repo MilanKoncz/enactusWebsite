@@ -47,9 +47,9 @@ describe("content/board", () => {
     }
   });
 
-  it("leaves every photo null until portraits are confirmed", () => {
+  it("has a real portrait for every member", () => {
     for (const member of board) {
-      expect(member.photo).toBeNull();
+      expect(member.photo).toMatch(/^\/image\/board\/.+\.jpg$/);
     }
   });
 

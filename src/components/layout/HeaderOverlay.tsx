@@ -4,23 +4,21 @@ import { useEffect, useRef } from "react";
 import { useHeaderSurface } from "@/components/layout/HeaderSurface";
 
 // Marks the bottom edge of a hero section that the fixed header should sit
-// transparent over. rootMargin shrinks the observed viewport by 96px from
-// the top — exactly the header's height (h-24, matching the sentinel
-// spacer in Header.tsx) — so `isIntersecting` flips to false at the precise
-// moment this point scrolls up underneath the header, not while it's still
-// visible below it. IntersectionObserver fires once immediately on
+// transparent over. rootMargin shrinks the observed viewport by 50px from
+// the top, so `isIntersecting` flips to false once this point scrolls to
+// within 50px of the header (h-24 / 96px tall) — slightly before it
+// actually passes underneath it. IntersectionObserver fires once immediately on
 // `observe()`, so on load (hero fully visible, this sentinel far below the
 // fold) the header starts overlaid without any extra setup step. Unmounting
 // (navigating away from the page entirely) resets to solid as a safety net.
 export function HeaderOverlay() {
   const { setOverlaid } = useHeaderSurface();
   const ref = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     const observer = new IntersectionObserver(([entry]) => setOverlaid(entry.isIntersecting), {
-      rootMargin: "-96px 0px 0px 0px",
+      rootMargin: "-50px 0px 0px 0px",
       threshold: 0,
     });
     observer.observe(el);

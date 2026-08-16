@@ -72,9 +72,7 @@
   "Hero": {
     "prefix": "We are",
     "rotating": ["BEGRIFF_1", "BEGRIFF_2", "BEGRIFF_3"],
-    "cta": "Apply now",
-    "videoPlaceholderKind": "Video",
-    "videoPlaceholderLabel": "Stage pitch loop"
+    "cta": "Apply now"
   },
   "PartnerMarquee": {
     "eyebrow": "The companies behind us"

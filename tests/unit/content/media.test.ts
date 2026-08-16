@@ -2,10 +2,13 @@ import { describe, expect, it } from "vitest";
 import { heroMedia, heroMediaSchema } from "@/content/media";
 
 describe("content/media", () => {
-  it("leaves poster, mobile image, and sources unset until footage is shot", () => {
-    expect(heroMedia.posterSrc).toBeNull();
+  it("has a real poster and video source", () => {
+    expect(heroMedia.posterSrc).toBe("/video/hero-poster.png");
+    expect(heroMedia.sources).toEqual([{ src: "/video/hero-video.mp4", type: "video/mp4" }]);
+  });
+
+  it("leaves the mobile still image unset until one is delivered", () => {
     expect(heroMedia.mobileImageSrc).toBeNull();
-    expect(heroMedia.sources).toEqual([]);
   });
 
   it("reserves the intended aspect ratio so the hero has no layout shift once footage arrives", () => {

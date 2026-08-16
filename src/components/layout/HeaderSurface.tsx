@@ -16,8 +16,14 @@ export const HeaderSurfaceContext = createContext<HeaderSurfaceContextValue>({
   setOverlaid: () => {},
 });
 
-export function HeaderSurfaceProvider({ children }: { children: ReactNode }) {
-  const [overlaid, setOverlaid] = useState(false);
+export function HeaderSurfaceProvider({
+  children,
+  initialOverlaid = false,
+}: {
+  children: ReactNode;
+  initialOverlaid?: boolean;
+}) {
+  const [overlaid, setOverlaid] = useState(initialOverlaid);
   return (
     <HeaderSurfaceContext.Provider value={{ overlaid, setOverlaid }}>
       {children}

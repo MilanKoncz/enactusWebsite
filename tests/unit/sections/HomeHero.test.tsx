@@ -42,17 +42,21 @@ describe("HomeHero", () => {
     expect(logo!.compareDocumentPosition(heading)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 
-  it("shows a placeholder background while no hero footage exists", () => {
+  it("renders the hero video with the real poster and source", () => {
     mockIntersectionObserver();
     mockMatchMedia(false);
-    renderWithIntl(<HomeHero />);
-    expect(screen.getByText("Bühnenpitch-Loop")).toBeInTheDocument();
+    const { container } = renderWithIntl(<HomeHero />);
+    const video = container.querySelector("video");
+    expect(video).toHaveAttribute("poster", "/video/hero-poster.png");
+    expect(video!.querySelector("source")).toHaveAttribute("src", "/video/hero-video.mp4");
   });
 
+  // axe-core takes noticeably longer to scan a real <video> element than the
+  // gradient placeholder it replaced — comfortably past the default 5000ms.
   it("has no accessibility violations", async () => {
     mockIntersectionObserver();
     mockMatchMedia(false);
     const { container } = renderWithIntl(<HomeHero />);
     expect(await axe(container)).toHaveNoViolations();
-  });
+  }, 15000);
 });

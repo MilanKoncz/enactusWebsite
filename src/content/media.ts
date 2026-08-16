@@ -1,12 +1,11 @@
 import { z } from "zod";
 
 /**
- * The homepage hero's video/poster/mobile-image triple. No footage has been
- * shot yet, so every source stays null — width/height are set to the
- * intended aspect ratio so the hero reserves its final on-screen size before
- * any asset exists, and no layout shift occurs once it's delivered (see
- * ASSETS-TODO.md). `sources` holds one entry per encoded format (e.g. webm,
- * mp4); empty until footage exists.
+ * The homepage hero's video/poster/mobile-image triple. Video and poster are
+ * real (board media handover, 2026-08-16); mobileImageSrc still has no still
+ * frame, so the hero shows no image below the `md` breakpoint (see
+ * ASSETS-TODO.md). width/height match the delivered video's aspect ratio.
+ * `sources` holds one entry per encoded format (e.g. webm, mp4).
  */
 
 const videoSourceSchema = z.object({
@@ -25,9 +24,12 @@ const heroMediaSchema = z.object({
 export type HeroMedia = z.infer<typeof heroMediaSchema>;
 
 export const heroMedia: HeroMedia = heroMediaSchema.parse({
-  posterSrc: null,
+  posterSrc: "/video/hero-poster.png",
   mobileImageSrc: null,
-  sources: [],
+  sources: [{
+      src: "/video/hero-video.mp4",
+      type: "video/mp4",
+    }],
   width: 1920,
   height: 1080,
 });

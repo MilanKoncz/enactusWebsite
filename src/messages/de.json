@@ -72,9 +72,7 @@
   "Hero": {
     "prefix": "Wir sind",
     "rotating": ["BEGRIFF_1", "BEGRIFF_2", "BEGRIFF_3"],
-    "cta": "Jetzt bewerben",
-    "videoPlaceholderKind": "Video",
-    "videoPlaceholderLabel": "Bühnenpitch-Loop"
+    "cta": "Jetzt bewerben"
   },
   "PartnerMarquee": {
     "eyebrow": "Unternehmen, die uns tragen"
