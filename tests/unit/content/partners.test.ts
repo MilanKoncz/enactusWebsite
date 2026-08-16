@@ -1,9 +1,19 @@
 import { describe, expect, it } from "vitest";
 import { partners, partnerSchema } from "@/content/partners";
 
+const MARQUEE_ONLY_SLUGS = ["htgf", "allianz-global-investors", "basf", "phoenix-group", "pg"];
+
 describe("content/partners", () => {
-  it("has the twelve confirmed partners", () => {
-    expect(partners).toHaveLength(12);
+  it("has the twelve confirmed partners plus five homepage-marquee-only additions", () => {
+    expect(partners).toHaveLength(17);
+  });
+
+  it("keeps the five marquee-only additions tier-less, so they never appear on the tiered /partner grid", () => {
+    for (const slug of MARQUEE_ONLY_SLUGS) {
+      const p = partners.find((partner) => partner.slug === slug);
+      expect(p?.tier).toBeNull();
+      expect(p?.url).toBeNull();
+    }
   });
 
   it("groups partners into the three confirmed tiers", () => {
@@ -31,11 +41,11 @@ describe("content/partners", () => {
     }
   });
 
-  it("has a confirmed url for every partner except MCEI", () => {
+  it("has a confirmed url for every tiered partner except MCEI", () => {
     const bySlug = Object.fromEntries(partners.map((p) => [p.slug, p.url]));
     expect(bySlug.mcei).toBeNull();
     for (const p of partners) {
-      if (p.slug === "mcei") continue;
+      if (p.slug === "mcei" || MARQUEE_ONLY_SLUGS.includes(p.slug)) continue;
       expect(p.url).toMatch(/^https:\/\//);
     }
   });

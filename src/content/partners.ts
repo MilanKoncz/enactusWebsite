@@ -16,6 +16,15 @@ import { z } from "zod";
  * live via independent search results instead; `mcei` could not be
  * confirmed at all (the domain is behind a maintenance-mode auth wall) and
  * stays null.
+ *
+ * Five more (`htgf`, `allianz-global-investors`, `basf`, `phoenix-group`,
+ * `pg`) were added 2026-08-16 for the homepage logo band only, from the
+ * board's own logo handover (`neue medien/Logo Firmen/`) — real logos, but
+ * `tier`/`url` stay `null` until the board assigns a partnership tier and
+ * the sites are fetched and confirmed the same way the twelve above were
+ * (see ASSETS-TODO.md). A `null` tier simply never matches PartnerTiers.tsx's
+ * fixed `TIER_ORDER`, so these five appear in the homepage band without
+ * also showing up (unconfirmed) on /partner's tiered grid.
  */
 
 const partnerSchema = z.object({
@@ -27,7 +36,13 @@ const partnerSchema = z.object({
 });
 export type Partner = z.infer<typeof partnerSchema>;
 
-function partner(input: { slug: string; name: string; logo: string; tier: string; url?: string }): Partner {
+function partner(input: {
+  slug: string;
+  name: string;
+  logo: string;
+  tier: string | null;
+  url?: string;
+}): Partner {
   return partnerSchema.parse({ ...input, url: input.url ?? null });
 }
 
@@ -108,6 +123,22 @@ export const partners: Partner[] = [
     tier: "Sponsoring",
     url: "https://www.absolventum.de/",
   }),
+  // Homepage logo band only — see the file comment above.
+  partner({ slug: "htgf", name: "HTGF", logo: "/brand/partners/htgf.png", tier: null }),
+  partner({
+    slug: "allianz-global-investors",
+    name: "Allianz Global Investors",
+    logo: "/brand/partners/allianz-global-investors.png",
+    tier: null,
+  }),
+  partner({ slug: "basf", name: "BASF", logo: "/brand/partners/basf.png", tier: null }),
+  partner({
+    slug: "phoenix-group",
+    name: "PHOENIX group",
+    logo: "/brand/partners/phoenix-group.png",
+    tier: null,
+  }),
+  partner({ slug: "pg", name: "P&G", logo: "/brand/partners/pg.webp", tier: null }),
 ];
 
 export { partnerSchema };

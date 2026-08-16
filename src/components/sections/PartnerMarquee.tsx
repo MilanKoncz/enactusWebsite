@@ -9,17 +9,24 @@ import { partners } from "@/content/partners";
 import { cn } from "@/lib/cn";
 
 // The track is `partners` rendered twice back to back, animated by exactly
-// -50% (globals.css's @keyframes marquee) — one full set width — so the
-// loop is seamless as long as both halves are identical, which they always
-// are here. The second half is aria-hidden and hidden under reduced motion,
-// so a screen reader or a static page never encounters the same eight
-// partners twice. The viewport itself stays overflow-hidden by default —
-// only reduced motion (where the animation is off entirely) switches it to
-// scrollable, so there's never a horizontal scrollbar while the loop runs.
-// `contain-content` is load-bearing, not decoration: without it, Chromium
-// still folds this track's full unclipped width into the document's own
-// scrollWidth even though overflow-hidden/auto correctly clips it visually
-// — a real horizontal scrollbar on the page with nothing to show for it.
+// -50% played in reverse (globals.css's @keyframes marquee and its
+// `reverse` direction — board feedback: run the band right to left instead
+// of left to right) — one full set width — so the loop is seamless as long
+// as both halves are identical, which they always are here. The second half
+// is aria-hidden and hidden under reduced motion, so a screen reader or a
+// static page never encounters the same partners twice. The viewport itself
+// stays overflow-hidden by default — only reduced motion (where the
+// animation is off entirely) switches it to scrollable, so there's never a
+// horizontal scrollbar while the loop runs. `contain-content` is
+// load-bearing, not decoration: without it, Chromium still folds this
+// track's full unclipped width into the document's own scrollWidth even
+// though overflow-hidden/auto correctly clips it visually — a real
+// horizontal scrollbar on the page with nothing to show for it.
+//
+// The track itself sits outside Container so it runs full-bleed, edge to
+// edge of the viewport (board feedback: no side margins) — same reasoning
+// as AlumniVoices' track. Only the eyebrow above it stays inside a
+// Container, so it lines up with the rest of the page's content width.
 export function PartnerMarquee() {
   const t = useTranslations("PartnerMarquee");
   const tPlaceholder = useTranslations("Placeholder");
@@ -27,41 +34,42 @@ export function PartnerMarquee() {
   const track = [...partners, ...partners];
 
   return (
-    <Section className="relative isolate py-16">
+    <Section className="relative isolate pt-16 pb-10">
       <ThreadSegment stop="partners" />
-      <Container className="relative flex flex-col gap-6">
+      <Container className="relative">
         <Eyebrow>{t("eyebrow")}</Eyebrow>
-        <div className="overflow-hidden contain-content motion-reduce:overflow-x-auto">
-          {/* No hover pause: stopping the loop under every incidental mouse
-              pass read as a bug, not a feature — a mouse user was never
-              going to interact with a logo here anyway. focus-within stays:
-              a keyboard user tabbing through the track needs it to hold
-              still to actually read what's focused. Reduced motion stops it
-              outright, unconditionally, further down. */}
-          <div className="flex w-max animate-marquee gap-16 focus-within:[animation-play-state:paused] motion-reduce:animate-none">
-            {track.map((partner, index) => {
-              const isDuplicate = index >= partners.length;
-              return (
-                <div
-                  key={`${partner.slug}-${index}`}
-                  aria-hidden={isDuplicate ? "true" : undefined}
-                  className={cn("flex shrink-0 items-center", isDuplicate && "motion-reduce:hidden")}
-                >
-                  {partner.logo ? (
-                    <div className="relative h-8 w-32">
-                      <Image src={partner.logo} alt={partner.name} fill className="object-contain" />
-                    </div>
-                  ) : (
-                    <PlaceholderMark hint={tPlaceholder("missingHint")} className="text-body-m">
-                      {partner.name}
-                    </PlaceholderMark>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
       </Container>
+      <div className="relative mt-6 overflow-hidden contain-content motion-reduce:overflow-x-auto">
+        {/* No hover pause: stopping the loop under every incidental mouse
+            pass read as a bug, not a feature — a mouse user was never
+            going to interact with a logo here anyway. focus-within stays:
+            a keyboard user tabbing through the track needs it to hold
+            still to actually read what's focused. Reduced motion stops it
+            outright, unconditionally, further down. */}
+        <div className="flex w-max animate-marquee gap-16 focus-within:[animation-play-state:paused] motion-reduce:animate-none">
+          {track.map((partner, index) => {
+            const isDuplicate = index >= partners.length;
+            return (
+              <div
+                key={`${partner.slug}-${index}`}
+                aria-hidden={isDuplicate ? "true" : undefined}
+                className={cn("flex shrink-0 items-center", isDuplicate && "motion-reduce:hidden")}
+              >
+                {partner.logo ? (
+                  // 1.5x the previous h-8/w-32 (board feedback: bigger logos).
+                  <div className="relative h-12 w-48">
+                    <Image src={partner.logo} alt={partner.name} fill className="object-contain" />
+                  </div>
+                ) : (
+                  <PlaceholderMark hint={tPlaceholder("missingHint")} className="text-body-m">
+                    {partner.name}
+                  </PlaceholderMark>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </Section>
   );
 }
