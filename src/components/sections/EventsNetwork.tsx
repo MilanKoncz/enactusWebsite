@@ -1,6 +1,8 @@
 import { useFormatter, useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { LinkCard } from "@/components/ui/LinkCard";
+import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { networkStats, teamLinks } from "@/content/network";
@@ -12,6 +14,7 @@ import { networkStats, teamLinks } from "@/content/network";
 // source, so it renders as a plain count.
 export function EventsNetwork() {
   const t = useTranslations("EventsNetwork");
+  const tPlaceholder = useTranslations("Placeholder");
   const format = useFormatter();
 
   return (
@@ -41,18 +44,20 @@ export function EventsNetwork() {
 
         <div className="flex flex-col gap-6">
           <Eyebrow>{t("teamsHeading")}</Eyebrow>
-          <ul className="flex flex-wrap gap-x-8 gap-y-4">
+          <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             {teamLinks.map((team) => (
               <li key={team.key}>
-                <a
-                  href={team.url ?? undefined}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={t("teamLinkLabel", { name: team.name })}
-                  className="link-underline text-body-m font-medium"
-                >
-                  {team.name}
-                </a>
+                {team.url ? (
+                  <LinkCard
+                    href={team.url}
+                    title={team.name}
+                    ariaLabel={t("teamLinkLabel", { name: team.name })}
+                  />
+                ) : (
+                  <PlaceholderMark hint={tPlaceholder("missingHint")} className="w-fit text-body-m font-medium">
+                    {team.name}
+                  </PlaceholderMark>
+                )}
               </li>
             ))}
           </ul>

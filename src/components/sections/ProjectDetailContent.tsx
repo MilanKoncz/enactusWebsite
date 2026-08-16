@@ -2,8 +2,10 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
 import { ImageLightbox } from "@/components/ui/ImageLightbox";
+import { LinkCard } from "@/components/ui/LinkCard";
 import { Placeholder } from "@/components/ui/Placeholder";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
+import { formatDomain } from "@/lib/domain";
 import { sdgIconSrc, SDG_GOALS_URL } from "@/content/sdg";
 import type { Project, ProjectLead } from "@/content/projects";
 
@@ -176,16 +178,15 @@ export function ProjectDetailContent({ project, labels, className }: ProjectDeta
         )}
       </div>
 
-      <div className="flex flex-wrap gap-x-8 gap-y-2">
+      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start">
         {project.externalUrl ? (
-          <a
+          <LinkCard
             href={project.externalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="link-underline w-fit text-body-m font-medium"
-          >
-            {labels.externalLinkLabel}
-          </a>
+            eyebrow={labels.externalLinkLabel}
+            title={formatDomain(project.externalUrl)}
+            ariaLabel={`${labels.externalLinkLabel} — ${formatDomain(project.externalUrl)}`}
+            className="w-full sm:w-auto sm:min-w-64"
+          />
         ) : (
           <PlaceholderMark hint={tPlaceholder("missingHint")} className="w-fit text-body-m font-medium">
             {labels.externalLinkLabel}
@@ -196,7 +197,7 @@ export function ProjectDetailContent({ project, labels, className }: ProjectDeta
             href={project.linkedinUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="link-underline w-fit text-body-m font-medium"
+            className="link-underline w-fit self-center text-body-m font-medium"
           >
             {tShared("linkedinLabel")}
           </a>

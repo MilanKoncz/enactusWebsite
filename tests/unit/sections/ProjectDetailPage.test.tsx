@@ -78,12 +78,11 @@ describe("ProjectDetailPage", () => {
     );
   });
 
-  it("links a project's own website when there is one", () => {
+  it("links a project's own website when there is one, showing its domain", () => {
     renderWithIntl(<ProjectDetailPage project={mealyo} />);
-    expect(screen.getByRole("link", { name: "Projektwebsite besuchen" })).toHaveAttribute(
-      "href",
-      "https://mealyo.de",
-    );
+    const link = screen.getByRole("link", { name: "Projektwebsite besuchen — mealyo.de" });
+    expect(link).toHaveAttribute("href", "https://mealyo.de");
+    expect(link).toHaveTextContent("mealyo.de");
   });
 
   it("has no accessibility violations", async () => {

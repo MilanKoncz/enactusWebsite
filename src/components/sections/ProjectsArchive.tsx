@@ -30,31 +30,35 @@ export function ProjectsArchive() {
     <Section>
       <Container className="flex flex-col gap-10">
         <SectionHeading as="h1" eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
-        <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        <ul className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
           {archivedProjects.map((project) => (
             <li key={project.slug}>
               <Link
                 href={`/projekte/${project.slug}`}
-                className="flex flex-col gap-3 rounded-md border border-ink/10 bg-paper p-4 transition-[border-color,transform] duration-[var(--duration-fast)] ease-signature hover:-translate-y-px hover:border-ink/20 focus-visible:-translate-y-px focus-visible:border-ink/20"
+                className="flex h-full flex-col gap-4 rounded-md border border-ink/10 bg-paper p-5 transition-[border-color,transform] duration-[var(--duration-fast)] ease-signature hover:-translate-y-px hover:border-ink/20 focus-visible:-translate-y-px focus-visible:border-ink/20"
               >
-                {project.logo ? (
-                  <span className="relative block w-full aspect-square">
-                    <Image src={project.logo} alt="" fill sizes="25vw" className="object-contain p-2" />
-                  </span>
-                ) : (
-                  <Placeholder kind="Logo" label={project.name} ratio="1 / 1" className="p-2" />
-                )}
-                <p className="text-body-m font-medium">{project.name}</p>
-                {project.year ? (
-                  <p className="font-mono text-mono-xs opacity-60">{project.year}</p>
-                ) : (
-                  <PlaceholderMark hint={t("yearMissingHint")} className="w-fit font-mono text-mono-xs opacity-60">
-                    {tPlaceholder("missingLabel")}
-                  </PlaceholderMark>
-                )}
-                <Badge status={project.status} className="w-fit">
-                  {tStatus(project.status)}
-                </Badge>
+                <div className="relative">
+                  {project.logo ? (
+                    <span className="relative block w-full aspect-square">
+                      <Image src={project.logo} alt="" fill sizes="25vw" className="object-contain p-2" />
+                    </span>
+                  ) : (
+                    <Placeholder kind="Logo" label={project.name} ratio="1 / 1" className="p-2" />
+                  )}
+                  <Badge status={project.status} className="absolute right-2 top-2">
+                    {tStatus(project.status)}
+                  </Badge>
+                </div>
+                <div className="flex flex-1 flex-col justify-end gap-1">
+                  <p className="text-body-l font-medium">{project.name}</p>
+                  {project.year ? (
+                    <p className="font-mono text-mono-xs uppercase opacity-60">{project.year}</p>
+                  ) : (
+                    <PlaceholderMark hint={t("yearMissingHint")} className="w-fit font-mono text-mono-xs uppercase opacity-60">
+                      {tPlaceholder("missingLabel")}
+                    </PlaceholderMark>
+                  )}
+                </div>
               </Link>
             </li>
           ))}
