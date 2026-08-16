@@ -3,28 +3,22 @@
 import * as Accordion from "@radix-ui/react-accordion";
 import { ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { faqEntries } from "@/content/faq";
 
 // entry.key is a validated string, not a literal union — same cast pattern
 // as ProjectDetailContent.tsx's ProjectCopyKey.
 type FaqCopyKey = Parameters<ReturnType<typeof useTranslations<"Faq">>>[0];
 
-// Canonical order the brief asked for: Allgemein, Bewerbung, Projekte —
+// Canonical order the board signed off on: Allgemein, Projekte, Bewerbung —
 // not whatever order content/faq.ts's entries happen to list in.
-const CATEGORY_ORDER = ["Allgemein", "Bewerbung", "Projekte"] as const;
+const CATEGORY_ORDER = ["Allgemein", "Projekte", "Bewerbung"] as const;
 type CategoryKey = (typeof CATEGORY_ORDER)[number];
 const CATEGORY_MESSAGE_KEY: Record<CategoryKey, "general" | "application" | "projects"> = {
   Allgemein: "general",
-  Bewerbung: "application",
   Projekte: "projects",
+  Bewerbung: "application",
 };
 
-// Every answer is a draft awaiting board sign-off (see content/faq.ts's file
-// comment and ASSETS-TODO.md) — PlaceholderMark's "unverified" variant marks
-// that quietly, the same treatment HomeKpis.tsx gives an unconfirmed figure,
-// rather than the loud dashed-box "missing" treatment: the text itself is
-// real, just not yet approved.
 export function Faq() {
   const t = useTranslations("Faq");
   const tPage = useTranslations("KontaktPage.faq");
@@ -53,9 +47,7 @@ export function Faq() {
                     </Accordion.Trigger>
                   </Accordion.Header>
                   <Accordion.Content className="pb-4 text-body-s opacity-80">
-                    <PlaceholderMark variant="unverified" hint={t("unverifiedHint")}>
-                      {t(`${entry.key}.answer` as FaqCopyKey)}
-                    </PlaceholderMark>
+                    {t(`${entry.key}.answer` as FaqCopyKey)}
                   </Accordion.Content>
                 </Accordion.Item>
               ))}

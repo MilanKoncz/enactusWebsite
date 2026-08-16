@@ -9,26 +9,30 @@ import { z } from "zod";
  * enum, not a free string, so that `t(\`${entry.key}.question\`)` in
  * components stays statically checked against messages/{locale}.json (the
  * same reasoning as content/stars.ts). `category` groups the three sections
- * the brief asked for (Allgemein/Bewerbung/Projekte) as a free string
- * rather than an enum, since a board handover could add a fourth.
+ * (Allgemein/Projekte/Bewerbung) as a free string rather than an enum,
+ * since a board handover could add a fourth.
  *
- * The eight questions and answers below are drafts, not confirmed copy —
- * written to set an honest expectation (real time, real responsibility)
- * without reading as an off-putting warning, but never asserting a specific
- * number (hours per week, deadlines) that hasn't actually been confirmed.
- * Every one of them renders through `PlaceholderMark variant="unverified"`
- * on /kontakt until the board signs off — see ASSETS-TODO.md.
+ * All fourteen questions and answers are the board's own wording, signed
+ * off 2026-08-16 — no draft marking, no PlaceholderMark. Keys are named
+ * after the question rather than numbered so that reordering the list, or
+ * dropping a question, doesn't silently reassign someone else's answer.
  */
 
 const faqKeySchema = z.enum([
-  "question-1",
-  "question-2",
-  "question-3",
-  "question-4",
-  "question-5",
-  "question-6",
-  "question-7",
-  "question-8",
+  "what-is-enactus",
+  "what-are-social-startups",
+  "what-work-looks-like",
+  "time-commitment",
+  "own-project",
+  "language",
+  "switch-project",
+  "spin-off",
+  "team-size",
+  "project-tasks",
+  "application-window",
+  "who-can-join",
+  "requirements",
+  "choose-position",
 ]);
 export type FaqKey = z.infer<typeof faqKeySchema>;
 
@@ -44,14 +48,20 @@ function faqEntry(key: FaqKey, order: number, category: string): FaqEntry {
 }
 
 export const faqEntries: FaqEntry[] = [
-  faqEntry("question-1", 1, "Allgemein"),
-  faqEntry("question-2", 2, "Allgemein"),
-  faqEntry("question-3", 3, "Allgemein"),
-  faqEntry("question-4", 4, "Bewerbung"),
-  faqEntry("question-5", 5, "Bewerbung"),
-  faqEntry("question-6", 6, "Bewerbung"),
-  faqEntry("question-7", 7, "Projekte"),
-  faqEntry("question-8", 8, "Projekte"),
+  faqEntry("what-is-enactus", 1, "Allgemein"),
+  faqEntry("what-are-social-startups", 2, "Allgemein"),
+  faqEntry("what-work-looks-like", 3, "Allgemein"),
+  faqEntry("time-commitment", 4, "Allgemein"),
+  faqEntry("own-project", 5, "Allgemein"),
+  faqEntry("language", 6, "Allgemein"),
+  faqEntry("switch-project", 7, "Projekte"),
+  faqEntry("spin-off", 8, "Projekte"),
+  faqEntry("team-size", 9, "Projekte"),
+  faqEntry("project-tasks", 10, "Projekte"),
+  faqEntry("application-window", 11, "Bewerbung"),
+  faqEntry("who-can-join", 12, "Bewerbung"),
+  faqEntry("requirements", 13, "Bewerbung"),
+  faqEntry("choose-position", 14, "Bewerbung"),
 ];
 
 export { faqEntrySchema, faqKeySchema };

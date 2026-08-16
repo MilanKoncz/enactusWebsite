@@ -4,9 +4,10 @@ import { z } from "zod";
  * The compact 3-station application-process timeline on /mitmachen —
  * distinct from process.ts's 8-station project stage-gate timeline (that one
  * describes what happens to a *project*; this one describes what happens to
- * a *candidate*). "application" and "interview" are confirmed by
- * messages/{locale}.json's Faq.question-5 answer ("Du bewirbst dich über das
- * Formular... Danach folgt in der Regel ein persönliches Gespräch");
+ * a *candidate*). "application" is confirmed by the board-approved
+ * Faq.application-window answer (a two-week window each semester, details on
+ * /mitmachen) and "interview" by Faq.choose-position ("laden wir dich zu
+ * einem persönlichen Gespräch ein");
  * "response" states the self-evident close of any application process
  * (you hear back) rather than an invented specific claim — no date or
  * duration is asserted anywhere in this file or its copy. Titles/short

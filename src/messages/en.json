@@ -503,38 +503,61 @@
     }
   },
   "Faq": {
-    "unverifiedHint": "This answer hasn't been signed off by the board yet.",
-    "question-1": {
-      "question": "What actually is Enactus Mannheim?",
-      "answer": "Enactus Mannheim is a student-run club that takes its own social ventures from idea to spin-off — responsibility for the project work and for running the club itself sits with the members."
+    "what-is-enactus": {
+      "question": "What is Enactus Mannheim e.V.?",
+      "answer": "Enactus Mannheim e.V. is a registered student association that tackles social and environmental problems with entrepreneurial approaches. Inside our projects, an idea is developed and scaled all the way into a working business."
     },
-    "question-2": {
-      "question": "How much time should I plan for each week?",
-      "answer": "It depends on your role and the project phase, but expect a real time commitment alongside your studies — noticeably more during intense phases than at a typical student club. If you're looking to drop by occasionally, this isn't the right fit."
+    "what-are-social-startups": {
+      "question": "What are social start-ups?",
+      "answer": "For a social start-up, the social impact of the business comes first. The goal is to solve an environmental or social problem and turn a profit while doing it."
     },
-    "question-3": {
-      "question": "Can I combine this with my studies, a part-time job, or other commitments?",
-      "answer": "Plenty of members make it work, but it takes real time management. Bring it up openly in the interview so you can figure out together whether it fits."
+    "what-work-looks-like": {
+      "question": "What would my work at Enactus look like?",
+      "answer": "If you join a project, your work depends heavily on that project. In the InnoLab you take part in the regular sessions and develop ideas as a team until you find the one you want to pursue. In a department, you take charge of one organisational area of running the association instead."
     },
-    "question-4": {
-      "question": "Who can apply to Enactus Mannheim?",
-      "answer": "Any student at the University of Mannheim, regardless of subject or semester. Genuine interest in responsibility and social-entrepreneurial work matters more than prior experience."
+    "time-commitment": {
+      "question": "How much time should I expect to put in?",
+      "answer": "Being part of Enactus isn't only work — it's shared memories and the friends you make along the way, so not every hour together is work. Expect roughly 8–10 hours a week across socials and your project, InnoLab or department. We ask for commitment, but we're understanding when something comes up. During exam season the workload is reduced as far as possible."
     },
-    "question-5": {
-      "question": "How does the application process work?",
-      "answer": "You apply through the form on /mitmachen while the application window is open. That's usually followed by a personal interview where we get to know each other."
+    "own-project": {
+      "question": "Can I pursue an idea of my own?",
+      "answer": "Absolutely. Every one of our projects starts with an idea to make the world better. Apply for the InnoLab and we'll help you work it out. Already well into business modelling? The route still runs through the InnoLab, where we support you at your own pace."
     },
-    "question-6": {
-      "question": "Do I already need business or social-entrepreneurship experience?",
-      "answer": "No. Most members learn the craft inside the club. What matters is your willingness to get up to speed and take on responsibility, not a polished résumé."
+    "language": {
+      "question": "Do I need to speak a particular language?",
+      "answer": "Association and project work happen in German — that is the working language of the club. Other languages are useful, but not required."
     },
-    "question-7": {
-      "question": "How is it decided which project I work on?",
-      "answer": "After joining, you get to know the running projects and match yourself to one based on interest and open capacity. The team works out the exact assignment together — it's not always your first choice."
+    "switch-project": {
+      "question": "Can I switch to a different project?",
+      "answer": "If things aren't working out, you can go to your project lead and the C&C board at any point and find a solution together — moving to another team, for instance."
     },
-    "question-8": {
-      "question": "What happens if a project fails?",
-      "answer": "That's built into how we work: every project passes through gates where we honestly decide whether it continues. A project being stopped isn't a personal failure, it's part of the process — more on /prozess."
+    "spin-off": {
+      "question": "Can I spin my project out of Enactus Mannheim?",
+      "answer": "Yes, gladly. Enactus offers you all the help and advice you need to spin your start-up out."
+    },
+    "team-size": {
+      "question": "How many people are in a project?",
+      "answer": "It depends heavily on what the project needs. Most projects start out in the ideation phase with 3–4 members and grow to 5–15 once they reach the project phase."
+    },
+    "project-tasks": {
+      "question": "What could I work on inside a project?",
+      "answer": "The tasks are varied and always depend on where the project currently stands — building prototypes, project trips, pitching, writing the business plan. We try to put your interests and strengths where you and the team get the most out of each other, without losing the fun of it."
+    },
+    "application-window": {
+      "question": "When can I apply?",
+      "answer": "There is an application window of roughly two weeks at the start of each semester. The “Mitmachen” page shows the next window and explains how the process works."
+    },
+    "who-can-join": {
+      "question": "Who can join the team?",
+      "answer": "You need to be enrolled at a university or university of applied sciences. Your subject doesn't matter — our projects live off teams that bring different disciplines and perspectives together."
+    },
+    "requirements": {
+      "question": "What do I need to bring?",
+      "answer": "What we expect from you is set out on the “Mitmachen” page."
+    },
+    "choose-position": {
+      "question": "Can I choose my own project or department?",
+      "answer": "You can apply with three ranked preferences for the work you'd like to do. We then offer you the highest-ranked position we can. If none of the three works out but you convinced us in person, we'll invite you in for a conversation."
     }
   },
   "PartnerStatements": {

@@ -503,38 +503,61 @@
     }
   },
   "Faq": {
-    "unverifiedHint": "Diese Antwort ist noch nicht vom Vorstand freigegeben.",
-    "question-1": {
-      "question": "Was ist Enactus Mannheim eigentlich?",
-      "answer": "Enactus Mannheim ist ein studentischer Verein, der eigene Sozialunternehmen von der Idee bis zur Ausgründung begleitet – von der Projektarbeit bis zur Vereinsführung liegt die Verantwortung bei den Mitgliedern selbst."
+    "what-is-enactus": {
+      "question": "Was ist Enactus Mannheim e.V.?",
+      "answer": "Enactus Mannheim e.V. ist ein eingetragener Verein von Student*innen, der versucht, soziale und ökologische Probleme durch unternehmerische Ansätze zu lösen. In Projekten wird eine Idee bis zum fertigen Business entwickelt und skaliert."
     },
-    "question-2": {
-      "question": "Wie viel Zeit sollte ich pro Woche einplanen?",
-      "answer": "Das hängt von deiner Rolle und der Projektphase ab, aber realistisch ist ein spürbarer Zeitaufwand neben dem Studium – in intensiven Phasen auch deutlich mehr als bei einem klassischen Hochschulverein. Wer nur gelegentlich vorbeischauen möchte, wird hier nicht glücklich."
+    "what-are-social-startups": {
+      "question": "Was sind Social Start-ups?",
+      "answer": "Für Social Start-ups ist die gesellschaftliche Wirkung ihrer unternehmerischen Tätigkeit am wichtigsten. Sie haben das Ziel, ökologische oder gesellschaftliche Probleme zu lösen und gleichzeitig Gewinne zu generieren."
     },
-    "question-3": {
-      "question": "Ist das mit Studium, Nebenjob oder anderem Engagement vereinbar?",
-      "answer": "Viele Mitglieder bekommen das hin, aber es braucht echtes Zeitmanagement. Sprich das offen im Bewerbungsgespräch an, damit ihr gemeinsam einschätzen könnt, ob es passt."
+    "what-work-looks-like": {
+      "question": "Wie sieht meine Arbeit bei Enactus aus?",
+      "answer": "Bist du Teil eines Projekts, ist deine Arbeit stark abhängig vom Projekt. Im InnoLab würdest du an den regelmäßigen Sessions teilnehmen und im Team Ideen ausarbeiten, bis ihr die passende gefunden habt, die ihr verfolgen wollt. In einem Ressort wärst du hingegen verantwortlich für einen organisatorischen Bereich der Vereinsarbeit."
     },
-    "question-4": {
-      "question": "Wer kann sich bei Enactus Mannheim bewerben?",
-      "answer": "Grundsätzlich alle Studierenden der Universität Mannheim, unabhängig von Fach oder Semester. Wichtiger als Vorerfahrung ist echtes Interesse an Verantwortung und sozialunternehmerischer Arbeit."
+    "time-commitment": {
+      "question": "Mit welchem Zeitaufwand sollte ich rechnen?",
+      "answer": "Teil von Enactus zu sein bedeutet nicht nur Arbeit, sondern auch gemeinsame Erinnerungen zu sammeln und Freunde zu finden. Demnach ist nicht jede Stunde gemeinsam Arbeit. Du kannst etwa 8–10 Stunden pro Woche für Socials und Projekt, Inno oder Ressort erwarten. Wir erwarten von dir Commitment, sind aber tolerant, falls etwas dazwischenkommt. Während der Klausurenphase wird der Zeitaufwand weitestgehend reduziert."
     },
-    "question-5": {
-      "question": "Wie läuft der Bewerbungsprozess ab?",
-      "answer": "Du bewirbst dich über das Formular auf /mitmachen, sobald das Bewerbungsfenster offen ist. Danach folgt in der Regel ein persönliches Gespräch, in dem wir uns gegenseitig kennenlernen."
+    "own-project": {
+      "question": "Kann ich ein eigenes Projekt umsetzen?",
+      "answer": "Sicher! Jedes Projekt von uns beginnt mit einer Idee, die Welt zu verbessern. Bewirb dich für das InnoLab und wir unterstützen dich bei der Ausarbeitung. Du bist schon fortgeschritten im Business Modelling? Auch hier geht der Weg durch das InnoLab, in dem wir dich in deiner Geschwindigkeit unterstützen."
     },
-    "question-6": {
-      "question": "Brauche ich schon Erfahrung in Business oder Social Entrepreneurship?",
-      "answer": "Nein. Die meisten Mitglieder lernen das Handwerk erst im Verein. Was zählt, ist die Bereitschaft, dich einzuarbeiten und Verantwortung zu übernehmen – nicht ein fertiger Lebenslauf."
+    "language": {
+      "question": "Muss ich eine bestimmte Sprache sprechen?",
+      "answer": "Im Verein und bei der Projektarbeit sprechen wir Deutsch. Andere Sprachkenntnisse sind hilfreich, aber kein Muss."
     },
-    "question-7": {
-      "question": "Wie wird entschieden, an welchem Projekt ich mitarbeite?",
-      "answer": "Nach der Aufnahme lernst du die laufenden Projekte kennen und ordnest dich nach Interesse und freien Kapazitäten zu. Die genaue Zuteilung besprecht ihr im Team – ein Wunschkonzert ist es nicht immer."
+    "switch-project": {
+      "question": "Ist es möglich, das Projekt zu wechseln?",
+      "answer": "Sollte es zu Unstimmigkeiten kommen, kannst du dich jederzeit an deine Projektleitung und den C&C-Vorstand wenden und gemeinsam eine Lösung finden, zum Beispiel einen Wechsel in ein anderes Team."
     },
-    "question-8": {
-      "question": "Was passiert, wenn ein Projekt scheitert?",
-      "answer": "Das gehört zum Prozess dazu: Jedes Projekt durchläuft Gates, an denen ehrlich entschieden wird, ob es weitergeht. Ein gestopptes Projekt ist kein persönliches Scheitern, sondern Teil davon, wie wir arbeiten – mehr dazu auf /prozess."
+    "spin-off": {
+      "question": "Kann ich mein Projekt bei Enactus Mannheim ausgründen?",
+      "answer": "Ja, sehr gerne. Enactus bietet dir alle Hilfe und Beratung, um dich bei der Ausgründung deines Start-ups zu unterstützen."
+    },
+    "team-size": {
+      "question": "Wie viele Mitglieder sind in einem Projekt?",
+      "answer": "Das hängt stark vom Bedarf des Projekts ab. Meist starten Projekte in der Ideation-Phase mit 3–4 Mitgliedern. In der Projektphase wachsen sie auf 5–15 Mitglieder an."
+    },
+    "project-tasks": {
+      "question": "Welche Aufgaben kann ich in einem Projekt übernehmen?",
+      "answer": "Die Aufgaben sind vielfältig und immer vom aktuellen Projektstand abhängig. Von Prototypen bauen über Projektreisen, Pitchen bis zum Businessplan ist alles dabei. Wir versuchen, deine Interessen und Begabungen so einzusetzen, dass du und das Projektteam am stärksten voneinander profitieren und der Spaß nicht verloren geht."
+    },
+    "application-window": {
+      "question": "In welchem Zeitraum kann ich mich bewerben?",
+      "answer": "Wir haben am Anfang jedes Semesters einen Bewerbungszeitraum von etwa zwei Wochen. Auf der Seite „Mitmachen“ siehst du den nächsten Bewerbungszeitraum und findest weitere Informationen zum genauen Ablauf."
+    },
+    "who-can-join": {
+      "question": "Wer kann Teil des Teams werden?",
+      "answer": "Du musst an einer Universität oder Hochschule eingeschrieben sein. Deine Fachrichtung ist dabei nicht wichtig. Unsere Projekte leben von Teams mit unterschiedlichen fachlichen Disziplinen und Perspektiven."
+    },
+    "requirements": {
+      "question": "Welche Voraussetzungen muss ich erfüllen?",
+      "answer": "Was wir von dir erwarten, findest du auf der Seite „Mitmachen“."
+    },
+    "choose-position": {
+      "question": "Kann ich mir mein Projekt oder Ressort selbst aussuchen?",
+      "answer": "Wir geben dir die Möglichkeit, dich auf drei Prioritäten zu bewerben, an denen du gerne mitarbeiten würdest. Die höchstmöglich priorisierte Position wirst du dann von uns angeboten bekommen. Falls keine der drei Optionen möglich sein sollte, du uns aber persönlich überzeugt hast, laden wir dich zu einem persönlichen Gespräch ein."
     }
   },
   "PartnerStatements": {
