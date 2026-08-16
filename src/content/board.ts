@@ -20,8 +20,8 @@ const boardMemberSchema = z.object({
 });
 export type BoardMember = z.infer<typeof boardMemberSchema>;
 
-function member(input: Omit<z.input<typeof boardMemberSchema>, "photo">): BoardMember {
-  return boardMemberSchema.parse({ ...input, photo: null });
+function member(input: z.input<typeof boardMemberSchema>): BoardMember {
+  return boardMemberSchema.parse({ ...input});
 }
 
 export const board: BoardMember[] = [
@@ -29,6 +29,7 @@ export const board: BoardMember[] = [
     slug: "thorben-ossig",
     name: "Thorben Ossig",
     role: "Team-Lead",
+    photo: "/image/board/Thorben.jpg",
     email: "thorben.ossig@unimannheim.enactus.team",
     linkedinUrl: "https://www.linkedin.com/in/thorben-o-06600a31a",
   }),
@@ -36,6 +37,7 @@ export const board: BoardMember[] = [
     slug: "anton-osuhovskiy",
     name: "Anton Osuhovskiy",
     role: "Finance-Lead",
+    photo: "/image/board/Anton.jpg",
     email: "anton.osuhovskiy@unimannheim.enactus.team",
     // No LinkedIn profile given — a confirmed absence, not a gap to chase.
     linkedinUrl: null,
@@ -44,22 +46,25 @@ export const board: BoardMember[] = [
     slug: "tom-iizuka",
     name: "Tom Iizuka",
     role: "Operations-Lead",
+    photo: "/image/board/Tom.jpg",
     email: "tom.iizuka@unimannheim.enactus.team",
     linkedinUrl: "https://www.linkedin.com/in/tom-iizuka-678770399",
-  }),
-  member({
-    slug: "philip-strobl",
-    name: "Philip Strobl",
-    role: "Inno-Lead",
-    email: "philip.strobl@unimannheim.enactus.team",
-    linkedinUrl: "https://www.linkedin.com/in/philip-strobl-5015a4356",
   }),
   member({
     slug: "risto-terhart",
     name: "Risto Terhart",
     role: "C&C Lead",
+    photo: "/image/board/Risto.jpg",
     email: "risto.terhart@unimannheim.enactus.team",
     linkedinUrl: "https://www.linkedin.com/in/risto-terhart-28ba56229",
+  }),
+    member({
+    slug: "philip-strobl",
+    name: "Philip Strobl",
+    role: "Inno-Lead",
+    photo: "/image/board/Philip.jpg",
+    email: "philip.strobl@unimannheim.enactus.team",
+    linkedinUrl: "https://www.linkedin.com/in/philip-strobl-5015a4356",
   }),
 ];
 
