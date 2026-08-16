@@ -2,8 +2,15 @@ version: 2
 updates:
   - package-ecosystem: "npm"
     directory: "/"
+    # Paused until after the 1 September 2026 launch: weekly PRs were
+    # generating red CI runs and mail noise during the final push.
+    # open-pull-requests-limit: 0 stops new PRs outright; schedule is turned
+    # down to monthly as a second layer for whenever the limit is raised
+    # again. Re-enable both (interval: "weekly", limit back to the default)
+    # once the post-launch dependency pass is scheduled — see ASSETS-TODO.md.
     schedule:
-      interval: "weekly"
+      interval: "monthly"
+    open-pull-requests-limit: 0
     groups:
       patch-and-minor:
         update-types:
