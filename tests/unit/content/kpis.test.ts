@@ -2,23 +2,23 @@ import { describe, expect, it } from "vitest";
 import { kpiSchema, kpis } from "@/content/kpis";
 
 describe("content/kpis", () => {
-  it("has the five headline figures", () => {
+  it("has the five headline figures in the board-requested order", () => {
     expect(kpis.map((k) => k.key)).toEqual([
-      "nationalChampionships",
-      "worldCupFinals",
-      "spinoffs",
-      "funding",
       "projectIterations",
+      "funding",
+      "nationalChampionships",
+      "worldRanking",
+      "spinoffs",
     ]);
   });
 
   it("matches the figures confirmed by the board", () => {
     const byKey = Object.fromEntries(kpis.map((k) => [k.key, k.value]));
-    expect(byKey.nationalChampionships).toBe(8);
-    expect(byKey.worldCupFinals).toBe(2);
-    expect(byKey.spinoffs).toBe(5);
-    expect(byKey.funding).toBe(150_000);
     expect(byKey.projectIterations).toBe(65);
+    expect(byKey.funding).toBe(150_000);
+    expect(byKey.nationalChampionships).toBe(8);
+    expect(byKey.worldRanking).toBe(16);
+    expect(byKey.spinoffs).toBe(5);
   });
 
   it("marks every KPI as board-confirmed", () => {
@@ -32,14 +32,12 @@ describe("content/kpis", () => {
   });
 
   it("rejects a KPI with an unknown key", () => {
-    expect(() =>
-      kpiSchema.parse({ key: "foundedYear", value: 2003, verified: true, asOf: "2026-08-15" }),
-    ).toThrow();
+    expect(() => kpiSchema.parse({ key: "worldCupFinals", value: 2, verified: true })).toThrow();
   });
 
-  it("rejects a KPI with a malformed asOf date", () => {
-    expect(() =>
-      kpiSchema.parse({ key: "spinoffs", value: 5, verified: false, asOf: "26-07-2026" }),
-    ).toThrow();
+  it("no longer carries a per-KPI asOf date — dropped from the schema along with the homepage's 'Stand' line", () => {
+    for (const k of kpis) {
+      expect(k).not.toHaveProperty("asOf");
+    }
   });
 });

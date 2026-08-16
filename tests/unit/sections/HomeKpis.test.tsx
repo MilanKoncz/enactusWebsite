@@ -5,25 +5,30 @@ import { renderWithIntl } from "../../fixtures/intl";
 import { HomeKpis } from "@/components/sections/HomeKpis";
 
 describe("HomeKpis", () => {
-  it("renders the section heading", () => {
+  it("renders a small eyebrow instead of a headline — board feedback dropped the big title", () => {
     renderWithIntl(<HomeKpis />);
-    expect(
-      screen.getByRole("heading", { level: 2, name: "Zahlen, die für sich sprechen" }),
-    ).toBeInTheDocument();
+    expect(screen.getByText("In Zahlen")).toBeInTheDocument();
+    expect(screen.queryByRole("heading")).not.toBeInTheDocument();
   });
 
-  it("renders all five KPI labels", () => {
+  it("renders all five KPI labels in the requested order", () => {
     renderWithIntl(<HomeKpis />);
-    expect(screen.getByText("Nationale Meistertitel")).toBeInTheDocument();
-    expect(screen.getByText("World-Cup-Finale")).toBeInTheDocument();
-    expect(screen.getByText("Gegründet & Übergeben")).toBeInTheDocument();
-    expect(screen.getByText("Eingeworbenes Funding")).toBeInTheDocument();
-    expect(screen.getByText("Projektiterationen")).toBeInTheDocument();
+    const labels = screen
+      .getAllByText(/Projektiterationen|Eingeworbenes Funding|Nationale Meistertitel|Weltweit|Gegründet & Übergeben/)
+      .map((el) => el.textContent);
+    expect(labels).toEqual([
+      "Projektiterationen",
+      "Eingeworbenes Funding",
+      "Nationale Meistertitel",
+      "Weltweit",
+      "Gegründet & Übergeben",
+    ]);
   });
 
-  it("renders the world-cup-finals figure with a multiplier suffix", () => {
+  it("renders the world-ranking figure with a 'Top' prefix and its field-size detail", () => {
     renderWithIntl(<HomeKpis />);
-    expect(screen.getByText("2×")).toBeInTheDocument();
+    expect(screen.getByText("Top 16")).toBeInTheDocument();
+    expect(screen.getByText("von über 1.000 Teams")).toBeInTheDocument();
   });
 
   it("renders funding and project iterations as lower bounds", () => {
@@ -38,9 +43,9 @@ describe("HomeKpis", () => {
     expect(container.querySelectorAll(".border-dotted")).toHaveLength(0);
   });
 
-  it("renders a single as-of line for the whole row, not one per figure", () => {
+  it("no longer renders an as-of line — board feedback removed it from the page", () => {
     renderWithIntl(<HomeKpis />);
-    expect(screen.getByText("Stand: August 2026")).toBeInTheDocument();
+    expect(screen.queryByText(/Stand:/)).not.toBeInTheDocument();
   });
 
   it("has no accessibility violations", async () => {

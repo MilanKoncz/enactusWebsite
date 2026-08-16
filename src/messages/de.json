@@ -81,15 +81,15 @@
   },
   "Kpis": {
     "eyebrow": "In Zahlen",
-    "title": "Zahlen, die für sich sprechen",
     "labels": {
-      "nationalChampionships": "Nationale Meistertitel",
-      "worldCupFinals": "World-Cup-Finale",
-      "spinoffs": "Gegründet & Übergeben",
+      "projectIterations": "Projektiterationen",
       "funding": "Eingeworbenes Funding",
-      "projectIterations": "Projektiterationen"
+      "nationalChampionships": "Nationale Meistertitel",
+      "worldRanking": "Weltweit",
+      "spinoffs": "Gegründet & Übergeben"
     },
-    "asOf": "Stand: {date}"
+    "topRankFormat": "Top {value}",
+    "worldRankingDetail": "von über 1.000 Teams"
   },
   "Pillars": {
     "eyebrow": "Warum Enactus",

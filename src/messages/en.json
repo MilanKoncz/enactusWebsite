@@ -81,15 +81,15 @@
   },
   "Kpis": {
     "eyebrow": "In numbers",
-    "title": "Numbers that speak for themselves",
     "labels": {
-      "nationalChampionships": "National championships",
-      "worldCupFinals": "World Cup finals",
-      "spinoffs": "Founded & handed over",
+      "projectIterations": "Project iterations",
       "funding": "Funding raised",
-      "projectIterations": "Project iterations"
+      "nationalChampionships": "National championships",
+      "worldRanking": "Worldwide",
+      "spinoffs": "Founded & handed over"
     },
-    "asOf": "As of {date}"
+    "topRankFormat": "Top {value}",
+    "worldRankingDetail": "out of 1,000+ teams"
   },
   "Pillars": {
     "eyebrow": "Why Enactus",
