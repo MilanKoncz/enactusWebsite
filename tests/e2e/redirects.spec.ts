@@ -48,11 +48,27 @@ test.describe("sitemap.xml and robots.txt", () => {
     expect(body).not.toContain("styleguide");
   });
 
-  test("robots.txt disallows /styleguide and points at the sitemap", async ({ request, baseURL }) => {
+  // The e2e server runs locally, never on the confirmed production host —
+  // lib/productionDeployment.ts is deliberately strict about that, so
+  // robots.txt here always takes the blanket-disallow branch rather than
+  // the granular one. That branch (only /api/, /styleguide disallowed) is
+  // covered instead by tests/unit/app/robots.test.ts, which mocks the host.
+  test("robots.txt disallows everything outside the confirmed production deployment, and points at the sitemap", async ({
+    request,
+    baseURL,
+  }) => {
     const response = await request.get(`${baseURL}/robots.txt`);
     expect(response.status()).toBe(200);
     const body = await response.text();
-    expect(body).toContain("Disallow: /styleguide");
+    expect(body).toContain("Disallow: /");
     expect(body).toContain("Sitemap:");
+  });
+
+  test("serves X-Robots-Tag: noindex outside the confirmed production deployment", async ({
+    request,
+    baseURL,
+  }) => {
+    const response = await request.get(`${baseURL}/`);
+    expect(response.headers()["x-robots-tag"]).toBe("noindex");
   });
 });

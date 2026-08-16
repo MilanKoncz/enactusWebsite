@@ -7,11 +7,18 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { org } from "@/content/org";
 import { privacyReviewStatus } from "@/content/privacy";
 
+// No blanket opacity on the body wrapper: legal text should stay at full
+// contrast, and — more importantly — CSS opacity compounds multiplicatively
+// with a nested child's own opacity. Fact's label below is already ink/60;
+// stacked inside a further opacity-90 wrapper it measured as an effective
+// ~54% (axe-core color-contrast in a real browser caught this at 3.96:1,
+// under the 4.5:1 minimum — jsdom-based unit a11y checks don't reliably
+// compute real color-contrast, so this only ever surfaced in Playwright).
 function LegalSection({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-3">
       <h2 className="text-heading-2 font-display">{title}</h2>
-      <div className="flex flex-col gap-3 text-body-m opacity-90">{children}</div>
+      <div className="flex flex-col gap-3 text-body-m">{children}</div>
     </section>
   );
 }
