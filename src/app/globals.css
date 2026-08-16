@@ -119,10 +119,12 @@
      "caret hidden" rather than "caret stuck visibly mid-blink". */
   --animate-caret-blink: caret-blink 1s steps(1) infinite;
 
-  /* Benefits' tool halfcircle (ToolOrbit) — a slow, small rigid sway, never
-     a full spin (docs/design-system.md motion rule 5: transform only). The
-     counter-sway keyframe is this one played with inverted values so each
-     logo cancels the stage's rotation and stays upright through the motion. */
+  /* Benefits' tool halfcircle (ToolOrbit) — a slow, small rigid sway of the
+     whole arc, never a full spin (docs/design-system.md motion rule 5:
+     transform only). The counter-sway keyframe is this one played with
+     inverted values, so each logo cancels the stage's rotation exactly and
+     stays upright through the motion. It cancels the sway and nothing else:
+     a logo's position on the arc is a translation, never a rotated arm. */
   --animate-orbit-sway: orbit-sway 6s ease-in-out infinite alternate;
   --animate-orbit-counter-sway: orbit-counter-sway 6s ease-in-out infinite alternate;
 
@@ -134,13 +136,12 @@
   --ease-signature: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* Gates the pillar/benefit detail text and the board LinkedIn marker's
-   hidden-by-default state: only a pointer-hover-capable device at md+ width
-   ever hides that content, so it stays visible unconditionally on touch and
-   on small screens — the two cases where a visitor could never trigger a
-   hover (docs/design-system.md: "hover enhances, hover never hides"). Content
-   is additionally always in the accessibility tree regardless of this CSS —
-   opacity, not display or aria-hidden, is what this variant ever touches. */
+/* "A pointer that can actually hover, at md+ width" — the only condition
+   under which a hover-only enhancement is allowed to exist at all. Nothing
+   keyed off it may hide content (docs/design-system.md: "hover enhances,
+   hover never hides"); it now gates the board portrait's zoom and the
+   process timeline's station panels, both of which are additions to
+   something already legible. */
 @custom-variant desktop-hover (@media (hover: hover) and (min-width: 768px));
 
 :root {

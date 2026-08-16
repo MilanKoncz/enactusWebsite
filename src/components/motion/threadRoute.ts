@@ -66,8 +66,13 @@ const ROUTES: Record<ThreadStop, Record<ThreadWidth, Waypoints>> = {
     wide: { from: 82, bow: 74, to: 86 },
     narrow: { from: 90, bow: 86, to: 93 },
   },
+  // The bow crosses back toward the centre earlier than the amplitude alone
+  // would suggest: at `lg` and up, the right-hand third of this section is
+  // the tool arc (ToolOrbit), which is also a 2px gold curve. Two of them
+  // overlapping read as one broken line rather than as two elements, so the
+  // thread clears the arc's band before the arc begins.
   benefits: {
-    wide: { from: 86, bow: 78, to: 50 },
+    wide: { from: 86, bow: 58, to: 50 },
     narrow: { from: 93, bow: 84, to: 50 },
   },
   "gate-alumni": {

@@ -26,10 +26,13 @@ export function Benefits() {
   return (
     <Section className="relative isolate">
       <ThreadSegment stop="benefits" />
-      <Container className="relative flex flex-col gap-12 lg:flex-row lg:items-center lg:gap-16">
-        <div className="flex flex-col gap-12 lg:flex-1">
-          <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      <Container className="relative flex flex-col gap-12">
+        <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
+        {/* The orbit is a sibling of the grid, not of the whole column: it
+            centres against the cards themselves, so it reads as belonging to
+            them instead of floating somewhere beside the section. */}
+        <div className="flex flex-col gap-12 lg:flex-row lg:items-center lg:gap-16">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:flex-1">
             {benefits.map((benefit) => (
               <Card key={benefit.key} interaction="grow" className="flex flex-col gap-3">
                 <h3 className="text-heading-3 font-sans">{t(`${benefit.key}.title`)}</h3>
@@ -38,9 +41,9 @@ export function Benefits() {
               </Card>
             ))}
           </div>
-        </div>
-        <div className="hidden shrink-0 lg:block">
-          <ToolOrbit />
+          <div className="hidden shrink-0 lg:block">
+            <ToolOrbit />
+          </div>
         </div>
       </Container>
     </Section>

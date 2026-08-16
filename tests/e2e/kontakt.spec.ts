@@ -47,11 +47,22 @@ test.describe("/kontakt", () => {
 
   test("opens an FAQ answer on tap or click", async ({ page }) => {
     await page.goto("/kontakt");
-    const button = page.getByRole("button", { name: /Was ist Enactus Mannheim eigentlich/ });
+    const button = page.getByRole("button", { name: /Was ist Enactus Mannheim e\.V\./ });
     await button.scrollIntoViewIfNeeded();
     await expect(button).toHaveAttribute("aria-expanded", "false");
     await button.click();
     await expect(button).toHaveAttribute("aria-expanded", "true");
+    await expect(page.getByText(/eingetragener Verein von Student\*innen/)).toBeVisible();
+  });
+
+  // Grouping and category order are asserted against the real content in
+  // tests/unit/sections/Faq.test.tsx; "Projekte" is also a nav link, so
+  // matching it by text on the whole page belongs in the unit test, not here.
+  test("lists every board-approved question", async ({ page }) => {
+    await page.goto("/kontakt");
+    await expect(page.getByRole("button", { name: /Muss ich eine bestimmte Sprache sprechen/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Kann ich mein Projekt bei Enactus Mannheim ausgründen/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: /In welchem Zeitraum kann ich mich bewerben/ })).toBeVisible();
   });
 
   test("submits the contact form and shows a real success notice", async ({ page }) => {
