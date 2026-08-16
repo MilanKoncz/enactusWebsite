@@ -1,9 +1,8 @@
 import { requireLocale } from "@/i18n/requireLocale";
 import { SkipLink } from "@/components/layout/SkipLink";
 import { Header } from "@/components/layout/Header";
-import { HeaderSurfaceProvider } from "@/components/layout/HeaderSurface";
 import { Footer } from "@/components/layout/Footer";
-
+import { HeaderSurfaceProviderClient } from "@/components/HeaderSurfaceProviderClient";
 // Route group (site) keeps this chrome away from [locale]/styleguide, which
 // needs its own single <main>.
 export default async function SiteLayout({
@@ -19,13 +18,13 @@ export default async function SiteLayout({
   await requireLocale(params);
 
   return (
-    <HeaderSurfaceProvider>
+    <HeaderSurfaceProviderClient>
       <SkipLink />
       <Header />
       <main id="inhalt" tabIndex={-1} className="flex-1">
         {children}
       </main>
       <Footer />
-    </HeaderSurfaceProvider>
+    </HeaderSurfaceProviderClient>
   );
 }

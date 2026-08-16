@@ -15,12 +15,11 @@ import { useHeaderSurface } from "@/components/layout/HeaderSurface";
 export function HeaderOverlay() {
   const { setOverlaid } = useHeaderSurface();
   const ref = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     const observer = new IntersectionObserver(([entry]) => setOverlaid(entry.isIntersecting), {
-      rootMargin: "-96px 0px 0px 0px",
+      rootMargin: "-50px 0px 0px 0px",
       threshold: 0,
     });
     observer.observe(el);
