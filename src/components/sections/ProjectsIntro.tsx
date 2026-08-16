@@ -2,7 +2,6 @@ import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { ThreadSegment } from "@/components/motion/ThreadSegment";
 
 // /projekte has no hero, so this SectionHeading carries the page's one h1 —
 // same reasoning as ProcessIntro.tsx. No `lead`: the brief gives one exact
@@ -13,7 +12,6 @@ export function ProjectsIntro() {
 
   return (
     <Section className="relative isolate">
-      <ThreadSegment stop="projects-intro" />
       <Container className="relative">
         <SectionHeading as="h1" eyebrow={t("eyebrow")} title={t("title")} />
       </Container>

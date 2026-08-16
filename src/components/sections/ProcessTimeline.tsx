@@ -18,7 +18,6 @@ import { Container } from "@/components/ui/Container";
 import { GateMarker } from "@/components/ui/GateMarker";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { Section } from "@/components/ui/Section";
-import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { CHECKLIST_LENGTH, steps, type IconKey, type Step } from "@/content/process";
 
 const ICONS: Record<IconKey, LucideIcon> = {
@@ -185,13 +184,9 @@ function Station({ step, index, openKey, onOpen, onClose }: StationProps) {
   );
 }
 
-// The gate marker becomes the timeline itself here: the golden thread
-// (ThreadSegment, threadRoute.ts) runs as the "process-timeline" stop, axis
-// "x" at md+ (a horizontal spine, one component reused rather than a second
-// line-drawing implementation) and axis "y" below md (a vertical rail down
-// the stacked list) — see threadRoute.ts's axisFor for why that switch needs
-// no logic here at all: it happens on the same md boundary the layout itself
-// already switches on. Desktop *reveals* a station on hover via pure CSS
+// The golden thread used to run through this timeline as its spine; it is
+// homepage-only since 2026-08-16 (see threadRoute.ts), so the stations carry
+// the band on their own. Desktop *reveals* a station on hover via pure CSS
 // (desktop-hover: variants, inert on touch, where hover: none) — but
 // `aria-expanded` has to describe the same thing sighted mouse users see, so
 // keyboard focus (which hover-capable and touch devices alike can reach)
@@ -218,24 +213,13 @@ export function ProcessTimeline() {
         <div
           role="group"
           aria-label={t("timeline.regionLabel")}
-          // The middle row is a fixed 4rem, not auto: it holds only the
-          // absolutely positioned thread (a grid item's own box never
-          // contributes to its track's auto-sizing), so an auto track here
-          // would collapse to zero height and flatten the band the thread is
-          // supposed to run through.
+          // The middle row stays a fixed 4rem after the thread's removal: it
+          // is the breathing space between the station icons above it and
+          // their labels below, and an auto track with nothing in it would
+          // collapse the band to zero.
           className="relative isolate flex flex-col gap-10 py-20 md:grid md:grid-rows-[auto_4rem_auto] md:gap-x-0 md:gap-y-8 md:py-24"
           style={{ gridTemplateColumns: `repeat(${TRACK_COLUMNS}, minmax(0, 1fr))` }}
         >
-          {/* Below md this is just another absolutely positioned, inset-0
-              child of the (relative) track wrapper, covering its full
-              stacked height — the same contract every other ThreadSegment
-              usage relies on. At md+, row-start-2 + col-span-full turns it
-              into a grid item with a *definite* grid area; per the CSS Grid
-              spec, an absolutely positioned item with a definite area
-              resolves inset-0/h-full/w-full against that area, not the whole
-              grid — so it shrinks to exactly the thread's own row without
-              any manual width/height override. */}
-          <ThreadSegment stop="process-timeline" className="md:row-start-2 md:col-span-full" />
           {steps.map((step, index) => (
             <Station key={step.key} step={step} index={index} openKey={openKey} onOpen={open} onClose={close} />
           ))}

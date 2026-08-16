@@ -3,7 +3,6 @@ import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { networkStats, teamLinks } from "@/content/network";
 
 // Both network figures are approximations by the source's own wording (see
@@ -17,7 +16,6 @@ export function EventsNetwork() {
 
   return (
     <Section className="relative isolate">
-      <ThreadSegment stop="events-network" />
       <Container className="relative flex flex-col gap-16">
         <div className="flex flex-col gap-10">
           <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />

@@ -3,7 +3,6 @@ import { Container } from "@/components/ui/Container";
 import { GateMarker } from "@/components/ui/GateMarker";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { ThreadSegment } from "@/components/motion/ThreadSegment";
 
 const BENEFIT_KEYS = ["recruiting", "image", "publicity", "philanthropy"] as const;
 
@@ -19,7 +18,6 @@ export function PartnerIntro() {
 
   return (
     <Section className="relative isolate">
-      <ThreadSegment stop="partner-intro" />
       <Container className="relative flex flex-col gap-16">
         <SectionHeading as="h1" eyebrow={t("eyebrow")} title={t("title")} lead={t("intro")} />
         <div className="flex flex-col gap-8">

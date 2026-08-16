@@ -4,7 +4,6 @@ import { Container } from "@/components/ui/Container";
 import { GateMarker } from "@/components/ui/GateMarker";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { mitmachenSteps, type MitmachenIconKey } from "@/content/mitmachenProcess";
 
 const ICONS: Record<MitmachenIconKey, LucideIcon> = {
@@ -16,17 +15,12 @@ const ICONS: Record<MitmachenIconKey, LucideIcon> = {
 // Three stations, not the old page's six — "much shorter" per the brief.
 // Static and non-interactive on purpose: ProcessTimeline's hover-expand
 // panels exist to hold gating criteria for an 8-station project lifecycle;
-// three short, always-visible steps don't need that machinery. The golden
-// thread still runs through as "mitmachen-timeline" (threadRoute.ts) even
-// though the layout itself doesn't change axis the way /prozess's timeline
-// does — that horizontal-spine trick is process-timeline's one named
-// exception, not a pattern every horizontal row repeats.
+// three short, always-visible steps don't need that machinery.
 export function MitmachenTimeline() {
   const t = useTranslations("MitmachenPage.timeline");
 
   return (
     <Section className="relative isolate">
-      <ThreadSegment stop="mitmachen-timeline" />
       <Container className="relative flex flex-col gap-12">
         <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
         <ol

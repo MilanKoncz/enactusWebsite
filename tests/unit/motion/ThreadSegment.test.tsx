@@ -17,12 +17,25 @@ describe("ThreadSegment", () => {
     expect(container.querySelector("svg")).toHaveClass("pointer-events-none");
   });
 
-  it("normalizes both the wide and narrow paths to the same length for the dash animation", () => {
+  it("renders a wide and a narrow path, each with a uniform 2px stroke", () => {
     const { container } = render(<ThreadSegment stop="kpis" />);
     const paths = container.querySelectorAll("path");
     expect(paths).toHaveLength(2);
     for (const path of paths) {
-      expect(path).toHaveAttribute("pathLength", "100");
+      expect(path).toHaveAttribute("vector-effect", "non-scaling-stroke");
+      expect(path).toHaveAttribute("stroke-width", "2");
+    }
+  });
+
+  // The reveal has to clip the svg box, not dash the path: non-scaling-stroke
+  // resolves stroke-dasharray in screen pixels, which broke every segment
+  // longer than the dash into fragments. See .thread-reveal in globals.css.
+  it("carries the scroll reveal on the svg box rather than on the paths", () => {
+    const { container } = render(<ThreadSegment stop="kpis" />);
+    expect(container.querySelector("svg")).toHaveClass("thread-reveal");
+    for (const path of container.querySelectorAll("path")) {
+      expect(path).not.toHaveAttribute("pathLength");
+      expect(path).not.toHaveClass("thread-reveal");
     }
   });
 

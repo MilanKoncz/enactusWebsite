@@ -2,7 +2,6 @@ import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { trips } from "@/content/journeys";
 
 // "FSS"/"HWS" are the University of Mannheim's own semester abbreviations
@@ -24,7 +23,6 @@ export function JourneysSection() {
 
   return (
     <Section className="relative isolate">
-      <ThreadSegment stop="events-journeys" />
       <Container className="relative flex flex-col gap-10">
         <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
         <ol className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">

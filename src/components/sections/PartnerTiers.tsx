@@ -4,7 +4,6 @@ import { Container } from "@/components/ui/Container";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { partners } from "@/content/partners";
 
 // Canonical order, not the order tiers happen to appear in content/partners.ts
@@ -34,7 +33,6 @@ export function PartnerTiers() {
 
   return (
     <Section className="relative isolate">
-      <ThreadSegment stop="partner-tiers" />
       <Container className="relative flex flex-col gap-16">
         <SectionHeading eyebrow={t("eyebrow")} title={tTiers("heading")} lead={tTiers("lead")} />
         {TIER_ORDER.map((tier) => {

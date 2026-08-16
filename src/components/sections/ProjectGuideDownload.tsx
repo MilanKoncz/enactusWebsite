@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { projectGuide } from "@/content/process";
 
 const HINT_ID = "project-guide-hint";
@@ -26,7 +25,6 @@ export function ProjectGuideDownload() {
 
   return (
     <Section className="relative isolate">
-      <ThreadSegment stop="process-guide" />
       <Container className="relative flex flex-col items-start gap-6">
         <SectionHeading eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
         {projectGuide.available && projectGuide.href ? (

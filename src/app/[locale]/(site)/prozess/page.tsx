@@ -26,13 +26,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 // (the compressed, expandable stage-gate sequence) is where the visual
 // weight actually goes instead.
 //
-// The golden thread runs through all four sections as the "process-*"
-// threadRoute.ts stops, picking up fresh at process-intro rather than
-// continuing from the homepage's own last stop — this page is reachable
-// directly, not only by scrolling on from "/". ProcessTimeline is the one
-// stop that changes axis: horizontal at md+, where the timeline itself is
-// laid out sideways, vertical below it, where the timeline stacks — see
-// threadRoute.ts's axisFor and ProcessTimeline.tsx's own comment.
+// No golden thread here: it is a homepage-only signature since 2026-08-16
+// (see threadRoute.ts) — carrying it down every page turned the one
+// memorable element into wallpaper.
 export default async function ProcessPage({ params }: PageProps) {
   await requireLocale(params);
 

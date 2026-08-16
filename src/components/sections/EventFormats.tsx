@@ -10,7 +10,6 @@ import { Placeholder } from "@/components/ui/Placeholder";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { eventFormats, type EventFormat, type EventFormatKey } from "@/content/eventFormats";
 import { cn } from "@/lib/cn";
 
@@ -48,7 +47,6 @@ export function EventFormats() {
 
   return (
     <Section className="relative isolate">
-      <ThreadSegment stop="events-formats" />
       <Container className="relative flex flex-col gap-10">
         <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
 

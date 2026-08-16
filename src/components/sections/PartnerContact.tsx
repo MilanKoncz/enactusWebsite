@@ -2,7 +2,6 @@ import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { ThreadSegment } from "@/components/motion/ThreadSegment";
 
 const CONTACT_EMAIL = "teamvorstand@unimannheim.enactus.team";
 
@@ -24,7 +23,6 @@ export function PartnerContact() {
 
   return (
     <Section surface="ink" className="relative isolate border-b border-paper/10 py-36">
-      <ThreadSegment stop="partner-contact" />
       <Container className="relative flex flex-col items-start gap-8">
         <SectionHeading eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
         <a href={`mailto:${CONTACT_EMAIL}`} className={MAILTO_BUTTON_CLASSES}>

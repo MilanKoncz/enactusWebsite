@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
 // The one dark (ink) section on this page, same "dark moment at the very
@@ -33,7 +32,6 @@ export function MitmachenCta() {
 
   return (
     <Section surface="ink" className="relative isolate border-b border-paper/10 py-36">
-      <ThreadSegment stop="mitmachen-cta" />
       <Container className="relative flex flex-col items-start gap-8">
         <SectionHeading eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
         <div className="flex flex-wrap items-center gap-6">

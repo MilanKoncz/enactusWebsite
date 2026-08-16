@@ -2,7 +2,6 @@ import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { partnerStatements } from "@/content/partnerStatements";
 
 // statement.slug is a validated string, not a literal union — same cast
@@ -20,7 +19,6 @@ export function PartnerStatementsSection() {
 
   return (
     <Section className="relative isolate">
-      <ThreadSegment stop="partner-statements" />
       <Container className="relative flex flex-col gap-12">
         <SectionHeading eyebrow={t("eyebrow")} title={t("heading")} />
         <div className="grid grid-cols-1 gap-12 md:grid-cols-2">

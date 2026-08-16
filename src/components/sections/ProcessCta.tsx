@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { ThreadSegment } from "@/components/motion/ThreadSegment";
 
 // Single-CTA sibling of ClosingCta.tsx, not a reuse of it: ClosingCta's own
 // secondary button links to /prozess, which would point right back at the
@@ -17,7 +16,6 @@ export function ProcessCta() {
 
   return (
     <Section surface="ink" className="relative isolate border-b border-paper/10 py-36">
-      <ThreadSegment stop="process-cta" />
       <Container className="relative flex flex-col items-start gap-8">
         <SectionHeading eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
         <Button href="/mitmachen" size="lg">

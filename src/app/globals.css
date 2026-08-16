@@ -65,6 +65,14 @@
   --text-body-s--letter-spacing: 0em;
   --text-body-s--font-weight: 400;
 
+  /* The gate marker's own label size (GateMarker.tsx). One step above
+     mono-s: the signature element's label was reading as fine print next to
+     the rule it belongs to. */
+  --text-mono-m: 0.9375rem;
+  --text-mono-m--line-height: 1.4;
+  --text-mono-m--letter-spacing: 0.06em;
+  --text-mono-m--font-weight: 500;
+
   --text-mono-s: 0.8125rem;
   --text-mono-s--line-height: 1.4;
   --text-mono-s--letter-spacing: 0.08em;
@@ -138,6 +146,11 @@
 :root {
   --focus-ring: var(--color-ink);
 
+  /* Whatever the enclosing Section paints behind its content. Only needed
+     where an element has to punch a hole in something drawn underneath it —
+     the gate marker's label interrupting the golden thread it sits on. */
+  --surface-bg: var(--color-paper);
+
   /* The golden thread (.thread-path, ThreadSegment.tsx) — plain gold on a
      paper surface. --container-inset mirrors Container.tsx's own padding
      steps (px-4 sm:px-6 lg:px-10), so a full-bleed element lined up against
@@ -176,6 +189,7 @@
    heller" means in practice. */
 [data-surface="ink"] {
   --focus-ring: var(--color-gold);
+  --surface-bg: var(--color-ink);
   --thread-stroke: color-mix(in srgb, var(--color-gold) 100%, white 25%);
 }
 
@@ -265,10 +279,10 @@ h6 {
 
 @keyframes thread-draw {
   from {
-    stroke-dashoffset: 100;
+    clip-path: inset(0 0 100% 0);
   }
   to {
-    stroke-dashoffset: 0;
+    clip-path: inset(0 0 0% 0);
   }
 }
 
@@ -298,21 +312,34 @@ h6 {
     }
   }
 
-  /* The golden thread's per-section stroke (ThreadSegment.tsx). pathLength=100
-     on the <path> normalizes its length to 100 user units regardless of the
-     section's actual pixel size, so stroke-dasharray/-offset never need a
-     measured length. Same structure as .reveal above: the base rule is fully
-     drawn (stroke-dashoffset: 0), and only a browser that both supports
-     animation-timeline: view() AND has no reduced-motion preference ever
-     hides it first to draw it in — never unsupported-or-reduced-motion. */
-  .thread-path {
-    stroke-dashoffset: 0;
+  /* The golden thread's per-section reveal (ThreadSegment.tsx). Clipped from
+     the bottom up, not drawn with stroke-dasharray: the path carries
+     vector-effect="non-scaling-stroke" so that a 2px stroke survives
+     preserveAspectRatio="none", and that same property makes dash lengths
+     resolve in screen pixels rather than in the path's own user units — a
+     pathLength=100 normalisation the dash array then ignores. The result was
+     a fixed 100px-on/100px-off pattern over paths measuring anywhere from
+     190px (a gate divider) to 1377px (the alumni section at 1280px wide), so
+     every longer segment rendered as a row of disconnected fragments. An
+     inset() clip needs no length at all and is exact at every width.
+
+     The clip sits on the <svg>, not on the <path>: CSS clip-path on an SVG
+     shape resolves percentages against its fill-box, which is zero-width for
+     the perfectly vertical gate-divider paths — a zero-width box would clip
+     the non-scaling 2px stroke away entirely. The svg's border-box is the
+     section box, which is what the reveal should track anyway.
+
+     Same structure as .reveal above: the base rule is fully visible, and
+     only a browser that both supports animation-timeline: view() AND has no
+     reduced-motion preference ever hides it first to reveal it — never
+     unsupported-or-reduced-motion. */
+  .thread-reveal {
+    clip-path: none;
   }
 
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
-      .thread-path {
-        stroke-dasharray: 100;
+      .thread-reveal {
         animation: thread-draw linear both;
         animation-timeline: view();
         /* Not the default (cover 0% cover 100%): that spans from before the

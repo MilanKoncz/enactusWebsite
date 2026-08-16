@@ -4,7 +4,6 @@ import { useLocale, useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { ApplicationForm } from "./ApplicationForm";
 import { ReminderSignupForm } from "./ReminderSignupForm";
 import { useNow } from "@/lib/useNow";
@@ -51,7 +50,6 @@ export function MitmachenApplication() {
 
   return (
     <Section id="bewerbung" className="relative isolate">
-      <ThreadSegment stop="mitmachen-application" />
       <Container className="relative flex flex-col gap-10">
         <SectionHeading eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
 

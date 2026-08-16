@@ -2,7 +2,6 @@ import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { ThreadSegment } from "@/components/motion/ThreadSegment";
 
 // /prozess has no hero, so this SectionHeading carries the page's one h1
 // directly (SectionHeading defaults to h2, built for pages where a hero
@@ -14,7 +13,6 @@ export function ProcessIntro() {
 
   return (
     <Section className="relative isolate">
-      <ThreadSegment stop="process-intro" />
       <Container className="relative">
         <SectionHeading as="h1" eyebrow={t("eyebrow")} title={t("title")} lead={t("intro")} />
       </Container>

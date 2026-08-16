@@ -118,10 +118,38 @@ test.describe("homepage under reduced motion", () => {
   // page.emulateMedia() as below, both work correctly. If a future
   // Playwright upgrade fixes the underlying issue, test.use() can replace
   // this again.
-  test("draws the golden thread fully instead of animating it in", async ({ page }) => {
+  test("shows the golden thread in full instead of revealing it on scroll", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
-    const path = page.locator(".thread-path").first();
-    await expect(path).toHaveCSS("stroke-dashoffset", "0px");
+    const svg = page.locator(".thread-reveal").first();
+    await expect(svg).toHaveCSS("clip-path", "none");
+  });
+});
+
+test.describe("the golden thread", () => {
+  // The reveal is a clip on the svg box; a dash on the path would resolve in
+  // screen pixels under non-scaling-stroke and break every long segment into
+  // fragments (see .thread-reveal in globals.css). Asserting the absence of
+  // the dash is what stops that regressing.
+  test("is one unbroken line, never a dashed one", async ({ page }) => {
+    await page.goto("/");
+    const paths = page.locator("svg[data-thread] path");
+    const count = await paths.count();
+    expect(count).toBeGreaterThan(0);
+    for (let i = 0; i < count; i++) {
+      await expect(paths.nth(i)).toHaveCSS("stroke-dasharray", "none");
+    }
+  });
+
+  test("appears on the homepage and on no other page", async ({ page }) => {
+    await page.goto("/");
+    expect(await page.locator("svg[data-thread]").count()).toBeGreaterThan(0);
+
+    for (const path of ["/projekte", "/events", "/partner", "/kontakt", "/prozess"]) {
+      await page.goto(path);
+      expect(await page.locator("svg[data-thread]").count(), `${path} still draws the thread`).toBe(
+        0,
+      );
+    }
   });
 });

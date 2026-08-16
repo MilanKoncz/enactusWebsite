@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 // right where it ends. Its stops (threadRoute.ts) are named for and ordered
 // exactly like the sections below; the three GateDivider stops keep the
 // thread vertical and centered, so it becomes each gate's rule for a moment
-// instead of running beside it.
+// instead of running beside it. This page is the only one that carries it.
 export default async function HomePage({ params }: PageProps) {
   const locale = await requireLocale(params);
   const t = await getTranslations({ locale, namespace: "Home" });
@@ -44,7 +44,10 @@ export default async function HomePage({ params }: PageProps) {
     <>
       <HomeHero />
       <PartnerMarquee />
-      <GateDivider label={t("dividers.kpis")} stop="gate-kpis" />
+      {/* No label here: the figures below name themselves, and a
+          "Kennzahlen" caption on the thread was doing nothing the section
+          didn't already say. The gate keeps its seam in the run. */}
+      <GateDivider stop="gate-kpis" />
       <HomeKpis />
       <Pillars />
       <Benefits />

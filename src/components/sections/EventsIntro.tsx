@@ -2,7 +2,6 @@ import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { ThreadSegment } from "@/components/motion/ThreadSegment";
 
 // /events has no hero, so this SectionHeading carries the page's one h1 —
 // same reasoning as ProcessIntro.tsx / ProjectsIntro.tsx. The brief asks for
@@ -13,7 +12,6 @@ export function EventsIntro() {
 
   return (
     <Section className="relative isolate">
-      <ThreadSegment stop="events-intro" />
       <Container className="relative">
         <SectionHeading as="h1" eyebrow={t("eyebrow")} title={t("title")} />
       </Container>

@@ -5,7 +5,6 @@ import { HoverDetail } from "@/components/ui/HoverDetail";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/motion/Reveal";
-import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { expectations, offers } from "@/content/mitmachenFit";
 
 // Same always-visible-title/hover-reveals-detail mechanic as Pillars.tsx and
@@ -25,7 +24,6 @@ export function MitmachenFit() {
 
   return (
     <Section className="relative isolate">
-      <ThreadSegment stop="mitmachen-fit" />
       <Container className="relative flex flex-col gap-16">
         <SectionHeading as="h1" eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
         <Reveal className="grid grid-cols-1 gap-12 lg:grid-cols-2">

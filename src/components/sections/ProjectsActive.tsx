@@ -11,7 +11,6 @@ import { Badge } from "@/components/ui/Badge";
 import { Container } from "@/components/ui/Container";
 import { Placeholder } from "@/components/ui/Placeholder";
 import { Section } from "@/components/ui/Section";
-import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { ProjectDetailContent } from "./ProjectDetailContent";
 import { projects, type Project } from "@/content/projects";
 
@@ -114,7 +113,6 @@ export function ProjectsActive() {
 
   return (
     <Section className="relative isolate">
-      <ThreadSegment stop="projects-active" />
       <Container className="relative flex flex-col gap-6">
         <p className="font-mono text-mono-xs uppercase opacity-60">{t("heading")}</p>
         <ul className="flex flex-col gap-4">

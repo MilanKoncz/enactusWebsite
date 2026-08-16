@@ -6,7 +6,6 @@ import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { YouTubeFacade } from "@/components/ui/YouTubeFacade";
 import { Link } from "@/lib/navigation";
-import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { stars } from "@/content/stars";
 
 // star.key is a validated string, not a literal union — same cast pattern as
@@ -21,7 +20,6 @@ export function ProjectsStars() {
 
   return (
     <Section className="relative isolate">
-      <ThreadSegment stop="projects-stars" />
       <Container className="relative flex flex-col gap-10">
         <SectionHeading eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
         <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">

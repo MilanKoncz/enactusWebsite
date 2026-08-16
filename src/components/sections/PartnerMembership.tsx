@@ -2,7 +2,6 @@ import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { ThreadSegment } from "@/components/motion/ThreadSegment";
 
 // No signup button here on purpose: the old site's "Fördermitglied werden"
 // CTA pointed at infrastructure this rebuild doesn't have yet, and inventing
@@ -14,7 +13,6 @@ export function PartnerMembership() {
 
   return (
     <Section className="relative isolate">
-      <ThreadSegment stop="partner-membership" />
       <Container className="relative flex flex-col gap-10">
         <SectionHeading eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2">

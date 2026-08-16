@@ -22,29 +22,6 @@ test.describe("/prozess", () => {
     }
   });
 
-  test("the timeline thread runs horizontally at desktop width and vertically on a narrow one", async ({
-    page,
-  }) => {
-    await page.goto("/prozess");
-    // ThreadSegment always renders both paths (hidden md:block, then
-    // md:hidden); boundingBox() returns null for the one CSS currently hides
-    // rather than a zero-size box, which is a more reliable signal here than
-    // a :visible locator on an SVG path.
-    const paths = page.locator('svg[data-thread="process-timeline"] path');
-
-    await page.setViewportSize({ width: 1280, height: 900 });
-    const wide = await paths.nth(0).boundingBox();
-    expect(await paths.nth(1).boundingBox()).toBeNull();
-    expect(wide).not.toBeNull();
-    expect(wide!.width).toBeGreaterThan(wide!.height);
-
-    await page.setViewportSize({ width: 360, height: 800 });
-    const narrow = await paths.nth(1).boundingBox();
-    expect(await paths.nth(0).boundingBox()).toBeNull();
-    expect(narrow).not.toBeNull();
-    expect(narrow!.height).toBeGreaterThan(narrow!.width);
-  });
-
   test("desktop: the first and last stations sit close enough together to be found without a long scroll", async ({
     page,
     isMobile,
@@ -97,17 +74,5 @@ test.describe("/prozess", () => {
 
     await button.tap();
     await expect(panel).toHaveCSS("opacity", "1");
-  });
-});
-
-test.describe("/prozess under reduced motion", () => {
-  // page.emulateMedia(), not test.use({ reducedMotion: "reduce" }) — see the
-  // matching note in home.spec.ts; the latter doesn't reach the fixture page
-  // in this project's Playwright install.
-  test("draws the timeline thread fully instead of animating it in", async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/prozess");
-    const path = page.locator('svg[data-thread="process-timeline"] path').first();
-    await expect(path).toHaveCSS("stroke-dashoffset", "0px");
   });
 });

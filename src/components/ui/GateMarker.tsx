@@ -27,8 +27,20 @@ export function GateMarker({ label, variant = "milestone", as = "div", className
         className={cn("w-[2px] bg-gold", isDivider ? "h-8" : "min-h-8 self-stretch")}
       />
       {/* currentColor, not a hardcoded ink, so this reads correctly on an
-          ink-surfaced (dark) section too — same pattern as Eyebrow. */}
-      <span className="whitespace-nowrap font-mono text-mono-s uppercase">{label}</span>
+          ink-surfaced (dark) section too — same pattern as Eyebrow. The
+          divider variant additionally paints its own surface behind the
+          label: on the homepage the golden thread runs vertically through
+          the exact centre of every gate stop, and without a backdrop it
+          would cross the words. --surface-bg follows the enclosing
+          Section's surface (globals.css), so this stays correct on ink. */}
+      <span
+        className={cn(
+          "whitespace-nowrap font-mono text-mono-m uppercase",
+          isDivider && "bg-[var(--surface-bg)] px-3",
+        )}
+      >
+        {label}
+      </span>
     </Wrapper>
   );
 }
