@@ -5,6 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { HeaderOverlay } from "@/components/layout/HeaderOverlay";
 import { Logo } from "@/components/layout/Logo";
+import { HeroVideo } from "@/components/motion/HeroVideo";
 import { RotatingText } from "@/components/motion/RotatingText";
 import { heroMedia } from "@/content/media";
 
@@ -24,18 +25,7 @@ export function HomeHero() {
       className="relative -mt-24 overflow-hidden pt-36 pb-24 md:pb-36"
     >
       <div aria-hidden="true" className="absolute inset-0">
-        <video
-          className="hidden h-full w-full object-cover md:block"
-          muted
-          playsInline
-          loop
-          preload="metadata"
-          poster={heroMedia.posterSrc ?? undefined}
-        >
-          {heroMedia.sources.map((source) => (
-            <source key={source.src} src={source.src} type={source.type} />
-          ))}
-        </video>
+        <HeroVideo />
         {heroMedia.mobileImageSrc && (
           <Image
             src={heroMedia.mobileImageSrc}

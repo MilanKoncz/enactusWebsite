@@ -94,6 +94,38 @@ test.describe("homepage", () => {
     expect(await neighbour.boundingBox()).toEqual(before);
   });
 
+  test("actually plays the hero video at desktop width", async ({ page, isMobile }) => {
+    test.skip(isMobile, "the video is display:none below md and deliberately never loads there");
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto("/");
+
+    const advanced = await page.evaluate(async () => {
+      const video = document.querySelector("video")!;
+      // Give play() a moment to be called and the file a moment to buffer.
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const first = video.currentTime;
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return { paused: video.paused, error: video.error?.code ?? null, first, second: video.currentTime };
+    });
+
+    expect(advanced.error).toBeNull();
+    expect(advanced.paused).toBe(false);
+    expect(advanced.second).toBeGreaterThan(advanced.first);
+  });
+
+  // 43 MB behind a display:none element is the single biggest thing a phone
+  // could waste here.
+  test("never downloads the hero video on a narrow viewport", async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+    const videoRequests: string[] = [];
+    page.on("request", (request) => {
+      if (request.url().includes("/video/hero-video")) videoRequests.push(request.url());
+    });
+    await page.goto("/");
+    await page.waitForTimeout(2000);
+    expect(videoRequests).toEqual([]);
+  });
+
   test("names every board member's LinkedIn link without needing a hover", async ({ page }) => {
     await page.goto("/");
     const link = page.getByRole("link", { name: /LinkedIn-Profil von Thorben Ossig/ });
@@ -144,6 +176,15 @@ test.describe("homepage under reduced motion", () => {
   // page.emulateMedia() as below, both work correctly. If a future
   // Playwright upgrade fixes the underlying issue, test.use() can replace
   // this again.
+  test("never starts the hero video", async ({ page, isMobile }) => {
+    test.skip(isMobile, "the video is display:none below md and never starts there anyway");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto("/");
+    await page.waitForTimeout(1500);
+    expect(await page.evaluate(() => document.querySelector("video")!.paused)).toBe(true);
+  });
+
   test("shows the golden thread in full instead of revealing it on scroll", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
