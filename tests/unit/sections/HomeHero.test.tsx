@@ -51,9 +51,20 @@ describe("HomeHero", () => {
     expect(logo!.compareDocumentPosition(heading)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 
-  it("renders the hero video with the real poster and source", () => {
+  // The video itself is HeroVideo's contract and is covered there, including
+  // that it renders nothing below md. What matters here is only that the
+  // hero mounts it — and that a narrow viewport gets no video markup at all,
+  // since a hidden <video> still downloads in WebKit.
+  it("mounts no video markup below the md breakpoint", () => {
     mockIntersectionObserver();
     mockMatchMedia(false);
+    const { container } = renderWithIntl(<HomeHero />);
+    expect(container.querySelector("video")).toBeNull();
+  });
+
+  it("renders the hero video with the real poster and source at desktop width", () => {
+    mockIntersectionObserver();
+    mockMatchMedia(true);
     const { container } = renderWithIntl(<HomeHero />);
     const video = container.querySelector("video");
     expect(video).toHaveAttribute("poster", "/video/hero-poster.png");

@@ -9,20 +9,22 @@ import { heroMedia } from "@/content/media";
 // and playback has to switch on the exact same boundary the visibility does.
 const DESKTOP_QUERY = "(min-width: 768px)";
 
-// The hero's background video. Playback is started from here rather than
-// with an `autoplay` attribute, for two reasons that the attribute cannot
-// express:
+// The hero's background video.
 //
-//   1. docs/design-system.md's motion rule 4 — a reduced-motion preference
-//      has to mean the video never starts, not that it starts and is paused
-//      a frame later.
-//   2. The element is `hidden` below `md`, and a hidden <video> still
-//      downloads and plays. With `preload="none"` and no autoplay attribute,
-//      a phone fetches the poster and nothing else — the file itself is
-//      43 MB.
+// Nothing is rendered at all below `md`. Hiding the element with CSS is not
+// enough: `display: none` does not stop a <video> from loading, and while
+// `preload="none"` holds in Chromium, WebKit ignores it and fetches the file
+// regardless — caught by the e2e check on a real WebKit, where a phone was
+// pulling the whole 43 MB video plus a 1.2 MB poster for an element it can
+// never see. Not rendering it is the only guarantee that holds in every
+// engine, and it drops the poster from the phone's payload too.
 //
-// If the browser refuses the play() call anyway, the poster simply stays,
-// which is the same thing every visitor below `md` already sees.
+// Playback is then started from here rather than with an `autoplay`
+// attribute, so that docs/design-system.md's motion rule 4 can hold: a
+// reduced-motion preference means the video never starts, not that it starts
+// and is paused a frame later. If the browser refuses the play() call
+// anyway, the poster stays — the same thing every visitor below `md`
+// already sees.
 export function HeroVideo() {
   const reducedMotion = usePrefersReducedMotion();
   const isDesktop = useMediaQuery(DESKTOP_QUERY);
@@ -32,7 +34,7 @@ export function HeroVideo() {
     const video = ref.current;
     if (!video) return;
 
-    if (reducedMotion || !isDesktop) {
+    if (reducedMotion) {
       video.pause();
       return;
     }
@@ -40,10 +42,14 @@ export function HeroVideo() {
     void video.play().catch(() => {});
   }, [reducedMotion, isDesktop]);
 
+  // After the hooks, never before them — an early return above would make
+  // the hook order conditional.
+  if (!isDesktop) return null;
+
   return (
     <video
       ref={ref}
-      className="hidden h-full w-full object-cover md:block"
+      className="h-full w-full object-cover"
       muted
       playsInline
       loop

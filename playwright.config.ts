@@ -13,7 +13,12 @@ export default defineConfig({
   // Left uncapped locally, where a developer's own machine and worker count
   // aren't the thing this is guarding.
   workers: process.env.CI ? 2 : undefined,
-  reporter: "html",
+  // On CI the "github" reporter annotates the failing line directly in the
+  // workflow log and on the diff — without it a red run only shows a test
+  // name, and the HTML report it writes is never opened by anyone. Keep the
+  // HTML report too: the workflow uploads it as an artifact on failure, and
+  // it is the only thing carrying the traces.
+  reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "html",
   use: {
     baseURL: "http://localhost:3000",
     trace: "on-first-retry",

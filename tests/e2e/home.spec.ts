@@ -95,9 +95,12 @@ test.describe("homepage", () => {
   });
 
   test("actually plays the hero video at desktop width", async ({ page, isMobile }) => {
-    test.skip(isMobile, "the video is display:none below md and deliberately never loads there");
+    test.skip(isMobile, "the video is not rendered at all below md — see the narrow-viewport test");
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto("/");
+    // The element is mounted client-side once the md query resolves, so it
+    // is not in the initial HTML — wait for it rather than assuming.
+    await page.locator("video").waitFor({ state: "attached" });
 
     const advanced = await page.evaluate(async () => {
       const video = document.querySelector("video")!;
@@ -113,17 +116,21 @@ test.describe("homepage", () => {
     expect(advanced.second).toBeGreaterThan(advanced.first);
   });
 
-  // 43 MB behind a display:none element is the single biggest thing a phone
-  // could waste here.
-  test("never downloads the hero video on a narrow viewport", async ({ page }) => {
+  // 43 MB of video plus a 1.2 MB poster, for an element a phone can never
+  // see, is the single biggest thing this page could waste. Hiding it with
+  // CSS is not enough — `display: none` does not stop a <video> loading, and
+  // WebKit ignores preload="none" — so nothing is rendered below md at all,
+  // and this asserts it against every engine in the matrix.
+  test("never downloads the hero video or its poster on a narrow viewport", async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
     const videoRequests: string[] = [];
     page.on("request", (request) => {
-      if (request.url().includes("/video/hero-video")) videoRequests.push(request.url());
+      if (request.url().includes("/video/")) videoRequests.push(new URL(request.url()).pathname);
     });
     await page.goto("/");
     await page.waitForTimeout(2000);
     expect(videoRequests).toEqual([]);
+    expect(await page.locator("video").count()).toBe(0);
   });
 
   // Read as raw HTML, never through a rendered page: the point is that the
@@ -204,10 +211,11 @@ test.describe("homepage under reduced motion", () => {
   // Playwright upgrade fixes the underlying issue, test.use() can replace
   // this again.
   test("never starts the hero video", async ({ page, isMobile }) => {
-    test.skip(isMobile, "the video is display:none below md and never starts there anyway");
+    test.skip(isMobile, "the video is not rendered at all below md, so there is nothing to start");
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto("/");
+    await page.locator("video").waitFor({ state: "attached" });
     await page.waitForTimeout(1500);
     expect(await page.evaluate(() => document.querySelector("video")!.paused)).toBe(true);
   });

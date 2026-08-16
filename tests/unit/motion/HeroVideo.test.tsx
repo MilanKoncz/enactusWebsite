@@ -39,9 +39,12 @@ function mockQueries(matches: Record<string, boolean>) {
   );
 }
 
+const DESKTOP = { "(min-width: 768px)": true, "(prefers-reduced-motion: reduce)": false };
+const PHONE = { "(min-width: 768px)": false, "(prefers-reduced-motion: reduce)": false };
+
 describe("HeroVideo", () => {
   it("carries the real poster and source, muted, looping and inline", () => {
-    mockMatchMedia(false);
+    mockQueries(DESKTOP);
     const { container } = render(<HeroVideo />);
     const video = container.querySelector("video")!;
     expect(video).toHaveAttribute("poster", "/video/hero-poster.png");
@@ -51,29 +54,46 @@ describe("HeroVideo", () => {
     expect(video).toHaveAttribute("playsinline");
   });
 
-  // Without this the browser fetches all 43 MB on a phone, where the element
-  // is display:none and can never be seen.
   it("never preloads the file itself", () => {
-    mockMatchMedia(false);
+    mockQueries(DESKTOP);
     const { container } = render(<HeroVideo />);
     expect(container.querySelector("video")).toHaveAttribute("preload", "none");
   });
 
+  // `display: none` does not stop a <video> loading, and WebKit ignores
+  // preload="none" outright — so below md the element must not exist at all,
+  // or a phone downloads 43 MB of video plus a 1.2 MB poster it can never
+  // see. This is the assertion that guards that.
+  it("renders nothing at all below the breakpoint that shows it", () => {
+    mockQueries(PHONE);
+    const { container } = render(<HeroVideo />);
+    expect(container.querySelector("video")).toBeNull();
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  // useMediaQuery reports false during SSR, so the server never emits the
+  // element either — the same guarantee, before hydration.
+  it("renders nothing when matchMedia cannot answer, as during SSR", () => {
+    mockMatchMedia(false);
+    const { container } = render(<HeroVideo />);
+    expect(container.querySelector("video")).toBeNull();
+  });
+
   it("plays at desktop width when motion is welcome", () => {
-    mockQueries({ "(min-width: 768px)": true, "(prefers-reduced-motion: reduce)": false });
+    mockQueries(DESKTOP);
     render(<HeroVideo />);
     expect(play).toHaveBeenCalled();
   });
 
   it("never starts under a reduced-motion preference", () => {
-    mockQueries({ "(min-width: 768px)": true, "(prefers-reduced-motion: reduce)": true });
+    mockQueries({ ...DESKTOP, "(prefers-reduced-motion: reduce)": true });
     render(<HeroVideo />);
     expect(play).not.toHaveBeenCalled();
     expect(pause).toHaveBeenCalled();
   });
 
   it("never starts below the breakpoint that shows it", () => {
-    mockQueries({ "(min-width: 768px)": false, "(prefers-reduced-motion: reduce)": false });
+    mockQueries(PHONE);
     render(<HeroVideo />);
     expect(play).not.toHaveBeenCalled();
   });
@@ -82,7 +102,7 @@ describe("HeroVideo", () => {
   // poster stays and nothing else may break.
   it("swallows a refused play() instead of throwing", async () => {
     play.mockImplementation(() => Promise.reject(new Error("NotAllowedError")));
-    mockQueries({ "(min-width: 768px)": true, "(prefers-reduced-motion: reduce)": false });
+    mockQueries(DESKTOP);
     expect(() => render(<HeroVideo />)).not.toThrow();
     await Promise.resolve();
   });
