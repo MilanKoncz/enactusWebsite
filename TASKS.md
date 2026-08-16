@@ -26,7 +26,7 @@ live entirely in `ASSETS-TODO.md`, not duplicated here.
 | 5 — Assets | Partial — hero video/poster and board photos landed 2026-08-16; rest open |
 | 6 — English | Open |
 | 7 — Launch | Open |
-| 8 — Documentation | Open |
+| 8 — Documentation | Done (`docs/architecture.md`, `docs/content-guide.md`) |
 
 Phase-by-phase detail for 0–4 (what was built, which commit, notable
 decisions) is in git history, not repeated here — see `git log`.
@@ -73,7 +73,7 @@ exists in both files.
 
 ## Phase 8 — Documentation
 
-`docs/architecture.md`, `docs/content-guide.md` — neither exists yet.
-
-Short and task-oriented. The reader is next year's Head of IT, who has never
-seen this codebase and needs to swap a board member's photo in ten minutes.
+Done, 2026-08-16: `docs/architecture.md` (stack, folder map, request flow)
+and `docs/content-guide.md` (task-oriented — swap a photo, add a project,
+update recruiting windows, translate a string), both linked from
+`CLAUDE.md`'s reference docs list.

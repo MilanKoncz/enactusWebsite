@@ -13,8 +13,11 @@ think "these people ship."
 
 Read the relevant file before working in that area. Do not guess.
 
+- `docs/architecture.md` — stack, folder map, request flow, where to look next
+- `docs/content-guide.md` — task-oriented: swap a photo, add a project, translate a string
 - `docs/design-system.md` — tokens, typography, motion, the signature element
 - `docs/engineering.md` — forms, database, privacy, SEO, testing detail
+- `docs/deployment.md` — environment variables, hosting, cron, mail
 - `ASSETS-TODO.md` — every missing asset and unverified fact
 
 ## Non-negotiables
