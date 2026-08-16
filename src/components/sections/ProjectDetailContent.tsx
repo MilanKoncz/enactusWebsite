@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
+import { ImageLightbox } from "@/components/ui/ImageLightbox";
 import { Placeholder } from "@/components/ui/Placeholder";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import type { Project, ProjectLead } from "@/content/projects";
@@ -39,7 +40,9 @@ function ProjectLeadCard({ lead }: { lead: ProjectLead }) {
     <div className="flex items-center gap-3">
       <div className="relative w-16 shrink-0 overflow-hidden rounded-md aspect-3/4">
         {lead.photo ? (
-          <Image src={lead.photo} alt={lead.name} fill sizes="64px" className="object-cover" />
+          <ImageLightbox src={lead.photo} alt={lead.name} triggerClassName="absolute inset-0">
+            <Image src={lead.photo} alt={lead.name} fill sizes="64px" className="object-cover" />
+          </ImageLightbox>
         ) : (
           <Placeholder kind="Foto" label={lead.name} ratio="3 / 4" className="size-full p-2" />
         )}
@@ -120,13 +123,15 @@ export function ProjectDetailContent({ project, labels, className }: ProjectDeta
             const image = project.images[index];
             return image ? (
               <div key={image} className="relative overflow-hidden rounded-md aspect-4/3">
-                <Image
-                  src={image}
-                  alt={project.name}
-                  fill
-                  sizes="(min-width: 640px) 33vw, 100vw"
-                  className="object-cover"
-                />
+                <ImageLightbox src={image} alt={project.name} triggerClassName="absolute inset-0">
+                  <Image
+                    src={image}
+                    alt={project.name}
+                    fill
+                    sizes="(min-width: 640px) 33vw, 100vw"
+                    className="object-cover"
+                  />
+                </ImageLightbox>
               </div>
             ) : (
               <Placeholder key={index} kind="Foto" label={project.name} ratio="4 / 3" />

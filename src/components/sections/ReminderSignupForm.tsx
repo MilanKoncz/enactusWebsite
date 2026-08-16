@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
+import { FormStatusMessage } from "@/components/ui/FormStatusMessage";
 import { Link } from "@/lib/navigation";
 import { reminderSignupSchema, type ReminderSignupValues } from "@/lib/reminderSignupSchema";
 import { postJson } from "@/lib/submitForm";
@@ -42,11 +43,7 @@ export function ReminderSignupForm() {
   }
 
   if (state === "success") {
-    return (
-      <div role="status" className="flex flex-col gap-2 rounded-md border-l-2 border-dashed border-gold py-1 pl-4">
-        <p className="text-body-m">{t("submitSuccess")}</p>
-      </div>
-    );
+    return <FormStatusMessage variant="success">{t("submitSuccess")}</FormStatusMessage>;
   }
 
   return (
@@ -83,11 +80,7 @@ export function ReminderSignupForm() {
           </p>
         )}
       </div>
-      {state === "error" && (
-        <p role="alert" className="text-body-s text-oxblood">
-          {t("submitError")}
-        </p>
-      )}
+      {state === "error" && <FormStatusMessage variant="error">{t("submitError")}</FormStatusMessage>}
       <Button type="submit" className="self-start" loading={state === "pending"}>
         {state === "pending" ? t("submitPending") : t("submitLabel")}
       </Button>

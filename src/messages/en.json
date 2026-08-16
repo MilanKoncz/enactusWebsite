@@ -1023,5 +1023,9 @@
       "error": "Wrong password.",
       "rateLimited": "Too many attempts. Please try again later."
     }
+  },
+  "ImageLightbox": {
+    "openLabel": "Enlarge {alt}",
+    "close": "Close"
   }
 }

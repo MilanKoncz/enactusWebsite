@@ -1023,5 +1023,9 @@
       "error": "Falsches Passwort.",
       "rateLimited": "Zu viele Versuche. Bitte später erneut versuchen."
     }
+  },
+  "ImageLightbox": {
+    "openLabel": "{alt} vergrößern",
+    "close": "Schließen"
   }
 }

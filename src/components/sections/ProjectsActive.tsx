@@ -43,7 +43,21 @@ function ProjectCard({ project, isOpen, onToggle }: ProjectCardProps) {
   const reducedMotion = usePrefersReducedMotion();
 
   return (
-    <motion.li layout={!reducedMotion} className="list-none rounded-md border border-ink/10 bg-paper">
+    // "position", not the default (full) layout mode: plain `layout` asks
+    // Framer to FLIP the li's own box between its old and new size, which
+    // means scaling it — and a scale transform on a box also visually
+    // scales its non-motion children (the button, the logo, the text),
+    // stretching them for the transition's duration. That's the
+    // Zwischengröße bug: the card briefly measures/renders an intermediate
+    // squashed size while the panel is mounting. "position" mode only
+    // interpolates the X/Y a sibling shifts by when this card grows or
+    // shrinks above it — exactly what "andere Karten rutschen sauber nach"
+    // needs — without ever trying to scale this card's own, undistorted
+    // content.
+    <motion.li
+      layout={reducedMotion ? false : "position"}
+      className="list-none rounded-md border border-ink/10 bg-paper"
+    >
       <button
         type="button"
         aria-expanded={isOpen}

@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
+import { FormStatusMessage } from "@/components/ui/FormStatusMessage";
 import { contactFormSchema, type ContactFormValues } from "@/lib/contactFormSchema";
 import { postJson } from "@/lib/submitForm";
 
@@ -43,14 +44,7 @@ export function ContactForm() {
   }
 
   if (state === "success") {
-    return (
-      <div
-        role="status"
-        className="flex flex-col gap-3 rounded-md border-l-2 border-dashed border-gold py-1 pl-4"
-      >
-        <p className="text-body-m">{t("submitSuccess")}</p>
-      </div>
-    );
+    return <FormStatusMessage variant="success">{t("submitSuccess")}</FormStatusMessage>;
   }
 
   return (
@@ -81,9 +75,7 @@ export function ContactForm() {
         {...register("message")}
       />
       {state === "error" && (
-        <p role="alert" className="text-body-s text-oxblood">
-          {t("submitError", { email: CONTACT_EMAIL })}
-        </p>
+        <FormStatusMessage variant="error">{t("submitError", { email: CONTACT_EMAIL })}</FormStatusMessage>
       )}
       <Button type="submit" className="self-start" loading={state === "pending"}>
         {state === "pending" ? t("submitPending") : t("submitLabel")}

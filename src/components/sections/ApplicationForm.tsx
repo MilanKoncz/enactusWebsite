@@ -8,6 +8,7 @@ import { AlertCircle } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
+import { FormStatusMessage } from "@/components/ui/FormStatusMessage";
 import { Link } from "@/lib/navigation";
 import {
   applicationFormSchema,
@@ -89,11 +90,7 @@ export function ApplicationForm() {
   }
 
   if (state === "success") {
-    return (
-      <div role="status" className="flex flex-col gap-3 rounded-md border-l-2 border-dashed border-gold py-1 pl-4">
-        <p className="text-body-m">{t("submitSuccess")}</p>
-      </div>
-    );
+    return <FormStatusMessage variant="success">{t("submitSuccess")}</FormStatusMessage>;
   }
 
   return (
@@ -214,9 +211,7 @@ export function ApplicationForm() {
       </div>
 
       {state === "error" && (
-        <p role="alert" className="text-body-s text-oxblood">
-          {t("submitError", { email: CONTACT_EMAIL })}
-        </p>
+        <FormStatusMessage variant="error">{t("submitError", { email: CONTACT_EMAIL })}</FormStatusMessage>
       )}
 
       <Button type="submit" className="self-start" loading={state === "pending"}>

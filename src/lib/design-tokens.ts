@@ -9,6 +9,8 @@ export const colorTokens = {
   paper: "#f3f5f9",
   sand: "#d2bd80",
   oxblood: "#300612",
+  moss: "#215c40",
+  amber: "#795c13",
 } as const;
 
 export type ColorTokenName = keyof typeof colorTokens;

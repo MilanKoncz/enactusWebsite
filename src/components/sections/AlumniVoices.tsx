@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
+import { ImageLightbox } from "@/components/ui/ImageLightbox";
 import { Placeholder } from "@/components/ui/Placeholder";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { Section } from "@/components/ui/Section";
@@ -123,7 +125,21 @@ export function AlumniVoices() {
                 </div>
               </div>
               <div className="md:col-span-5 md:col-start-8">
-                <Placeholder kind="Foto" label={alumnus.name} ratio="3 / 4" className="w-full" />
+                {alumnus.photo ? (
+                  <div className="relative aspect-3/4 w-full overflow-hidden">
+                    <ImageLightbox src={alumnus.photo} alt={alumnus.name} triggerClassName="absolute inset-0">
+                      <Image
+                        src={alumnus.photo}
+                        alt={alumnus.name}
+                        fill
+                        sizes="(min-width: 768px) 40vw, 100vw"
+                        className="object-cover"
+                      />
+                    </ImageLightbox>
+                  </div>
+                ) : (
+                  <Placeholder kind="Foto" label={alumnus.name} ratio="3 / 4" className="w-full" />
+                )}
               </div>
             </div>
           ))}

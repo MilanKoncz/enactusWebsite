@@ -8,13 +8,19 @@ export type BadgeProps = {
   children: ReactNode;
 } & Omit<ComponentPropsWithoutRef<"span">, "children">;
 
-// Fläche vs. outline keeps the four states distinguishable without relying on
-// color perception. Contrast for every pair is verified in
-// tests/unit/contrast.test.ts.
+// Intuitive per-status color (active green, spinoff gold, paused yellow,
+// cancelled a muted red), but color is never the only signal: active and
+// spinoff stay filled, paused and cancelled stay an outline, so the four
+// states are still distinguishable without color perception. Contrast for
+// every pair is verified in tests/unit/contrast.test.ts. Paused and
+// cancelled read as muted amber/oxblood rather than a bright yellow/red —
+// a saturated yellow or red text can't clear 4.5:1 against paper at all,
+// so "intuitive color" and "passes AA" both bend toward the muted end of
+// each hue, not the vivid one.
 const STATUS_CLASSES: Record<BadgeStatus, string> = {
-  active: "bg-ink text-paper",
+  active: "bg-moss text-paper",
   spinoff: "bg-gold text-ink",
-  paused: "border border-ink/40 bg-transparent text-ink/60",
+  paused: "border border-amber/50 bg-transparent text-amber",
   cancelled: "border border-oxblood/40 bg-transparent text-oxblood",
 };
 

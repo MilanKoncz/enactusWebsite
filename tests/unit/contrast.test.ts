@@ -26,7 +26,7 @@ describe("design tokens: color contrast", () => {
     expect(cssTokens).toEqual(colorTokens);
   });
 
-  const { ink, gold, paper, sand, oxblood } = cssTokens;
+  const { ink, gold, paper, sand, oxblood, moss, amber } = cssTokens;
 
   it("text on gold is ink and passes AA — the one rule with no exceptions", () => {
     const ratio = contrastRatio(ink, gold);
@@ -58,6 +58,18 @@ describe("design tokens: color contrast", () => {
 
   it("Badge cancelled — oxblood text on paper — passes AA", () => {
     expect(passesAA(contrastRatio(oxblood, paper))).toBe(true);
+  });
+
+  it("Badge active — paper text on a moss (green) fill — passes AA", () => {
+    expect(passesAA(contrastRatio(paper, moss))).toBe(true);
+  });
+
+  it("Badge paused — amber (yellow) text on paper — passes AA", () => {
+    expect(passesAA(contrastRatio(amber, paper))).toBe(true);
+  });
+
+  it("a saturated, un-muted yellow fails AA on paper — this is why paused uses amber, not a bright yellow", () => {
+    expect(passesAA(contrastRatio("#ffeb3b", paper))).toBe(false);
   });
 
   it("sand on paper fails AA — this combination must never ship", () => {

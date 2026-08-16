@@ -1,5 +1,7 @@
+import { FaLinkedin } from "react-icons/fa";
 import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
+import { ImageLightbox } from "@/components/ui/ImageLightbox";
 import { Placeholder } from "@/components/ui/Placeholder";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { Section } from "@/components/ui/Section";
@@ -8,21 +10,26 @@ import { ProximityGroup } from "@/components/motion/ProximityGroup";
 import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { board } from "@/content/board";
 import Image from "next/image";
-// No LinkedIn brand icon: neither @icons-pack/react-simple-icons (dropped
-// after a takedown, see Footer.tsx) nor lucide-react ship one, so this uses
-// the same text-only fallback Footer already established. Always visible, on
-// every device: it used to fade out at desktop widths and only return on
-// hover, which put a real link behind a gesture — the exact thing
-// docs/design-system.md's "hover enhances, hover never hides" rules out.
+// react-icons' bundled Font Awesome brand icon, not Simple Icons: Simple
+// Icons dropped LinkedIn's mark after a takedown request (see Footer.tsx's
+// identical use of FaLinkedin for the same reason).
+//
+// A deliberate, named exception to "hover enhances, hover never hides"
+// (docs/design-system.md), scoped to exactly this element: the mark flies
+// in on hover/focus for a pointer that can actually hover, but stays
+// permanently visible everywhere else — touch (no hover to enhance),
+// keyboard-only without a hovering pointer, and prefers-reduced-motion —
+// via the .linkedin-mark rule in globals.css, which only hides-then-reveals
+// inside `@media (hover: hover) and (min-width: 768px) and
+// (prefers-reduced-motion: no-preference)`. Name and role are never gated
+// by any of this, only the icon.
 //
 // The pointer-proximity lift/saturation (ProximityGroup, `proximity-item` +
 // `data-portrait` below) is a separate, purely decorative layer on top: it's
 // disabled outright on touch and under reduced motion (ProximityGroup never
-// attaches a listener there), and the LinkedIn link, name, and role stay
-// reachable and legible exactly as before regardless of pointer state — the
-// effect is never the only way to reach any of that.
+// attaches a listener there).
 const LINKEDIN_MARK_CLASSES =
-  "absolute left-2 top-2 rounded-sm bg-paper/90 px-2 py-0.5 text-mono-xs font-mono uppercase text-ink";
+  "linkedin-mark absolute left-2 top-2 flex items-center justify-center rounded-full bg-paper/90 p-2 text-ink";
 
 // Zoom lands on the crop itself (this Placeholder/photo), never on
 // data-portrait or the card around it — docs/design-system.md's Interaction
@@ -59,12 +66,14 @@ export function BoardGrid() {
               className="group proximity-item flex flex-col gap-3">
               <div data-portrait className="relative overflow-hidden rounded-md aspect-3/4 w-full">
                 {member.photo ? (
-                  <Image
-                    src={member.photo}
-                    alt={member.name}
-                    fill
-                    className={PORTRAIT_ZOOM_CLASSES}
-                  />
+                  <ImageLightbox src={member.photo} alt={member.name} triggerClassName="absolute inset-0">
+                    <Image
+                      src={member.photo}
+                      alt={member.name}
+                      fill
+                      className={PORTRAIT_ZOOM_CLASSES}
+                    />
+                  </ImageLightbox>
                 ) : (
                   <Placeholder
                     kind="Foto"
@@ -81,12 +90,15 @@ export function BoardGrid() {
                     rel="noopener noreferrer"
                     aria-label={t("linkedinLabel", { name: member.name })}
                     className={LINKEDIN_MARK_CLASSES}>
-                    {t("linkedin")}
+                    <FaLinkedin aria-hidden="true" className="size-4" />
                   </a>
                 ) : (
+                  // No animated reveal here — a missing-data marker stays
+                  // plainly visible like every other PlaceholderMark on the
+                  // site, not gated behind a hover gesture.
                   <PlaceholderMark
                     hint={tPlaceholder("missingHint")}
-                    className={LINKEDIN_MARK_CLASSES}>
+                    className="absolute left-2 top-2 rounded-sm bg-paper/90 px-2 py-0.5 text-mono-xs font-mono uppercase text-ink">
                     {t("linkedin")}
                   </PlaceholderMark>
                 )}

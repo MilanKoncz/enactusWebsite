@@ -14,6 +14,17 @@ describe("Badge", () => {
     expect(screen.getByText(label)).toBeInTheDocument();
   });
 
+  it.each([
+    ["active", true],
+    ["spinoff", true],
+    ["paused", false],
+    ["cancelled", false],
+  ] as const)("status %s is filled, not just colored, when filled=%s", (status, filled) => {
+    render(<Badge status={status}>Status</Badge>);
+    const badge = screen.getByText("Status");
+    expect(badge.className.includes("bg-transparent")).toBe(!filled);
+  });
+
   it("has no accessibility violations across all statuses", async () => {
     const { container } = render(
       <>

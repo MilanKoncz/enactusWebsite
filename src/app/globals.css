@@ -16,6 +16,8 @@
   --color-paper: #f3f5f9;
   --color-sand: #d2bd80;
   --color-oxblood: #300612;
+  --color-moss: #215c40;
+  --color-amber: #795c13;
 
   /* Type scale — display is Instrument Serif, everything else Geist/Geist Mono.
      Never write an arbitrary text-[Npx] value in a component; add a step here
@@ -337,6 +339,36 @@ h6 {
     }
   }
 
+  /* Board portraits' LinkedIn mark (BoardGrid.tsx). Visible and in place by
+     default — the safe fallback for touch (no hover to enhance), keyboard
+     use without a hovering pointer, and reduced motion. Only inside
+     `(hover: hover) and (min-width: 768px) and (prefers-reduced-motion:
+     no-preference)` does it start flown-out and transparent, flying back in
+     on :hover/:focus-within of the portrait's `group` wrapper — same
+     three-part guard as .hover-grow above, just inverted resting/active
+     values, and a deliberate, scoped exception to "hover enhances, hover
+     never hides" rather than a pattern to reuse elsewhere. */
+  .linkedin-mark {
+    opacity: 1;
+    transform: translateX(0);
+    transition:
+      opacity var(--duration-fast) var(--ease-signature),
+      transform var(--duration-fast) var(--ease-signature);
+  }
+
+  @media (hover: hover) and (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+    .linkedin-mark {
+      opacity: 0;
+      transform: translateX(-0.5rem);
+    }
+
+    .group:hover .linkedin-mark,
+    .group:focus-within .linkedin-mark {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
   /* The golden thread's per-section reveal (ThreadSegment.tsx). Clipped from
      the bottom up, not drawn with stroke-dasharray: the path carries
      vector-effect="non-scaling-stroke" so that a 2px stroke survives
@@ -417,7 +449,12 @@ h6 {
     bottom: -0.15em;
     width: 100%;
     height: 1px;
-    background: currentColor;
+    /* The signature gold accent, not currentColor: a growing underline is a
+       decorative accent line, not running text, so the "gold is never a
+       text color on paper" rule (docs/design-system.md) doesn't apply to
+       it — it was black before only because it inherited the surrounding
+       prose color by default. */
+    background: var(--color-gold);
     transform: scaleX(0);
     transform-origin: left;
     transition: transform var(--duration-fast) var(--ease-signature);

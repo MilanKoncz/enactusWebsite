@@ -61,12 +61,13 @@ describe("BoardGrid", () => {
     expect(screen.getByText("Finanzen")).toBeInTheDocument();
   });
 
-  it("renders a real LinkedIn link once a URL is confirmed", () => {
+  it("renders a real LinkedIn link (as an icon, labelled for screen readers) once a URL is confirmed", () => {
     renderWithIntl(<BoardGrid />);
     const link = screen.getByRole("link", { name: "LinkedIn-Profil von Jane Doe öffnen" });
     expect(link).toHaveAttribute("href", "https://www.linkedin.com/in/jane-doe");
     expect(link).toHaveAttribute("target", "_blank");
     expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
+    expect(link.querySelector("svg")).toBeInTheDocument();
   });
 
   it("renders the LinkedIn marker as a placeholder, not a dead link, while unconfirmed", () => {
@@ -74,14 +75,22 @@ describe("BoardGrid", () => {
     expect(
       screen.queryByRole("link", { name: /John Doe/ }),
     ).not.toBeInTheDocument();
-    expect(screen.getAllByText("LinkedIn")).toHaveLength(2);
+    expect(screen.getAllByText("LinkedIn")).toHaveLength(1);
+  });
+
+  it("makes the real LinkedIn link keyboard-focusable directly, not only via the portrait column", () => {
+    renderWithIntl(<BoardGrid />);
+    const link = screen.getByRole("link", { name: "LinkedIn-Profil von Jane Doe öffnen" });
+    link.focus();
+    expect(link).toHaveFocus();
   });
 
   it("makes each portrait column keyboard-focusable, so the LinkedIn marker is reachable without a mouse", () => {
     renderWithIntl(<BoardGrid />);
-    for (const mark of screen.getAllByText("LinkedIn")) {
-      expect(mark.closest('[tabindex="0"]')).toBeInTheDocument();
-    }
+    const placeholderMark = screen.getByText("LinkedIn");
+    expect(placeholderMark.closest('[tabindex="0"]')).toBeInTheDocument();
+    const link = screen.getByRole("link", { name: "LinkedIn-Profil von Jane Doe öffnen" });
+    expect(link.closest('[tabindex="0"]')).toBeInTheDocument();
   });
 
   it("has no accessibility violations", async () => {

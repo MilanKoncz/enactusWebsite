@@ -22,8 +22,23 @@ decoration.
   --color-paper:   #f3f5f9; /* Page background.                       */
   --color-sand:    #d2bd80; /* Warm nuance, dark backgrounds only.    */
   --color-oxblood: #300612; /* Rare. Deep emphasis on dark.           */
+  --color-moss:    #215c40; /* Project status: active (filled).       */
+  --color-amber:   #795c13; /* Project status: paused (outline).      */
 }
 ```
+
+`moss` and `amber` exist for two purposes: `Badge`'s project-status colors
+(`ui/Badge.tsx`) — active (moss, filled), spinoff (gold, filled), paused
+(amber, outline), cancelled (oxblood, outline) — and `moss` doubles as the
+site's one success color (`ui/FormStatusMessage.tsx`, every form's
+confirmation), the same "green = active/good" reading in both places.
+`amber` stays scoped to `Badge`'s paused state; error messages reuse
+oxblood, already the site's one error/emphasis color, rather than adding a
+third red. All are muted rather than a vivid green/yellow on purpose: a
+saturated yellow or green can't clear 4.5:1 as text against `--color-paper`,
+so "reads as its intuitive color" and "passes AA" both push toward the muted
+end of the hue. Don't introduce a third color for a fifth state — reuse one
+of these four before adding a new token.
 
 Enactus Gold in the global brand kit is `#FFC222`; the local kit uses `#FFC321`.
 We use the local value until the board decides otherwise.
