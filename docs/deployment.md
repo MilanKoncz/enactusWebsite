@@ -83,6 +83,49 @@ first. Run `db:verify` after every schema change and before trusting a
 deploy: it's a real write against the real database, not a mock, and it's
 what confirms the driver and the schema actually agree with each other.
 
+## Mail
+
+Every send goes through `lib/mail.ts` and Resend. Nothing in the send path
+is read at module scope, so a missing variable is a **runtime** failure, not
+a build failure: `next build` stays green with the whole Resend
+configuration unset, and the first sign of trouble is mail silently not
+arriving.
+
+Silently is not quite right, though — it is recorded. `/api/kontakt` and
+`/api/bewerbung` both write to Postgres *before* attempting a send, and a
+failed send is stored on the row rather than surfaced to the sender, who is
+told their message went through, because it did:
+
+```sql
+select mail_status, mail_error, created_at from contact_messages
+order by created_at desc limit 20;
+```
+
+`mail_status` is `pending`, `sent`, or `failed`; `mail_error` holds the
+provider's or the code's own message. That column is the first place to look
+when someone reports that a contact message never arrived — it distinguishes
+"never reached the mail layer" from "Resend rejected it" without guessing.
+
+To test the delivery path itself:
+
+```
+npm run mail:test                    # to RESEND_REPLY_TO_EMAIL
+npm run mail:test someone@example.com
+```
+
+It sends one real mail with the same `from`, `replyTo`, and account the
+contact form uses, then reads the message back from Resend and prints its
+`last_event`, so an accepted-but-bounced send is visible too. It checks every
+required variable first and stops with a readable list if any is missing,
+and it warns if `RESEND_FROM_EMAIL` is not on `enactus-mannheim.com` — the
+only domain verified with Resend, so a sender on any other domain is
+rejected by the API.
+
+Setting the variables in `.env.local` only fixes local runs. Preview and
+Production read Vercel's project environment variables, and each Vercel
+environment is configured separately — a key present in Development does
+nothing for the deployed site.
+
 ## Scheduled cleanup
 
 `content/retention.ts` states how long each table keeps a row; nothing
