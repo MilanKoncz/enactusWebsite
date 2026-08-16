@@ -9,11 +9,19 @@
  * that header. Kept as one pure, host-only check (no request object, no
  * Next.js server APIs) so both call sites — and this file's own tests — can
  * use it without needing a real request context.
+ *
+ * Reads the server-side `VERCEL_ENV`, not `NEXT_PUBLIC_VERCEL_ENV`: both call
+ * sites (robots.ts, proxy.ts) run exclusively server-side, where `VERCEL_ENV`
+ * is always populated by Vercel with no extra configuration. The `NEXT_PUBLIC_`
+ * variant only exists in the client bundle, and getting it there requires
+ * turning on the Vercel project setting "Automatically expose System
+ * Environment Variables" — a setting this project deliberately doesn't rely
+ * on, since nothing here needs the variable in client code.
  */
 const PRODUCTION_HOSTS = new Set(["enactus-mannheim.com", "www.enactus-mannheim.com"]);
 
 export function isProductionDeployment(host: string | null): boolean {
-  return process.env.NEXT_PUBLIC_VERCEL_ENV === "production" && host !== null && PRODUCTION_HOSTS.has(host);
+  return process.env.VERCEL_ENV === "production" && host !== null && PRODUCTION_HOSTS.has(host);
 }
 
 export { PRODUCTION_HOSTS };

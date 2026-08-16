@@ -16,46 +16,46 @@ vi.mock("next/headers", () => ({
 }));
 
 afterEach(() => {
-  delete process.env.NEXT_PUBLIC_VERCEL_ENV;
+  delete process.env.VERCEL_ENV;
   mockHost = "enactus-mannheim.com";
 });
 
 describe("robots", () => {
-  it("allows crawling on the confirmed production host with NEXT_PUBLIC_VERCEL_ENV=production", async () => {
-    process.env.NEXT_PUBLIC_VERCEL_ENV = "production";
+  it("allows crawling on the confirmed production host with VERCEL_ENV=production", async () => {
+    process.env.VERCEL_ENV = "production";
     mockHost = "enactus-mannheim.com";
     const result = await robots();
     expect(result.rules).toMatchObject({ userAgent: "*", allow: "/" });
   });
 
   it("disallows /api/ and /styleguide in both locales when crawling is allowed", async () => {
-    process.env.NEXT_PUBLIC_VERCEL_ENV = "production";
+    process.env.VERCEL_ENV = "production";
     mockHost = "enactus-mannheim.com";
     const result = await robots();
     const rules = result.rules as { disallow: string[] };
     expect(rules.disallow).toEqual(expect.arrayContaining(["/api/", "/styleguide", "/en/styleguide"]));
   });
 
-  it("disallows everything when NEXT_PUBLIC_VERCEL_ENV isn't production", async () => {
-    process.env.NEXT_PUBLIC_VERCEL_ENV = "preview";
+  it("disallows everything when VERCEL_ENV isn't production", async () => {
+    process.env.VERCEL_ENV = "preview";
     mockHost = "enactus-mannheim.com";
     const result = await robots();
     expect(result.rules).toEqual({ userAgent: "*", disallow: "/" });
   });
 
   it("disallows everything when the host isn't the confirmed production domain", async () => {
-    process.env.NEXT_PUBLIC_VERCEL_ENV = "production";
+    process.env.VERCEL_ENV = "production";
     mockHost = "enactus-mannheim-website.vercel.app";
     const result = await robots();
     expect(result.rules).toEqual({ userAgent: "*", disallow: "/" });
   });
 
   it("points at the generated sitemap whether crawling is allowed or not", async () => {
-    process.env.NEXT_PUBLIC_VERCEL_ENV = "production";
+    process.env.VERCEL_ENV = "production";
     mockHost = "enactus-mannheim.com";
     expect((await robots()).sitemap).toMatch(/\/sitemap\.xml$/);
 
-    process.env.NEXT_PUBLIC_VERCEL_ENV = "preview";
+    process.env.VERCEL_ENV = "preview";
     expect((await robots()).sitemap).toMatch(/\/sitemap\.xml$/);
   });
 });

@@ -25,16 +25,15 @@ the full list and current values.
 - `DATABASE_URL`, `RESEND_API_KEY`, `APPLICATION_RECIPIENT_EMAIL` — unset
   until Phase 2's backend provisioning (Neon `eu-central-1`, Resend EU
   region). Do not build against mocks in the meantime.
-- `NEXT_PUBLIC_VERCEL_ENV` — **not** in `.env.example`: this is a Vercel
-  System Environment Variable, only ever set by Vercel itself, never by
-  hand. It gates indexing (`docs/engineering.md`'s SEO section,
+- `VERCEL_ENV` — **not** in `.env.example`: this is a Vercel System
+  Environment Variable, only ever set by Vercel itself, never by hand. It
+  gates indexing (`docs/engineering.md`'s SEO section,
   `lib/productionDeployment.ts`) — the real site is only crawlable when this
   is `production` *and* the request host is the confirmed production
-  domain. It requires the Vercel project setting "Automatically expose
-  System Environment Variables" to be turned on; without it, this variable
-  is always empty and the live site stays disallowed/noindexed forever.
-  Check this setting before wondering why a fresh production deploy isn't
-  showing up in search results.
+  domain. Both `robots.ts` and `proxy.ts` read it server-side, where Vercel
+  always populates it with no project configuration required — unlike its
+  `NEXT_PUBLIC_` counterpart, it needs no "Automatically expose System
+  Environment Variables" setting turned on.
 
 ## Domain
 

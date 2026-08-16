@@ -62,7 +62,7 @@ protection checklist.
   these throws away years of ranking.
 - `sitemap.ts` and `robots.ts` generated from the route tree.
 - **Only the confirmed production domain gets indexed.** `robots.ts` checks
-  the request's Host header and `NEXT_PUBLIC_VERCEL_ENV` (via
+  the request's Host header and `VERCEL_ENV` (via
   `lib/productionDeployment.ts`) and disallows everything unless both the
   environment is `production` *and* the host is `enactus-mannheim.com` or
   `www.enactus-mannheim.com` — this catches Vercel preview builds, the
@@ -70,10 +70,9 @@ protection checklist.
   `proxy.ts` backs this up with an `X-Robots-Tag: noindex` response header
   in the same non-production cases, since a URL that's `disallow`ed in
   `robots.txt` can still appear in search results (without a snippet) if
-  something else links to it. Requires Vercel's "Automatically expose
-  System Environment Variables" project setting to be on — without it,
-  `NEXT_PUBLIC_VERCEL_ENV` is never set and the real site stays noindexed
-  forever.
+  something else links to it. Both checks run server-side, where Vercel
+  populates `VERCEL_ENV` automatically — no project setting to remember to
+  turn on, unlike the `NEXT_PUBLIC_` variant.
 
 ## i18n
 
