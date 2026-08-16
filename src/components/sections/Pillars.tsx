@@ -12,17 +12,21 @@ import { pillars } from "@/content/pillars";
 // Overlay strength for each pillar's background photo — a flat scrim rather
 // than a gradient, so every pixel behind the text gets the same guarantee
 // regardless of where the photo happens to be bright, and paper text over
-// it never depends on which part of the crop sits behind which line. 0.75
-// is a deliberate, tested choice, not a guess: tests/unit/contrast.test.ts
+// it never depends on which part of the crop sits behind which line. 0.85
+// is a deliberate, measured choice, not a guess: tests/unit/contrast.test.ts
 // blends ink at this exact opacity over a worst-case pure-white photo
-// background and checks the result against paper text still clears WCAG AA.
-// Two exports, not one: Tailwind's class scanner needs the literal
-// "bg-ink/75" string somewhere in source (a template literal built from the
-// numeric value below wouldn't be visible to it), while the test needs the
-// plain number to feed the contrast formula — keep both in sync by hand if
-// this ever changes.
-export const PILLAR_OVERLAY_OPACITY_CLASS = "bg-ink/75";
-export const PILLAR_OVERLAY_OPACITY = 0.75;
+// background and checks the result against both full-opacity paper text
+// (the title) and DetailText's muted 60%-opacity paper text — the actual
+// failure this was raised to fix. 0.75 passed the first check but not the
+// second (3.97:1, short of AA's 4.5:1), which is exactly what made the
+// ESG pillar's bright SDG-wheel photo read as competing with its own text
+// instead of sitting calmly behind it. Two exports, not one: Tailwind's
+// class scanner needs the literal "bg-ink/85" string somewhere in source (a
+// template literal built from the numeric value below wouldn't be visible
+// to it), while the test needs the plain number to feed the contrast
+// formula — keep both in sync by hand if this ever changes.
+export const PILLAR_OVERLAY_OPACITY_CLASS = "bg-ink/85";
+export const PILLAR_OVERLAY_OPACITY = 0.85;
 
 // Title, lead, and the supporting detail sentence are all always visible.
 // Hover grows the column slightly and does nothing else (.hover-grow in

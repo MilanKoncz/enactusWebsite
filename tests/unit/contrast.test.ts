@@ -77,4 +77,16 @@ describe("design tokens: color contrast", () => {
     const worstCaseBackground = blendOverBackground(ink, PILLAR_OVERLAY_OPACITY, "#ffffff");
     expect(passesAA(contrastRatio(paper, worstCaseBackground))).toBe(true);
   });
+
+  it("DetailText's muted paper (60% opacity) over a pillar's photo overlay also passes AA against worst-case white", () => {
+    // The gap the full-opacity check above doesn't cover: DetailText
+    // (components/ui/DetailText.tsx) renders its supporting sentence at
+    // opacity-60, not full opacity — a scrim strong enough for the title
+    // isn't automatically strong enough for that dimmer text too. This is
+    // the exact check that caught PILLAR_OVERLAY_OPACITY at 0.75 (3.97:1,
+    // failing) before it was raised to 0.85.
+    const worstCaseBackground = blendOverBackground(ink, PILLAR_OVERLAY_OPACITY, "#ffffff");
+    const mutedText = blendOverBackground(paper, 0.6, worstCaseBackground);
+    expect(passesAA(contrastRatio(mutedText, worstCaseBackground))).toBe(true);
+  });
 });
