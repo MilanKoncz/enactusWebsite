@@ -41,4 +41,26 @@ test.describe("/datenschutz", () => {
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations).toEqual([]);
   });
+
+  test("has no automatically detectable accessibility violations on the English route", async ({
+    page,
+  }) => {
+    await page.goto("/en/datenschutz");
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations).toEqual([]);
+  });
+
+  test("renders the real draft, not the coming-soon placeholder", async ({ page }) => {
+    await page.goto("/datenschutz");
+    await expect(page.getByRole("heading", { level: 1, name: "Datenschutzerklärung" })).toBeVisible();
+    await expect(page.getByText(/Entwurf/).first()).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "Bewerbungsformular" })).toBeVisible();
+    await expect(page.getByText(/Es gibt keinen Datei-Upload/)).toBeVisible();
+  });
+
+  test("renders a real English translation", async ({ page }) => {
+    await page.goto("/en/datenschutz");
+    await expect(page.getByRole("heading", { level: 1, name: "Privacy policy" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "Application form" })).toBeVisible();
+  });
 });

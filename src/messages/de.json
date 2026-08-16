@@ -609,5 +609,124 @@
     "responsibleLabel": "Inhaltlich verantwortlich gemäß § 18 Abs. 2 MStV",
     "responsibleSame": "Dieselben Personen wie unter „Vertreten durch“.",
     "copyright": "© {year} Enactus Mannheim e.V. Alle Rechte vorbehalten."
+  },
+  "Datenschutz": {
+    "eyebrow": "Rechtliches",
+    "title": "Datenschutzerklärung",
+    "draftNotice": "Entwurf — diese Erklärung ist noch nicht vom Datenschutzbeauftragten von Enactus Germany geprüft und freigegeben.",
+    "reviewedNotice": "Zuletzt geprüft am {date} durch den Datenschutzbeauftragten von Enactus Germany.",
+    "intro": {
+      "title": "Geltungsbereich",
+      "body": [
+        "Diese Erklärung beschreibt, welche personenbezogenen Daten wir auf dieser Website verarbeiten, zu welchem Zweck, auf welcher Rechtsgrundlage und wie lange wir sie speichern.",
+        "Sie gilt für alle Unterseiten dieser Website, einschließlich des Bewerbungsformulars, der Erinnerungsliste und des Kontaktformulars."
+      ]
+    },
+    "responsible": {
+      "title": "Verantwortlicher",
+      "intro": "Verantwortlich für die Datenverarbeitung auf dieser Website ist:",
+      "contactLabel": "E-Mail",
+      "noDpo": "Ein betrieblicher Datenschutzbeauftragter ist für Enactus Mannheim e. V. nicht bestellt.",
+      "externalDpo": "Enactus Germany stellt den studentischen Teams kostenlos einen Datenschutzbeauftragten zur Beratung. Dieser Entwurf geht vor Veröffentlichung an ihn."
+    },
+    "hosting": {
+      "title": "Hosting",
+      "body": [
+        "Diese Website wird bei Vercel Inc. gehostet und über den Standort „fra1“ (Frankfurt am Main) ausgeliefert. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO — unser berechtigtes Interesse an einer sicheren, schnellen und zuverlässigen Bereitstellung der Website.",
+        "Vercel Inc. hat seinen Sitz in den USA und kann Daten (etwa Server-Logs) auch außerhalb der EU verarbeiten. Ein solcher Transfer ist über die EU-Standardvertragsklauseln nach Art. 46 DSGVO abgesichert."
+      ]
+    },
+    "database": {
+      "title": "Datenbank",
+      "body": [
+        "Bewerbungen, Kontaktanfragen und Anmeldungen zur Erinnerungsliste speichern wir in einer Postgres-Datenbank bei Neon, Region „eu-central-1“ (Frankfurt am Main).",
+        "Wir speichern nur, was für die jeweilige Anfrage nötig ist, und löschen die Daten, sobald der Zweck entfällt (Art. 5 Abs. 1 lit. e DSGVO)."
+      ],
+      "retentionLabel": "Genaue Aufbewahrungsdauer",
+      "retentionMissingHint": "Die genaue Aufbewahrungsdauer ist noch nicht vom Vorstand festgelegt."
+    },
+    "email": {
+      "title": "E-Mail-Versand",
+      "notActiveLabel": "Noch nicht aktiv",
+      "notActiveNote": "Dieser Abschnitt beschreibt den geplanten Aufbau. Aktuell ist kein Formular an Resend angebunden — es werden noch keine Daten über diesen Weg verschickt.",
+      "body": [
+        "Sobald die Formulare angebunden sind, verschicken wir E-Mails (Bewerbungsbestätigung, Kontaktantwort, Erinnerungs-Opt-in) über Resend, mit Versand aus der EU-Region.",
+        "Die Rechtsgrundlage ist dieselbe wie für die jeweilige Anfrage — siehe die Abschnitte zum Bewerbungs-, Kontakt- und Erinnerungsformular."
+      ]
+    },
+    "analytics": {
+      "title": "Analyse",
+      "body": [
+        "Wir nutzen Vercel Analytics zur anonymen Auswertung der Seitenaufrufe. Der Dienst setzt keine Cookies und erstellt keine geräteübergreifenden Profile — deshalb zeigen wir keinen Cookie-Banner.",
+        "Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO — unser berechtigtes Interesse zu verstehen, welche Inhalte genutzt werden."
+      ]
+    },
+    "fonts": {
+      "title": "Schriftarten",
+      "body": [
+        "Alle Schriftarten sind lokal auf unserem Server eingebunden (self-hosted). Es findet keine Verbindung zu Google Fonts oder einem anderen externen Font-Anbieter statt — deine IP-Adresse wird dafür also nicht an Dritte übermittelt."
+      ]
+    },
+    "youtube": {
+      "title": "YouTube-Einbindungen",
+      "body": [
+        "Videos (z. B. Projekt-Pitches) binden wir über eine Klick-zum-Laden-Vorschau ein. Vor deinem Klick wird keine Verbindung zu YouTube aufgebaut und es werden keine Cookies gesetzt.",
+        "Erst mit dem Klick lädt der eingebettete Player über youtube-nocookie.com; ab diesem Zeitpunkt gilt die Datenschutzerklärung von YouTube / Google."
+      ]
+    },
+    "application": {
+      "title": "Bewerbungsformular",
+      "intro": "Wenn du dich über /mitmachen bewirbst, erheben wir die folgenden Angaben:",
+      "fieldsHeading": "Erhobene Angaben",
+      "fields": [
+        "Vorname, Nachname, E-Mail-Adresse",
+        "Studiengang, Fachsemester, Hochschule",
+        "Bisheriges Engagement / Berufserfahrung (Freitext)",
+        "Sprachen und weitere Kenntnisse (Freitext)",
+        "Motivation (Freitext)",
+        "Wunschbereich (Projekte oder Vorstandsbereiche)",
+        "Verfügbarkeit in Stunden pro Woche",
+        "Wie du auf uns aufmerksam geworden bist"
+      ],
+      "noUpload": "Es gibt keinen Datei-Upload. Angaben, die sonst in einem Lebenslauf stehen würden, erheben wir ausschließlich als strukturierte Formularfelder, nicht als Dokument.",
+      "purposeLabel": "Zweck",
+      "purpose": "Prüfung und Bearbeitung deiner Bewerbung.",
+      "legalBasisLabel": "Rechtsgrundlage",
+      "legalBasis": "Art. 6 Abs. 1 lit. a DSGVO (deine Einwilligung über die Pflicht-Checkbox) in Verbindung mit Art. 6 Abs. 1 lit. b DSGVO analog (Anbahnung der Mitgliedschaft).",
+      "accessLabel": "Zugriff",
+      "access": "Der Vorstand und die IT-Verantwortlichen des Vereins. Bewerbungen werden zunächst in unserer Datenbank gespeichert und danach als PDF an it@unimannheim.enactus.team gesendet (siehe „E-Mail-Versand“, aktuell noch nicht aktiv).",
+      "antiSpam": "Ein verstecktes Feld (Honeypot) und eine Prüfung der Ausfüllzeit helfen uns, automatisierte Spam-Einsendungen zu erkennen — beides ist keine Angabe über dich, sondern eine rein technische Prüfung."
+    },
+    "reminder": {
+      "title": "Erinnerungsliste",
+      "body": [
+        "Solange das Bewerbungsfenster geschlossen ist, kannst du dich für eine E-Mail-Erinnerung eintragen, sobald es öffnet.",
+        "Wir speichern deine E-Mail-Adresse, ein Bestätigungs-Token, ob du bestätigt hast, den Zeitpunkt der Bestätigung und deine IP-Adresse als Nachweis deiner Einwilligung (Double-Opt-in). Erst nach deiner Bestätigung verschicken wir Erinnerungen.",
+        "Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Jede E-Mail enthält einen funktionierenden Ein-Klick-Abmeldelink."
+      ]
+    },
+    "contact": {
+      "title": "Kontaktformular",
+      "body": [
+        "Über /kontakt kannst du uns Name, E-Mail-Adresse, optional einen Betreff und deine Nachricht schicken.",
+        "Zweck ist die Bearbeitung deiner Anfrage; Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO — unser berechtigtes Interesse, Anfragen zu beantworten.",
+        "Das Formular ist aktuell noch nicht angebunden (siehe „E-Mail-Versand“) — beim Absenden wird noch nichts an uns übertragen; bis dahin zeigt dir die Seite stattdessen unsere Kontakt-E-Mail-Adresse an."
+      ]
+    },
+    "rights": {
+      "title": "Deine Rechte",
+      "intro": "Du hast jederzeit das Recht auf:",
+      "list": [
+        "Auskunft über deine gespeicherten Daten (Art. 15 DSGVO)",
+        "Berichtigung unrichtiger Daten (Art. 16 DSGVO)",
+        "Löschung deiner Daten (Art. 17 DSGVO)",
+        "Einschränkung der Verarbeitung (Art. 18 DSGVO)",
+        "Datenübertragbarkeit (Art. 20 DSGVO)",
+        "Widerspruch gegen die Verarbeitung (Art. 21 DSGVO)",
+        "Widerruf einer erteilten Einwilligung mit Wirkung für die Zukunft (Art. 7 Abs. 3 DSGVO)"
+      ],
+      "contactPrompt": "Wende dich dazu an:",
+      "complaint": "Du kannst dich außerdem jederzeit bei einer Datenschutz-Aufsichtsbehörde beschweren — zuständig für Enactus Mannheim ist die Landesbeauftragte für den Datenschutz und die Informationsfreiheit Baden-Württemberg (LfDI Baden-Württemberg)."
+    }
   }
 }

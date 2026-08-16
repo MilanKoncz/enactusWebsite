@@ -609,5 +609,124 @@
     "responsibleLabel": "Inhaltlich verantwortlich gemäß § 18 Abs. 2 MStV",
     "responsibleSame": "Dieselben Personen wie unter „Vertreten durch“.",
     "copyright": "© {year} Enactus Mannheim e.V. Alle Rechte vorbehalten."
+  },
+  "Datenschutz": {
+    "eyebrow": "Legal",
+    "title": "Privacy policy",
+    "draftNotice": "Draft — this policy has not yet been reviewed and approved by Enactus Germany's data protection officer.",
+    "reviewedNotice": "Last reviewed on {date} by Enactus Germany's data protection officer.",
+    "intro": {
+      "title": "Scope",
+      "body": [
+        "This policy describes which personal data we process on this website, for what purpose, on what legal basis, and for how long we keep it.",
+        "It covers every page on this website, including the application form, the reminder list, and the contact form."
+      ]
+    },
+    "responsible": {
+      "title": "Controller",
+      "intro": "The controller responsible for data processing on this website is:",
+      "contactLabel": "Email",
+      "noDpo": "Enactus Mannheim e. V. has not appointed an in-house data protection officer.",
+      "externalDpo": "Enactus Germany provides student teams with a data protection officer for advice, free of charge. This draft goes to them before publication."
+    },
+    "hosting": {
+      "title": "Hosting",
+      "body": [
+        "This website is hosted by Vercel Inc. and served from the „fra1“ location (Frankfurt am Main). The legal basis is Art. 6(1)(f) GDPR — our legitimate interest in providing a secure, fast, and reliable website.",
+        "Vercel Inc. is based in the USA and may process some data (such as server logs) outside the EU. Any such transfer is safeguarded under the EU Standard Contractual Clauses per Art. 46 GDPR."
+      ]
+    },
+    "database": {
+      "title": "Database",
+      "body": [
+        "We store applications, contact messages, and reminder-list sign-ups in a Postgres database hosted by Neon, region „eu-central-1“ (Frankfurt am Main).",
+        "We store only what a given request needs, and delete it once its purpose no longer applies (Art. 5(1)(e) GDPR)."
+      ],
+      "retentionLabel": "Exact retention period",
+      "retentionMissingHint": "The exact retention period hasn't been set by the board yet."
+    },
+    "email": {
+      "title": "Email delivery",
+      "notActiveLabel": "Not yet active",
+      "notActiveNote": "This section describes the planned setup. No form is connected to Resend yet — no data is sent through this channel at present.",
+      "body": [
+        "Once the forms are connected, we'll send emails (application confirmation, contact reply, reminder opt-in) through Resend, from its EU region.",
+        "The legal basis matches whichever request the email belongs to — see the application, contact, and reminder sections below."
+      ]
+    },
+    "analytics": {
+      "title": "Analytics",
+      "body": [
+        "We use Vercel Analytics for anonymous page-view analysis. The service sets no cookies and builds no cross-device profiles — that's why this site shows no cookie banner.",
+        "The legal basis is Art. 6(1)(f) GDPR — our legitimate interest in understanding which content gets used."
+      ]
+    },
+    "fonts": {
+      "title": "Fonts",
+      "body": [
+        "Every font is self-hosted on our own server. There is no connection to Google Fonts or any other external font provider, so your IP address is never sent to a third party for this."
+      ]
+    },
+    "youtube": {
+      "title": "YouTube embeds",
+      "body": [
+        "We embed videos (project pitches, for instance) behind a click-to-load preview. Nothing connects to YouTube and no cookies are set before you click.",
+        "Only after you click does the embedded player load via youtube-nocookie.com; from that point on, YouTube's / Google's own privacy policy applies."
+      ]
+    },
+    "application": {
+      "title": "Application form",
+      "intro": "When you apply through /mitmachen, we collect the following information:",
+      "fieldsHeading": "Fields collected",
+      "fields": [
+        "First name, last name, email address",
+        "Degree program, semester, university",
+        "Previous involvement / work experience (free text)",
+        "Languages and other skills (free text)",
+        "Motivation (free text)",
+        "Area of interest (projects or board departments)",
+        "Availability in hours per week",
+        "How you heard about us"
+      ],
+      "noUpload": "There is no file upload. Information that would otherwise sit in a CV is collected exclusively through structured form fields, never as a document.",
+      "purposeLabel": "Purpose",
+      "purpose": "Reviewing and processing your application.",
+      "legalBasisLabel": "Legal basis",
+      "legalBasis": "Art. 6(1)(a) GDPR (your consent via the required checkbox), combined with Art. 6(1)(b) GDPR by analogy (taking steps toward membership).",
+      "accessLabel": "Access",
+      "access": "The board and the association's IT lead. Applications are written to our database first, then sent as a PDF to it@unimannheim.enactus.team (see \"Email delivery\", not yet active).",
+      "antiSpam": "A hidden field (honeypot) and a submission-timing check help us catch automated spam — neither collects anything about you; both are purely technical checks."
+    },
+    "reminder": {
+      "title": "Reminder list",
+      "body": [
+        "While the application window is closed, you can sign up for an email reminder for when it opens.",
+        "We store your email address, a confirmation token, whether you've confirmed, the time of confirmation, and your IP address as proof of consent (double opt-in). We only send reminders once you've confirmed.",
+        "The legal basis is your consent (Art. 6(1)(a) GDPR). Every email carries a working one-click unsubscribe link."
+      ]
+    },
+    "contact": {
+      "title": "Contact form",
+      "body": [
+        "Through /kontakt you can send us your name, email address, an optional subject, and your message.",
+        "The purpose is handling your inquiry; the legal basis is Art. 6(1)(f) GDPR — our legitimate interest in responding to inquiries.",
+        "The form isn't connected yet (see \"Email delivery\") — submitting it doesn't send us anything at present; until then, the page shows our contact email address instead."
+      ]
+    },
+    "rights": {
+      "title": "Your rights",
+      "intro": "You have the right, at any time, to:",
+      "list": [
+        "Access the data we hold about you (Art. 15 GDPR)",
+        "Have inaccurate data corrected (Art. 16 GDPR)",
+        "Have your data deleted (Art. 17 GDPR)",
+        "Restrict processing (Art. 18 GDPR)",
+        "Data portability (Art. 20 GDPR)",
+        "Object to processing (Art. 21 GDPR)",
+        "Withdraw a given consent with effect for the future (Art. 7(3) GDPR)"
+      ],
+      "contactPrompt": "Reach us at:",
+      "complaint": "You can also lodge a complaint with a data protection supervisory authority at any time — the authority responsible for Enactus Mannheim is the State Commissioner for Data Protection and Freedom of Information Baden-Württemberg (LfDI Baden-Württemberg)."
+    }
   }
 }
