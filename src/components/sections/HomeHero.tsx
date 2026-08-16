@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { Suspense } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
@@ -19,51 +20,21 @@ export function HomeHero() {
   const rotating = t.raw("rotating") as string[];
 
   return (
-    <Section
-      surface="ink"
-      className="relative -mt-24 overflow-hidden pt-36 pb-24 md:pb-36"
-    >
+    <Section surface="ink" className="relative -mt-24 overflow-hidden pt-36 pb-24 md:pb-36">
       <div aria-hidden="true" className="absolute inset-0">
-        {heroMedia.posterSrc ? (
-          <>
-            <video
-              className="hidden h-full w-full object-cover md:block"
-              muted
-              playsInline
-              loop
-              preload="metadata"
-              poster={heroMedia.posterSrc}
-            >
-              {heroMedia.sources.map((source) => (
-                <source key={source.src} src={source.src} type={source.type} />
-              ))}
-            </video>
-            {heroMedia.mobileImageSrc && (
-              <Image
-                src={heroMedia.mobileImageSrc}
-                alt=""
-                fill
-                priority
-                className="object-cover md:hidden"
-              />
-            )}
-          </>
-        ) : (
-          <>
-            {/* PLACEHOLDER, temporary: a gradient wash stands in for the real
-                hero video so the glass button variant has color/luminance
-                variation to blur and saturate against — a flat placeholder
-                box gave it nothing to show. Remove this div the moment
-                heroMedia.posterSrc is real; see ASSETS-TODO.md. */}
-            <div className="h-full w-full bg-[linear-gradient(135deg,var(--color-ink)_0%,var(--color-oxblood)_38%,var(--color-gold)_75%,var(--color-sand)_100%)]" />
-            <Placeholder
-              kind={t("videoPlaceholderKind")}
-              label={t("videoPlaceholderLabel")}
-              className="absolute inset-6 h-auto w-auto md:inset-10"
-            />
-          </>
-        )}
-        <div className={`absolute inset-0 ${heroMedia.posterSrc ? "bg-ink/80" : "bg-ink/55"}`} />
+        <video
+          className="h-full w-full object-cover"
+          muted
+          playsInline
+          loop
+          autoPlay
+          preload="metadata"
+          poster={heroMedia.posterSrc ?? ""}>
+          {heroMedia.sources.map((source) => (
+            <source key={source.src} src={source.src} type={source.type} />
+          ))}
+        </video>
+        <div className={`absolute inset-0 ${heroMedia.sources ? "bg-ink/55" : "bg-ink/80"}`} />
       </div>
 
       <Container className="relative flex flex-col gap-8">

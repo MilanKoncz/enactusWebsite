@@ -25,9 +25,12 @@ const heroMediaSchema = z.object({
 export type HeroMedia = z.infer<typeof heroMediaSchema>;
 
 export const heroMedia: HeroMedia = heroMediaSchema.parse({
-  posterSrc: null,
+  posterSrc: "/video/hero-poster.png",
   mobileImageSrc: null,
-  sources: [],
+  sources: [{
+      src: "/video/hero-video.mp4",
+      type: "video/mp4",
+    }],
   width: 1920,
   height: 1080,
 });
