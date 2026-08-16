@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import * as Accordion from "@radix-ui/react-accordion";
 import * as Tabs from "@radix-ui/react-tabs";
 import { useTranslations } from "next-intl";
@@ -10,11 +11,27 @@ import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ThreadSegment } from "@/components/motion/ThreadSegment";
-import { eventFormats, type EventFormatKey } from "@/content/eventFormats";
+import { eventFormats, type EventFormat, type EventFormatKey } from "@/content/eventFormats";
+import { cn } from "@/lib/cn";
 
 // format.key is a validated string, not a literal union — same cast pattern
 // as ProjectDetailContent.tsx's ProjectCopyKey.
 type FormatCopyKey = Parameters<ReturnType<typeof useTranslations<"EventFormats">>>[0];
+
+// One real photo (socials, workshops, gala) and one still-missing slot
+// (teamweekend) render through the exact same tile shape — a real image
+// swaps in for the dashed Placeholder without changing the surrounding
+// layout, so a photo landing later never reflows the grid around it.
+function FormatMedia({ format, title, ratio, className }: { format: EventFormat; title: string; ratio: string; className?: string }) {
+  if (!format.image) {
+    return <Placeholder kind="Bild" label={title} ratio={ratio} className={className} />;
+  }
+  return (
+    <div className={cn("relative overflow-hidden rounded-md", className)} style={{ aspectRatio: ratio }}>
+      <Image src={format.image} alt="" fill className="object-cover" />
+    </div>
+  );
+}
 
 // Two different components for the same four formats, not one clever
 // responsive layout: the brief draws a real distinction between desktop
@@ -51,7 +68,7 @@ export function EventFormats() {
                   className="flex flex-col gap-3 rounded-md border border-ink/10 p-2 text-left transition-[border-color,transform] duration-[var(--duration-fast)] ease-signature hover:-translate-y-px hover:border-ink/30 focus-visible:-translate-y-px focus-visible:border-ink/30 data-[state=active]:border-gold"
                 >
                   <span aria-hidden="true" className="contents">
-                    <Placeholder kind="Bild" label={title} ratio="4 / 3" />
+                    <FormatMedia format={format} title={title} ratio="4 / 3" />
                     <span className="font-mono text-mono-s uppercase">{title}</span>
                   </span>
                 </Tabs.Trigger>
@@ -92,7 +109,12 @@ export function EventFormats() {
                     className="flex w-full items-center gap-4 p-4 text-left transition-[background-color,transform] duration-[var(--duration-fast)] ease-signature hover:-translate-y-px hover:bg-ink/5 focus-visible:-translate-y-px focus-visible:bg-ink/5 data-[state=open]:border-l-2 data-[state=open]:border-gold"
                   >
                     <span aria-hidden="true" className="contents">
-                      <Placeholder kind="Bild" label={title} ratio="1 / 1" className="size-14 shrink-0 p-2" />
+                      <FormatMedia
+                        format={format}
+                        title={title}
+                        ratio="1 / 1"
+                        className={format.image ? "size-14 shrink-0" : "size-14 shrink-0 p-2"}
+                      />
                       <span className="font-mono text-mono-s uppercase">{title}</span>
                     </span>
                   </Accordion.Trigger>

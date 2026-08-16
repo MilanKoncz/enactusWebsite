@@ -14,7 +14,7 @@ import { EventFormats } from "@/components/sections/EventFormats";
 describe("EventFormats", () => {
   it("renders all four formats as both a tablist and an accordion", () => {
     renderWithIntl(<EventFormats />);
-    for (const title of ["Socials", "Workshops", "Teamwochenende", "Journeys"]) {
+    for (const title of ["Socials", "Workshops", "Teamwochenende", "Gala"]) {
       expect(screen.getByRole("tab", { name: title })).toBeInTheDocument();
       expect(screen.getByRole("button", { name: title })).toBeInTheDocument();
     }
@@ -44,6 +44,16 @@ describe("EventFormats", () => {
 
     await user.click(screen.getByRole("button", { name: "Teamwochenende" }));
     expect(screen.getByRole("tab", { name: "Teamwochenende" })).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("renders a real photo for the three confirmed formats, and a placeholder for teamweekend", () => {
+    const { container } = renderWithIntl(<EventFormats />);
+    expect(container.querySelectorAll('img[src*="socials.webp"]').length).toBeGreaterThan(0);
+    expect(container.querySelectorAll('img[src*="workshops.webp"]').length).toBeGreaterThan(0);
+    expect(container.querySelectorAll('img[src*="gala.webp"]').length).toBeGreaterThan(0);
+    // Teamwochenende still has no photo — it keeps the dashed Placeholder,
+    // identifiable by its "Bild" kind label rather than an <img>.
+    expect(screen.getAllByText("Bild").length).toBeGreaterThan(0);
   });
 
   it("expands only the clicked accordion item, closing the previous one", async () => {
