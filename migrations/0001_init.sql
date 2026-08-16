@@ -70,7 +70,7 @@ create index if not exists contact_messages_created_at_idx on contact_messages (
 
 -- One row per (bucket, window) pair, upserted with an atomic increment —
 -- see lib/db.ts's consumeRateLimit for the single-statement read+increment
--- this is built for. bucket is "<route>:<sha256(ip)>"; the IP itself is
+-- this is built for. bucket is "<route>:<sha256(ip)>" — the IP itself is
 -- never stored, only its hash.
 create table if not exists rate_limit_hits (
   bucket text not null,
