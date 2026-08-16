@@ -615,126 +615,204 @@
   "Datenschutz": {
     "eyebrow": "Legal",
     "title": "Privacy policy",
+    "effectiveDate": "Last updated: August 2026",
     "draftNotice": "Draft — this policy has not yet been reviewed and approved by Enactus Germany's data protection officer.",
     "reviewedNotice": "Last reviewed on {date} by Enactus Germany's data protection officer.",
-    "intro": {
+    "scope": {
       "title": "Scope",
       "body": [
-        "This policy describes which personal data we process on this website, for what purpose, on what legal basis, and for how long we keep it.",
-        "It covers every page on this website, including the application form, the reminder list, and the contact form."
+        "This policy describes which personal data we process when you visit this website, for what purpose, on what legal basis, and for how long we keep it.",
+        "It applies to every page on this website, including the application form, the reminder list, and the contact form. Linked third-party websites — for instance our projects, partners, or Enactus Germany — have their own privacy policies."
       ]
     },
     "responsible": {
       "title": "Controller",
       "intro": "The controller responsible for data processing on this website is:",
       "contactLabel": "Email",
-      "noDpo": "Enactus Mannheim e. V. has not appointed an in-house data protection officer.",
-      "externalDpo": "Enactus Germany provides student teams with a data protection officer for advice, free of charge. This draft goes to them before publication."
+      "representativesLabel": "Authorized board (Vertretungsberechtigter Vorstand)",
+      "registerLabel": "Register court",
+      "noDpo": "Enactus Mannheim e. V. has not appointed an in-house data protection officer; the statutory conditions requiring one are not met."
     },
     "hosting": {
-      "title": "Hosting",
-      "body": [
-        "This website is hosted by Vercel Inc. and served from the „fra1“ location (Frankfurt am Main). The legal basis is Art. 6(1)(f) GDPR — our legitimate interest in providing a secure, fast, and reliable website.",
-        "Vercel Inc. is based in the USA and may process some data (such as server logs) outside the EU. Any such transfer is safeguarded under the EU Standard Contractual Clauses per Art. 46 GDPR."
-      ]
+      "title": "Hosting and server logs",
+      "intro": "This website is hosted by Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA, and served from the Frankfurt am Main location (region \"fra1\").",
+      "fieldsIntro": "Loading a page processes technically necessary access data:",
+      "fields": [
+        "IP address of the requesting device",
+        "date and time of access",
+        "the address requested and the amount of data transferred",
+        "the server's status message",
+        "the referring page, where transmitted",
+        "browser type, browser version, and operating system"
+      ],
+      "purpose": "This data is technically required to deliver the website and serves operational security and defence against attacks. We do not combine it with any other data source.",
+      "legalBasisLabel": "Legal basis",
+      "legalBasis": "Art. 6(1)(f) GDPR. Our legitimate interest lies in providing the website securely, stably, and reliably.",
+      "retentionLabel": "Retention",
+      "retention": "Vercel deletes these logs automatically after a short time; we do not evaluate them on a personal basis and keep no permanent copies."
     },
     "database": {
       "title": "Database",
       "body": [
-        "We store applications, contact messages, and reminder-list sign-ups in a Postgres database hosted by Neon, region \"eu-central-1\" (Frankfurt am Main).",
-        "We store only what a given request needs, and delete it once its purpose no longer applies (Art. 5(1)(e) GDPR). A daily automated cleanup job enforces the retention periods listed below — they aren't just a stated intention.",
-        "To protect against automated bulk submissions, we count requests per IP address; for that purpose we store the IP address only as a one-way hash (SHA-256), never in plain text, and delete the counter again automatically after a short time."
-      ],
-      "retentionHeading": "Retention periods",
-      "retentionUnconfirmedHint": "This period is set, but not yet given final sign-off by the board.",
-      "retentionApplicationsLabel": "Applications",
-      "retentionApplications": "{months} months after the respective application window closes",
-      "retentionContactLabel": "Contact messages",
-      "retentionContact": "{months} months",
-      "retentionReminderLabel": "Reminder list",
-      "retentionReminder": "Confirmed sign-ups: until you unsubscribe. Unconfirmed sign-ups: {days} days"
+        "We store applications, contact messages, and reminder-list sign-ups in a Postgres database from provider Neon Inc., USA. The database runs in the \"eu-central-1\" region (Frankfurt am Main), so the data stays within the European Union.",
+        "We collect only what a given purpose requires, and delete it once that purpose no longer applies (Art. 5(1)(c) and (e) GDPR). The specific periods are in the \"Retention\" section."
+      ]
     },
     "email": {
       "title": "Email delivery",
       "body": [
-        "We send emails (application confirmation, contact forwarding, reminder opt-in) through Resend, from its \"eu-west-1\" region (Ireland) — the only EU region Resend offers.",
-        "The legal basis matches whichever request the email belongs to — see the application, contact, and reminder sections below.",
-        "Click and open tracking, and a tracking subdomain, are deliberately switched off for our sending on Resend — we don't track whether or when you open an email or click a link inside one."
-      ]
+        "For automatically generated emails — application confirmation, forwarding of contact inquiries, reminder-list confirmation — we use Resend (Plus Five Five, Inc., USA). Sending happens from the Ireland region (\"eu-west-1\"), within the European Union.",
+        "We transmit the recipient's email address and the content of the respective message.",
+        "Our emails carry no open tracking, no click tracking, and no tracking pixels. Those features are deliberately switched off on our account. Links in our emails go straight to their destination and are never redirected through an intermediary service."
+      ],
+      "legalBasisLabel": "Legal basis",
+      "legalBasis": "The same basis as the underlying request — see the application, reminder-list, and contact-form sections."
     },
     "analytics": {
       "title": "Analytics",
       "body": [
-        "We use Vercel Analytics for anonymous page-view analysis. The service sets no cookies and builds no cross-device profiles — that's why this site shows no cookie banner.",
-        "The legal basis is Art. 6(1)(f) GDPR — our legitimate interest in understanding which content gets used."
-      ]
+        "We use Vercel Analytics for anonymous evaluation of page views. The service sets no cookies, stores no identifiers on your device, and builds no cross-device profiles. We only collect aggregated figures such as the page viewed, an approximate country-level region, device type, and referring page.",
+        "This gives us no way to identify individual people. Because no information is stored on or read from your device, no consent under § 25 TDDDG (the German cookie-consent law) is required — that's why this website shows no cookie banner."
+      ],
+      "legalBasisLabel": "Legal basis",
+      "legalBasis": "Art. 6(1)(f) GDPR. Our legitimate interest lies in understanding which content is used, so we can improve the website."
     },
-    "fonts": {
-      "title": "Fonts",
-      "body": [
-        "Every font is self-hosted on our own server. There is no connection to Google Fonts or any other external font provider, so your IP address is never sent to a third party for this."
-      ]
-    },
-    "youtube": {
-      "title": "YouTube embeds",
-      "body": [
-        "We embed videos (project pitches, for instance) behind a click-to-load preview. Nothing connects to YouTube and no cookies are set before you click.",
-        "Only after you click does the embedded player load via youtube-nocookie.com; from that point on, YouTube's / Google's own privacy policy applies."
-      ]
+    "externalContent": {
+      "title": "Fonts and external content",
+      "fontsBody": "Every font is embedded locally on our own server. There is no connection to Google Fonts or any other external font provider; your IP address is never transmitted to a third party for this.",
+      "videoLabel": "Video embeds",
+      "videoBody": [
+        "We embed project pitches and similar videos behind a click-to-load preview. Before you click, no connection to YouTube is made, no data is transmitted, and no cookies are set. Only a preview image served from our own server is shown.",
+        "Only once you click the preview image does the embedded player load from the youtube-nocookie.com domain. From that point on, Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Ireland, processes your data under its own responsibility; Google's privacy policy applies. We have no influence over the nature or extent of that processing."
+      ],
+      "legalBasisLabel": "Legal basis",
+      "legalBasis": "Art. 6(1)(a) GDPR. You give your consent by deliberately clicking the preview image."
     },
     "application": {
       "title": "Application form",
-      "intro": "When you apply through /mitmachen, we collect the following information:",
-      "fieldsHeading": "Fields collected",
+      "intro": "Through the \"Mitmachen\" page you can apply for membership. We collect:",
+      "fieldsHeading": "Information collected",
       "fields": [
-        "First name, last name, email address",
-        "Degree program, semester, university",
-        "Previous involvement / work experience (free text)",
-        "Languages and other skills (free text)",
-        "Motivation (free text)",
-        "Area of interest (projects or board departments)",
-        "Availability in hours per week",
-        "How you heard about us"
+        "first name, last name, email address",
+        "degree program, semester, university",
+        "previous involvement / work experience (free text)",
+        "languages and other skills (free text)",
+        "motivation (free text)",
+        "desired area of involvement",
+        "availability in hours per week",
+        "how you heard about us",
+        "the time you gave consent"
       ],
-      "noUpload": "There is no file upload. Information that would otherwise sit in a CV is collected exclusively through structured form fields, never as a document.",
+      "noUpload": "There is no file upload. Information that would usually sit in a CV is collected exclusively through structured form fields. We ask you not to provide any special category personal data under Art. 9 GDPR — for instance about health, religious or philosophical belief, political opinion, or sexual orientation. Such information is not required for selection.",
       "purposeLabel": "Purpose",
-      "purpose": "Reviewing and processing your application.",
+      "purpose": "Reviewing and processing your application, and getting in touch as part of the selection process.",
       "legalBasisLabel": "Legal basis",
-      "legalBasis": "Art. 6(1)(a) GDPR (your consent via the required checkbox), combined with Art. 6(1)(b) GDPR by analogy (taking steps toward membership).",
-      "accessLabel": "Access",
-      "access": "The board and the association's IT lead. Applications are written to our database first, then sent as a PDF to info@unimannheim.enactus.team (see \"Email delivery\"). You also receive a short confirmation at the email address you provided.",
-      "antiSpam": "A hidden field (honeypot) and a submission-timing check help us catch automated spam — neither collects anything about you; both are purely technical checks."
+      "legalBasis": "Art. 6(1)(b) GDPR. Processing takes place to carry out pre-contractual measures at your request.",
+      "accessLabel": "Recipients",
+      "access": "The board and the people responsible for processing applications within the association. Your application is stored in our database first, then sent as a PDF to info@unimannheim.enactus.team.",
+      "necessityLabel": "Whether you have to provide it",
+      "necessity": "Providing this data is neither legally nor contractually required. Without the fields marked as mandatory, however, we cannot process your application."
     },
     "reminder": {
       "title": "Reminder list",
       "body": [
-        "While the application window is closed, you can sign up for an email reminder for when it opens.",
-        "We store your email address, a confirmation token, whether you've confirmed, the time of confirmation, and your IP address as proof of consent (double opt-in). We only send reminders once you've confirmed.",
-        "The legal basis is your consent (Art. 6(1)(a) GDPR). Every email carries a working one-click unsubscribe link — the confirmation link and the unsubscribe link use two separate, independent tokens, so a forwarded confirmation link can never also work as an unsubscribe link."
-      ]
+        "While the application window is closed, you can sign up to be notified once it opens.",
+        "We store your email address, the time you signed up, the time you confirmed, the IP address used for that confirmation, and two randomly generated tokens for confirmation and unsubscribing.",
+        "Sign-up uses the double opt-in procedure: after submitting, you receive an email with a confirmation link. We only add you to the list once you confirm. We store the time and IP address of your confirmation as proof of your consent; without that proof, we could not demonstrate the sending was lawful."
+      ],
+      "legalBasisLabel": "Legal basis",
+      "legalBasis": "Art. 6(1)(a) GDPR for sending, Art. 6(1)(f) GDPR for storing the proof of consent.",
+      "withdrawalLabel": "Withdrawal",
+      "withdrawal": "Every email contains an unsubscribe link that works without any further input. Withdrawal takes effect for the future and does not affect the lawfulness of processing carried out before it."
     },
     "contact": {
       "title": "Contact form",
       "body": [
-        "Through /kontakt you can send us your name, email address, an optional subject, and your message.",
-        "The purpose is handling your inquiry; the legal basis is Art. 6(1)(f) GDPR — our legitimate interest in responding to inquiries.",
-        "Your message is stored in our database first, then forwarded to us by email."
-      ]
+        "Through the \"Kontakt\" page you can send us a message. We collect your name, email address, an optional subject, and the content of your message."
+      ],
+      "purposeLabel": "Purpose",
+      "purpose": "Handling and answering your inquiry.",
+      "legalBasisLabel": "Legal basis",
+      "legalBasis": "Art. 6(1)(f) GDPR. Our legitimate interest lies in answering inquiries. If your inquiry aims at forming or pursuing a membership or partnership, Art. 6(1)(b) GDPR also applies.",
+      "alternative": "You are of course also welcome to reach us by email directly, without the form."
+    },
+    "antiSpam": {
+      "title": "Protection against abuse",
+      "intro": "To defend against automated bulk submissions, we use the following measures:",
+      "measures": [
+        "a form field invisible to you, filled in only by automated programs",
+        "a check of the time between loading and submitting the form",
+        "a limit on the number of submissions per sender within a time window"
+      ],
+      "ipHandling": "For that limit, we store your IP address only as a cryptographic hash, from which the original address cannot be recomputed. These values are deleted automatically once the respective time window elapses.",
+      "noCaptcha": "We deliberately do not use a CAPTCHA — it would be a barrier for people with disabilities and would transmit additional data to third parties.",
+      "legalBasisLabel": "Legal basis",
+      "legalBasis": "Art. 6(1)(f) GDPR. Our legitimate interest lies in protecting our systems from abusive use."
+    },
+    "retention": {
+      "title": "Retention periods",
+      "tableCaption": "Retention periods by data type",
+      "columns": ["Data", "Duration"],
+      "applicationsLabel": "Applications",
+      "applicationsValue": "{months} months after the respective application period ends",
+      "contactLabel": "Contact inquiries",
+      "contactValue": "{months} months after final processing",
+      "reminderConfirmedLabel": "Confirmed reminder-list sign-ups",
+      "reminderConfirmedValue": "until withdrawn",
+      "reminderUnconfirmedLabel": "Unconfirmed reminder-list sign-ups",
+      "reminderUnconfirmedValue": "{days} days after sign-up",
+      "rateLimitLabel": "Hash values for abuse prevention",
+      "rateLimitValue": "until the time window elapses",
+      "serverLogsLabel": "Server logs",
+      "serverLogsValue": "per Vercel's own policy, short-term",
+      "note": "Statutory retention obligations remain unaffected. Where such an obligation prevents deletion, we restrict processing instead."
+    },
+    "processors": {
+      "title": "Processors and recipients",
+      "intro": "We do not pass on personal data for advertising purposes and do not sell it. Data is transmitted only to the following service providers, who act as our processors under Art. 28 GDPR:",
+      "tableCaption": "Processors we use",
+      "columns": ["Service", "Purpose", "Processing location"],
+      "rows": [
+        ["Vercel Inc., USA", "Hosting, delivery, analytics", "Frankfurt am Main"],
+        ["Neon Inc., USA", "Database", "Frankfurt am Main"],
+        ["Plus Five Five, Inc. (Resend), USA", "Email delivery", "Ireland"]
+      ],
+      "dpaNote": "We have data-processing agreements in place with every provider listed.",
+      "transferLabel": "Third-country transfers",
+      "transfer": "The companies listed are based in the United States. Processing itself takes place within the European Union, but access from the USA — for maintenance and support, for instance — cannot be fully ruled out. For that case, we have agreed the European Commission's Standard Contractual Clauses under Art. 46(2)(c) GDPR with these providers."
+    },
+    "automatedDecisions": {
+      "title": "No automated decision-making",
+      "body": "No automated decision-making, including profiling under Art. 22 GDPR, takes place. Decisions about applications are made exclusively by people."
+    },
+    "encryption": {
+      "title": "Encryption",
+      "body": "This website is delivered exclusively over an encrypted (TLS) connection. You can recognize this by the lock icon in your browser's address bar. This protects everything you submit through our forms from being read by third parties in transit."
     },
     "rights": {
       "title": "Your rights",
-      "intro": "You have the right, at any time, to:",
+      "intro": "You have the following rights against us:",
       "list": [
-        "Access the data we hold about you (Art. 15 GDPR)",
-        "Have inaccurate data corrected (Art. 16 GDPR)",
-        "Have your data deleted (Art. 17 GDPR)",
-        "Restrict processing (Art. 18 GDPR)",
-        "Data portability (Art. 20 GDPR)",
-        "Object to processing (Art. 21 GDPR)",
-        "Withdraw a given consent with effect for the future (Art. 7(3) GDPR)"
+        "Access to whether and which data we process about you (Art. 15 GDPR)",
+        "Rectification of inaccurate or incomplete data (Art. 16 GDPR)",
+        "Erasure of your data (Art. 17 GDPR)",
+        "Restriction of processing (Art. 18 GDPR)",
+        "Data portability in a common format (Art. 20 GDPR)",
+        "Objection to processing based on a legitimate interest (Art. 21 GDPR)",
+        "Withdrawal of a given consent with effect for the future (Art. 7(3) GDPR)"
       ],
-      "contactPrompt": "Reach us at:",
-      "complaint": "You can also lodge a complaint with a data protection supervisory authority at any time — the authority responsible for Enactus Mannheim is the State Commissioner for Data Protection and Freedom of Information Baden-Württemberg (LfDI Baden-Württemberg)."
+      "contactPrompt": "An informal message is enough to exercise these rights:"
+    },
+    "complaints": {
+      "title": "Right to complain",
+      "body": "Independently of the above, you have the right to lodge a complaint with a data protection supervisory authority. The authority responsible for us is:",
+      "authorityName": "Der Landesbeauftragte für den Datenschutz und die Informationsfreiheit Baden-Württemberg",
+      "authorityAddress": ["Lautenschlagerstraße 20", "70173 Stuttgart"],
+      "note": "You can also contact the supervisory authority where you live or work."
+    },
+    "changes": {
+      "title": "Changes to this privacy policy",
+      "body": "We update this policy whenever the legal situation, our services, or the nature of our data processing changes. The version published on this page always applies. The date of the last change is at the top of this policy."
     }
   },
   "MitmachenPage": {

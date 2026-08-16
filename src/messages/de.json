@@ -615,76 +615,82 @@
   "Datenschutz": {
     "eyebrow": "Rechtliches",
     "title": "Datenschutzerklärung",
+    "effectiveDate": "Stand: August 2026",
     "draftNotice": "Entwurf — diese Erklärung ist noch nicht vom Datenschutzbeauftragten von Enactus Germany geprüft und freigegeben.",
     "reviewedNotice": "Zuletzt geprüft am {date} durch den Datenschutzbeauftragten von Enactus Germany.",
-    "intro": {
+    "scope": {
       "title": "Geltungsbereich",
       "body": [
-        "Diese Erklärung beschreibt, welche personenbezogenen Daten wir auf dieser Website verarbeiten, zu welchem Zweck, auf welcher Rechtsgrundlage und wie lange wir sie speichern.",
-        "Sie gilt für alle Unterseiten dieser Website, einschließlich des Bewerbungsformulars, der Erinnerungsliste und des Kontaktformulars."
+        "Diese Erklärung beschreibt, welche personenbezogenen Daten wir beim Besuch dieser Website verarbeiten, zu welchem Zweck, auf welcher Rechtsgrundlage und wie lange wir sie speichern.",
+        "Sie gilt für sämtliche Unterseiten dieser Website einschließlich des Bewerbungsformulars, der Erinnerungsliste und des Kontaktformulars. Für verlinkte Websites Dritter — etwa die Seiten unserer Projekte, Partner oder von Enactus Germany — gelten deren eigene Datenschutzerklärungen."
       ]
     },
     "responsible": {
       "title": "Verantwortlicher",
       "intro": "Verantwortlich für die Datenverarbeitung auf dieser Website ist:",
       "contactLabel": "E-Mail",
-      "noDpo": "Ein betrieblicher Datenschutzbeauftragter ist für Enactus Mannheim e. V. nicht bestellt.",
-      "externalDpo": "Enactus Germany stellt den studentischen Teams kostenlos einen Datenschutzbeauftragten zur Beratung. Dieser Entwurf geht vor Veröffentlichung an ihn."
+      "representativesLabel": "Vertretungsberechtigter Vorstand",
+      "registerLabel": "Registergericht",
+      "noDpo": "Ein betrieblicher Datenschutzbeauftragter ist für Enactus Mannheim e. V. nicht bestellt; die gesetzlichen Voraussetzungen hierfür liegen nicht vor."
     },
     "hosting": {
-      "title": "Hosting",
-      "body": [
-        "Diese Website wird bei Vercel Inc. gehostet und über den Standort „fra1“ (Frankfurt am Main) ausgeliefert. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO — unser berechtigtes Interesse an einer sicheren, schnellen und zuverlässigen Bereitstellung der Website.",
-        "Vercel Inc. hat seinen Sitz in den USA und kann Daten (etwa Server-Logs) auch außerhalb der EU verarbeiten. Ein solcher Transfer ist über die EU-Standardvertragsklauseln nach Art. 46 DSGVO abgesichert."
-      ]
+      "title": "Hosting und Server-Protokolle",
+      "intro": "Diese Website wird von Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA, gehostet und über den Standort Frankfurt am Main (Region „fra1“) ausgeliefert.",
+      "fieldsIntro": "Beim Aufruf einer Seite werden technisch notwendige Zugriffsdaten verarbeitet:",
+      "fields": [
+        "IP-Adresse des anfragenden Geräts",
+        "Datum und Uhrzeit des Zugriffs",
+        "aufgerufene Adresse und übertragene Datenmenge",
+        "Statusmeldung des Servers",
+        "verweisende Seite, sofern übermittelt",
+        "Browsertyp, Browserversion und Betriebssystem"
+      ],
+      "purpose": "Diese Daten sind für die Auslieferung der Website technisch erforderlich und dienen der Betriebssicherheit sowie der Abwehr von Angriffen. Eine Zusammenführung mit anderen Datenquellen findet nicht statt.",
+      "legalBasisLabel": "Rechtsgrundlage",
+      "legalBasis": "Art. 6 Abs. 1 lit. f DSGVO. Unser berechtigtes Interesse liegt in der sicheren, stabilen und funktionsfähigen Bereitstellung der Website.",
+      "retentionLabel": "Speicherdauer",
+      "retention": "Die Protokolle werden von Vercel nach kurzer Zeit automatisch gelöscht; wir werten sie nicht personenbezogen aus und legen keine dauerhaften Kopien an."
     },
     "database": {
       "title": "Datenbank",
       "body": [
-        "Bewerbungen, Kontaktanfragen und Anmeldungen zur Erinnerungsliste speichern wir in einer Postgres-Datenbank bei Neon, Region „eu-central-1“ (Frankfurt am Main).",
-        "Wir speichern nur, was für die jeweilige Anfrage nötig ist, und löschen die Daten, sobald der Zweck entfällt (Art. 5 Abs. 1 lit. e DSGVO). Eine automatische, tägliche Löschroutine setzt die unten genannten Fristen durch — sie sind also keine bloße Absichtserklärung.",
-        "Zum Schutz vor automatisierten Massen-Einsendungen zählen wir Anfragen je IP-Adresse; die IP-Adresse speichern wir dafür ausschließlich als Einweg-Hash (SHA-256), nie im Klartext, und löschen den Zähler nach kurzer Zeit automatisch wieder."
-      ],
-      "retentionHeading": "Aufbewahrungsfristen",
-      "retentionUnconfirmedHint": "Diese Frist ist festgelegt, aber vom Vorstand noch nicht endgültig bestätigt.",
-      "retentionApplicationsLabel": "Bewerbungen",
-      "retentionApplications": "{months} Monate nach Ende des jeweiligen Bewerbungsfensters",
-      "retentionContactLabel": "Kontaktanfragen",
-      "retentionContact": "{months} Monate",
-      "retentionReminderLabel": "Erinnerungsliste",
-      "retentionReminder": "Bestätigte Anmeldungen: bis zur Abmeldung. Unbestätigte Anmeldungen: {days} Tage"
+        "Bewerbungen, Kontaktanfragen und Anmeldungen zur Erinnerungsliste speichern wir in einer Postgres-Datenbank des Anbieters Neon Inc., USA. Die Datenbank wird in der Region „eu-central-1“ (Frankfurt am Main) betrieben; die Daten liegen damit innerhalb der Europäischen Union.",
+        "Wir erheben ausschließlich Angaben, die für den jeweiligen Zweck erforderlich sind, und löschen sie, sobald dieser Zweck entfällt (Art. 5 Abs. 1 lit. c und e DSGVO). Die konkreten Fristen finden sich im Abschnitt „Speicherdauer“."
+      ]
     },
     "email": {
       "title": "E-Mail-Versand",
       "body": [
-        "E-Mails (Bewerbungsbestätigung, Kontakt-Weiterleitung, Erinnerungs-Opt-in) verschicken wir über Resend, mit Versand aus der Region „eu-west-1“ (Irland) — der einzigen EU-Region, die Resend anbietet.",
-        "Die Rechtsgrundlage ist dieselbe wie für die jeweilige Anfrage — siehe die Abschnitte zum Bewerbungs-, Kontakt- und Erinnerungsformular.",
-        "Klick- und Öffnungs-Tracking sowie eine Tracking-Subdomain sind bei Resend für unseren Versand bewusst deaktiviert — wir verfolgen nicht, ob oder wann du eine E-Mail öffnest oder auf einen Link darin klickst."
-      ]
+        "Für den Versand automatisch erzeugter E-Mails — Bewerbungsbestätigung, Weiterleitung von Kontaktanfragen, Bestätigungsmail der Erinnerungsliste — nutzen wir den Dienst Resend (Plus Five Five, Inc., USA). Der Versand erfolgt über die Region Irland („eu-west-1“) und damit innerhalb der Europäischen Union.",
+        "Übermittelt werden die E-Mail-Adresse der empfangenden Person sowie der Inhalt der jeweiligen Nachricht.",
+        "Unsere E-Mails enthalten kein Öffnungs-Tracking, kein Klick-Tracking und keine Zählpixel. Die entsprechenden Funktionen des Dienstes sind bewusst deaktiviert. Links in unseren E-Mails führen direkt zum Ziel und werden nicht über einen Zwischendienst umgeleitet."
+      ],
+      "legalBasisLabel": "Rechtsgrundlage",
+      "legalBasis": "Dieselbe wie für die jeweils zugrunde liegende Anfrage — siehe die Abschnitte zum Bewerbungs-, Erinnerungs- und Kontaktformular."
     },
     "analytics": {
-      "title": "Analyse",
+      "title": "Reichweitenmessung",
       "body": [
-        "Wir nutzen Vercel Analytics zur anonymen Auswertung der Seitenaufrufe. Der Dienst setzt keine Cookies und erstellt keine geräteübergreifenden Profile — deshalb zeigen wir keinen Cookie-Banner.",
-        "Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO — unser berechtigtes Interesse zu verstehen, welche Inhalte genutzt werden."
-      ]
+        "Wir nutzen Vercel Analytics zur anonymen Auswertung der Seitenaufrufe. Der Dienst setzt keine Cookies, speichert keine Kennungen auf deinem Gerät und erstellt keine geräteübergreifenden Profile. Erhoben werden ausschließlich aggregierte Angaben wie aufgerufene Seite, ungefähre Herkunftsregion auf Länderebene, Gerätetyp und verweisende Seite.",
+        "Ein Rückschluss auf einzelne Personen ist uns damit nicht möglich. Weil keine Informationen auf deinem Endgerät gespeichert oder ausgelesen werden, ist keine Einwilligung nach § 25 TDDDG erforderlich — deshalb zeigt diese Website auch keinen Cookie-Banner."
+      ],
+      "legalBasisLabel": "Rechtsgrundlage",
+      "legalBasis": "Art. 6 Abs. 1 lit. f DSGVO. Unser berechtigtes Interesse liegt darin, zu verstehen, welche Inhalte genutzt werden, um die Website verbessern zu können."
     },
-    "fonts": {
-      "title": "Schriftarten",
-      "body": [
-        "Alle Schriftarten sind lokal auf unserem Server eingebunden (self-hosted). Es findet keine Verbindung zu Google Fonts oder einem anderen externen Font-Anbieter statt — deine IP-Adresse wird dafür also nicht an Dritte übermittelt."
-      ]
-    },
-    "youtube": {
-      "title": "YouTube-Einbindungen",
-      "body": [
-        "Videos (z. B. Projekt-Pitches) binden wir über eine Klick-zum-Laden-Vorschau ein. Vor deinem Klick wird keine Verbindung zu YouTube aufgebaut und es werden keine Cookies gesetzt.",
-        "Erst mit dem Klick lädt der eingebettete Player über youtube-nocookie.com; ab diesem Zeitpunkt gilt die Datenschutzerklärung von YouTube / Google."
-      ]
+    "externalContent": {
+      "title": "Schriftarten und externe Inhalte",
+      "fontsBody": "Sämtliche Schriftarten sind lokal auf unserem Server eingebunden. Es findet keine Verbindung zu Google Fonts oder einem anderen externen Schriftanbieter statt; deine IP-Adresse wird hierfür nicht an Dritte übermittelt.",
+      "videoLabel": "Videoeinbindungen",
+      "videoBody": [
+        "Projekt-Pitches und ähnliche Videos binden wir über eine Klick-zum-Laden-Vorschau ein. Vor deinem Klick wird keine Verbindung zu YouTube aufgebaut, es werden keine Daten übertragen und keine Cookies gesetzt. Angezeigt wird lediglich ein von unserem Server ausgeliefertes Vorschaubild.",
+        "Erst wenn du das Vorschaubild anklickst, lädt der eingebettete Player über die Domain youtube-nocookie.com. Ab diesem Zeitpunkt verarbeitet Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland, deine Daten nach eigener Verantwortung; es gilt die Datenschutzerklärung von Google. Auf Art und Umfang dieser Verarbeitung haben wir keinen Einfluss."
+      ],
+      "legalBasisLabel": "Rechtsgrundlage",
+      "legalBasis": "Art. 6 Abs. 1 lit. a DSGVO. Deine Einwilligung erteilst du durch den bewussten Klick auf das Vorschaubild."
     },
     "application": {
       "title": "Bewerbungsformular",
-      "intro": "Wenn du dich über /mitmachen bewirbst, erheben wir die folgenden Angaben:",
+      "intro": "Über die Seite „Mitmachen“ kannst du dich um eine Mitgliedschaft bewerben. Erhoben werden:",
       "fieldsHeading": "Erhobene Angaben",
       "fields": [
         "Vorname, Nachname, E-Mail-Adresse",
@@ -692,49 +698,121 @@
         "Bisheriges Engagement / Berufserfahrung (Freitext)",
         "Sprachen und weitere Kenntnisse (Freitext)",
         "Motivation (Freitext)",
-        "Wunschbereich (Projekte oder Vorstandsbereiche)",
+        "gewünschter Einsatzbereich",
         "Verfügbarkeit in Stunden pro Woche",
-        "Wie du auf uns aufmerksam geworden bist"
+        "Angabe, wie du auf uns aufmerksam geworden bist",
+        "Zeitpunkt deiner Einwilligung"
       ],
-      "noUpload": "Es gibt keinen Datei-Upload. Angaben, die sonst in einem Lebenslauf stehen würden, erheben wir ausschließlich als strukturierte Formularfelder, nicht als Dokument.",
+      "noUpload": "Es gibt keinen Datei-Upload. Angaben, die üblicherweise in einem Lebenslauf stehen, erheben wir ausschließlich als strukturierte Formularfelder. Wir bitten dich, keine Angaben zu besonderen Kategorien personenbezogener Daten nach Art. 9 DSGVO zu machen — etwa zu Gesundheit, religiöser oder weltanschaulicher Überzeugung, politischer Meinung oder sexueller Orientierung. Solche Angaben sind für die Auswahl nicht erforderlich.",
       "purposeLabel": "Zweck",
-      "purpose": "Prüfung und Bearbeitung deiner Bewerbung.",
+      "purpose": "Prüfung und Bearbeitung deiner Bewerbung sowie Kontaktaufnahme im Rahmen des Auswahlverfahrens.",
       "legalBasisLabel": "Rechtsgrundlage",
-      "legalBasis": "Art. 6 Abs. 1 lit. a DSGVO (deine Einwilligung über die Pflicht-Checkbox) in Verbindung mit Art. 6 Abs. 1 lit. b DSGVO analog (Anbahnung der Mitgliedschaft).",
-      "accessLabel": "Zugriff",
-      "access": "Der Vorstand und die IT-Verantwortlichen des Vereins. Bewerbungen werden zunächst in unserer Datenbank gespeichert und danach als PDF an info@unimannheim.enactus.team gesendet (siehe „E-Mail-Versand“). Du erhältst zusätzlich eine kurze Bestätigung an die von dir angegebene E-Mail-Adresse.",
-      "antiSpam": "Ein verstecktes Feld (Honeypot) und eine Prüfung der Ausfüllzeit helfen uns, automatisierte Spam-Einsendungen zu erkennen — beides ist keine Angabe über dich, sondern eine rein technische Prüfung."
+      "legalBasis": "Art. 6 Abs. 1 lit. b DSGVO. Die Verarbeitung erfolgt zur Durchführung vorvertraglicher Maßnahmen auf deine Anfrage hin.",
+      "accessLabel": "Empfänger",
+      "access": "Der Vorstand sowie die für die Bewerbungsbearbeitung zuständigen Personen des Vereins. Deine Bewerbung wird zunächst in unserer Datenbank gespeichert und anschließend als PDF an info@unimannheim.enactus.team übermittelt.",
+      "necessityLabel": "Erforderlichkeit",
+      "necessity": "Die Bereitstellung der Daten ist weder gesetzlich noch vertraglich vorgeschrieben. Ohne die als Pflichtfelder gekennzeichneten Angaben können wir deine Bewerbung jedoch nicht bearbeiten."
     },
     "reminder": {
       "title": "Erinnerungsliste",
       "body": [
-        "Solange das Bewerbungsfenster geschlossen ist, kannst du dich für eine E-Mail-Erinnerung eintragen, sobald es öffnet.",
-        "Wir speichern deine E-Mail-Adresse, ein Bestätigungs-Token, ob du bestätigt hast, den Zeitpunkt der Bestätigung und deine IP-Adresse als Nachweis deiner Einwilligung (Double-Opt-in). Erst nach deiner Bestätigung verschicken wir Erinnerungen.",
-        "Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Jede E-Mail enthält einen funktionierenden Ein-Klick-Abmeldelink — Bestätigungs- und Abmeldelink verwenden dabei zwei getrennte, unabhängige Tokens, damit ein weitergeleiteter Bestätigungslink niemals gleichzeitig als Abmeldelink funktioniert."
-      ]
+        "Solange das Bewerbungsfenster geschlossen ist, kannst du dich benachrichtigen lassen, sobald es öffnet.",
+        "Wir speichern deine E-Mail-Adresse, den Zeitpunkt der Anmeldung, den Zeitpunkt deiner Bestätigung, die dabei verwendete IP-Adresse sowie zwei zufällig erzeugte Kennungen für Bestätigung und Abmeldung.",
+        "Die Anmeldung erfolgt im Double-Opt-in-Verfahren: Nach dem Absenden erhältst du eine E-Mail mit einem Bestätigungslink. Erst nach deiner Bestätigung nehmen wir dich in die Liste auf. Zeitpunkt und IP-Adresse der Bestätigung speichern wir als Nachweis deiner Einwilligung; ohne diesen Nachweis könnten wir die Rechtmäßigkeit des Versands nicht belegen."
+      ],
+      "legalBasisLabel": "Rechtsgrundlage",
+      "legalBasis": "Art. 6 Abs. 1 lit. a DSGVO für den Versand, Art. 6 Abs. 1 lit. f DSGVO für die Speicherung des Einwilligungsnachweises.",
+      "withdrawalLabel": "Widerruf",
+      "withdrawal": "Jede E-Mail enthält einen Abmeldelink, der ohne weitere Angaben funktioniert. Der Widerruf wirkt für die Zukunft und berührt die Rechtmäßigkeit der bis dahin erfolgten Verarbeitung nicht."
     },
     "contact": {
       "title": "Kontaktformular",
       "body": [
-        "Über /kontakt kannst du uns Name, E-Mail-Adresse, optional einen Betreff und deine Nachricht schicken.",
-        "Zweck ist die Bearbeitung deiner Anfrage; Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO — unser berechtigtes Interesse, Anfragen zu beantworten.",
-        "Deine Nachricht wird zunächst in unserer Datenbank gespeichert und anschließend per E-Mail an uns weitergeleitet."
-      ]
+        "Über die Seite „Kontakt“ kannst du uns eine Nachricht senden. Erhoben werden Name, E-Mail-Adresse, optional ein Betreff sowie der Inhalt deiner Nachricht."
+      ],
+      "purposeLabel": "Zweck",
+      "purpose": "Bearbeitung und Beantwortung deiner Anfrage.",
+      "legalBasisLabel": "Rechtsgrundlage",
+      "legalBasis": "Art. 6 Abs. 1 lit. f DSGVO. Unser berechtigtes Interesse liegt in der Beantwortung von Anfragen. Zielt deine Anfrage auf den Abschluss oder die Anbahnung einer Mitgliedschaft oder Partnerschaft, ist zusätzlich Art. 6 Abs. 1 lit. b DSGVO einschlägig.",
+      "alternative": "Du kannst uns selbstverständlich auch ohne das Formular per E-Mail erreichen."
+    },
+    "antiSpam": {
+      "title": "Schutz vor Missbrauch",
+      "intro": "Um automatisierte Masseneinsendungen abzuwehren, setzen wir folgende Maßnahmen ein:",
+      "measures": [
+        "ein für dich unsichtbares Formularfeld, das nur von automatisierten Programmen ausgefüllt wird",
+        "eine Prüfung der Zeit zwischen Aufruf und Absenden des Formulars",
+        "eine Begrenzung der Anzahl von Einsendungen je Absender innerhalb eines Zeitfensters"
+      ],
+      "ipHandling": "Für die Begrenzung speichern wir deine IP-Adresse ausschließlich als kryptografischen Hashwert, aus dem sich die ursprüngliche Adresse nicht zurückrechnen lässt. Diese Werte werden nach Ablauf des jeweiligen Zeitfensters automatisch gelöscht.",
+      "noCaptcha": "Ein Captcha setzen wir bewusst nicht ein — es wäre eine Barriere für Menschen mit Behinderung und würde zusätzliche Daten an Dritte übermitteln.",
+      "legalBasisLabel": "Rechtsgrundlage",
+      "legalBasis": "Art. 6 Abs. 1 lit. f DSGVO. Unser berechtigtes Interesse liegt im Schutz unserer Systeme vor missbräuchlicher Nutzung."
+    },
+    "retention": {
+      "title": "Speicherdauer",
+      "tableCaption": "Aufbewahrungsfristen nach Datenart",
+      "columns": ["Daten", "Dauer"],
+      "applicationsLabel": "Bewerbungen",
+      "applicationsValue": "{months} Monate nach Ende des jeweiligen Bewerbungszeitraums",
+      "contactLabel": "Kontaktanfragen",
+      "contactValue": "{months} Monate nach abschließender Bearbeitung",
+      "reminderConfirmedLabel": "Bestätigte Anmeldungen zur Erinnerungsliste",
+      "reminderConfirmedValue": "bis zum Widerruf",
+      "reminderUnconfirmedLabel": "Unbestätigte Anmeldungen zur Erinnerungsliste",
+      "reminderUnconfirmedValue": "{days} Tage nach Anmeldung",
+      "rateLimitLabel": "Hashwerte zur Missbrauchsabwehr",
+      "rateLimitValue": "bis zum Ablauf des Zeitfensters",
+      "serverLogsLabel": "Server-Protokolle",
+      "serverLogsValue": "nach Vorgabe von Vercel, kurzfristig",
+      "note": "Gesetzliche Aufbewahrungspflichten bleiben unberührt. Sofern solche Pflichten einer Löschung entgegenstehen, schränken wir die Verarbeitung stattdessen ein."
+    },
+    "processors": {
+      "title": "Auftragsverarbeiter und Empfänger",
+      "intro": "Wir geben personenbezogene Daten nicht zu Werbezwecken weiter und verkaufen sie nicht. Eine Übermittlung erfolgt ausschließlich an die folgenden Dienstleister, die für uns als Auftragsverarbeiter nach Art. 28 DSGVO tätig sind:",
+      "tableCaption": "Eingesetzte Auftragsverarbeiter",
+      "columns": ["Dienst", "Zweck", "Verarbeitungsort"],
+      "rows": [
+        ["Vercel Inc., USA", "Hosting, Auslieferung, Reichweitenmessung", "Frankfurt am Main"],
+        ["Neon Inc., USA", "Datenbank", "Frankfurt am Main"],
+        ["Plus Five Five, Inc. (Resend), USA", "E-Mail-Versand", "Irland"]
+      ],
+      "dpaNote": "Mit allen genannten Anbietern bestehen Verträge zur Auftragsverarbeitung.",
+      "transferLabel": "Drittlandbezug",
+      "transfer": "Die genannten Unternehmen haben ihren Sitz in den Vereinigten Staaten. Die Verarbeitung findet zwar innerhalb der Europäischen Union statt, ein Zugriff aus den USA — etwa im Rahmen von Wartung und Support — lässt sich jedoch nicht vollständig ausschließen. Für diesen Fall haben wir mit den Anbietern die Standardvertragsklauseln der Europäischen Kommission nach Art. 46 Abs. 2 lit. c DSGVO vereinbart."
+    },
+    "automatedDecisions": {
+      "title": "Keine automatisierte Entscheidungsfindung",
+      "body": "Eine automatisierte Entscheidungsfindung einschließlich Profiling nach Art. 22 DSGVO findet nicht statt. Über Bewerbungen entscheiden ausschließlich Menschen."
+    },
+    "encryption": {
+      "title": "Verschlüsselung",
+      "body": "Diese Website wird ausschließlich über eine verschlüsselte Verbindung (TLS) ausgeliefert. Du erkennst das am Schlosssymbol in der Adresszeile deines Browsers. Damit sind alle Angaben, die du über unsere Formulare übermittelst, auf dem Transportweg vor dem Mitlesen durch Dritte geschützt."
     },
     "rights": {
       "title": "Deine Rechte",
-      "intro": "Du hast jederzeit das Recht auf:",
+      "intro": "Dir stehen gegenüber uns die folgenden Rechte zu:",
       "list": [
-        "Auskunft über deine gespeicherten Daten (Art. 15 DSGVO)",
-        "Berichtigung unrichtiger Daten (Art. 16 DSGVO)",
+        "Auskunft darüber, ob und welche Daten wir zu dir verarbeiten (Art. 15 DSGVO)",
+        "Berichtigung unrichtiger oder unvollständiger Daten (Art. 16 DSGVO)",
         "Löschung deiner Daten (Art. 17 DSGVO)",
         "Einschränkung der Verarbeitung (Art. 18 DSGVO)",
-        "Datenübertragbarkeit (Art. 20 DSGVO)",
-        "Widerspruch gegen die Verarbeitung (Art. 21 DSGVO)",
+        "Datenübertragbarkeit in einem gängigen Format (Art. 20 DSGVO)",
+        "Widerspruch gegen Verarbeitungen, die auf einem berechtigten Interesse beruhen (Art. 21 DSGVO)",
         "Widerruf einer erteilten Einwilligung mit Wirkung für die Zukunft (Art. 7 Abs. 3 DSGVO)"
       ],
-      "contactPrompt": "Wende dich dazu an:",
-      "complaint": "Du kannst dich außerdem jederzeit bei einer Datenschutz-Aufsichtsbehörde beschweren — zuständig für Enactus Mannheim ist die Landesbeauftragte für den Datenschutz und die Informationsfreiheit Baden-Württemberg (LfDI Baden-Württemberg)."
+      "contactPrompt": "Zur Ausübung genügt eine formlose Nachricht an:"
+    },
+    "complaints": {
+      "title": "Beschwerderecht",
+      "body": "Unabhängig davon steht dir das Recht zu, dich bei einer Datenschutz-Aufsichtsbehörde zu beschweren. Für uns zuständig ist:",
+      "authorityName": "Der Landesbeauftragte für den Datenschutz und die Informationsfreiheit Baden-Württemberg",
+      "authorityAddress": ["Lautenschlagerstraße 20", "70173 Stuttgart"],
+      "note": "Du kannst dich auch an die Aufsichtsbehörde deines Wohnsitzes oder deines Arbeitsplatzes wenden."
+    },
+    "changes": {
+      "title": "Änderungen dieser Datenschutzerklärung",
+      "body": "Wir passen diese Erklärung an, wenn sich die Rechtslage, unsere Dienste oder die Art der Datenverarbeitung ändern. Es gilt jeweils die auf dieser Seite veröffentlichte Fassung. Das Datum der letzten Änderung findest du am Anfang dieser Erklärung."
     }
   },
   "MitmachenPage": {
