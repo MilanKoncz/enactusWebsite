@@ -58,21 +58,47 @@ test.describe("homepage", () => {
     expect(visited.size).toBe(count);
   });
 
-  test("shows the pillar detail text on touch without any hover or focus interaction", async ({
-    page,
-    isMobile,
-  }) => {
-    test.skip(!isMobile, "the always-visible-on-touch behavior only differs from desktop here");
+  // 0.6, not 1 — DetailText's base state is muted (opacity-60, the same
+  // "legible but secondary" treatment used throughout the site). What must
+  // never happen again is the text starting at 0 anywhere: this ran on touch
+  // only while the desktop state was hover-gated, and covers both now.
+  test("shows the pillar detail text without any hover or focus interaction", async ({ page }) => {
     await page.goto("/");
-    // 0.6, not 1 — HoverDetail's own always-visible base state is muted
-    // (opacity-60, the same "legible but secondary" treatment used
-    // throughout the site); desktop-hover:opacity-0 is what a touch device
-    // at this width must never apply.
     const detail = page
       .getByText("Wir wählen Projekte danach aus, welches SDG sie voranbringen")
       .first();
     await detail.scrollIntoViewIfNeeded();
     await expect(detail).toHaveCSS("opacity", "0.6");
+  });
+
+  test("grows a benefit card on hover without moving anything around it", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, "the grow is deliberately inert where a pointer cannot hover");
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto("/");
+
+    const card = page.locator(".hover-grow").filter({ hasText: "Verantwortung" }).first();
+    await card.scrollIntoViewIfNeeded();
+    const neighbour = page.locator(".hover-grow").filter({ hasText: "Teamarbeit" }).first();
+
+    await expect(card).toHaveCSS("transform", "none");
+    const before = await neighbour.boundingBox();
+
+    await card.hover();
+    // matrix(1.02, 0, 0, 1.02, 0, 0) — a scale, not a translate.
+    await expect(card).toHaveCSS("transform", /^matrix\(1\.02, 0, 0, 1\.02, 0, 0\)$/);
+
+    // A transform never reflows: the neighbouring card has not moved.
+    expect(await neighbour.boundingBox()).toEqual(before);
+  });
+
+  test("names every board member's LinkedIn link without needing a hover", async ({ page }) => {
+    await page.goto("/");
+    const link = page.getByRole("link", { name: /LinkedIn-Profil von Thorben Ossig/ });
+    await link.scrollIntoViewIfNeeded();
+    await expect(link).toHaveCSS("opacity", "1");
   });
 
   test("the golden thread is purely decorative: aria-hidden, and never a tab stop", async ({ page }) => {

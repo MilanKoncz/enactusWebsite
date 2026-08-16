@@ -32,7 +32,8 @@ describe("Pillars", () => {
     // single-text-node matching.
     const esgLead = screen
       .getByRole("heading", { level: 3, name: "ESG-Charakter" })
-      .closest('[tabindex="0"]')!.querySelector("p");
+      .closest(".hover-grow")!
+      .querySelector("p");
     expect(esgLead).toHaveTextContent(
       "Jedes Projekt zahlt auf ein UN-Nachhaltigkeitsziel ein, nicht nur auf eine Geschäftsidee.",
     );
@@ -52,10 +53,19 @@ describe("Pillars", () => {
     ).toBeInTheDocument();
   });
 
-  it("makes each pillar column keyboard-focusable, so hover-equivalent content is reachable without a mouse", () => {
+  // No tab stop on the column: it holds nothing interactive now that the
+  // detail sentence is permanent, and a focus stop that only grows a box is
+  // noise in the tab order.
+  it("adds no tab stop of its own around a pillar column", () => {
+    const { container } = renderWithIntl(<Pillars />);
+    expect(container.querySelectorAll('[tabindex="0"]')).toHaveLength(0);
+  });
+
+  it("grows the column on hover instead of revealing anything", () => {
     renderWithIntl(<Pillars />);
-    const heading = screen.getByRole("heading", { level: 3, name: "ESG-Charakter" });
-    const column = heading.closest('[tabindex="0"]');
+    const column = screen
+      .getByRole("heading", { level: 3, name: "ESG-Charakter" })
+      .closest(".hover-grow");
     expect(column).toBeInTheDocument();
   });
 

@@ -10,10 +10,10 @@ import { board } from "@/content/board";
 import Image from "next/image";
 // No LinkedIn brand icon: neither @icons-pack/react-simple-icons (dropped
 // after a takedown, see Footer.tsx) nor lucide-react ship one, so this uses
-// the same text-only fallback Footer already established. Same
-// hover-or-focus reveal mechanic as Pillars/Benefits (desktop-hover, tabIndex
-// on the group so it's keyboard-reachable), applied to a badge instead of a
-// paragraph — on touch and small screens it's simply always visible.
+// the same text-only fallback Footer already established. Always visible, on
+// every device: it used to fade out at desktop widths and only return on
+// hover, which put a real link behind a gesture — the exact thing
+// docs/design-system.md's "hover enhances, hover never hides" rules out.
 //
 // The pointer-proximity lift/saturation (ProximityGroup, `proximity-item` +
 // `data-portrait` below) is a separate, purely decorative layer on top: it's
@@ -22,16 +22,18 @@ import Image from "next/image";
 // reachable and legible exactly as before regardless of pointer state — the
 // effect is never the only way to reach any of that.
 const LINKEDIN_MARK_CLASSES =
-  "absolute left-2 top-2 rounded-sm bg-paper/90 px-2 py-0.5 text-mono-xs font-mono uppercase text-ink transition-opacity duration-[var(--duration-fast)] ease-signature desktop-hover:opacity-0 desktop-hover:group-hover:opacity-100 desktop-hover:group-focus-within:opacity-100";
+  "absolute left-2 top-2 rounded-sm bg-paper/90 px-2 py-0.5 text-mono-xs font-mono uppercase text-ink";
 
 // Zoom lands on the crop itself (this Placeholder/photo), never on
 // data-portrait or the card around it — docs/design-system.md's Interaction
 // section: "no layout shift". data-portrait's own overflow-hidden (above) is
 // what turns the scale into a crop instead of the image spilling over its
-// neighbors. Exported for the same reason NAV_BUTTON_CLASSES is: the
+// neighbors. `motion-safe` because the blanket reduced-motion rule in
+// globals.css only shortens the transition — without it the zoom would still
+// land, instantly. Exported for the same reason NAV_BUTTON_CLASSES is: the
 // styleguide demos the real class string.
 export const PORTRAIT_ZOOM_CLASSES =
-  "transition-transform duration-[var(--duration-calm)] ease-signature desktop-hover:group-hover:scale-[1.06] desktop-hover:group-focus-within:scale-[1.06]";
+  "transition-transform duration-[var(--duration-calm)] ease-signature motion-safe:desktop-hover:group-hover:scale-[1.06] motion-safe:desktop-hover:group-focus-within:scale-[1.06]";
 
 // member.slug is a validated string (content/board.ts), not a literal union,
 // so next-intl's typed message keys can't statically confirm it names a real

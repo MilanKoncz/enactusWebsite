@@ -43,10 +43,19 @@ describe("Benefits", () => {
     ).toBeInTheDocument();
   });
 
-  it("makes each card keyboard-focusable, so hover-equivalent content is reachable without a mouse", () => {
+  // No tab stop on the card: it holds nothing interactive now that the
+  // detail sentence is permanent, and a focus stop that only grows a box is
+  // noise in the tab order.
+  it("adds no tab stop of its own around a benefit card", () => {
+    const { container } = renderWithIntl(<Benefits />);
+    expect(container.querySelectorAll('[tabindex="0"]')).toHaveLength(0);
+  });
+
+  it("grows the card on hover instead of revealing anything", () => {
     renderWithIntl(<Benefits />);
-    const heading = screen.getByRole("heading", { level: 3, name: "Verantwortung" });
-    const card = heading.closest('[tabindex="0"]');
+    const card = screen
+      .getByRole("heading", { level: 3, name: "Verantwortung" })
+      .closest(".hover-grow");
     expect(card).toBeInTheDocument();
   });
 

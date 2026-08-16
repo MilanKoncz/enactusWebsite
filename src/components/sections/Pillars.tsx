@@ -2,7 +2,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { GateMarker } from "@/components/ui/GateMarker";
-import { HoverDetail } from "@/components/ui/HoverDetail";
+import { DetailText } from "@/components/ui/DetailText";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/motion/Reveal";
@@ -24,13 +24,14 @@ import { pillars } from "@/content/pillars";
 export const PILLAR_OVERLAY_OPACITY_CLASS = "bg-ink/75";
 export const PILLAR_OVERLAY_OPACITY = 0.75;
 
-// Title and lead are always visible — only the supporting detail sentence
-// is hover/focus-revealed (HoverDetail), and only on hover-capable desktop
-// widths (globals.css's desktop-hover). The scroll entrance (Reveal) wraps
-// the whole three-column row, so it reads as one arrival, not three
-// staggered ones. Each column doubles GateMarker as its own h3 — the gold
-// rule and mono label carry the heading instead of a separate, larger one
-// repeating the same two or three words right below it.
+// Title, lead, and the supporting detail sentence are all always visible.
+// Hover grows the column slightly and does nothing else (.hover-grow in
+// globals.css) — it used to fade the detail in, which hid real content from
+// exactly the desktop visitors who could trigger it. The scroll entrance
+// (Reveal) wraps the whole three-column row, so it reads as one arrival, not
+// three staggered ones. Each column doubles GateMarker as its own h3 — the
+// gold rule and mono label carry the heading instead of a separate, larger
+// one repeating the same two or three words right below it.
 //
 // Each column now carries its own background photo (content/pillars.ts),
 // with the dark scrim above sitting between the photo and the text so
@@ -49,8 +50,7 @@ export function Pillars() {
           {pillars.map((pillar) => (
             <div
               key={pillar.key}
-              tabIndex={0}
-              className="group relative isolate flex flex-col gap-4 overflow-hidden rounded-md p-6"
+              className="hover-grow relative isolate flex flex-col gap-4 overflow-hidden rounded-md p-6"
             >
               {pillar.image && (
                 <>
@@ -75,7 +75,7 @@ export function Pillars() {
                     })
                   : t(`${pillar.key}.lead`)}
               </p>
-              <HoverDetail>{t(`${pillar.key}.detail`)}</HoverDetail>
+              <DetailText>{t(`${pillar.key}.detail`)}</DetailText>
             </div>
           ))}
         </Reveal>

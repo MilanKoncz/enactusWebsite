@@ -312,6 +312,30 @@ h6 {
     }
   }
 
+  /* The boxes that used to reveal a detail sentence on hover — the pillars,
+     the benefits cards, the /mitmachen expectations and offers. Their text
+     is permanent now (docs/design-system.md: "hover enhances, hover never
+     hides"), and hover does one thing instead: the box grows a little.
+
+     Three guards, all deliberate. `hover: hover` and `min-width: 768px`
+     together mean a touch device sees no difference from the resting state
+     at all, rather than a scale stuck on after a tap. The reduced-motion
+     query removes the scale outright — the blanket rule further up only
+     shortens transition durations, which would still leave the box sitting
+     at its grown size. And it is a transform, so the box never changes the
+     space it occupies and nothing around it moves. Focus is treated exactly
+     like hover, never as the lesser state. */
+  .hover-grow {
+    transition: transform var(--duration-fast) var(--ease-signature);
+  }
+
+  @media (hover: hover) and (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+    .hover-grow:hover,
+    .hover-grow:focus-visible {
+      transform: scale(1.02);
+    }
+  }
+
   /* The golden thread's per-section reveal (ThreadSegment.tsx). Clipped from
      the bottom up, not drawn with stroke-dasharray: the path carries
      vector-effect="non-scaling-stroke" so that a 2px stroke survives

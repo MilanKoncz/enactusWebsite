@@ -102,6 +102,12 @@ Section eyebrows are mono, small, and restrained, but never below 4.5:1 contrast
 1. **Hover enhances, hover never hides.** Content readable without interaction.
    Exceptions: project cards and the Ideation timeline, where expanding saves
    real space. On touch devices those expand on tap, not hover.
+
+   Everything else that used to fade text in on hover — the pillars, the
+   benefits cards, the `/mitmachen` expectations and offers, the board
+   portraits' LinkedIn mark — shows its text at all times. Those boxes carry
+   `.hover-grow` instead: `scale(1.02)` on hover or focus, and nothing else.
+   Inert on touch and under `prefers-reduced-motion`.
 2. **CSS first.** Scroll reveals use `IntersectionObserver` or CSS scroll-driven
    animations — compositor work, no main thread cost. Reach for `motion` only for
    the orchestrated hero sequence and a small number of shared layout
@@ -166,7 +172,11 @@ Component specifics:
   boost, a translucent border brighter than the fill, a hairline light edge on
   top, a faint inner shadow underneath.
 - **Card** — hover/focus: the same lift as Button, plus the border
-  brightening from `ink/10` toward `ink/20`.
+  brightening from `ink/10` toward `ink/20`. `interaction="grow"` swaps that
+  for `.hover-grow` on the cards that carry an always-visible detail
+  sentence. A card is defined by its border, never by a fill: the section
+  under it already paints the same surface, and an opaque card would hide
+  the golden thread passing behind it.
 - **Badge** — hover/focus: a barely-there lift only, no color change — color
   already carries the status and shouldn't shift with the pointer.
 - **Prose links** — hover/focus: an underline that grows in from the left

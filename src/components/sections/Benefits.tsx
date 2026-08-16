@@ -1,16 +1,20 @@
 import { useTranslations } from "next-intl";
 import { Card } from "@/components/ui/Card";
 import { Container } from "@/components/ui/Container";
-import { HoverDetail } from "@/components/ui/HoverDetail";
+import { DetailText } from "@/components/ui/DetailText";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { ToolOrbit } from "@/components/motion/ToolOrbit";
 import { benefits } from "@/content/benefits";
 
-// Same hover/focus mechanic as Pillars (HoverDetail), denser grid, no gate
-// marker — that motif belongs to the pillars, one signature element, not
-// two competing ones on the same page.
+// Same always-visible detail text as Pillars (DetailText), denser grid, no
+// gate marker — that motif belongs to the pillars, one signature element,
+// not two competing ones on the same page. The cards no longer carry
+// `tabIndex={0}`: that existed to make the hidden detail sentence
+// keyboard-reachable, and a focus stop on a card that contains nothing
+// interactive is only noise in the tab order now that the text is always
+// there.
 //
 // ToolOrbit sits beside the grid on large screens only (board feedback: a
 // decorative flourish, not information — dropped below `lg` rather than
@@ -27,10 +31,10 @@ export function Benefits() {
           <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             {benefits.map((benefit) => (
-              <Card key={benefit.key} tabIndex={0} className="group flex flex-col gap-3">
+              <Card key={benefit.key} interaction="grow" className="flex flex-col gap-3">
                 <h3 className="text-heading-3 font-sans">{t(`${benefit.key}.title`)}</h3>
                 <p className="text-body-m">{t(`${benefit.key}.lead`)}</p>
-                <HoverDetail>{t(`${benefit.key}.detail`)}</HoverDetail>
+                <DetailText>{t(`${benefit.key}.detail`)}</DetailText>
               </Card>
             ))}
           </div>

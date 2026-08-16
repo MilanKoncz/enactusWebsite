@@ -17,7 +17,7 @@ import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Field } from "@/components/ui/Field";
 import { GateMarker } from "@/components/ui/GateMarker";
-import { HoverDetail } from "@/components/ui/HoverDetail";
+import { DetailText } from "@/components/ui/DetailText";
 import { Placeholder } from "@/components/ui/Placeholder";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { Section } from "@/components/ui/Section";
@@ -507,22 +507,21 @@ export default async function StyleguidePage({
       </section>
 
       <section className="flex flex-col gap-6">
-        <h2 className="text-heading-2 font-sans">HoverDetail</h2>
+        <h2 className="text-heading-2 font-sans">DetailText und .hover-grow</h2>
         <p className="text-body-m font-sans text-ink/60">
-          Immer sichtbar außer auf einem hover-fähigen Desktop (≥768px, <code>hover: hover</code>)
-          — dort erst bei Hover oder Tastaturfokus auf die Karte. Im Browser mit Maus über die
-          Karte fahren oder hineintabben, um den Effekt zu sehen; unten (unter 768px oder ohne
-          Hover) bleibt der Text stehen.
+          Der Detailtext ist auf jedem Gerät und in jeder Breite sichtbar. Hover macht nur eins:
+          Die Box wächst leicht (<code>scale(1.02)</code>). Auf Touch-Geräten und unter{" "}
+          <code>prefers-reduced-motion: reduce</code> passiert gar nichts.
         </p>
-        <Demo label="Karte mit tabIndex={0} — Hover oder Fokus zeigt den Detailtext auf Desktop">
-          <div tabIndex={0} className="group max-w-sm rounded-md border border-ink/10 p-4">
+        <Demo label="Karte mit .hover-grow — Hover vergrößert nur, deckt nichts auf">
+          <div className="hover-grow max-w-sm rounded-md border border-ink/10 p-4">
             <p className="text-heading-3 font-sans">Verantwortung</p>
             <p className="mt-2 text-body-m">
               Ihr übernehmt von Anfang an echte Verantwortung für ein Projekt.
             </p>
-            <HoverDetail className="mt-2">
+            <DetailText className="mt-2">
               Kein Praktikum, das nebenherläuft — ihr entscheidet operativ mit.
-            </HoverDetail>
+            </DetailText>
           </div>
         </Demo>
       </section>

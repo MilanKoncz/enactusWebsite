@@ -1,15 +1,16 @@
 import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { GateMarker } from "@/components/ui/GateMarker";
-import { HoverDetail } from "@/components/ui/HoverDetail";
+import { DetailText } from "@/components/ui/DetailText";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/motion/Reveal";
 import { expectations, offers } from "@/content/mitmachenFit";
 
-// Same always-visible-title/hover-reveals-detail mechanic as Pillars.tsx and
-// Benefits.tsx (HoverDetail) — the brief is explicit that content here stays
-// readable without interaction, hover only adds depth. "Agency" is defined
+// Same always-visible detail text as Pillars.tsx and Benefits.tsx
+// (DetailText), with hover growing the item slightly and revealing nothing
+// (.hover-grow) — the brief is explicit that content here stays readable
+// without interaction. "Agency" is defined
 // inline, in its own `lead` sentence (never a link out — a conversion page
 // doesn't send people away), the same way every other expectation states
 // what it means without a glossary.
@@ -31,10 +32,10 @@ export function MitmachenFit() {
             <h2 className="text-heading-2 font-display">{t("expectationsHeading")}</h2>
             <div className="flex flex-col gap-6">
               {expectations.map((item) => (
-                <div key={item.key} tabIndex={0} className="group flex flex-col gap-2">
+                <div key={item.key} className="hover-grow flex flex-col gap-2 rounded-md p-2">
                   <GateMarker as="h3" label={t(`expectations.${item.key}.title`)} />
                   <p className="text-body-m">{t(`expectations.${item.key}.lead`)}</p>
-                  <HoverDetail>{t(`expectations.${item.key}.detail`)}</HoverDetail>
+                  <DetailText>{t(`expectations.${item.key}.detail`)}</DetailText>
                 </div>
               ))}
             </div>
@@ -43,10 +44,10 @@ export function MitmachenFit() {
             <h2 className="text-heading-2 font-display">{t("offersHeading")}</h2>
             <div className="flex flex-col gap-6">
               {offers.map((item) => (
-                <div key={item.key} tabIndex={0} className="group flex flex-col gap-2">
+                <div key={item.key} className="hover-grow flex flex-col gap-2 rounded-md p-2">
                   <GateMarker as="h3" label={t(`offers.${item.key}.title`)} />
                   <p className="text-body-m">{t(`offers.${item.key}.lead`)}</p>
-                  <HoverDetail>{t(`offers.${item.key}.detail`)}</HoverDetail>
+                  <DetailText>{t(`offers.${item.key}.detail`)}</DetailText>
                 </div>
               ))}
             </div>
