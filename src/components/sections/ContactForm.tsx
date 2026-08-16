@@ -64,7 +64,6 @@ export function ContactForm() {
       />
       <Field
         label={t("subjectLabel")}
-        hint={t("subjectHint")}
         error={errors.subject && t("subjectError")}
         {...register("subject")}
       />

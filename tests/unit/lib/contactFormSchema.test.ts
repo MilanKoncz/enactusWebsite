@@ -13,9 +13,17 @@ describe("contactFormSchema", () => {
     expect(() => contactFormSchema.parse(valid)).not.toThrow();
   });
 
-  it("accepts a submission without a subject — it's optional", () => {
+  it("rejects a submission without a subject — it's required", () => {
     const { subject: _subject, ...rest } = valid;
-    expect(() => contactFormSchema.parse(rest)).not.toThrow();
+    expect(() => contactFormSchema.parse(rest)).toThrow();
+  });
+
+  it("rejects a subject shorter than two characters", () => {
+    expect(() => contactFormSchema.parse({ ...valid, subject: "A" })).toThrow();
+  });
+
+  it("rejects a subject over 150 characters", () => {
+    expect(() => contactFormSchema.parse({ ...valid, subject: "a".repeat(151) })).toThrow();
   });
 
   it("rejects a name shorter than two characters", () => {

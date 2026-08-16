@@ -518,8 +518,7 @@
       "emailLabel": "Email",
       "emailError": "Please enter a valid email address.",
       "subjectLabel": "Subject",
-      "subjectHint": "Optional.",
-      "subjectError": "The subject is too long (max. 150 characters).",
+      "subjectError": "Please enter a subject (2 to 150 characters).",
       "messageLabel": "Message",
       "messageError": "Please write at least 10 characters.",
       "submitLabel": "Send message",
@@ -765,7 +764,7 @@
     "contact": {
       "title": "Contact form",
       "body": [
-        "Through the \"Kontakt\" page you can send us a message. We collect your name, email address, an optional subject, and the content of your message."
+        "Through the \"Kontakt\" page you can send us a message. We collect your name, email address, a subject, and the content of your message."
       ],
       "purposeLabel": "Purpose",
       "purpose": "Handling and answering your inquiry.",

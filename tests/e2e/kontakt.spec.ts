@@ -76,6 +76,7 @@ test.describe("/kontakt", () => {
     await page.goto("/kontakt");
     await page.getByLabel("Name").fill("Jane Doe");
     await page.getByLabel("E-Mail").fill("jane@example.com");
+    await page.getByLabel("Betreff").fill("Partnerschaft");
     await page.getByLabel("Nachricht").fill("Wir würden gerne mit euch sprechen.");
     await page.getByRole("button", { name: "Nachricht senden" }).click();
 
@@ -87,6 +88,7 @@ test.describe("/kontakt", () => {
     await page.goto("/kontakt");
     await page.getByLabel("Name").fill("Jane Doe");
     await page.getByLabel("E-Mail").fill("jane@example.com");
+    await page.getByLabel("Betreff").fill("Partnerschaft");
     await page.getByLabel("Nachricht").fill("Wir würden gerne mit euch sprechen.");
     await page.getByRole("button", { name: "Nachricht senden" }).click();
 

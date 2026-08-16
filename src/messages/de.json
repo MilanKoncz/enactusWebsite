@@ -518,8 +518,7 @@
       "emailLabel": "E-Mail",
       "emailError": "Bitte gib eine gültige E-Mail-Adresse ein.",
       "subjectLabel": "Betreff",
-      "subjectHint": "Optional.",
-      "subjectError": "Der Betreff ist zu lang (max. 150 Zeichen).",
+      "subjectError": "Bitte gib einen Betreff ein (2 bis 150 Zeichen).",
       "messageLabel": "Nachricht",
       "messageError": "Bitte schreib uns mindestens 10 Zeichen.",
       "submitLabel": "Nachricht senden",
@@ -765,7 +764,7 @@
     "contact": {
       "title": "Kontaktformular",
       "body": [
-        "Über die Seite „Kontakt“ kannst du uns eine Nachricht senden. Erhoben werden Name, E-Mail-Adresse, optional ein Betreff sowie der Inhalt deiner Nachricht."
+        "Über die Seite „Kontakt“ kannst du uns eine Nachricht senden. Erhoben werden Name, E-Mail-Adresse, ein Betreff sowie der Inhalt deiner Nachricht."
       ],
       "purposeLabel": "Zweck",
       "purpose": "Bearbeitung und Beantwortung deiner Anfrage.",

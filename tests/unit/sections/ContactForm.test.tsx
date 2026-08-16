@@ -31,12 +31,7 @@ describe("ContactForm", () => {
     expect(screen.getByRole("button", { name: "Nachricht senden" })).toBeInTheDocument();
   });
 
-  it("marks the subject field as optional", () => {
-    renderWithIntl(<ContactForm />);
-    expect(screen.getByText("Optional.")).toBeInTheDocument();
-  });
-
-  it("blocks submission and shows errors when required fields are empty", async () => {
+  it("blocks submission and shows errors when required fields are empty, including the subject", async () => {
     const user = userEvent.setup();
     renderWithIntl(<ContactForm />);
 
@@ -44,6 +39,7 @@ describe("ContactForm", () => {
 
     expect(await screen.findByText("Bitte gib deinen Namen ein (mindestens 2 Zeichen).")).toBeInTheDocument();
     expect(screen.getByText("Bitte gib eine gültige E-Mail-Adresse ein.")).toBeInTheDocument();
+    expect(screen.getByText("Bitte gib einen Betreff ein (2 bis 150 Zeichen).")).toBeInTheDocument();
     expect(screen.getByText("Bitte schreib uns mindestens 10 Zeichen.")).toBeInTheDocument();
     // Nothing was sent — validation failed before any request went out.
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
@@ -56,6 +52,7 @@ describe("ContactForm", () => {
 
     await user.type(screen.getByLabelText("Name"), "Jane Doe");
     await user.type(screen.getByLabelText("E-Mail"), "jane@example.com");
+    await user.type(screen.getByLabelText("Betreff"), "Partnerschaft");
     await user.type(screen.getByLabelText("Nachricht"), "Wir würden gerne mit euch sprechen.");
     await user.click(screen.getByRole("button", { name: "Nachricht senden" }));
 
@@ -64,7 +61,12 @@ describe("ContactForm", () => {
     expect(fetch).toHaveBeenCalledWith("/api/kontakt", expect.objectContaining({ method: "POST" }));
     const requestInit = vi.mocked(fetch).mock.calls[0]?.[1];
     const body = JSON.parse(requestInit?.body as string);
-    expect(body).toMatchObject({ name: "Jane Doe", email: "jane@example.com", locale: "de" });
+    expect(body).toMatchObject({
+      name: "Jane Doe",
+      email: "jane@example.com",
+      subject: "Partnerschaft",
+      locale: "de",
+    });
   });
 
   it("shows an error and keeps the form filled in when the request fails", async () => {
@@ -74,6 +76,7 @@ describe("ContactForm", () => {
 
     await user.type(screen.getByLabelText("Name"), "Jane Doe");
     await user.type(screen.getByLabelText("E-Mail"), "jane@example.com");
+    await user.type(screen.getByLabelText("Betreff"), "Partnerschaft");
     await user.type(screen.getByLabelText("Nachricht"), "Wir würden gerne mit euch sprechen.");
     await user.click(screen.getByRole("button", { name: "Nachricht senden" }));
 
