@@ -1,5 +1,56 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
+
+// /mitmachen bakes its recruiting-window data into the static page at
+// build time — by design, that build must succeed without a database
+// (lib/recruitingWindows.ts falls back to an empty, closed-looking list),
+// so there's no way to make a real build say "a window is open" without a
+// real, migrated database reachable in CI. MitmachenApplication.tsx
+// re-fetches the same data client-side on mount specifically so tests like
+// these have a seam to intercept, the same way every other DB-backed form
+// on this site already does (see the /api/bewerbung and /api/bewerbung/token
+// mocks below). Mocking this is what actually puts the page in the "open"
+// state here, regardless of what the CI build's own database access baked
+// into the static HTML.
+//
+// The window deliberately spans far past to far future so it contains the
+// *real* current time, which is what lets these tests run without
+// page.clock.install(). A faked clock is not usable here: installed before
+// the navigation, it stalls delivery of a route-mocked fetch response in
+// WebKit, so the component never receives this list and the form never
+// appears — reproducible on Mobile Safari, invisible on Chromium.
+const OPEN_WINDOW = {
+  semester: "HWS26",
+  start: "2000-01-01T00:00:00+01:00",
+  end: "2099-12-31T23:59:00+01:00",
+};
+
+function mockOpenRecruitingWindow(page: Page) {
+  return page.route("**/api/recruiting-windows", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ windows: [OPEN_WINDOW] }),
+    }),
+  );
+}
+
+// Issued 10s in the past, so ApplicationForm's minimum-fill-time gate
+// (lib/antiSpam.ts's MIN_FILL_MS, 3s) is already satisfied the moment the
+// form is filled in — no fake clock and no real waiting needed. The
+// signature is nonsense on purpose: /api/bewerbung is mocked too, so
+// nothing ever verifies it, and hardcoding a real one would tie the test
+// to FORM_TOKEN_SECRET being set in the e2e environment.
+function mockFormToken(page: Page) {
+  return page.route("**/api/bewerbung/token", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ token: `${Date.now() - 10_000}.e2e-test-signature` }),
+    }),
+  );
+}
 
 test.describe("/mitmachen", () => {
   test("has no automatically detectable accessibility violations", async ({ page }) => {
@@ -79,6 +130,8 @@ test.describe("/mitmachen", () => {
   test("shows the real application form during the open window, and a real success notice on submit", async ({
     page,
   }) => {
+    await mockOpenRecruitingWindow(page);
+    await mockFormToken(page);
     // /api/bewerbung itself is exercised by the Vitest integration suite
     // against a mocked db/mail/PDF layer — this only proves the form calls
     // the route and reacts to its response, without needing a real
@@ -86,20 +139,6 @@ test.describe("/mitmachen", () => {
     await page.route("**/api/bewerbung", (route) =>
       route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true }) }),
     );
-    // Also stubbed, not left to hit the real route: this decouples the test
-    // from whether FORM_TOKEN_SECRET happens to be set for this e2e run,
-    // and — since its issue time matches the faked clock below — makes the
-    // later fastForward(4000) actually exercise the intended
-    // minimum-fill-time gate rather than passing it by incidental clock skew.
-    const tokenIssuedAt = new Date("2026-09-05T12:00:00+02:00").getTime();
-    await page.route("**/api/bewerbung/token", (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ token: `${tokenIssuedAt}.e2e-test-signature` }),
-      }),
-    );
-    await page.clock.install({ time: new Date("2026-09-05T12:00:00+02:00") });
     await page.goto("/mitmachen");
 
     await expect(page.getByRole("button", { name: "Bewerbung absenden" })).toBeVisible();
@@ -117,8 +156,8 @@ test.describe("/mitmachen", () => {
     await page.getByLabel("Verfügbarkeit in Stunden pro Woche").fill("10");
     await page.getByRole("checkbox", { name: /Datenschutzerklärung/ }).check();
 
-    // Past the anti-spam minimum fill time (ApplicationForm.tsx's MIN_FILL_MS).
-    await page.clock.fastForward(4000);
+    // No wait needed for the anti-spam minimum fill time: mockFormToken
+    // hands the form a token already 10s old.
     await page.getByRole("button", { name: "Bewerbung absenden" }).click();
 
     await expect(page.getByRole("status")).toContainText("Danke für deine Bewerbung");
@@ -127,7 +166,8 @@ test.describe("/mitmachen", () => {
   test("blocks the application form with visible errors when required fields are empty", async ({
     page,
   }) => {
-    await page.clock.install({ time: new Date("2026-09-05T12:00:00+02:00") });
+    await mockOpenRecruitingWindow(page);
+    await mockFormToken(page);
     await page.goto("/mitmachen");
     await page.getByRole("button", { name: "Bewerbung absenden" }).click();
     await expect(page.getByText("Bitte gib deinen Vornamen ein.")).toBeVisible();

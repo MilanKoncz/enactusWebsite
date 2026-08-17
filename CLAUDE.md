@@ -45,6 +45,34 @@ correct semantics, `prefers-reduced-motion` respected. Baseline, not an achievem
 **Push after every commit.** Unpushed work has been left behind twice already in
 this project.
 
+**Done means the CI run is green.** A task is finished when the GitHub Actions
+run for the *pushed commit* has concluded successfully — not when it was green
+locally. Local means Windows and Chromium; CI means Linux and additionally
+WebKit, and that difference has produced a red build twice. Before reporting a
+task complete, fetch the real run status for that exact commit SHA and state it
+in the report. If the run is red or still in progress, say so rather than
+reporting "green".
+
+```
+curl -s "https://api.github.com/repos/MilanKoncz/enactusWebsite/actions/runs?per_page=5"
+```
+
+`gh` is not installed here; the REST API works unauthenticated for run status.
+Job logs need auth — reuse the stored git credential rather than asking for a
+token:
+
+```
+GH_PW=$(printf 'protocol=https\nhost=github.com\n\n' | git credential fill | sed -n 's/^password=//p')
+curl -sL -H "Authorization: Bearer $GH_PW" ".../actions/jobs/<job-id>/logs"
+```
+
+Two traps this project has already hit, worth checking before pushing:
+- **`next build` must never require a database.** `docs/deployment.md` promises
+  it, and CI has no `DATABASE_URL`. Verify by actually removing it and building.
+- **E2E needs a mockable seam for DB-backed state.** A value baked into a static
+  page at build time cannot be mocked by Playwright; route it through an API
+  endpoint `page.route()` can intercept, like every form on this site does.
+
 **Ask in chat and wait.** On any real decision or ambiguity, ask directly in the
 chat and wait for the answer — never guess, never work around it, never write a
 `HANDOFF.md` instead. `HANDOFF.md` is only for explicitly unattended runs.

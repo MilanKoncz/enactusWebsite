@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
@@ -37,10 +38,40 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
 // fact once, in words, so a screen reader isn't asked to re-announce a
 // number every tick (same non-announcing pattern as everywhere else ticking
 // content appears in this codebase).
-export function MitmachenApplication({ recruitingWindows }: { recruitingWindows: RecruitingWindow[] }) {
+//
+// `initialRecruitingWindows` is the page's own build/ISR-time value —
+// correct in production, an empty (closed) fallback in a build with no
+// database (lib/recruitingWindows.ts). This component re-fetches the same
+// data itself on mount (GET /api/recruiting-windows) and prefers that
+// result once it arrives: unlike the prop, that request is a real HTTP
+// call e2e tests can intercept with page.route(), the same seam every
+// other DB-backed form on this site already has. In production the two
+// values are normally identical; the re-fetch mainly guards against the
+// static page being stale in the narrow window before its next ISR
+// regeneration.
+export function MitmachenApplication({
+  recruitingWindows: initialRecruitingWindows,
+}: {
+  recruitingWindows: RecruitingWindow[];
+}) {
   const t = useTranslations("MitmachenPage.application");
   const locale = useLocale();
   const now = useNow();
+  const [recruitingWindows, setRecruitingWindows] = useState(initialRecruitingWindows);
+
+  useEffect(() => {
+    fetch("/api/recruiting-windows")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((body: { windows?: RecruitingWindow[] } | null) => {
+        if (body?.windows) setRecruitingWindows(body.windows);
+      })
+      .catch(() => {
+        // Left as the build-time value — a same-origin GET with no
+        // external dependency failing at all would mean the site itself
+        // is unreachable, at which point nothing else works either.
+      });
+  }, []);
+
   const phase = recruitingPhaseAt(now, recruitingWindows);
   const window = currentOrNextRecruitingWindow(now, recruitingWindows);
 

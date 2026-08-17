@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { screen, waitFor } from "@testing-library/react";
 import { axe } from "jest-axe";
 import { renderWithIntl } from "../../fixtures/intl";
 import { MitmachenApplication } from "@/components/sections/MitmachenApplication";
@@ -18,8 +18,18 @@ function freezeNowAt(ms: number) {
 }
 
 describe("MitmachenApplication", () => {
+  beforeEach(() => {
+    // The component re-fetches its own data on mount (GET
+    // /api/recruiting-windows) — rejecting it here keeps every test below
+    // on the `recruitingWindows` prop it explicitly passes in, exactly as
+    // before this fetch existed. The one test that cares about a
+    // successful refresh overrides this itself.
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("no network in tests")));
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it("shows the countdown and reminder sign-up before the window opens", () => {
@@ -67,5 +77,20 @@ describe("MitmachenApplication", () => {
     freezeNowAt((opensMs + closesMs) / 2);
     const { container } = renderWithIntl(<MitmachenApplication recruitingWindows={[hws26]} />);
     expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it("prefers a freshly fetched window list over the initial prop once it arrives", async () => {
+    freezeNowAt((opensMs + closesMs) / 2);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(new Response(JSON.stringify({ windows: [hws26] }), { status: 200 })),
+    );
+    // Starts closed (empty prop) — the open state only appears once the
+    // mocked fetch resolves and the component adopts its result.
+    renderWithIntl(<MitmachenApplication recruitingWindows={[]} />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Bewerbung absenden" })).toBeInTheDocument();
+    });
   });
 });
