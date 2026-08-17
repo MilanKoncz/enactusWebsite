@@ -1,3 +1,4 @@
+import { Archive } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/Badge";
 import { Container } from "@/components/ui/Container";
@@ -41,9 +42,15 @@ export function ProjectsStars() {
             </li>
           ))}
         </ul>
-        <Link href="/projekte/archiv" className="link-underline w-fit text-body-m opacity-70">
-          {tArchive("label")}
-        </Link>
+        <div className="flex flex-col items-center gap-3 border-t border-ink/10 pt-10 text-center">
+          <Link
+            href="/projekte/archiv"
+            className="link-underline inline-flex items-center gap-2 text-body-l font-medium"
+          >
+            <Archive className="size-5 shrink-0" aria-hidden="true" />
+            {tArchive("label")}
+          </Link>
+        </div>
       </Container>
     </Section>
   );

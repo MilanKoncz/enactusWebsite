@@ -34,7 +34,7 @@ describe("ProjectsStars", () => {
     expect(iframe).toHaveAttribute("src", expect.stringContaining("youtube-nocookie.com/embed/9Ord09u363s"));
   });
 
-  it("links subtly to the project archive", () => {
+  it("links to the project archive", () => {
     renderWithIntl(<ProjectsStars />);
     expect(
       screen.getByRole("link", { name: "Alle bisherigen Projekte im Archiv ansehen" }),
