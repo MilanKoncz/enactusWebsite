@@ -153,6 +153,11 @@ reaches for its own duration or easing value.
      A slight overshoot, not ease-in-out: hover states should feel like they
      have a little intent, not a mechanical fade. */
   --ease-signature: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* A line growing from 0 to full width (the prose-link underline) needs a
+     clean sweep, not a bounce — the overshoot above is right for a scale/lift
+     that settles back, wrong for a scaleX. */
+  --ease-grow: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 :root {
