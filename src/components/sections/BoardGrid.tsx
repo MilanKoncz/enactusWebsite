@@ -3,7 +3,6 @@ import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { ImageLightbox } from "@/components/ui/ImageLightbox";
 import { Placeholder } from "@/components/ui/Placeholder";
-import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ProximityGroup } from "@/components/motion/ProximityGroup";
@@ -51,7 +50,6 @@ type BoardBioKey = Parameters<ReturnType<typeof useTranslations<"Board">>>[0];
 export function BoardGrid() {
   const t = useTranslations("BoardGrid");
   const tBoard = useTranslations("Board");
-  const tPlaceholder = useTranslations("Placeholder");
 
   return (
     <Section className="relative isolate">
@@ -92,16 +90,7 @@ export function BoardGrid() {
                     className={LINKEDIN_MARK_CLASSES}>
                     <FaLinkedin aria-hidden="true" className="size-4" />
                   </a>
-                ) : (
-                  // No animated reveal here — a missing-data marker stays
-                  // plainly visible like every other PlaceholderMark on the
-                  // site, not gated behind a hover gesture.
-                  <PlaceholderMark
-                    hint={tPlaceholder("missingHint")}
-                    className="absolute left-2 top-2 rounded-sm bg-paper/90 px-2 py-0.5 text-mono-xs font-mono uppercase text-ink">
-                    {t("linkedin")}
-                  </PlaceholderMark>
-                )}
+                ) : null}
               </div>
               <p className="text-body-m font-medium">{member.name}</p>
               <p className="text-body-s opacity-60">{member.role}</p>

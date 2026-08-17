@@ -70,12 +70,12 @@ describe("BoardGrid", () => {
     expect(link.querySelector("svg")).toBeInTheDocument();
   });
 
-  it("renders the LinkedIn marker as a placeholder, not a dead link, while unconfirmed", () => {
+  it("renders nothing for a confirmed absence — no link, no icon, no text", () => {
     renderWithIntl(<BoardGrid />);
     expect(
       screen.queryByRole("link", { name: /John Doe/ }),
     ).not.toBeInTheDocument();
-    expect(screen.getAllByText("LinkedIn")).toHaveLength(1);
+    expect(screen.queryByText("LinkedIn")).not.toBeInTheDocument();
   });
 
   it("makes the real LinkedIn link keyboard-focusable directly, not only via the portrait column", () => {
@@ -85,12 +85,12 @@ describe("BoardGrid", () => {
     expect(link).toHaveFocus();
   });
 
-  it("makes each portrait column keyboard-focusable, so the LinkedIn marker is reachable without a mouse", () => {
+  it("makes each portrait column keyboard-focusable, so the LinkedIn link is reachable without a mouse", () => {
     renderWithIntl(<BoardGrid />);
-    const placeholderMark = screen.getByText("LinkedIn");
-    expect(placeholderMark.closest('[tabindex="0"]')).toBeInTheDocument();
     const link = screen.getByRole("link", { name: "LinkedIn-Profil von Jane Doe öffnen" });
     expect(link.closest('[tabindex="0"]')).toBeInTheDocument();
+    const [nameCaption] = screen.getAllByText("John Doe");
+    expect(nameCaption.closest('[tabindex="0"]')).toBeInTheDocument();
   });
 
   it("has no accessibility violations", async () => {
