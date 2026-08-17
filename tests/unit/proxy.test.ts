@@ -34,4 +34,19 @@ describe("proxy", () => {
     const response = proxy(requestFor("www.enactus-mannheim.com"));
     expect(response.headers.get("X-Robots-Tag")).toBeNull();
   });
+
+  it("404s the /en-prefixed admin route — it only ever answers at /admin", () => {
+    const response = proxy(requestFor("enactus-mannheim.com", "/en/admin/bewerbungen"));
+    expect(response.status).toBe(404);
+  });
+
+  it("404s the bare /en/admin path too", () => {
+    const response = proxy(requestFor("enactus-mannheim.com", "/en/admin"));
+    expect(response.status).toBe(404);
+  });
+
+  it("leaves the unprefixed /admin route to next-intl's own routing", () => {
+    const response = proxy(requestFor("enactus-mannheim.com", "/admin/bewerbungen"));
+    expect(response.status).not.toBe(404);
+  });
 });

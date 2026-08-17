@@ -35,8 +35,13 @@ export default async function AdminBewerbungenPage({ params }: PageProps) {
 
   if (!authenticated) {
     return (
-      <Container className="flex flex-col gap-10 py-24">
-        <SectionHeading as="h1" eyebrow={t("login.eyebrow")} title={t("login.title")} />
+      <Container className="flex max-w-md flex-col items-center gap-10 py-24">
+        <SectionHeading
+          as="h1"
+          eyebrow={t("login.eyebrow")}
+          title={t("login.title")}
+          className="text-center"
+        />
         <AdminLoginForm />
       </Container>
     );
@@ -47,7 +52,7 @@ export default async function AdminBewerbungenPage({ params }: PageProps) {
   const dateFormatter = new Intl.DateTimeFormat("de-DE", { dateStyle: "medium", timeStyle: "short" });
 
   return (
-    <Container className="flex flex-col gap-12 py-24">
+    <Container className="flex max-w-4xl flex-col gap-12 py-24">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <SectionHeading as="h1" eyebrow={t("eyebrow")} title={t("title")} />
         <AdminLogoutButton />
