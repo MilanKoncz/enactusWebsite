@@ -19,6 +19,19 @@
   --color-moss: #215c40;
   --color-amber: #795c13;
 
+  /* Calendar category colors — a separate layer, NOT brand colors. Seven
+     event categories need seven distinguishable colors; the five brand
+     colors above don't stretch that far. Used only by the homepage event
+     calendar (CategoryBadge.tsx) — full contrast figures and the
+     fill/outline rule in docs/design-system.md. */
+  --color-cal-innolab: #5B3A8C;
+  --color-cal-projekte: #14625E;
+  --color-cal-journeys: #1F4F9B;
+  --color-cal-wettkaempfe: #FFC321; /* == --color-gold, kept equal by a test */
+  --color-cal-socials: #A3441E;
+  --color-cal-workshops: #4A5D23;
+  --color-cal-bewerbung: #300612; /* == --color-oxblood, kept equal by a test */
+
   /* Type scale — display is Instrument Serif, everything else Geist/Geist Mono.
      Never write an arbitrary text-[Npx] value in a component; add a step here
      instead. */

@@ -131,6 +131,15 @@
       "detail": "Egal worum es geht und wann immer du es brauchst. Einmal Enactee, immer Enactee."
     }
   },
+  "CalendarCategories": {
+    "innolab": "Inno Lab",
+    "projekte": "Projekte",
+    "journeys": "Journeys",
+    "wettkaempfe": "Wettkämpfe",
+    "socials": "Socials",
+    "workshops": "Workshops",
+    "bewerbung": "Bewerbung"
+  },
   "AlumniVoices": {
     "eyebrow": "Wohin es führt",
     "title": "Was aus unseren Mitgliedern wird",

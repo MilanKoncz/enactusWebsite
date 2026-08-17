@@ -131,6 +131,15 @@
       "detail": "Whatever it's about, whenever you need it. Once an Enactee, always an Enactee."
     }
   },
+  "CalendarCategories": {
+    "innolab": "Inno Lab",
+    "projekte": "Projects",
+    "journeys": "Journeys",
+    "wettkaempfe": "Competitions",
+    "socials": "Socials",
+    "workshops": "Workshops",
+    "bewerbung": "Applications"
+  },
   "AlumniVoices": {
     "eyebrow": "Where it leads",
     "title": "What becomes of our members",

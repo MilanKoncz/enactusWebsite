@@ -16,7 +16,27 @@ import { extendTailwindMerge } from "tailwind-merge";
 const customTwMerge = extendTailwindMerge({
   extend: {
     theme: {
-      color: ["ink", "gold", "paper", "sand", "oxblood"],
+      color: [
+        "ink",
+        "gold",
+        "paper",
+        "sand",
+        "oxblood",
+        "moss",
+        "amber",
+        // The calendar's own color layer (docs/design-system.md) — a
+        // separate set of seven, not brand colors, but registered here for
+        // the same reason as the five above: without this, `cn()` can
+        // misclassify e.g. `text-cal-socials` against a font-size utility
+        // sharing the `text-` prefix.
+        "cal-innolab",
+        "cal-projekte",
+        "cal-journeys",
+        "cal-wettkaempfe",
+        "cal-socials",
+        "cal-workshops",
+        "cal-bewerbung",
+      ],
       text: [
         "display-1",
         "display-2",
@@ -27,6 +47,7 @@ const customTwMerge = extendTailwindMerge({
         "body-l",
         "body-m",
         "body-s",
+        "mono-m",
         "mono-s",
         "mono-xs",
       ],

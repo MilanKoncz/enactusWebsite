@@ -59,6 +59,67 @@ We use the local value until the board decides otherwise.
 Navy, paper, and gold carry the design. Sand appears occasionally. Oxblood is
 almost never needed — if you reach for it, question the layout instead.
 
+## Calendar category colors — a separate layer
+
+The homepage event calendar (`CategoryBadge.tsx`) sorts events into seven
+categories: `innolab` · `projekte` · `journeys` · `wettkaempfe` · `socials` ·
+`workshops` · `bewerbung`. The five brand colors above don't stretch to seven
+distinguishable hues, so the calendar gets its own, clearly separate palette —
+**these are not brand colors**, they exist only inside the calendar, and
+nowhere else on the site should reach for a `cal-*` token.
+
+```css
+@theme {
+  --color-cal-innolab: #5B3A8C;      /* Violet */
+  --color-cal-projekte: #14625E;     /* Petrol */
+  --color-cal-journeys: #1F4F9B;     /* Blue */
+  --color-cal-wettkaempfe: #FFC321;  /* Gold — reuses --color-gold exactly */
+  --color-cal-socials: #A3441E;      /* Terracotta */
+  --color-cal-workshops: #4A5D23;    /* Olive */
+  --color-cal-bewerbung: #300612;    /* Oxblood — reuses --color-oxblood exactly */
+}
+```
+
+`wettkaempfe` and `bewerbung` deliberately reuse the site's existing gold and
+oxblood values rather than defining two near-duplicate hues — a drift test in
+`tests/unit/contrast.test.ts` keeps that equality enforced, not just
+documented.
+
+**Fill-vs-outline, the same split `Badge.tsx` uses for project status:**
+`wettkaempfe` is the only filled category — gold background, `--color-ink`
+text (gold is never a text color, no exception here either). The other six
+are their own color as text plus a hairline border on paper, never filled.
+
+Measured contrast, text-as-color against paper (`#f3f5f9`), rendered pixel,
+not estimated:
+
+| Category | Hex | As text on paper | Ink on it |
+| --- | --- | --- | --- |
+| innolab | `#5B3A8C` | 7.92:1 | 2.16:1 |
+| journeys | `#1F4F9B` | 7.26:1 | 2.35:1 |
+| workshops | `#4A5D23` | 6.68:1 | 2.56:1 |
+| projekte | `#14625E` | 6.55:1 | 2.61:1 |
+| socials | `#A3441E` | 5.65:1 | 3.02:1 |
+| bewerbung | `#300612` | 16.58:1 | 1.03:1 |
+| wettkaempfe | `#FFC321` | 1.47:1 — fails, never used as text | 11.61:1 |
+
+Color is never the only signal for a category: every `CategoryBadge` also
+carries a fixed lucide icon (`Lightbulb`, `Rocket`, `Plane`, `Trophy`,
+`PartyPopper`, `GraduationCap`, `UserPlus`) and the category's name as text.
+
+**Past events, muted differently per category.** A past event stays visible
+(this is a calendar, not an announcements list) but reads as quieter than an
+upcoming one. The six outline categories mute by dimming the row's title and
+metadata text to `ink` at 60% opacity on paper — the same documented minimum
+as any other muted text — while the category badge itself (icon, name,
+color) stays at full strength, since it's a graphical label, not running
+copy. `wettkaempfe` cannot mute the same way: it has no outline state to fall
+back to, and gold as bare text on paper measures 1.47:1. A past `wettkaempfe`
+badge instead keeps its gold fill and dims the ink text to 70% opacity, not
+the usual 60% — measured against this particular fill, `ink`/60 is 4.30:1
+(fails AA), `ink`/70 is 5.78:1. Both figures are asserted in
+`tests/unit/contrast.test.ts` so neither value drifts unnoticed.
+
 ## Typography
 
 - **Display — Instrument Serif.** Headlines only, large, tight tracking. Never

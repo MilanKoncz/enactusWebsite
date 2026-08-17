@@ -7,23 +7,43 @@ import {
   passesAA,
   WCAG_AA_NORMAL_TEXT,
 } from "@/lib/contrast";
-import { colorTokens } from "@/lib/design-tokens";
+import { calendarColorTokens, colorTokens } from "@/lib/design-tokens";
 import { PILLAR_IMAGE_FIT, PILLAR_OVERLAY_OPACITY } from "@/components/sections/Pillars";
 
-function readCssColorTokens(): Record<string, string> {
+/**
+ * Reads every `--color-*` custom property out of the @theme block, split
+ * into the brand layer and the calendar layer (the `cal-` prefix). The
+ * character class includes `-` — the original pattern here only matched
+ * `[a-z]+`, which happened to work while every color name was a single
+ * word, but would have silently let `--color-cal-innolab` etc. through
+ * unmatched (a hyphenated name isn't `[a-z]+`), so the drift check below
+ * would never have noticed the calendar layer diverging from
+ * design-tokens.ts at all.
+ */
+function readCssColorTokens(): { tokens: Record<string, string>; calendarTokens: Record<string, string> } {
   const css = readFileSync(resolve(process.cwd(), "src/app/globals.css"), "utf-8");
   const tokens: Record<string, string> = {};
-  for (const match of css.matchAll(/--color-([a-z]+):\s*(#[0-9a-fA-F]{6});/g)) {
-    tokens[match[1]] = match[2];
+  const calendarTokens: Record<string, string> = {};
+  for (const match of css.matchAll(/--color-([a-z-]+):\s*(#[0-9a-fA-F]{6});/g)) {
+    const [, name, value] = match;
+    if (name.startsWith("cal-")) {
+      calendarTokens[name] = value;
+    } else {
+      tokens[name] = value;
+    }
   }
-  return tokens;
+  return { tokens, calendarTokens };
 }
 
 describe("design tokens: color contrast", () => {
-  const cssTokens = readCssColorTokens();
+  const { tokens: cssTokens, calendarTokens: cssCalendarTokens } = readCssColorTokens();
 
   it("keeps src/lib/design-tokens.ts in sync with the @theme colors in globals.css", () => {
     expect(cssTokens).toEqual(colorTokens);
+  });
+
+  it("keeps the calendar color layer in sync with globals.css, separately from the brand tokens", () => {
+    expect(cssCalendarTokens).toEqual(calendarColorTokens);
   });
 
   const { ink, gold, paper, sand, oxblood, moss, amber } = cssTokens;
@@ -113,5 +133,59 @@ describe("design tokens: color contrast", () => {
     expect(PILLAR_IMAGE_FIT.esg).toBe("contain");
     const worstCaseBackground = blendOverBackground(ink, PILLAR_OVERLAY_OPACITY, "#ffffff");
     expect(passesAA(contrastRatio(paper, worstCaseBackground))).toBe(true);
+  });
+});
+
+describe("calendar category colors", () => {
+  const { tokens: cssTokens, calendarTokens: cssCalendarTokens } = readCssColorTokens();
+  const { ink, gold, paper, oxblood } = cssTokens;
+  const {
+    "cal-innolab": calInnolab,
+    "cal-projekte": calProjekte,
+    "cal-journeys": calJourneys,
+    "cal-wettkaempfe": calWettkaempfe,
+    "cal-socials": calSocials,
+    "cal-workshops": calWorkshops,
+    "cal-bewerbung": calBewerbung,
+  } = cssCalendarTokens;
+
+  it("reuses the existing gold and oxblood tokens rather than defining new duplicate colors", () => {
+    // wettkaempfe is the signature gold, bewerbung is oxblood — the palette
+    // was chosen to reuse both rather than invent two near-duplicate hues,
+    // and this keeps that intentional whether or not it stays visible from
+    // the hex values alone.
+    expect(calWettkaempfe).toBe(gold);
+    expect(calBewerbung).toBe(oxblood);
+  });
+
+  it("the six outline categories pass AA as text on paper", () => {
+    for (const color of [calInnolab, calProjekte, calJourneys, calSocials, calWorkshops, calBewerbung]) {
+      expect(passesAA(contrastRatio(color, paper))).toBe(true);
+    }
+  });
+
+  it("wettkaempfe (gold) fails AA as text on paper — it is the one filled category, never an outline", () => {
+    expect(passesAA(contrastRatio(calWettkaempfe, paper))).toBe(false);
+  });
+
+  it("ink on the wettkaempfe fill passes AA — the only category with a filled background", () => {
+    expect(passesAA(contrastRatio(ink, calWettkaempfe))).toBe(true);
+  });
+
+  // A past wettkaempfe row keeps its gold fill (it's the one category that
+  // can't be dimmed by dropping the fill, see the outline-categories case
+  // below) and mutes its title/meta text instead. ink/60 is this project's
+  // documented minimum for muted text — but that figure was measured
+  // against paper, not against a fill this bright, and doesn't transfer:
+  // measured here at 4.30:1, below the 4.5:1 floor. ink/70 is the value
+  // actually used, measured at 5.78:1.
+  it("ink at 60% opacity fails AA on the wettkaempfe fill — muted text needs a different value there", () => {
+    const muted = blendOverBackground(ink, 0.6, calWettkaempfe);
+    expect(passesAA(contrastRatio(muted, calWettkaempfe))).toBe(false);
+  });
+
+  it("ink at 70% opacity passes AA on the wettkaempfe fill — the value a past wettkaempfe row actually uses", () => {
+    const muted = blendOverBackground(ink, 0.7, calWettkaempfe);
+    expect(passesAA(contrastRatio(muted, calWettkaempfe))).toBe(true);
   });
 });
