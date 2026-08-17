@@ -60,4 +60,37 @@ the run ends, not left behind as permanent documentation.
 
 ## Notes / open items
 
-(filled in as the run proceeds)
+- **A3 design call: month-collapse split uses the server's own render-time
+  clock, not the ticking `useNow()`.** `EventCalendar` receives
+  `initialNowMs` from `page.tsx` (via `getServerNowMs()`, a plain function
+  outside any component — `Date.now()` directly inside the page's render
+  trips `react-hooks/purity`'s "impure call during render" check). That
+  value drives which event is highlighted, which months collapse behind
+  "Frühere Termine", and which rows dim as past — all fixed for the
+  lifetime of that render, so nothing reorganises itself right after
+  hydration. `useNow(60_000)` (real hook, ticking, starting at 0) drives
+  only the highlight card's countdown *phrase* — guarded on `now > 0` so
+  the server output is the bare date, per the brief, and no nonsense
+  day-count against the Unix epoch ever renders. Considered computing month
+  boundaries from the ticking clock too, rejected: at `now === 0` every
+  real month is "current or later" (1970 < everything), so once the real
+  clock arrived, any genuinely past month would visibly vanish behind the
+  collapse a moment after mount — a layout shift the "no layout shift on
+  load" floor rules out. `getServerNowMs()`/`getCalendarEvents()` share the
+  homepage's inherited 1-hour ISR window (confirmed in the build output:
+  `/[locale]` now shows `1h / 1y`, matching `/mitmachen`'s existing
+  pattern), so "now" is at most an hour stale — irrelevant at day
+  granularity.
+- **The highlighted event is excluded from the grouped list below it** —
+  showing the same event twice (once large, once in the agenda) read as a
+  rendering bug in testing, not emphasis.
+- **`content/events.ts` and its test are deleted** (see correction 4 above)
+  — `docs/content-guide.md`'s events-calendar pointer updated to the new
+  admin flow, and its `ASSETS-TODO.md` row removed. `/events` itself is
+  unchanged; it never read that file.
+- **Known pre-existing flake, not caused by this work:**
+  `tests/e2e/projekte.spec.ts`'s "never introduces a horizontal scrollbar…"
+  failed once under Mobile Safari with 6 parallel workers, passed cleanly
+  alone and on a retry. That spec doesn't touch the homepage or anything
+  this run has changed — matches the WebKit-under-load flakiness
+  `playwright.config.ts`'s own comment already documents.

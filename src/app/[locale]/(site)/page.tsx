@@ -6,10 +6,12 @@ import { PartnerMarquee } from "@/components/sections/PartnerMarquee";
 import { HomeKpis } from "@/components/sections/HomeKpis";
 import { Pillars } from "@/components/sections/Pillars";
 import { Benefits } from "@/components/sections/Benefits";
+import { EventCalendar } from "@/components/sections/EventCalendar";
 import { AlumniVoices } from "@/components/sections/AlumniVoices";
 import { BoardGrid } from "@/components/sections/BoardGrid";
 import { ClosingCta } from "@/components/sections/ClosingCta";
 import { GateDivider } from "@/components/sections/GateDivider";
+import { getCalendarEvents, getServerNowMs } from "@/lib/calendarEvents";
 
 type PageProps = {
   params: Promise<{ locale: string }>;
@@ -39,6 +41,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function HomePage({ params }: PageProps) {
   const locale = await requireLocale(params);
   const t = await getTranslations({ locale, namespace: "Home" });
+  const events = await getCalendarEvents();
+  // The server's own render-time clock, passed down so EventCalendar's
+  // first client render can agree with the server exactly — see that
+  // component's own comment on why this isn't read from useNow() instead.
+  const nowMs = getServerNowMs();
 
   return (
     <>
@@ -51,6 +58,8 @@ export default async function HomePage({ params }: PageProps) {
       <HomeKpis />
       <Pillars />
       <Benefits />
+      <GateDivider label={t("dividers.calendar")} stop="gate-calendar" />
+      <EventCalendar events={events} initialNowMs={nowMs} />
       <GateDivider label={t("dividers.alumni")} stop="gate-alumni" />
       <AlumniVoices />
       <GateDivider label={t("dividers.board")} stop="gate-board" />

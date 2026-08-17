@@ -64,6 +64,7 @@
   },
   "Home": {
     "dividers": {
+      "calendar": "Termine",
       "alumni": "Stimmen aus dem Netzwerk",
       "board": "Vorstand"
     }
@@ -129,6 +130,22 @@
       "title": "Enactus Community",
       "lead": "Du wirst nicht nur Teil einer lokalen Studenteninitiative, sondern Mitglied einer weltweiten Enactus-Community aus engagierten Enactees, die dich für die gute Sache unterstützen.",
       "detail": "Egal worum es geht und wann immer du es brauchst. Einmal Enactee, immer Enactee."
+    }
+  },
+  "EventCalendar": {
+    "eyebrow": "Termine",
+    "title": "Was als Nächstes ansteht",
+    "lead": "Der Semesterplan auf einen Blick — von der Bewerbung bis zum nächsten Wettkampf.",
+    "filterLabel": "Nach Kategorie filtern",
+    "earlierMonths": "Frühere Termine",
+    "empty": "Aktuell stehen keine Termine im Kalender.",
+    "emptyFiltered": "Keine Termine für diese Auswahl.",
+    "tentativeLabel": "Termin steht noch nicht fest",
+    "highlight": {
+      "eyebrow": "Nächster Termin",
+      "today": "heute",
+      "tomorrow": "morgen",
+      "inDays": "in {days} Tagen"
     }
   },
   "CalendarCategories": {

@@ -69,6 +69,22 @@ before its start, and any window overlapping an existing one (naming which).
 A change is live on `/mitmachen` immediately — the page's cache is
 invalidated by the same request that saved it.
 
+## Update the event calendar (Termine)
+
+Events live in the `calendar_events` table, not in a content file — the same
+move recruiting windows made. Manage them at **`/admin/termine`**: list,
+create, edit, delete. Each event has a category (fixed set of seven — see
+`docs/design-system.md`'s calendar color layer), a start date, an optional
+end date for multi-day events, optional start/end times, an optional
+location and description, and a "not yet confirmed" flag that shows a
+dashed border and a note on the public page instead of a firm date.
+
+Titles and descriptions are entered in German; the optional English fields
+fall back to the German text when left blank — the board maintains this
+table directly, and a second-language pass wasn't asked for. A change is
+live on the homepage immediately, the same cache-invalidation-on-save
+arrangement as the recruiting windows above.
+
 The page also warns, standing, when no window with a future end date exists:
 that's the state in which `/mitmachen` says "closed" indefinitely.
 
@@ -119,7 +135,8 @@ entries note in a comment why a given one was hard to verify automatically.
 - FAQ: `src/content/faq.ts` for the question's `category`/order, the
   question and answer text under `"Faq.<key>.question"` /
   `.answer"` in messages.
-- Events calendar: `src/content/events.ts`.
+- Events calendar: see "Update the event calendar (Termine)" above — the
+  `calendar_events` table, not a content file.
 - Process-page gate checklists: `messages/{de,en}.json`'s
   `"Process.steps.<milestone>.checklist"` — never invent a checkpoint; leave
   the placeholder tokens (`PRÜFPUNKT_n`) until the board confirms one.

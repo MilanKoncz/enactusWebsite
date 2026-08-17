@@ -64,6 +64,7 @@
   },
   "Home": {
     "dividers": {
+      "calendar": "Events",
       "alumni": "Voices from the network",
       "board": "Board"
     }
@@ -129,6 +130,22 @@
       "title": "Enactus community",
       "lead": "You don't just become part of a local student initiative — you become a member of a worldwide Enactus community of committed Enactees who support you for the cause.",
       "detail": "Whatever it's about, whenever you need it. Once an Enactee, always an Enactee."
+    }
+  },
+  "EventCalendar": {
+    "eyebrow": "Calendar",
+    "title": "What's coming up",
+    "lead": "The semester plan at a glance — from applications to the next competition.",
+    "filterLabel": "Filter by category",
+    "earlierMonths": "Earlier events",
+    "empty": "There are currently no events in the calendar.",
+    "emptyFiltered": "No events match this selection.",
+    "tentativeLabel": "Date not yet confirmed",
+    "highlight": {
+      "eyebrow": "Next up",
+      "today": "today",
+      "tomorrow": "tomorrow",
+      "inDays": "in {days} days"
     }
   },
   "CalendarCategories": {

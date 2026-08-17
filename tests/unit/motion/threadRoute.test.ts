@@ -21,6 +21,8 @@ describe("threadRoute", () => {
       "kpis",
       "pillars",
       "benefits",
+      "gate-calendar",
+      "calendar",
       "gate-alumni",
       "alumni",
       "gate-board",
@@ -29,8 +31,8 @@ describe("threadRoute", () => {
     ]);
   });
 
-  it("keeps the three gate-divider stops perfectly vertical, in both widths", () => {
-    for (const stop of ["gate-kpis", "gate-alumni", "gate-board"] as const) {
+  it("keeps the four gate-divider stops perfectly vertical, in both widths", () => {
+    for (const stop of ["gate-kpis", "gate-calendar", "gate-alumni", "gate-board"] as const) {
       for (const width of WIDTHS) {
         const { from, bow, to } = waypointsFor(stop, width);
         expect(from).toBe(50);

@@ -42,6 +42,24 @@ const CATEGORY_CLASSES: Record<CalendarCategory, string> = {
 // badge, so their own color and icon stay at full strength.
 const PAST_WETTKAEMPFE_CLASSES = "bg-cal-wettkaempfe text-ink/70";
 
+/**
+ * A category's color as a left-edge accent border — the gate-marker motif
+ * (docs/design-system.md) applied to the highlighted next-event card.
+ * Exported as a static, fully-spelled-out map rather than built from a
+ * template string (`` `border-l-cal-${category}` ``): Tailwind's scanner
+ * only picks up class names it can see literally in source, so an
+ * interpolated one would compile to nothing.
+ */
+export const CATEGORY_LEFT_BORDER_CLASS: Record<CalendarCategory, string> = {
+  innolab: "border-l-cal-innolab",
+  projekte: "border-l-cal-projekte",
+  journeys: "border-l-cal-journeys",
+  wettkaempfe: "border-l-cal-wettkaempfe",
+  socials: "border-l-cal-socials",
+  workshops: "border-l-cal-workshops",
+  bewerbung: "border-l-cal-bewerbung",
+};
+
 export type CategoryBadgeProps = {
   category: CalendarCategory;
   /** The event this badge labels is in the past — see the comment above. */
