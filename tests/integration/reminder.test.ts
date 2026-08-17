@@ -6,6 +6,8 @@ const upsertReminderSignup = vi.fn();
 const confirmReminderSignup = vi.fn();
 const unsubscribeReminder = vi.fn();
 const findConfirmedReminderSignups = vi.fn();
+const markReminderMailed = vi.fn();
+const markReminderMailFailed = vi.fn();
 const sendReminderConfirmationEmail = vi.fn();
 const checkRateLimit = vi.fn();
 const generateToken = vi.fn();
@@ -15,6 +17,8 @@ vi.mock("@/lib/db", () => ({
   confirmReminderSignup: (...args: unknown[]) => confirmReminderSignup(...args),
   unsubscribeReminder: (...args: unknown[]) => unsubscribeReminder(...args),
   findConfirmedReminderSignups: (...args: unknown[]) => findConfirmedReminderSignups(...args),
+  markReminderMailed: (...args: unknown[]) => markReminderMailed(...args),
+  markReminderMailFailed: (...args: unknown[]) => markReminderMailFailed(...args),
 }));
 
 vi.mock("@/lib/mail", () => ({
@@ -69,6 +73,7 @@ describe("POST /api/reminder", () => {
     checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
     generateToken.mockReturnValueOnce("confirm-token").mockReturnValueOnce("unsub-token");
     upsertReminderSignup.mockResolvedValue({
+      id: "signup-1",
       confirmed: false,
       confirmToken: "confirm-token",
       unsubscribeToken: "unsub-token",
@@ -92,6 +97,7 @@ describe("POST /api/reminder", () => {
     checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
     generateToken.mockReturnValue("ignored-token");
     upsertReminderSignup.mockResolvedValue({
+      id: "signup-1",
       confirmed: true,
       confirmToken: "old-token",
       unsubscribeToken: "old-unsub-token",
@@ -108,17 +114,42 @@ describe("POST /api/reminder", () => {
     checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
     generateToken.mockReturnValue("token");
     upsertReminderSignup.mockResolvedValue({
+      id: "signup-1",
       confirmed: false,
       confirmToken: "token",
       unsubscribeToken: "unsub-token",
     });
     sendReminderConfirmationEmail.mockRejectedValue(new Error("Resend is down"));
+    markReminderMailFailed.mockResolvedValue(undefined);
 
     const { POST } = await import("@/app/api/reminder/route");
     const response = await POST(postSignup({ email: "jane@example.com", consent: true, locale: "de" }));
 
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ ok: true });
+    // Recorded on the row, not only logged — that's what makes the signup
+    // show up in /admin/mails instead of vanishing into a console nobody
+    // reads.
+    expect(markReminderMailFailed).toHaveBeenCalledWith("signup-1", "Resend is down");
+  });
+
+  it("records a successful confirmation send on the row", async () => {
+    checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
+    generateToken.mockReturnValue("token");
+    upsertReminderSignup.mockResolvedValue({
+      id: "signup-1",
+      confirmed: false,
+      confirmToken: "token",
+      unsubscribeToken: "unsub-token",
+    });
+    sendReminderConfirmationEmail.mockResolvedValue("email-id");
+    markReminderMailed.mockResolvedValue(undefined);
+
+    const { POST } = await import("@/app/api/reminder/route");
+    await POST(postSignup({ email: "jane@example.com", consent: true, locale: "de" }));
+
+    expect(markReminderMailed).toHaveBeenCalledWith("signup-1");
+    expect(markReminderMailFailed).not.toHaveBeenCalled();
   });
 
   it("rejects a flood with 429 before touching the database", async () => {

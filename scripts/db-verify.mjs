@@ -78,6 +78,17 @@ async function verifyReminderSignups() {
   `;
   check("re-confirming an already-confirmed row matches zero rows", repeatConfirm.length, 0);
 
+  check("mail_status defaults to pending", inserted.mail_status, "pending");
+
+  await sql`update reminder_signups set mail_status = 'failed', mail_error = 'Resend is down' where id = ${inserted.id}`;
+  const [failed] = await sql`
+    select source, id, email, label, mail_error from (
+      select 'reminder_signups' as source, id, created_at, email, '' as label, mail_error
+      from reminder_signups where mail_status = 'failed'
+    ) t where id = ${inserted.id}
+  `;
+  check("a failed reminder send is findable with its error", failed?.mail_error, "Resend is down");
+
   const deleted = await sql`delete from reminder_signups where id = ${inserted.id} returning id`;
   check("delete removes exactly one row", deleted.length, 1);
 }

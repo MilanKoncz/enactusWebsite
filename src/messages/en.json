@@ -1071,6 +1071,27 @@
         "createdAt": "Received",
         "mailStatus": "Mail status"
       }
+    },
+    "failedMails": {
+      "title": "Failed mails",
+      "lead": "Every record whose notification never went out. The data itself is stored — only the delivery was missing.",
+      "empty": "No failed deliveries.",
+      "resend": "Resend",
+      "resent": "Sent.",
+      "resendFailed": "Sending failed again.",
+      "resendFailedWithReason": "Sending failed again: {reason}",
+      "columns": {
+        "source": "Source",
+        "record": "Record",
+        "createdAt": "Received",
+        "error": "Error",
+        "action": "Action"
+      },
+      "sources": {
+        "applications": "Application",
+        "contact_messages": "Contact message",
+        "reminder_signups": "Reminder"
+      }
     }
   },
   "ImageLightbox": {

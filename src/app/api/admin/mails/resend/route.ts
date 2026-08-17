@@ -1,0 +1,111 @@
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { z } from "zod";
+import { isAuthenticatedRequest } from "@/lib/adminSession";
+import {
+  findApplicationById,
+  findContactMessageById,
+  findReminderSignupById,
+  markApplicationMailed,
+  markApplicationMailFailed,
+  markContactMessageMailed,
+  markContactMessageMailFailed,
+  markReminderMailed,
+  markReminderMailFailed,
+} from "@/lib/db";
+import {
+  dispatchApplicationMails,
+  dispatchContactNotification,
+  dispatchReminderConfirmation,
+} from "@/lib/mailDispatch";
+
+/**
+ * Retries the notification for one record the board picked out of
+ * /admin/mails, then records the outcome on that row so the list reflects
+ * it immediately.
+ *
+ * Unlike the public form routes, a failure here is reported plainly: the
+ * board pressed a button and is owed the truth about whether it worked,
+ * where a visitor is told their submission succeeded (it did — it's stored)
+ * regardless of the mail. The provider's message goes back in the response
+ * as well as onto the row, because the person reading it is the person who
+ * can act on it.
+ */
+// `z.guid()`, not `z.uuid()`: the stricter one additionally requires RFC
+// 9562 version and variant bits, which the Postgres `uuid` column type does
+// not guarantee — it stores any 128-bit value. This check exists to keep
+// obvious junk away from the query, not to re-specify what a uuid is, and
+// rejecting an id the database would happily have found would be a bug in
+// the validator rather than a caught attack.
+const requestSchema = z.object({
+  source: z.enum(["applications", "contact_messages", "reminder_signups"]),
+  id: z.guid(),
+});
+
+export async function POST(request: NextRequest) {
+  if (!isAuthenticatedRequest(request)) {
+    return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
+  }
+
+  const body = await request.json().catch(() => null);
+  const parsed = requestSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ ok: false, error: "invalid_request" }, { status: 400 });
+  }
+  const { source, id } = parsed.data;
+
+  try {
+    const found = await resend(source, id);
+    if (!found) {
+      return NextResponse.json({ ok: false, error: "not_found" }, { status: 404 });
+    }
+  } catch (error) {
+    console.error(`Failed to resend mail for ${source} ${id}`, error);
+    const message = error instanceof Error ? error.message : String(error);
+    await recordFailure(source, id, message).catch((markError: unknown) => {
+      console.error("Failed to record the resend failure itself", markError);
+    });
+    return NextResponse.json({ ok: false, error: "send_failed", message }, { status: 502 });
+  }
+
+  return NextResponse.json({ ok: true });
+}
+
+// Returns false only when the row is genuinely gone (deleted between the
+// page render and the click), which is a 404 rather than a send failure —
+// nothing to retry and nothing to mark.
+async function resend(source: string, id: string): Promise<boolean> {
+  if (source === "applications") {
+    const application = await findApplicationById(id);
+    if (!application) return false;
+    await dispatchApplicationMails(application);
+    await markApplicationMailed(id);
+    return true;
+  }
+
+  if (source === "contact_messages") {
+    const message = await findContactMessageById(id);
+    if (!message) return false;
+    await dispatchContactNotification(message);
+    await markContactMessageMailed(id);
+    return true;
+  }
+
+  const signup = await findReminderSignupById(id);
+  if (!signup) return false;
+  // A confirmed subscriber has already used their link; re-sending the
+  // double-opt-in request would be confusing at best. The list never offers
+  // one of these (only mail_status = 'failed' rows appear, and confirming
+  // requires the mail to have arrived), so this is a guard against a
+  // hand-made request, not a case the UI can produce.
+  if (signup.confirmed) return false;
+  await dispatchReminderConfirmation(signup);
+  await markReminderMailed(id);
+  return true;
+}
+
+async function recordFailure(source: string, id: string, message: string): Promise<void> {
+  if (source === "applications") return markApplicationMailFailed(id, message);
+  if (source === "contact_messages") return markContactMessageMailFailed(id, message);
+  return markReminderMailFailed(id, message);
+}

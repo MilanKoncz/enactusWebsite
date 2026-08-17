@@ -128,6 +128,16 @@ export async function markApplicationMailFailed(id: string, error: string): Prom
   `;
 }
 
+// Powers /admin/mails's resend. Reads the whole row, unlike
+// ApplicationSummary below: re-rendering the PDF and re-sending the
+// notification needs every field the original send had, so this is the one
+// query allowed to return an application in full — and it's never used to
+// populate a list, only to act on a single record the board picked.
+export async function findApplicationById(id: string): Promise<Application | null> {
+  const rows = await sql()`select * from applications where id = ${id}`;
+  return rows.length > 0 ? toApplication(rows[0] as Record<string, unknown>) : null;
+}
+
 // Powers /admin/bewerbungen. Every field the admin list and CSV export need
 // and nothing else the board doesn't ask to see there (motivation, desired
 // areas, etc. stay out of both) — data minimisation applies to internal
@@ -263,6 +273,7 @@ export async function deleteRecruitingWindow(id: string): Promise<boolean> {
 }
 
 export type ReminderSignupResult = {
+  id: string;
   confirmed: boolean;
   confirmToken: string;
   unsubscribeToken: string;
@@ -291,10 +302,11 @@ export async function upsertReminderSignup(
         else excluded.unsubscribe_token
       end,
       locale = excluded.locale
-    returning confirmed, confirm_token, unsubscribe_token
+    returning id, confirmed, confirm_token, unsubscribe_token
   `;
   const row = rows[0] as Record<string, unknown>;
   return {
+    id: row.id as string,
     confirmed: row.confirmed as boolean,
     confirmToken: row.confirm_token as string,
     unsubscribeToken: row.unsubscribe_token as string,
@@ -306,6 +318,65 @@ export type ConfirmedReminderSignup = {
   email: string;
   locale: Locale;
 };
+
+// The same mail bookkeeping applications and contact_messages already had
+// (migrations/0004). Without it a subscriber whose double-opt-in link never
+// arrived was invisible: /api/reminder logged the failure and moved on, so
+// nobody could tell "never confirmed because they chose not to" from
+// "never confirmed because the mail never came".
+export async function markReminderMailed(id: string): Promise<void> {
+  await sql()`
+    update reminder_signups set mail_status = 'sent', mailed_at = now(), mail_error = null
+    where id = ${id}
+  `;
+}
+
+export async function markReminderMailFailed(id: string, error: string): Promise<void> {
+  await sql()`
+    update reminder_signups set mail_status = 'failed', mail_error = ${error}
+    where id = ${id}
+  `;
+}
+
+export type ReminderSignupRecord = {
+  id: string;
+  createdAt: Date;
+  email: string;
+  confirmed: boolean;
+  confirmedAt: Date | null;
+  unsubscribedAt: Date | null;
+  locale: Locale;
+  confirmToken: string;
+  unsubscribeToken: string;
+  mailStatus: MailStatus;
+};
+
+function toReminderSignupRecord(row: Record<string, unknown>): ReminderSignupRecord {
+  return {
+    id: row.id as string,
+    createdAt: row.created_at as Date,
+    email: row.email as string,
+    confirmed: row.confirmed as boolean,
+    confirmedAt: (row.confirmed_at as Date | null) ?? null,
+    unsubscribedAt: (row.unsubscribed_at as Date | null) ?? null,
+    locale: row.locale as Locale,
+    confirmToken: row.confirm_token as string,
+    unsubscribeToken: row.unsubscribe_token as string,
+    mailStatus: row.mail_status as MailStatus,
+  };
+}
+
+// Includes both tokens, unlike listReminderSignups below: resending a
+// confirmation mail has to rebuild the very links the original contained,
+// and those are the tokens. Single-record only, never used for a list.
+export async function findReminderSignupById(id: string): Promise<ReminderSignupRecord | null> {
+  const rows = await sql()`
+    select id, created_at, email, confirmed, confirmed_at, unsubscribed_at, locale,
+           confirm_token, unsubscribe_token, mail_status
+    from reminder_signups where id = ${id}
+  `;
+  return rows.length > 0 ? toReminderSignupRecord(rows[0] as Record<string, unknown>) : null;
+}
 
 // The WHERE clause is the entire race guard: a second click on the same
 // confirmation link (or two concurrent clicks) finds zero rows the second
@@ -406,6 +477,76 @@ export async function deleteExpiredContactMessages(cutoff: Date): Promise<number
     delete from contact_messages where created_at < ${cutoff.toISOString()} returning id
   `;
   return rows.length;
+}
+
+export async function findContactMessageById(id: string): Promise<ContactMessage | null> {
+  const rows = await sql()`
+    select id, created_at, name, email, subject, message, locale from contact_messages where id = ${id}
+  `;
+  if (rows.length === 0) return null;
+  const row = rows[0] as Record<string, unknown>;
+  return {
+    id: row.id as string,
+    createdAt: row.created_at as Date,
+    name: row.name as string,
+    email: row.email as string,
+    subject: (row.subject as string | null) ?? undefined,
+    message: row.message as string,
+    locale: row.locale as Locale,
+  };
+}
+
+/**
+ * The three form tables share one question — "whose notification never went
+ * out?" — so /admin/mails asks it once, as one UNION ALL, rather than three
+ * round trips the page would then have to interleave by date itself.
+ *
+ * `label` is whatever identifies the record to a human reading the list: an
+ * applicant's name, a contact message's subject, and nothing at all for a
+ * reminder signup, where the address *is* the record. It's built in SQL so
+ * all three branches come back the same shape and a single `order by` can
+ * sort across them.
+ *
+ * Note this is the only place mail_error is read back out. It holds a
+ * provider message, never anything a visitor typed, so showing it to the
+ * board leaks nothing — and without it the board can only see *that* a send
+ * failed, not why, which is the difference between a fixable problem and a
+ * mystery.
+ */
+export type FailedMailSource = "applications" | "contact_messages" | "reminder_signups";
+
+export type FailedMail = {
+  source: FailedMailSource;
+  id: string;
+  createdAt: Date;
+  email: string;
+  label: string;
+  mailError: string | null;
+};
+
+export async function listFailedMails(): Promise<FailedMail[]> {
+  const rows = await sql()`
+    select 'applications' as source, id, created_at, email,
+           first_name || ' ' || last_name as label, mail_error
+    from applications where mail_status = 'failed'
+    union all
+    select 'contact_messages' as source, id, created_at, email,
+           coalesce(subject, '') as label, mail_error
+    from contact_messages where mail_status = 'failed'
+    union all
+    select 'reminder_signups' as source, id, created_at, email,
+           '' as label, mail_error
+    from reminder_signups where mail_status = 'failed'
+    order by created_at desc
+  `;
+  return (rows as Record<string, unknown>[]).map((row) => ({
+    source: row.source as FailedMailSource,
+    id: row.id as string,
+    createdAt: row.created_at as Date,
+    email: row.email as string,
+    label: row.label as string,
+    mailError: (row.mail_error as string | null) ?? null,
+  }));
 }
 
 // A plain read, no write — checkRateLimit (rateLimit.ts) calls this first

@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getTranslations } from "next-intl/server";
 import { reminderRequestSchema } from "@/lib/apiSchemas";
-import { upsertReminderSignup } from "@/lib/db";
-import { sendReminderConfirmationEmail } from "@/lib/mail";
+import { markReminderMailed, markReminderMailFailed, upsertReminderSignup } from "@/lib/db";
+import { dispatchReminderConfirmation } from "@/lib/mailDispatch";
 import { checkRateLimit } from "@/lib/rateLimit";
 import { clientIp } from "@/lib/requestIp";
 import { generateToken } from "@/lib/tokens";
-import { siteUrl } from "@/lib/siteUrl";
 
 /**
  * Double opt-in, step one. This route only ever writes an unconfirmed row
@@ -40,24 +38,24 @@ export async function POST(request: NextRequest) {
 
   if (!result.confirmed) {
     try {
-      const t = await getTranslations({ locale: data.locale, namespace: "Mail.reminderConfirmation" });
-      const base = siteUrl();
-      const unsubscribeUrl = `${base}/api/reminder/abmelden?token=${result.unsubscribeToken}`;
-      await sendReminderConfirmationEmail({
+      await dispatchReminderConfirmation({
         email: data.email,
-        subject: t("subject"),
-        text: t("body", {
-          confirmUrl: `${base}/api/reminder/bestaetigen?token=${result.confirmToken}`,
-          unsubscribeUrl,
-        }),
-        unsubscribeUrl,
+        locale: data.locale,
+        confirmToken: result.confirmToken,
+        unsubscribeToken: result.unsubscribeToken,
       });
+      await markReminderMailed(result.id);
     } catch (error) {
       // The row is already saved; a failed confirmation email just means
-      // this particular attempt didn't reach the inbox. Logged, not
-      // retried automatically — the visitor can resubmit the same form,
-      // which safely reuses/renews the same unconfirmed row.
+      // this particular attempt didn't reach the inbox. Recorded on the
+      // row — not only logged — so /admin/mails can show it and offer a
+      // resend; a console line nobody reads is how a subscriber who never
+      // got their link stayed invisible before.
       console.error("Failed to send reminder confirmation email", error);
+      const message = error instanceof Error ? error.message : String(error);
+      await markReminderMailFailed(result.id, message).catch((markError: unknown) => {
+        console.error("Failed to record the reminder mail failure itself", markError);
+      });
     }
   }
 

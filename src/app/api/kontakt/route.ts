@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getTranslations } from "next-intl/server";
 import { contactRequestSchema } from "@/lib/apiSchemas";
 import { insertContactMessage, markContactMessageMailed, markContactMessageMailFailed } from "@/lib/db";
-import { sendContactMessageNotification } from "@/lib/mail";
+import { dispatchContactNotification } from "@/lib/mailDispatch";
 import { checkRateLimit } from "@/lib/rateLimit";
 import { clientIp } from "@/lib/requestIp";
 
@@ -41,13 +40,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const t = await getTranslations({ locale: data.locale, namespace: "Mail.contactNotification" });
-    await sendContactMessageNotification({
-      name: message.name,
-      email: message.email,
-      subject: t("subject", { name: message.name }),
-      text: `${message.name} (${message.email}) schreibt${message.subject ? ` zum Thema „${message.subject}“` : ""}:\n\n${message.message}`,
-    });
+    await dispatchContactNotification(message);
     await markContactMessageMailed(message.id);
   } catch (error) {
     console.error("Failed to forward contact message", error);

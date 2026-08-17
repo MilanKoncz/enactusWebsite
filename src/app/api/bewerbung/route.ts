@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { renderToBuffer } from "@react-pdf/renderer";
-import { getTranslations } from "next-intl/server";
 import { applicationRequestSchema } from "@/lib/apiSchemas";
 import { insertApplication, markApplicationMailed, markApplicationMailFailed } from "@/lib/db";
-import { sendApplicationConfirmation, sendApplicationNotification } from "@/lib/mail";
-import { ApplicationPdfDocument } from "@/lib/applicationPdf";
+import { dispatchApplicationMails } from "@/lib/mailDispatch";
 import { checkRateLimit } from "@/lib/rateLimit";
 import { clientIp } from "@/lib/requestIp";
 import { checkFormToken } from "@/lib/formToken";
@@ -99,17 +96,7 @@ export async function POST(request: NextRequest) {
   // different way (see ASSETS-TODO.md / the applications.mail_status
   // column the board can check).
   try {
-    const pdfBuffer = await renderToBuffer(ApplicationPdfDocument({ application }));
-    await sendApplicationNotification(application, pdfBuffer);
-
-    const t = await getTranslations({ locale: data.locale, namespace: "Mail.applicationConfirmation" });
-    await sendApplicationConfirmation({
-      email: application.email,
-      firstName: application.firstName,
-      subject: t("subject"),
-      text: t("body", { firstName: application.firstName }),
-    });
-
+    await dispatchApplicationMails(application);
     await markApplicationMailed(application.id);
   } catch (error) {
     console.error("Failed to send application mail", error);
