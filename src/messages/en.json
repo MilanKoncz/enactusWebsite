@@ -1124,6 +1124,34 @@
         "end": "End",
         "action": "Action"
       }
+    },
+    "reminders": {
+      "title": "Reminder list",
+      "lead": "Who wants to be notified when applications open. Only confirmed addresses may ever be mailed.",
+      "empty": "No entries yet.",
+      "downloadCsv": "Download as CSV",
+      "states": {
+        "confirmed": "confirmed",
+        "unconfirmed": "unconfirmed",
+        "unsubscribed": "unsubscribed"
+      },
+      "columns": {
+        "email": "Email",
+        "state": "Status",
+        "createdAt": "Signed up",
+        "confirmedAt": "Confirmed"
+      }
+    },
+    "contactMessages": {
+      "title": "Contact messages",
+      "lead": "Incoming enquiries and whether the forward to the mailbox worked. The message text itself lives only in the mailbox.",
+      "empty": "No contact messages yet.",
+      "columns": {
+        "createdAt": "Received",
+        "sender": "Sender",
+        "subject": "Subject",
+        "mailStatus": "Mail status"
+      }
     }
   },
   "ImageLightbox": {

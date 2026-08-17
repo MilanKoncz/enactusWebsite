@@ -392,7 +392,41 @@ function toReminderSignupRecord(row: Record<string, unknown>): ReminderSignupRec
   };
 }
 
-// Includes both tokens, unlike listReminderSignups below: resending a
+/**
+ * Powers /admin/erinnerungen and its CSV export. Deliberately narrower than
+ * ReminderSignupRecord: the two tokens stay out, because a list rendered in
+ * a browser (and exported to a file that gets emailed around) has no
+ * business carrying live confirm and unsubscribe links for other people's
+ * addresses — anyone holding the export could confirm or unsubscribe them.
+ */
+export type ReminderSignupSummary = {
+  id: string;
+  createdAt: Date;
+  email: string;
+  confirmed: boolean;
+  confirmedAt: Date | null;
+  unsubscribedAt: Date | null;
+  mailStatus: MailStatus;
+};
+
+export async function listReminderSignups(): Promise<ReminderSignupSummary[]> {
+  const rows = await sql()`
+    select id, created_at, email, confirmed, confirmed_at, unsubscribed_at, mail_status
+    from reminder_signups
+    order by created_at desc
+  `;
+  return (rows as Record<string, unknown>[]).map((row) => ({
+    id: row.id as string,
+    createdAt: row.created_at as Date,
+    email: row.email as string,
+    confirmed: row.confirmed as boolean,
+    confirmedAt: (row.confirmed_at as Date | null) ?? null,
+    unsubscribedAt: (row.unsubscribed_at as Date | null) ?? null,
+    mailStatus: row.mail_status as MailStatus,
+  }));
+}
+
+// Includes both tokens, unlike listReminderSignups above: resending a
 // confirmation mail has to rebuild the very links the original contained,
 // and those are the tokens. Single-record only, never used for a list.
 export async function findReminderSignupById(id: string): Promise<ReminderSignupRecord | null> {
@@ -503,6 +537,39 @@ export async function deleteExpiredContactMessages(cutoff: Date): Promise<number
     delete from contact_messages where created_at < ${cutoff.toISOString()} returning id
   `;
   return rows.length;
+}
+
+/**
+ * Powers /admin/kontakt. Carries the subject but not the message body: the
+ * board reads the actual enquiry in the mailbox it was forwarded to, so
+ * rendering it a second time in a browser tab would copy personal
+ * correspondence somewhere it isn't needed. What this page is for is
+ * answering "did it arrive, and if not why" — which needs the status, not
+ * the content.
+ */
+export type ContactMessageSummary = {
+  id: string;
+  createdAt: Date;
+  name: string;
+  email: string;
+  subject: string | null;
+  mailStatus: MailStatus;
+};
+
+export async function listContactMessages(): Promise<ContactMessageSummary[]> {
+  const rows = await sql()`
+    select id, created_at, name, email, subject, mail_status
+    from contact_messages
+    order by created_at desc
+  `;
+  return (rows as Record<string, unknown>[]).map((row) => ({
+    id: row.id as string,
+    createdAt: row.created_at as Date,
+    name: row.name as string,
+    email: row.email as string,
+    subject: (row.subject as string | null) ?? null,
+    mailStatus: row.mail_status as MailStatus,
+  }));
 }
 
 export async function findContactMessageById(id: string): Promise<ContactMessage | null> {

@@ -1124,6 +1124,34 @@
         "end": "Ende",
         "action": "Aktion"
       }
+    },
+    "reminders": {
+      "title": "Erinnerungsliste",
+      "lead": "Wer benachrichtigt werden möchte, sobald die Bewerbung öffnet. Nur bestätigte Adressen dürfen angeschrieben werden.",
+      "empty": "Noch keine Einträge.",
+      "downloadCsv": "Als CSV herunterladen",
+      "states": {
+        "confirmed": "bestätigt",
+        "unconfirmed": "unbestätigt",
+        "unsubscribed": "abgemeldet"
+      },
+      "columns": {
+        "email": "E-Mail",
+        "state": "Status",
+        "createdAt": "Eingetragen",
+        "confirmedAt": "Bestätigt"
+      }
+    },
+    "contactMessages": {
+      "title": "Kontaktanfragen",
+      "lead": "Eingegangene Anfragen und ob die Weiterleitung ins Postfach geklappt hat. Der Nachrichtentext selbst steht nur im Postfach.",
+      "empty": "Noch keine Kontaktanfragen.",
+      "columns": {
+        "createdAt": "Eingangsdatum",
+        "sender": "Absender",
+        "subject": "Betreff",
+        "mailStatus": "Mailstatus"
+      }
     }
   },
   "ImageLightbox": {
