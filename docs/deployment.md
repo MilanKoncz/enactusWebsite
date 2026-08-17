@@ -46,12 +46,26 @@ the full list and current values.
   request rather than running unauthenticated.
 - `ADMIN_PASSWORD` — gates `/admin/bewerbungen`, the board's application
   list. Compared in constant time (`lib/adminAuth.ts`), behind the same
-  rate limiting as the public forms. Also the HMAC key that signs the
-  page's session cookie — there is no separate session secret, since the
-  page has no account system to protect beyond this one shared password.
-  **Must be set in Vercel** (all environments the admin page should be
-  reachable from) — with it unset, `/api/admin/login` rejects every
-  request rather than falling open.
+  rate limiting as the public forms. **Must be set in Vercel** (all
+  environments the admin page should be reachable from) — with it unset,
+  `/api/admin/login` rejects every request rather than falling open. Must be
+  genuinely random (`openssl rand -hex 24`), shared via the board's password
+  manager rather than spoken — see `ADMIN_SESSION_SECRET` below for why a
+  weak, human-memorable password here is directly attackable.
+- `ADMIN_SESSION_SECRET` — the HMAC key that signs the admin session cookie,
+  deliberately a separate variable from `ADMIN_PASSWORD`. The cookie's
+  content (an expiry timestamp) is public, so a valid cookie is effectively
+  a plaintext/signature pair; if it were signed with `ADMIN_PASSWORD`
+  itself, anyone who obtained a valid cookie (a shared board laptop, a
+  browser profile backup, malware) could brute-force the password offline
+  at GPU speed — HMAC-SHA256 is fast by design and gives no resistance to
+  that on its own. A dedicated secret means a leaked cookie reveals nothing
+  about the password. **Must be set in Vercel** (all environments the admin
+  page should be reachable from) — with it unset, no session cookie can be
+  issued or verified, and `/admin/bewerbungen` is unreachable even with the
+  correct password. Generate with `openssl rand -hex 32`; unlike
+  `ADMIN_PASSWORD`, nobody ever types this, so there's no tension between
+  "random" and "memorable" to resolve.
 - `VERCEL_ENV` — **not** in `.env.example`: this is a Vercel System
   Environment Variable, only ever set by Vercel itself, never by hand. It
   gates indexing (`docs/engineering.md`'s SEO section,

@@ -14,9 +14,11 @@ vi.mock("@/lib/db", () => ({
 }));
 
 const ORIGINAL_PASSWORD = process.env.ADMIN_PASSWORD;
+const ORIGINAL_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET;
 
 beforeEach(() => {
   process.env.ADMIN_PASSWORD = "correct horse battery staple";
+  process.env.ADMIN_SESSION_SECRET = "a-completely-different-signing-secret";
   checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
 });
 
@@ -24,6 +26,8 @@ afterEach(() => {
   vi.resetAllMocks();
   if (ORIGINAL_PASSWORD === undefined) delete process.env.ADMIN_PASSWORD;
   else process.env.ADMIN_PASSWORD = ORIGINAL_PASSWORD;
+  if (ORIGINAL_SESSION_SECRET === undefined) delete process.env.ADMIN_SESSION_SECRET;
+  else process.env.ADMIN_SESSION_SECRET = ORIGINAL_SESSION_SECRET;
 });
 
 function loginRequest(password: unknown) {

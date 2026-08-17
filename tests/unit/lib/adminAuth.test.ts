@@ -7,13 +7,16 @@ import {
 } from "@/lib/adminAuth";
 
 const ORIGINAL_PASSWORD = process.env.ADMIN_PASSWORD;
+const ORIGINAL_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET;
 
 beforeEach(() => {
   process.env.ADMIN_PASSWORD = "correct horse battery staple";
+  process.env.ADMIN_SESSION_SECRET = "a-completely-different-signing-secret";
 });
 
 afterEach(() => {
   process.env.ADMIN_PASSWORD = ORIGINAL_PASSWORD;
+  process.env.ADMIN_SESSION_SECRET = ORIGINAL_SESSION_SECRET;
 });
 
 describe("verifyPassword", () => {
@@ -75,15 +78,22 @@ describe("createSessionCookieValue / verifySessionCookieValue", () => {
     expect(verifySessionCookieValue("")).toBe(false);
   });
 
-  it("rejects an otherwise-valid session once ADMIN_PASSWORD is removed", () => {
+  it("stays valid when ADMIN_PASSWORD changes — the cookie isn't signed with it", () => {
     const now = new Date("2026-09-01T10:00:00Z");
     const cookie = createSessionCookieValue(now);
-    delete process.env.ADMIN_PASSWORD;
+    process.env.ADMIN_PASSWORD = "a completely different password";
+    expect(verifySessionCookieValue(cookie, now)).toBe(true);
+  });
+
+  it("rejects an otherwise-valid session once ADMIN_SESSION_SECRET is removed", () => {
+    const now = new Date("2026-09-01T10:00:00Z");
+    const cookie = createSessionCookieValue(now);
+    delete process.env.ADMIN_SESSION_SECRET;
     expect(verifySessionCookieValue(cookie, now)).toBe(false);
   });
 
-  it("returns null when ADMIN_PASSWORD is unset", () => {
-    delete process.env.ADMIN_PASSWORD;
+  it("returns null when ADMIN_SESSION_SECRET is unset", () => {
+    delete process.env.ADMIN_SESSION_SECRET;
     expect(createSessionCookieValue(new Date("2026-09-01T10:00:00Z"))).toBeNull();
   });
 });

@@ -8,12 +8,15 @@ import { createHmac, timingSafeEqual } from "node:crypto";
  *
  * The cookie is intentionally not encrypted, only signed: it carries no
  * data worth hiding (just an expiry timestamp), so the only property that
- * matters is that it can't be forged or extended without ADMIN_PASSWORD.
- * The signing key is ADMIN_PASSWORD itself, HMAC'd — not a second secret —
- * because the threat model is a single shared board password already; a
- * separate ADMIN_SESSION_SECRET would be one more variable to set in Vercel
- * for no added protection against the one credential this page actually
- * guards.
+ * matters is that it can't be forged or extended.
+ *
+ * The signing key is a dedicated ADMIN_SESSION_SECRET, not ADMIN_PASSWORD
+ * itself. Signing with the password would mean every issued cookie is a
+ * plaintext/HMAC pair for that exact password — anyone holding a valid
+ * cookie (a shared board laptop, a browser profile backup, malware) could
+ * brute-force ADMIN_PASSWORD offline, at GPU speed, since HMAC-SHA256 is
+ * fast by design and offers no resistance to that on its own. A separate
+ * secret means a leaked cookie reveals nothing about the password at all.
  */
 
 export const ADMIN_SESSION_COOKIE = "admin_session";
@@ -41,7 +44,7 @@ export function verifyPassword(candidate: string): boolean {
 }
 
 export function createSessionCookieValue(now: Date = new Date()): string | null {
-  const secret = process.env.ADMIN_PASSWORD;
+  const secret = process.env.ADMIN_SESSION_SECRET;
   if (!secret) return null;
   const expiresAt = now.getTime() + ADMIN_SESSION_TTL_MS;
   return `${expiresAt}.${sign(String(expiresAt), secret)}`;
@@ -49,7 +52,7 @@ export function createSessionCookieValue(now: Date = new Date()): string | null 
 
 export function verifySessionCookieValue(value: string | undefined | null, now: Date = new Date()): boolean {
   if (!value) return false;
-  const secret = process.env.ADMIN_PASSWORD;
+  const secret = process.env.ADMIN_SESSION_SECRET;
   if (!secret) return false;
 
   const separatorIndex = value.indexOf(".");
