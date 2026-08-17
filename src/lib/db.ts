@@ -408,10 +408,23 @@ export async function deleteExpiredContactMessages(cutoff: Date): Promise<number
   return rows.length;
 }
 
+// A plain read, no write — checkRateLimit (rateLimit.ts) calls this first
+// so a request that's already over the limit gets rejected without
+// touching the database at all. Zero rows means no hit recorded yet this
+// window, i.e. a count of 0.
+export async function peekRateLimit(bucket: string, windowStart: Date): Promise<number> {
+  const rows = await sql()`
+    select count from rate_limit_hits where bucket = ${bucket} and window_start = ${windowStart.toISOString()}
+  `;
+  return rows.length > 0 ? ((rows[0] as Record<string, unknown>).count as number) : 0;
+}
+
 // One roundtrip, not a read followed by a write: ON CONFLICT DO UPDATE
 // increments and returns the new count atomically, so two concurrent
 // requests from the same bucket can't both read the same stale count and
-// both decide they're still under the limit.
+// both decide they're still under the limit. Only called once
+// peekRateLimit has already confirmed the request is under the limit —
+// this is the write that actually counts the request, not the check.
 export async function consumeRateLimit(bucket: string, windowStart: Date): Promise<number> {
   const rows = await sql()`
     insert into rate_limit_hits (bucket, window_start, count)

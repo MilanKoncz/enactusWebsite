@@ -184,6 +184,11 @@ async function verifyRateLimitHits() {
   const bucket = MARKER;
   const windowStart = new Date(0).toISOString();
 
+  const beforeAnyHit = await sql`
+    select count from rate_limit_hits where bucket = ${bucket} and window_start = ${windowStart}
+  `;
+  check("peek finds no row before the first hit", beforeAnyHit.length, 0);
+
   const [first] = await sql`
     insert into rate_limit_hits (bucket, window_start, count)
     values (${bucket}, ${windowStart}, 1)
@@ -191,6 +196,11 @@ async function verifyRateLimitHits() {
     returning count
   `;
   check("first hit has count 1", first.count, 1);
+
+  const [peeked] = await sql`
+    select count from rate_limit_hits where bucket = ${bucket} and window_start = ${windowStart}
+  `;
+  check("peek reads the count without incrementing it", peeked.count, 1);
 
   const [second] = await sql`
     insert into rate_limit_hits (bucket, window_start, count)

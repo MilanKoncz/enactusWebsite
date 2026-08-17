@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 
 const upsertReminderSignup = vi.fn();
@@ -143,6 +143,10 @@ describe("POST /api/reminder", () => {
 });
 
 describe("GET /api/reminder/bestaetigen", () => {
+  beforeEach(() => {
+    checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
+  });
+
   afterEach(() => {
     vi.resetAllMocks();
   });
@@ -178,9 +182,23 @@ describe("GET /api/reminder/bestaetigen", () => {
     const unknown = await GET(getConfirm("bad-token"));
     expect(unknown.headers.get("location")).toContain("bestaetigt=fehler");
   });
+
+  it("rejects a flood with an error redirect before touching the database", async () => {
+    checkRateLimit.mockResolvedValue({ allowed: false, remaining: 0 });
+
+    const { GET } = await import("@/app/api/reminder/bestaetigen/route");
+    const response = await GET(getConfirm("good-token"));
+
+    expect(response.headers.get("location")).toContain("bestaetigt=fehler");
+    expect(confirmReminderSignup).not.toHaveBeenCalled();
+  });
 });
 
 describe("/api/reminder/abmelden", () => {
+  beforeEach(() => {
+    checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
+  });
+
   afterEach(() => {
     vi.resetAllMocks();
   });
@@ -205,6 +223,16 @@ describe("/api/reminder/abmelden", () => {
     expect(unknown.headers.get("location")).toContain("abgemeldet=fehler");
   });
 
+  it("GET rejects a flood with an error redirect before touching the database", async () => {
+    checkRateLimit.mockResolvedValue({ allowed: false, remaining: 0 });
+
+    const { GET } = await import("@/app/api/reminder/abmelden/route");
+    const response = await GET(getUnsubscribe("good-token"));
+
+    expect(response.headers.get("location")).toContain("abgemeldet=fehler");
+    expect(unsubscribeReminder).not.toHaveBeenCalled();
+  });
+
   it("POST answers a bare 200 for a one-click unsubscribe, per RFC 8058", async () => {
     unsubscribeReminder.mockResolvedValue({ id: "1", locale: "de" });
 
@@ -222,5 +250,15 @@ describe("/api/reminder/abmelden", () => {
     const response = await POST(postUnsubscribe("bad-token"));
 
     expect(response.status).toBe(404);
+  });
+
+  it("POST rejects a flood with 429 before touching the database", async () => {
+    checkRateLimit.mockResolvedValue({ allowed: false, remaining: 0 });
+
+    const { POST } = await import("@/app/api/reminder/abmelden/route");
+    const response = await POST(postUnsubscribe("good-token"));
+
+    expect(response.status).toBe(429);
+    expect(unsubscribeReminder).not.toHaveBeenCalled();
   });
 });

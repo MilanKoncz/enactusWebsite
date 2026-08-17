@@ -70,9 +70,21 @@ const BASE_CLASSES =
 const SHINE_CLASSES =
   "btn-shine pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-paper/50 to-transparent";
 
+// Exported standalone for the rare case of a real, plain `<a href="mailto:...">`
+// that needs Button's exact look without going through Button itself — Button
+// always renders through next-intl's `Link` for its href branch
+// (lib/navigation.ts), which is built for internal app routes and wrong for
+// a mailto: link (see PartnerContact.tsx, which is the one place that needs
+// this). Callers get the base/variant/size classes only, not the primary
+// variant's shine sweep — that effect needs its own inner `<span>` element
+// (SHINE_CLASSES below), which only Button itself renders.
+export function buttonClasses(variant: ButtonVariant = "primary", size: ButtonSize = "md", className?: string) {
+  return cn(BASE_CLASSES, VARIANT_CLASSES[variant], SIZE_CLASSES[size], className);
+}
+
 export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
   function Button({ variant = "primary", size = "md", loading = false, className, children, ...rest }, ref) {
-    const sharedClassName = cn(BASE_CLASSES, VARIANT_CLASSES[variant], SIZE_CLASSES[size], className);
+    const sharedClassName = buttonClasses(variant, size, className);
 
     const content = (
       <>

@@ -64,4 +64,33 @@ describe("applicationFormSchema", () => {
     });
     expect(result.success).toBe(false);
   });
+
+  it("rejects more than 20 desired areas", () => {
+    const result = applicationFormSchema.safeParse({
+      ...validInput(),
+      desiredAreas: Array.from({ length: 21 }, (_, i) => `Area ${i}`),
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts exactly 20 desired areas", () => {
+    const result = applicationFormSchema.safeParse({
+      ...validInput(),
+      desiredAreas: Array.from({ length: 20 }, (_, i) => `Area ${i}`),
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects a desired area over 120 characters", () => {
+    const result = applicationFormSchema.safeParse({
+      ...validInput(),
+      desiredAreas: ["x".repeat(121)],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects an empty-string desired area", () => {
+    const result = applicationFormSchema.safeParse({ ...validInput(), desiredAreas: [""] });
+    expect(result.success).toBe(false);
+  });
 });

@@ -2,8 +2,22 @@ import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "jest-axe";
-import { Button } from "@/components/ui/Button";
+import { Button, buttonClasses } from "@/components/ui/Button";
 import { renderWithIntl } from "../../fixtures/intl";
+
+describe("buttonClasses", () => {
+  it("matches the classes an actual Button renders, for a plain <a> that can't use Button itself", () => {
+    render(<Button variant="primary" size="lg">Absenden</Button>);
+    const rendered = screen.getByRole("button", { name: "Absenden" });
+    expect(buttonClasses("primary", "lg")).toBe(rendered.className);
+  });
+
+  it("defaults to the primary variant and medium size, same as Button itself", () => {
+    render(<Button>Absenden</Button>);
+    const rendered = screen.getByRole("button", { name: "Absenden" });
+    expect(buttonClasses()).toBe(rendered.className);
+  });
+});
 
 describe("Button", () => {
   it("renders as a native button by default", () => {

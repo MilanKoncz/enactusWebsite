@@ -43,7 +43,16 @@ describe("content/org", () => {
     expect(() =>
       orgSchema.parse({
         ...org,
-        contactEmails: { general: "not-an-email", board: null },
+        contactEmails: { general: "not-an-email", board: "teamvorstand@unimannheim.enactus.team" },
+      }),
+    ).toThrow();
+  });
+
+  it("rejects a null board contact email — unlike general, it has no fallback path", () => {
+    expect(() =>
+      orgSchema.parse({
+        ...org,
+        contactEmails: { general: null, board: null },
       }),
     ).toThrow();
   });

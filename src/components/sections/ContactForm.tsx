@@ -9,8 +9,7 @@ import { Field } from "@/components/ui/Field";
 import { FormStatusMessage } from "@/components/ui/FormStatusMessage";
 import { contactFormSchema, type ContactFormValues } from "@/lib/contactFormSchema";
 import { postJson } from "@/lib/submitForm";
-
-const CONTACT_EMAIL = "teamvorstand@unimannheim.enactus.team";
+import { org } from "@/content/org";
 
 type SubmitState = "idle" | "pending" | "success" | "error";
 
@@ -74,7 +73,9 @@ export function ContactForm() {
         {...register("message")}
       />
       {state === "error" && (
-        <FormStatusMessage variant="error">{t("submitError", { email: CONTACT_EMAIL })}</FormStatusMessage>
+        <FormStatusMessage variant="error">
+          {t("submitError", { email: org.contactEmails.board })}
+        </FormStatusMessage>
       )}
       <Button type="submit" className="self-start" loading={state === "pending"}>
         {state === "pending" ? t("submitPending") : t("submitLabel")}

@@ -39,7 +39,13 @@ const orgSchema = z.object({
   legalRepresentatives: legalRepresentativesSchema,
   contactEmails: z.object({
     general: emailSchema,
-    board: emailSchema,
+    // Non-nullable, unlike `general`: three components (ApplicationForm,
+    // ContactForm, PartnerContact) render this as their fallback contact
+    // address, and a null here would need a fallback path duplicated in
+    // all three instead of one guarantee here. If the address is ever
+    // withdrawn without a replacement, that should fail the build loudly,
+    // not silently ship a broken mailto: link.
+    board: z.email(),
   }),
 });
 export type Org = z.infer<typeof orgSchema>;

@@ -19,8 +19,7 @@ import { MIN_FILL_MS } from "@/lib/antiSpam";
 import { postJson } from "@/lib/submitForm";
 import { board } from "@/content/board";
 import { projects } from "@/content/projects";
-
-const CONTACT_EMAIL = "teamvorstand@unimannheim.enactus.team";
+import { org } from "@/content/org";
 
 export { MIN_FILL_MS };
 
@@ -235,7 +234,7 @@ export function ApplicationForm() {
             ? t("submitWindowClosed")
             : submitError === "form_expired"
               ? t("submitFormExpired")
-              : t("submitError", { email: CONTACT_EMAIL })}
+              : t("submitError", { email: org.contactEmails.board })}
         </FormStatusMessage>
       )}
 
