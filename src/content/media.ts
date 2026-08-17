@@ -24,12 +24,21 @@ const heroMediaSchema = z.object({
 export type HeroMedia = z.infer<typeof heroMediaSchema>;
 
 export const heroMedia: HeroMedia = heroMediaSchema.parse({
-  posterSrc: "/video/hero-poster.png",
+  posterSrc: "/video/hero-poster.jpg",
   mobileImageSrc: null,
-  sources: [{
+  // WebM first: browsers pick the first source they can play, and VP9/WebM
+  // decodes to a smaller file than the H.264/MP4 fallback at the same
+  // visual quality.
+  sources: [
+    {
+      src: "/video/hero-video.webm",
+      type: "video/webm",
+    },
+    {
       src: "/video/hero-video.mp4",
       type: "video/mp4",
-    }],
+    },
+  ],
   width: 1920,
   height: 1080,
 });

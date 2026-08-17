@@ -67,8 +67,8 @@ describe("HomeHero", () => {
     mockMatchMedia(true);
     const { container } = renderWithIntl(<HomeHero />);
     const video = container.querySelector("video");
-    expect(video).toHaveAttribute("poster", "/video/hero-poster.png");
-    expect(video!.querySelector("source")).toHaveAttribute("src", "/video/hero-video.mp4");
+    expect(video).toHaveAttribute("poster", "/video/hero-poster.jpg");
+    expect(video!.querySelector("source")).toHaveAttribute("src", "/video/hero-video.webm");
   });
 
   // axe-core takes noticeably longer to scan a real <video> element than the

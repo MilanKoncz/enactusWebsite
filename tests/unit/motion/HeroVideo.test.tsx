@@ -47,8 +47,8 @@ describe("HeroVideo", () => {
     mockQueries(DESKTOP);
     const { container } = render(<HeroVideo />);
     const video = container.querySelector("video")!;
-    expect(video).toHaveAttribute("poster", "/video/hero-poster.png");
-    expect(video.querySelector("source")).toHaveAttribute("src", "/video/hero-video.mp4");
+    expect(video).toHaveAttribute("poster", "/video/hero-poster.jpg");
+    expect(video.querySelector("source")).toHaveAttribute("src", "/video/hero-video.webm");
     expect(video).toHaveProperty("muted", true);
     expect(video).toHaveAttribute("loop");
     expect(video).toHaveAttribute("playsinline");
@@ -62,8 +62,8 @@ describe("HeroVideo", () => {
 
   // `display: none` does not stop a <video> loading, and WebKit ignores
   // preload="none" outright — so below md the element must not exist at all,
-  // or a phone downloads 43 MB of video plus a 1.2 MB poster it can never
-  // see. This is the assertion that guards that.
+  // or a phone downloads tens of megabytes of video plus a poster it can
+  // never see. This is the assertion that guards that.
   it("renders nothing at all below the breakpoint that shows it", () => {
     mockQueries(PHONE);
     const { container } = render(<HeroVideo />);

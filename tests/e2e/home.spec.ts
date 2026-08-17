@@ -116,8 +116,8 @@ test.describe("homepage", () => {
     expect(advanced.second).toBeGreaterThan(advanced.first);
   });
 
-  // 43 MB of video plus a 1.2 MB poster, for an element a phone can never
-  // see, is the single biggest thing this page could waste. Hiding it with
+  // Tens of megabytes of video plus a poster, for an element a phone can
+  // never see, is the single biggest thing this page could waste. Hiding it with
   // CSS is not enough — `display: none` does not stop a <video> loading, and
   // WebKit ignores preload="none" — so nothing is rendered below md at all,
   // and this asserts it against every engine in the matrix.
