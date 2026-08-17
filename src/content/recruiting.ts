@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SITE_TIMEZONE } from "@/content/timezone";
 
 /**
  * The shape of an application window (Bewerbungsfenster) — the type and
@@ -18,7 +19,10 @@ import { z } from "zod";
  * "Europe/Berlin" or the offset elsewhere.
  */
 
-export const RECRUITING_TIMEZONE = "Europe/Berlin";
+// Re-exported from content/timezone.ts, which now holds the actual value —
+// see that file's comment. Kept as a named re-export, not a second constant,
+// so every existing import of RECRUITING_TIMEZONE keeps working unchanged.
+export const RECRUITING_TIMEZONE = SITE_TIMEZONE;
 
 // Mirrors the database's own check constraint (recruiting_windows_semester_format)
 // — HWS/FSS plus a two-digit year, e.g. "HWS26" or "FSS27".
