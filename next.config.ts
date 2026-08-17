@@ -1,7 +1,14 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import { SECURITY_HEADERS } from "./src/lib/securityHeaders";
 
 const nextConfig: NextConfig = {
+  // Applies to every route, including /api — proxy.ts's matcher
+  // deliberately excludes /api (see its own comment), so this is the one
+  // place a header can cover both the public pages and the API routes.
+  async headers() {
+    return [{ source: "/(.*)", headers: SECURITY_HEADERS }];
+  },
   images: {
     // Stars section YouTube facade (YouTubeFacade.tsx): the poster is
     // YouTube's own static thumbnail, fetched only for stars that have a

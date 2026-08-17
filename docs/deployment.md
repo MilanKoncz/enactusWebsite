@@ -8,6 +8,29 @@ the minimum needed to stand the site up and keep it running.
 Vercel, region `fra1` (Frankfurt). Configured via `next.config.ts` and the
 `next-intl` plugin — no extra Vercel-side routing config needed.
 
+## Security headers
+
+`src/lib/securityHeaders.ts`, applied via `next.config.ts`'s `headers()` to
+every route including `/api/*` — `proxy.ts`'s matcher deliberately excludes
+`/api` (locale rewriting has no business running there), so this is the one
+place a header can reach both the public pages and the API routes.
+
+Content-Security-Policy, `X-Frame-Options: DENY`, `Referrer-Policy`,
+`X-Content-Type-Options: nosniff`, a locked-down `Permissions-Policy`, and
+`Strict-Transport-Security`. The CSP allows `'unsafe-inline'` for both
+`script-src` and `style-src` — deliberate, not an oversight: a nonce-based
+CSP would force every page onto dynamic rendering (a per-request nonce has
+to come from somewhere request-scoped, i.e. middleware), directly against
+the LCP budget above, and Radix UI / `motion` position and animate elements
+via inline `style` attributes that no nonce can ever cover regardless.
+`frame-src`/`img-src` carry the two YouTube hosts the click-to-load facade
+needs (`youtube-nocookie.com`, `i.ytimg.com`); everything else is `'self'`.
+
+After any change here, load a representative set of pages in a real browser
+(or `node`-drive one with Playwright) and check the console for CSP
+violations before trusting the change — `tests/unit/lib/securityHeaders.test.ts`
+only asserts the header strings, not that a real page actually respects them.
+
 ## Environment variables
 
 Copy `.env.example` to `.env.local` for local development. See that file for
