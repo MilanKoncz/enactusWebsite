@@ -17,6 +17,40 @@ test.describe("homepage", () => {
     expect(scrollWidth).toBeLessThanOrEqual(clientWidth);
   });
 
+  test("keeps the five KPI figures in separate, non-overlapping columns at desktop width", async ({
+    page,
+    isMobile,
+  }) => {
+    // The regression this guards: at five equal grid columns, a wide figure
+    // (">150.000 €") can render past its own column and visually merge with
+    // its neighbour ("8") even though the grid itself is already even —
+    // something only a real layout measurement catches, never a unit test
+    // rendering in jsdom without layout.
+    test.skip(isMobile, "the five-column layout only exists from the lg breakpoint up");
+    await page.goto("/");
+
+    const labels = [
+      "Projektiterationen",
+      "Eingeworbenes Funding",
+      "Nationale Meistertitel",
+      "Weltweit",
+      "Gegründet & Übergeben",
+    ];
+    const boxes = [];
+    for (const label of labels) {
+      const tile = page.getByText(label, { exact: true }).locator("..");
+      const box = await tile.boundingBox();
+      expect(box).not.toBeNull();
+      boxes.push(box!);
+    }
+
+    for (let i = 1; i < boxes.length; i++) {
+      const previous = boxes[i - 1];
+      const current = boxes[i];
+      expect(current.x).toBeGreaterThanOrEqual(previous.x + previous.width - 1);
+    }
+  });
+
   test("is fully keyboard-traversable, and no element traps focus", async ({ page, isMobile }) => {
     test.skip(isMobile, "keyboard-only traversal is a desktop interaction pattern");
     await page.goto("/");

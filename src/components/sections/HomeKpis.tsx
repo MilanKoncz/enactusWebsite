@@ -1,4 +1,5 @@
 import { useFormatter, useTranslations } from "next-intl";
+import { cn } from "@/lib/cn";
 import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
@@ -51,13 +52,36 @@ export function HomeKpis() {
     <Section className="relative isolate">
       <ThreadSegment stop="kpis" />
       <Container className="relative flex flex-col gap-10">
-        <Eyebrow>{t("eyebrow")}</Eyebrow>
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-5">
-          {kpis.map((kpi) => {
+        <Eyebrow className="text-center lg:text-left">{t("eyebrow")}</Eyebrow>
+        {/* Two columns from 360px up — five figures never fit one legible
+            column, so the choice is 1 vs 2, not 1 vs 5. lg:grid-rows-[auto_
+            auto_auto] plus each tile's lg:grid-rows-subgrid below is what
+            keeps every tile's number/label/detail on the same three
+            baselines, whether or not that tile's detail line is empty — a
+            fixed min-height alone can't do that once a label wraps to two
+            lines. Below lg there's only ever one tile per row, so equal
+            height there falls out of the grid for free. */}
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-5 lg:grid-rows-[auto_auto_auto] lg:gap-x-0 lg:gap-y-0">
+          {kpis.map((kpi, index) => {
             const formatted = formatValue(kpi.key, kpi.value);
+            const isLast = index === kpis.length - 1;
             return (
-              <div key={kpi.key} className="flex flex-col gap-2">
-                <p className="text-display-2 font-display">
+              <div
+                key={kpi.key}
+                className={cn(
+                  "flex flex-col gap-2 text-center lg:grid lg:grid-rows-subgrid lg:row-span-3 lg:gap-2 lg:border-l lg:border-gold lg:px-6 lg:text-left lg:first:border-l-0 lg:first:pl-0 lg:last:pr-0",
+                  isLast && "col-span-2 lg:col-span-1",
+                )}
+              >
+                {/* display-2 (4rem) only fits the tablet range: two roomy
+                    columns. Both ends of the breakpoint scale give this row
+                    a narrow column instead — two tight columns below sm, five
+                    columns from lg — and display-2's widest figure
+                    (">150.000 €") runs past either one and collides with its
+                    neighbour, confirmed by measuring the rendered width, not
+                    eyeballed. display-3 (2.5rem) is the size that clears both
+                    narrow cases. */}
+                <p className="text-display-3 font-display sm:text-display-2 lg:text-display-3">
                   {kpi.verified ? (
                     formatted
                   ) : (
