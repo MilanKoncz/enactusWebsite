@@ -48,4 +48,13 @@ describe("SECURITY_HEADERS", () => {
     expect(hsts).toContain("includeSubDomains");
     expect(hsts).toMatch(/max-age=\d{7,}/);
   });
+
+  // Regression guard: this directive is redundant behind HTTPS-only
+  // hosting plus HSTS, but it breaks http://localhost in WebKit — the
+  // stylesheet and client bundle get upgraded to an https URL nothing
+  // serves, so the page renders unstyled and never hydrates. That took
+  // out 21 Mobile Safari e2e tests when it was first added.
+  it("does not upgrade insecure requests, which would break http://localhost in WebKit", () => {
+    expect(header("Content-Security-Policy")).not.toContain("upgrade-insecure-requests");
+  });
 });

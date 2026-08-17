@@ -37,7 +37,17 @@ const CONTENT_SECURITY_POLICY = [
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
-  "upgrade-insecure-requests",
+  // Deliberately no `upgrade-insecure-requests`. It buys nothing here —
+  // production is HTTPS-only on Vercel, every asset is same-origin and
+  // already https, and Strict-Transport-Security below already forces the
+  // scheme at the browser level for the real domain. What it *does* do is
+  // break every non-HTTPS environment: WebKit applies it to
+  // http://localhost too (Chromium exempts localhost as a trustworthy
+  // origin), so the stylesheet and client bundle get upgraded to an https
+  // URL nothing is listening on. The page then renders unstyled and never
+  // hydrates — which took out 21 Mobile Safari e2e tests across six specs
+  // when this directive was first added, in ways that looked like layout
+  // and interaction bugs rather than a CSP problem.
 ].join("; ");
 
 export const SECURITY_HEADERS: { key: string; value: string }[] = [
