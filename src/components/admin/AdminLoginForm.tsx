@@ -8,7 +8,7 @@ import { Field } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
 
 export function AdminLoginForm() {
-  const t = useTranslations("AdminBewerbungen.login");
+  const t = useTranslations("Admin.login");
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);

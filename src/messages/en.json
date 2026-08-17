@@ -1019,23 +1019,25 @@
       "subject": "New contact message from {name}"
     }
   },
-  "AdminBewerbungen": {
+  "Admin": {
     "eyebrow": "Admin",
-    "title": "Applications",
     "logout": "Log out",
-    "downloadCsv": "Download as CSV",
-    "noApplications": "No applications yet.",
-    "columns": {
-      "name": "Name",
-      "email": "Email",
-      "studyProgram": "Field of study",
-      "createdAt": "Received",
-      "mailStatus": "Mail status"
-    },
+    "credit": "Designed and built by Milan Koncz",
     "mailStatus": {
       "pending": "pending",
       "sent": "sent",
       "failed": "failed"
+    },
+    "nav": {
+      "label": "Admin sections",
+      "overview": "Overview",
+      "applications": "Applications",
+      "failedMails": "Failed mails",
+      "recruitingWindows": "Application windows",
+      "reminders": "Reminder list",
+      "contactMessages": "Contact messages",
+      "deletionRequests": "Deletion requests",
+      "system": "System status"
     },
     "login": {
       "eyebrow": "Admin",
@@ -1044,6 +1046,31 @@
       "submit": "Sign in",
       "error": "Wrong password.",
       "rateLimited": "Too many attempts. Please try again later."
+    },
+    "overview": {
+      "title": "Overview",
+      "lead": "Internal tooling for the board. Nothing in here is publicly reachable.",
+      "sections": {
+        "applications": "Every application, grouped by semester, with a CSV export per cycle.",
+        "failedMails": "Records whose mail delivery failed — with the error and a resend.",
+        "recruitingWindows": "Create, edit, and delete application windows.",
+        "reminders": "Who signed up for the reminder, confirmed and unconfirmed.",
+        "contactMessages": "Incoming contact messages with their delivery status.",
+        "deletionRequests": "Find and delete personal data for an address (GDPR Art. 15 and 17).",
+        "system": "Last cron run, database and Resend reachability, row counts."
+      }
+    },
+    "applications": {
+      "title": "Applications",
+      "downloadCsv": "Download as CSV",
+      "empty": "No applications yet.",
+      "columns": {
+        "name": "Name",
+        "email": "Email",
+        "studyProgram": "Field of study",
+        "createdAt": "Received",
+        "mailStatus": "Mail status"
+      }
     }
   },
   "ImageLightbox": {

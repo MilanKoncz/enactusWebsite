@@ -1,22 +1,10 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { ADMIN_SESSION_COOKIE, verifySessionCookieValue } from "@/lib/adminAuth";
+import { isAuthenticatedRequest } from "@/lib/adminSession";
 import { listApplicationsBySemester } from "@/lib/db";
+import { csvDocument, csvFilenameSegment } from "@/lib/csv";
 
 const CSV_COLUMNS = ["Name", "E-Mail", "Studiengang", "Eingangsdatum", "Mailstatus"];
-
-// UTF-8 BOM first, per the brief — without it Excel guesses the system
-// codepage and mangles every umlaut in a name or Studiengang.
-const UTF8_BOM = "﻿";
-
-function csvCell(value: string): string {
-  const escaped = value.replaceAll('"', '""');
-  return /[",\n]/.test(value) ? `"${escaped}"` : escaped;
-}
-
-function csvRow(cells: string[]): string {
-  return cells.map(csvCell).join(",") + "\r\n";
-}
 
 const MAIL_STATUS_LABEL: Record<string, string> = {
   pending: "ausstehend",
@@ -25,8 +13,7 @@ const MAIL_STATUS_LABEL: Record<string, string> = {
 };
 
 export async function GET(request: NextRequest) {
-  const session = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
-  if (!verifySessionCookieValue(session)) {
+  if (!isAuthenticatedRequest(request)) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 
@@ -35,25 +22,34 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "missing_semester" }, { status: 400 });
   }
 
-  const applications = await listApplicationsBySemester(semester);
-  const dateFormatter = new Intl.DateTimeFormat("de-DE", { dateStyle: "medium", timeStyle: "short" });
+  // Wrapped, unlike before: a Neon outage here used to surface as an
+  // unhandled 500 with no log line, which is the one failure mode the
+  // board would have to guess at.
+  let applications;
+  try {
+    applications = await listApplicationsBySemester(semester);
+  } catch (error) {
+    console.error("Failed to read applications for CSV export", error);
+    return NextResponse.json({ ok: false, error: "server_error" }, { status: 500 });
+  }
 
-  let csv = UTF8_BOM + csvRow(CSV_COLUMNS);
-  for (const application of applications) {
-    csv += csvRow([
+  const dateFormatter = new Intl.DateTimeFormat("de-DE", { dateStyle: "medium", timeStyle: "short" });
+  const csv = csvDocument(
+    CSV_COLUMNS,
+    applications.map((application) => [
       `${application.firstName} ${application.lastName}`,
       application.email,
       application.studyProgram,
       dateFormatter.format(application.createdAt),
       MAIL_STATUS_LABEL[application.mailStatus] ?? application.mailStatus,
-    ]);
-  }
+    ]),
+  );
 
   return new NextResponse(csv, {
     status: 200,
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="bewerbungen-${semester}.csv"`,
+      "Content-Disposition": `attachment; filename="bewerbungen-${csvFilenameSegment(semester)}.csv"`,
     },
   });
 }

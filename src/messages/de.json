@@ -1019,23 +1019,25 @@
       "subject": "Neue Kontaktanfrage von {name}"
     }
   },
-  "AdminBewerbungen": {
+  "Admin": {
     "eyebrow": "Admin",
-    "title": "Bewerbungen",
     "logout": "Abmelden",
-    "downloadCsv": "Als CSV herunterladen",
-    "noApplications": "Noch keine Bewerbungen.",
-    "columns": {
-      "name": "Name",
-      "email": "E-Mail",
-      "studyProgram": "Studiengang",
-      "createdAt": "Eingangsdatum",
-      "mailStatus": "Mailstatus"
-    },
+    "credit": "Designed and built by Milan Koncz",
     "mailStatus": {
       "pending": "ausstehend",
       "sent": "gesendet",
       "failed": "fehlgeschlagen"
+    },
+    "nav": {
+      "label": "Adminbereiche",
+      "overview": "Übersicht",
+      "applications": "Bewerbungen",
+      "failedMails": "Fehlgeschlagene Mails",
+      "recruitingWindows": "Bewerbungsfenster",
+      "reminders": "Erinnerungsliste",
+      "contactMessages": "Kontaktanfragen",
+      "deletionRequests": "Löschanfragen",
+      "system": "Systemstatus"
     },
     "login": {
       "eyebrow": "Admin",
@@ -1044,6 +1046,31 @@
       "submit": "Anmelden",
       "error": "Falsches Passwort.",
       "rateLimited": "Zu viele Versuche. Bitte später erneut versuchen."
+    },
+    "overview": {
+      "title": "Übersicht",
+      "lead": "Interne Werkzeuge für den Vorstand. Kein Bereich hier ist öffentlich erreichbar.",
+      "sections": {
+        "applications": "Alle Bewerbungen, nach Semester gruppiert, mit CSV-Export je Zyklus.",
+        "failedMails": "Datensätze, deren Mailversand gescheitert ist — mit Fehlertext und erneutem Versand.",
+        "recruitingWindows": "Bewerbungsfenster anlegen, bearbeiten und löschen.",
+        "reminders": "Wer sich für die Erinnerung eingetragen hat, bestätigt und unbestätigt.",
+        "contactMessages": "Eingegangene Kontaktanfragen mit Versandstatus.",
+        "deletionRequests": "Personenbezogene Daten zu einer Adresse suchen und löschen (Art. 15 und 17 DSGVO).",
+        "system": "Letzte Cron-Ausführung, Erreichbarkeit von Datenbank und Resend, Zeilenzahlen."
+      }
+    },
+    "applications": {
+      "title": "Bewerbungen",
+      "downloadCsv": "Als CSV herunterladen",
+      "empty": "Noch keine Bewerbungen.",
+      "columns": {
+        "name": "Name",
+        "email": "E-Mail",
+        "studyProgram": "Studiengang",
+        "createdAt": "Eingangsdatum",
+        "mailStatus": "Mailstatus"
+      }
     }
   },
   "ImageLightbox": {
