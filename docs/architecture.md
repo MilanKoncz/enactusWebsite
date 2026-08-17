@@ -113,14 +113,25 @@ client (`react-hook-form` + `zodResolver`) and the server (the API route):
 Full detail, including the double opt-in for the reminder list and rate
 limiting, is in `docs/engineering.md`.
 
-## The admin page
+## The admin area
 
-`/admin/bewerbungen` lists applications for the board, grouped by recruiting
-semester, with a per-semester CSV export. It is a normal page under
-`[locale]/admin`, gated by comparing a password (`ADMIN_PASSWORD`) against a
-signed, httpOnly session cookie (`src/lib/adminAuth.ts`) — no user-account
-system. It is excluded from `robots.ts` and `sitemap.ts`, and carries its
-own `noindex` metadata besides.
+Eight sections under `[locale]/admin` — applications, failed mails,
+application windows, the reminder list, contact messages, deletion
+requests, system status, plus an overview. Full list and what each is for:
+`docs/deployment.md`'s "The admin area".
+
+Gated by comparing a password (`ADMIN_PASSWORD`) against a signed, httpOnly
+session cookie (`src/lib/adminAuth.ts`, signed with `ADMIN_SESSION_SECRET`)
+— no user-account system. The gate is applied per page and per route via
+`src/lib/adminSession.ts`, never only in the layout: a layout renders its
+children regardless of what it returns, so the check has to sit ahead of
+each page's own query. Excluded from `robots.ts` and `sitemap.ts`, with
+`noindex` metadata besides, and `proxy.ts` 404s the `/en` variants.
+
+`src/components/admin/` holds the pieces shared across sections
+(`AdminNav`, `AdminTable`, `AdminLogin`, and the client components that
+perform mutations). `ADMIN_SECTIONS` in `adminSections.ts` is the single
+list the nav and the overview both read.
 
 ## Testing layers
 

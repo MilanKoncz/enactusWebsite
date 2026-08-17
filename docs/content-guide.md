@@ -58,23 +58,28 @@ key) if you forget one. A bio is prose, so it lives in messages, not in
 
 Application windows live in the `recruiting_windows` table, not in a content
 file (as of 2026-08-17 — this replaces the old `recruitingWindows` array).
-Board-facing management is at `/admin/bewerbungsfenster`, gated the same way
-as `/admin/bewerbungen` (password from `ADMIN_PASSWORD`, see
-`docs/deployment.md`); until that section ships, add or edit a row directly
-against the table (`migrations/0003_recruiting_windows.sql` has the schema —
-`semester`, `starts_at`, `ends_at`), matching the `HWS26`/`FSS27`-style label
-format and making sure the new window doesn't overlap an existing one.
-`src/content/recruiting.ts` still holds the shared `RecruitingWindow` type and
-its Zod validation, but no data — it's the type definition both the admin
-form and the public site's open/closed logic (`src/lib/recruitingStatus.ts`)
-read from, not a place to edit facts.
+Manage them at **`/admin/bewerbungsfenster`** (password from
+`ADMIN_PASSWORD`, see `docs/deployment.md`): list, create, edit, delete.
 
-Until an edit goes through the admin form, editing the table by hand won't
-show up on `/mitmachen` immediately — that page's cache
-(`lib/recruitingWindows.ts`) only self-invalidates via `revalidateTag`, which
-the admin mutation routes call and a manual `INSERT`/`UPDATE` doesn't. It
-resolves on its own within an hour (`revalidate: 3600`); to force it sooner,
-redeploy, or hit the route the admin form itself will eventually call.
+Enter times as ordinary local dates — they're interpreted in
+`RECRUITING_TIMEZONE` (Europe/Berlin) on the server, not in whatever
+timezone your laptop is set to, so the same form gives the same window from
+anywhere. The form rejects a label that isn't `HWS26`/`FSS27`-shaped, an end
+before its start, and any window overlapping an existing one (naming which).
+A change is live on `/mitmachen` immediately — the page's cache is
+invalidated by the same request that saved it.
+
+The page also warns, standing, when no window with a future end date exists:
+that's the state in which `/mitmachen` says "closed" indefinitely.
+
+`src/content/recruiting.ts` still holds the shared `RecruitingWindow` type
+and its Zod validation, but no data — it's the type definition both the
+admin form and the public site's open/closed logic
+(`src/lib/recruitingStatus.ts`) read from, not a place to edit facts.
+
+Editing the table by hand (rather than through the admin form) skips the
+cache invalidation, so `/mitmachen` can lag by up to an hour
+(`revalidate: 3600` in `lib/recruitingWindows.ts`). Use the admin page.
 
 The public `/mitmachen` page reads the window list through a short-lived
 cache (`src/lib/recruitingWindows.ts`) rather than querying on every visit —
@@ -90,6 +95,9 @@ automatically (`src/lib/recruitingSemester.ts`) — nothing else to update.
 `/admin/bewerbungen` (password from `ADMIN_PASSWORD`, see
 `docs/deployment.md`). Lists every application grouped by recruiting
 semester, newest first, with a "Als CSV herunterladen" button per group.
+
+If a row says its mail failed, `/admin/mails` shows why and offers a
+resend. `/admin` links every section; `docs/deployment.md` describes them.
 
 ## Update KPIs, network stats, or "since 2003"
 

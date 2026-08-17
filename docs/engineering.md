@@ -36,6 +36,14 @@ protection checklist.
 3. Only confirmed rows are ever mailed.
 4. Store confirmation timestamp and IP as proof of consent.
 5. Every mail carries a working one-click unsubscribe.
+6. Whether that confirmation mail actually went out is recorded on the row
+   (`mail_status`, `mail_error`), same as the other two forms — otherwise a
+   subscriber whose link never arrived is indistinguishable from one who
+   chose not to click. `/admin/mails` lists the failures and can resend.
+
+`/admin/erinnerungen` shows the list with confirmed, unconfirmed, and
+unsubscribed counted separately; only the confirmed figure is the number of
+people who may be mailed. Its CSV export deliberately carries no tokens.
 
 ## Data protection
 
@@ -43,6 +51,9 @@ protection checklist.
 - Collect the minimum. A field not used in selection does not belong on the form.
 - Data processing agreements required with Vercel, Neon, and Resend. Track their
   status in `ASSETS-TODO.md`.
+- Access and erasure requests (GDPR Art. 15 and 17) are served by
+  `/admin/loeschanfragen`: search one address across all three tables, see
+  every stored field, delete after confirming the address twice.
 - Enactus Germany provides a data protection officer who advises student teams
   free of charge. The privacy policy draft goes to him before launch, clearly
   marked as a draft until then.

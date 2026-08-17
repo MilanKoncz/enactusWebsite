@@ -149,10 +149,15 @@ a build failure: `next build` stays green with the whole Resend
 configuration unset, and the first sign of trouble is mail silently not
 arriving.
 
-Silently is not quite right, though — it is recorded. `/api/kontakt` and
-`/api/bewerbung` both write to Postgres *before* attempting a send, and a
-failed send is stored on the row rather than surfaced to the sender, who is
-told their message went through, because it did:
+Silently is not quite right, though — it is recorded. All three form routes
+write to Postgres *before* attempting a send, and a failed send is stored on
+the row rather than surfaced to the sender, who is told their message went
+through, because it did.
+
+**Look at `/admin/mails` first.** It lists every failed record across all
+three tables with the provider's own error and a per-record "resend", which
+is faster and safer than a manual query. The SQL below is the fallback when
+the admin page itself can't be reached:
 
 ```sql
 select mail_status, mail_error, created_at from contact_messages
@@ -160,9 +165,8 @@ order by created_at desc limit 20;
 ```
 
 `mail_status` is `pending`, `sent`, or `failed`; `mail_error` holds the
-provider's or the code's own message. That column is the first place to look
-when someone reports that a contact message never arrived — it distinguishes
-"never reached the mail layer" from "Resend rejected it" without guessing.
+provider's or the code's own message. That column distinguishes "never
+reached the mail layer" from "Resend rejected it" without guessing.
 
 To test the delivery path itself:
 
@@ -184,22 +188,44 @@ Production read Vercel's project environment variables, and each Vercel
 environment is configured separately — a key present in Development does
 nothing for the deployed site.
 
-## Admin application list
+## The admin area
 
-`/admin/bewerbungen` (German URL, no locale prefix, like every other page —
-also reachable at `/en/admin/bewerbungen`) lists every application, grouped
-by recruiting semester (`applications.recruiting_semester`,
-`migrations/0002_add_recruiting_semester.sql`), newest group first. Each
-group has a "Als CSV herunterladen" link (`GET
-/api/admin/bewerbungen/csv?semester=...`), UTF-8 with a BOM so Excel
-renders umlauts correctly.
+`/admin` (German URLs only — `proxy.ts` returns 404 for the `/en`-prefixed
+variants, since board tooling has no translated UI worth a second URL).
+Eight sections, all behind the same gate:
 
-Gated by `ADMIN_PASSWORD` (above) — no account system, one shared password.
-A correct password sets a signed, httpOnly, 8-hour session cookie
+| Path | What it's for |
+| --- | --- |
+| `/admin` | Overview linking every section |
+| `/admin/bewerbungen` | Applications by recruiting semester, CSV per group |
+| `/admin/mails` | Every failed send across all three tables, with a resend |
+| `/admin/bewerbungsfenster` | Create, edit, delete application windows |
+| `/admin/erinnerungen` | Reminder list, confirmed/unconfirmed/unsubscribed, CSV |
+| `/admin/kontakt` | Contact messages and their delivery status |
+| `/admin/loeschanfragen` | GDPR Art. 15 and 17 for one address |
+| `/admin/system` | Cron history, dependency reachability, row counts |
+
+Gated by `ADMIN_PASSWORD` with the session cookie signed by
+`ADMIN_SESSION_SECRET` (both above) — no account system, one shared
+password. A correct password sets a signed, httpOnly, 8-hour cookie
 (`lib/adminAuth.ts`); `/api/admin/login` is rate-limited the same way the
-public forms are. The page carries `noindex` metadata and is excluded from
-both `robots.ts` and `sitemap.ts` — it should never appear in search
-results regardless.
+public forms are. Every page and every `/api/admin/*` route checks the
+cookie itself *before* querying anything (`lib/adminSession.ts`) — the
+layout's check only decides whether to draw the nav, because a layout
+cannot stop its children from running. Every page carries `noindex`
+metadata, and `/admin` is excluded from both `robots.ts` and `sitemap.ts`.
+
+Two sections are worth knowing about before you need them:
+
+- **`/admin/mails`** is the answer to "the notification never arrived". A
+  resend reuses the exact same composition the original send used
+  (`lib/mailDispatch.ts`), so a retry can't quietly differ from what the
+  sender was promised. A retry that fails again says so and overwrites the
+  row's error with the newest reason.
+- **`/admin/loeschanfragen`** is the only irreversible action here, on data
+  no backup in this project restores. It requires the address to be typed
+  twice and logs what it removed, because that log is the only remaining
+  record afterwards.
 
 ## Scheduled cleanup
 
@@ -210,10 +236,16 @@ not as alternatives to each other but as a primary path and a fallback:
 
 1. **Vercel Cron** (`vercel.json`) calls the route once a day at 03:00 UTC
    with `Authorization: Bearer $CRON_SECRET`. Vercel's Hobby plan allows up
-   to two cron jobs at daily granularity, so this fits without a paid plan
-   — but Cron itself still has to be confirmed working after the first
-   deploy (Vercel's dashboard shows recent cron invocations under the
-   project's "Cron Jobs" tab).
+   to two cron jobs at daily granularity, so this fits without a paid plan.
+
+   **This has already failed silently once.** On 2026-08-17 the job was
+   registered correctly (`npx vercel crons ls` confirmed it) and still did
+   not fire at its 03:00 UTC slot, and nothing in the product noticed —
+   runtime logs are kept for a day on this plan, so the evidence was gone
+   before anyone looked. Every run now writes a row to `cron_runs`
+   (`migrations/0005`), and **`/admin/system`** shows the last run, the next
+   scheduled one, and raises a standing alert when no successful run is on
+   record for over 48 hours. Check that page rather than the dashboard.
 2. **`npm run db:cleanup`** calls the same route over HTTP by hand — against
    a local `npm run build && npm run start` by default, or against
    production with `CLEANUP_URL=https://www.enactus-mannheim.com npm run
