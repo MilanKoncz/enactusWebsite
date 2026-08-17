@@ -13,13 +13,17 @@ import { Link } from "@/lib/navigation";
 // telling the visitor what to do next. The heading itself stays the
 // meaningful text (t("title")) for anyone using a screen reader; "404" is a
 // decorative aria-hidden echo of it, not a replacement.
+//
+// Gold as a text color is only allowed on ink (docs/design-system.md — gold
+// on paper measures 1.47:1). The page runs on an ink surface for that
+// reason, not on paper with a gold override.
 export default async function NotFound() {
   const t = await getTranslations("NotFound");
 
   return (
-    <Section>
+    <Section surface="ink">
       <Container className="flex min-h-[60vh] flex-col items-center justify-center gap-6 py-24 text-center">
-        <p aria-hidden="true" className="text-display-1 font-display leading-none opacity-90">
+        <p aria-hidden="true" className="text-display-1 font-display leading-none text-gold">
           404
         </p>
         <h1 className="text-heading-2 font-sans">{t("title")}</h1>
