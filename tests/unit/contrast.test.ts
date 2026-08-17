@@ -8,7 +8,7 @@ import {
   WCAG_AA_NORMAL_TEXT,
 } from "@/lib/contrast";
 import { colorTokens } from "@/lib/design-tokens";
-import { PILLAR_OVERLAY_OPACITY } from "@/components/sections/Pillars";
+import { PILLAR_IMAGE_FIT, PILLAR_OVERLAY_OPACITY } from "@/components/sections/Pillars";
 
 function readCssColorTokens(): Record<string, string> {
   const css = readFileSync(resolve(process.cwd(), "src/app/globals.css"), "utf-8");
@@ -100,5 +100,18 @@ describe("design tokens: color contrast", () => {
     const worstCaseBackground = blendOverBackground(ink, PILLAR_OVERLAY_OPACITY, "#ffffff");
     const mutedText = blendOverBackground(paper, 0.6, worstCaseBackground);
     expect(passesAA(contrastRatio(mutedText, worstCaseBackground))).toBe(true);
+  });
+
+  it("the ESG pillar's SDG wheel is the case the worst-case-white checks above are actually for", () => {
+    // The two checks above use "#ffffff" as a stand-in for the brightest any
+    // pillar photo could show — this test names why that stand-in isn't
+    // theoretical for `esg` specifically. Its image is object-contain (see
+    // PILLAR_IMAGE_FIT in Pillars.tsx), chosen precisely so the whole wheel
+    // — including its white background, not just an arbitrarily cropped arc
+    // of it — sits behind the scrim. So for this one pillar, worst-case-white
+    // isn't a hypothetical upper bound; it's close to the real photo.
+    expect(PILLAR_IMAGE_FIT.esg).toBe("contain");
+    const worstCaseBackground = blendOverBackground(ink, PILLAR_OVERLAY_OPACITY, "#ffffff");
+    expect(passesAA(contrastRatio(paper, worstCaseBackground))).toBe(true);
   });
 });

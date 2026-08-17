@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { screen } from "@testing-library/react";
 import { axe } from "jest-axe";
 import { renderWithIntl } from "../../fixtures/intl";
-import { Pillars } from "@/components/sections/Pillars";
+import { Pillars, PILLAR_IMAGE_FIT } from "@/components/sections/Pillars";
 import { pillars } from "@/content/pillars";
 
 describe("Pillars", () => {
@@ -76,6 +76,28 @@ describe("Pillars", () => {
     for (const pillar of pillars) {
       expect(container.querySelector(`img[src*="${encodeURIComponent(pillar.image!)}"]`)).toBeInTheDocument();
     }
+  });
+
+  it("shows the ESG wheel whole (object-contain) and the two photos cropped (object-cover)", () => {
+    const { container } = renderWithIntl(<Pillars />);
+    for (const pillar of pillars) {
+      const img = container.querySelector(`img[src*="${encodeURIComponent(pillar.image!)}"]`);
+      const expectedClass = PILLAR_IMAGE_FIT[pillar.key] === "contain" ? "object-contain" : "object-cover";
+      expect(img).toHaveClass(expectedClass);
+    }
+  });
+
+  it("keeps the heading, lead, and detail in a positioned wrapper after the photo, so they always paint above it", () => {
+    renderWithIntl(<Pillars />);
+    const heading = screen.getByRole("heading", { level: 3, name: "ESG-Charakter" });
+    const column = heading.closest(".hover-grow")!;
+    const textWrapper = heading.parentElement!;
+    expect(textWrapper).toHaveClass("relative");
+    // The photo and its scrim are the column's first two children; the text
+    // wrapper must come after both in DOM order — painting order for
+    // same-stack-level positioned boxes follows DOM order, so this ordering
+    // is what keeps the text on top, not merely an implementation detail.
+    expect(Array.from(column.children).indexOf(textWrapper)).toBe(column.children.length - 1);
   });
 
   it("links the SDG reference in the ESG pillar's lead sentence to the official UN goals page", () => {

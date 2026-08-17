@@ -7,7 +7,24 @@ import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/motion/Reveal";
 import { ThreadSegment } from "@/components/motion/ThreadSegment";
-import { pillars } from "@/content/pillars";
+import { pillars, type PillarKey } from "@/content/pillars";
+
+// How each pillar's background photo should fit its card — a presentation
+// choice, not a fact about the organisation, so it stays out of
+// content/pillars.ts (which the board maintains) and lives here next to
+// PILLAR_OVERLAY_OPACITY instead. `esg`'s SDG wheel is a labelled infographic,
+// not a texture: cropping it (object-cover) cuts an arbitrary arc out of the
+// 17 goal colors that make it recognisable, and the scrim then sits on top of
+// that arbitrary crop rather than a whole, legible wheel. object-contain
+// keeps the whole wheel centered instead. The two photos stay object-cover,
+// which is the right fit for an actual photograph. Typed against PillarKey,
+// not a default case, so a fourth pillar fails to compile without an explicit
+// entry here.
+export const PILLAR_IMAGE_FIT: Record<PillarKey, "cover" | "contain"> = {
+  esg: "contain",
+  execution: "cover",
+  network: "cover",
+};
 
 // Overlay strength for each pillar's background photo — a flat scrim rather
 // than a gradient, so every pixel behind the text gets the same guarantee
@@ -54,32 +71,48 @@ export function Pillars() {
           {pillars.map((pillar) => (
             <div
               key={pillar.key}
-              className="hover-grow relative isolate flex flex-col gap-4 overflow-hidden rounded-md p-6"
+              className="hover-grow relative isolate flex flex-col gap-4 overflow-hidden rounded-md bg-ink p-6"
             >
               {pillar.image && (
                 <>
-                  <Image src={pillar.image} alt="" fill className="object-cover" />
+                  <Image
+                    src={pillar.image}
+                    alt=""
+                    fill
+                    className={PILLAR_IMAGE_FIT[pillar.key] === "contain" ? "object-contain" : "object-cover"}
+                  />
                   <div aria-hidden="true" className={`absolute inset-0 ${PILLAR_OVERLAY_OPACITY_CLASS}`} />
                 </>
               )}
-              <GateMarker as="h3" label={t(`${pillar.key}.title`)} />
-              <p className="text-body-l">
-                {pillar.key === "esg"
-                  ? t.rich("esg.lead", {
-                      sdgLink: (chunks) => (
-                        <a
-                          href="https://sdgs.un.org/goals"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="link-underline"
-                        >
-                          {chunks}
-                        </a>
-                      ),
-                    })
-                  : t(`${pillar.key}.lead`)}
-              </p>
-              <DetailText>{t(`${pillar.key}.detail`)}</DetailText>
+              {/* Explicitly positioned, not just a later sibling: the photo
+                  and scrim above are absolutely positioned, and an absolutely
+                  positioned box paints after plain in-flow content at the
+                  same stacking level regardless of DOM order — without this
+                  wrapper the photo and scrim painted over the heading and
+                  copy on all three cards, not only the one with a visibly
+                  transparent image. `relative` puts this wrapper in the same
+                  positioned bucket, where DOM order (this div comes after the
+                  photo) decides the paint order instead. */}
+              <div className="relative flex flex-col gap-4">
+                <GateMarker as="h3" label={t(`${pillar.key}.title`)} />
+                <p className="text-body-l">
+                  {pillar.key === "esg"
+                    ? t.rich("esg.lead", {
+                        sdgLink: (chunks) => (
+                          <a
+                            href="https://sdgs.un.org/goals"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="link-underline"
+                          >
+                            {chunks}
+                          </a>
+                        ),
+                      })
+                    : t(`${pillar.key}.lead`)}
+                </p>
+                <DetailText>{t(`${pillar.key}.detail`)}</DetailText>
+              </div>
             </div>
           ))}
         </Reveal>
