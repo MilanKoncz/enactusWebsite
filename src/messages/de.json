@@ -264,8 +264,8 @@
       "description": "Mealyo entwickelt eine App, die Lebensmittelverschwendung reduziert, indem der eigene Lebensmittelvorrat digitalisiert wird. Einfach den Kassenbon einscannen und fertig. Wenn Lebensmittel drohen schlecht zu werden, schlägt die App Rezepte für deren Verbrauch vor."
     },
     "resoap": {
-      "oneLiner": "ANREISSER_FEHLT",
-      "description": "BESCHREIBUNG_FEHLT"
+      "oneLiner": "Gebrauchtes Speiseöl wird zu hochwertiger Seife.",
+      "description": "ReSoap gibt gebrauchtem Speiseöl ein zweites Leben und verarbeitet es zu hochwertiger Seife. Statt als Abfall Umwelt und Infrastruktur zu belasten, wird das Öl zum Rohstoff für ein neues, nachhaltiges Produkt."
     },
     "impactwithus": {
       "oneLiner": "ImpactWithUs ist eine Social-Media-Beratung für NGOs, die durch höhere Sichtbarkeit die Spendeneinnahmen steigert.",
@@ -352,7 +352,8 @@
   "ProjectDetail": {
     "stageHeading": "Prozessstufe",
     "sdgHeading": "SDG-Fokus",
-    "linkedinLabel": "Projekt auf LinkedIn"
+    "linkedinLabel": "Projekt auf LinkedIn",
+    "unverifiedEmailHint": "Adresse aus dem üblichen Muster abgeleitet, noch nicht bestätigt"
   },
   "Sdg": {
     "goals": {

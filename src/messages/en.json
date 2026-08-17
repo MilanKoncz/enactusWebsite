@@ -264,8 +264,8 @@
       "description": "Mealyo is building an app that cuts food waste by digitising the food you already have at home. Scan your receipt and you're done. When something is about to spoil, the app suggests recipes that use it up."
     },
     "resoap": {
-      "oneLiner": "TEASER_MISSING",
-      "description": "DESCRIPTION_MISSING"
+      "oneLiner": "Used cooking oil becomes high-quality soap.",
+      "description": "ReSoap gives used cooking oil a second life, turning it into high-quality soap. Instead of burdening the environment and the sewer system as waste, the oil becomes the raw material for something new and sustainable."
     },
     "impactwithus": {
       "oneLiner": "Social media consulting for NGOs that raises donation income through greater visibility.",
@@ -352,7 +352,8 @@
   "ProjectDetail": {
     "stageHeading": "Process stage",
     "sdgHeading": "SDG focus",
-    "linkedinLabel": "Project on LinkedIn"
+    "linkedinLabel": "Project on LinkedIn",
+    "unverifiedEmailHint": "Address derived from the usual pattern, not yet confirmed"
   },
   "Sdg": {
     "goals": {

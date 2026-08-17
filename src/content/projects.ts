@@ -39,6 +39,15 @@ const assetPathSchema = z.string().startsWith("/");
 const projectLeadSchema = z.object({
   name: z.string().min(1),
   email: z.email().nullable(),
+  // Whether that address was handed over or merely follows the house
+  // pattern (vorname.nachname@unimannheim.enactus.team). ReSoap's two leads
+  // were named without addresses, so theirs are derived and carry `false` —
+  // rendered through PlaceholderMark's "unverified" variant rather than
+  // presented as confirmed, the same convention org.ts uses for
+  // foundingYear and legalRepresentatives. Defaults to true in the
+  // `project()` helper because every other address here came from a
+  // handover.
+  emailVerified: z.boolean(),
   linkedinUrl: z.url().nullable(),
   photo: assetPathSchema.nullable(),
 });
@@ -74,6 +83,7 @@ type ProjectInput = {
   leads?: Array<{
     name: string;
     email?: string | null;
+    emailVerified?: boolean;
     linkedinUrl?: string | null;
     photo?: string | null;
   }>;
@@ -96,6 +106,7 @@ function project(input: ProjectInput): Project {
     leads: (input.leads ?? []).map((lead) => ({
       name: lead.name,
       email: lead.email ?? null,
+      emailVerified: lead.emailVerified ?? true,
       linkedinUrl: lead.linkedinUrl ?? null,
       photo: lead.photo ?? null,
     })),
@@ -146,10 +157,42 @@ export const projects: Project[] = [
       },
     ],
   }),
-  // Lead's first name (Heidi) is confirmed; surname and email are not — see
-  // ASSETS-TODO.md. `leads` stays empty rather than storing a bare first
-  // name a future consumer could render as a complete name.
-  project({ slug: "resoap", name: "ReSoap", status: "active", sdgs: [6, 11, 12] }),
+  // Handed over 2026-08-17 by the project team: full names of both leads,
+  // the MVP stage, the logo, and photos of the process. Both addresses are
+  // *derived* from the house pattern rather than given, hence
+  // emailVerified: false — see ASSETS-TODO.md.
+  //
+  // SDGs stay 6/11/12 as previously confirmed. The handover document lists
+  // 6/8/12 (Decent Work instead of Sustainable Cities); that discrepancy is
+  // recorded in ASSETS-TODO.md for the project team to settle rather than
+  // silently resolved in either direction.
+  project({
+    slug: "resoap",
+    name: "ReSoap",
+    status: "active",
+    stage: "mvp",
+    logo: "/projects/resoap-logo.png",
+    images: [
+      "/projects/resoap-herstellung.jpg",
+      "/projects/resoap-reifeprozess.jpg",
+      "/projects/resoap-fertige-seife.jpg",
+    ],
+    sdgs: [6, 11, 12],
+    leads: [
+      {
+        name: "Heidi Hoffmann",
+        email: "heidi.hoffmann@unimannheim.enactus.team",
+        emailVerified: false,
+        photo: "/projects/leads/heidi-hoffmann.jpg",
+      },
+      {
+        name: "Nayab Sheikh",
+        email: "nayab.sheikh@unimannheim.enactus.team",
+        emailVerified: false,
+        photo: "/projects/leads/nayab-sheikh.jpg",
+      },
+    ],
+  }),
   project({
     slug: "impactwithus",
     name: "ImpactWithUs",

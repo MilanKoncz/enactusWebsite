@@ -34,9 +34,24 @@ describe("ProjectDetailPage", () => {
     );
   });
 
+  // Differgy, not ReSoap: ReSoap's leads were handed over on 2026-08-17, so
+  // an archive project is now the honest example of "nobody named yet".
   it("marks a project without a confirmed lead as a placeholder, not blank fields", () => {
-    renderWithIntl(<ProjectDetailPage project={resoap} />);
+    renderWithIntl(<ProjectDetailPage project={differgy} />);
     expect(screen.getAllByText("Angabe fehlt").length).toBeGreaterThan(0);
+  });
+
+  it("shows a derived lead address but marks it unconfirmed rather than presenting it as fact", () => {
+    renderWithIntl(<ProjectDetailPage project={resoap} />);
+
+    // Still a usable mailto — hiding it would leave the lead unreachable.
+    expect(
+      screen.getByRole("link", { name: "heidi.hoffmann@unimannheim.enactus.team" }),
+    ).toHaveAttribute("href", "mailto:heidi.hoffmann@unimannheim.enactus.team");
+    // ...but flagged, via the same "unverified" marker org.ts's facts use.
+    expect(
+      screen.getAllByTitle("Adresse aus dem üblichen Muster abgeleitet, noch nicht bestätigt").length,
+    ).toBeGreaterThan(0);
   });
 
   it("names both project leads", () => {

@@ -106,6 +106,27 @@ test.describe("/projekte/[slug]", () => {
     expect(results.violations).toEqual([]);
   });
 
+  // The detail pages had no breakpoint check, and two of them were quietly
+  // a few pixels over at 360px: a project lead's email address at this
+  // domain runs to ~38 characters with nothing to wrap at. Every active
+  // project is checked, not just one, because whether it overflows depends
+  // on how long that particular address happens to be.
+  test("never introduces a horizontal scrollbar at any breakpoint, for every active project", async ({
+    page,
+  }) => {
+    for (const slug of ["smilegreen", "mealyo", "resoap", "impactwithus"]) {
+      await page.goto(`/projekte/${slug}`);
+      for (const width of [360, 768, 1280, 1920]) {
+        await page.setViewportSize({ width, height: 900 });
+        const { scrollWidth, clientWidth } = await page.evaluate(() => ({
+          scrollWidth: document.documentElement.scrollWidth,
+          clientWidth: document.documentElement.clientWidth,
+        }));
+        expect(scrollWidth, `${slug} at width=${width}`).toBeLessThanOrEqual(clientWidth);
+      }
+    }
+  });
+
   test("renders a 404 for an unknown slug", async ({ page }) => {
     const response = await page.goto("/projekte/does-not-exist");
     expect(response?.status()).toBe(404);

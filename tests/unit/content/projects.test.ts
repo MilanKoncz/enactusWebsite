@@ -78,8 +78,25 @@ describe("content/projects", () => {
     ]);
   });
 
-  it("leaves ReSoap's leads empty — only a first name is confirmed", () => {
-    expect(projects.find((p) => p.slug === "resoap")!.leads).toEqual([]);
+  it("names both ReSoap leads, with derived addresses marked unconfirmed", () => {
+    const leads = projects.find((p) => p.slug === "resoap")!.leads;
+    expect(leads.map((l) => l.name)).toEqual(["Heidi Hoffmann", "Nayab Sheikh"]);
+    // Derived from the house pattern, never handed over — so they must not
+    // claim to be confirmed.
+    expect(leads.every((l) => l.emailVerified === false)).toBe(true);
+    expect(leads.map((l) => l.email)).toEqual([
+      "heidi.hoffmann@unimannheim.enactus.team",
+      "nayab.sheikh@unimannheim.enactus.team",
+    ]);
+    expect(leads.every((l) => l.photo !== null)).toBe(true);
+  });
+
+  it("marks every handed-over lead address as verified", () => {
+    const handedOver = projects
+      .flatMap((p) => p.leads)
+      .filter((l) => l.email !== null && !["Heidi Hoffmann", "Nayab Sheikh"].includes(l.name));
+    expect(handedOver.length).toBeGreaterThan(0);
+    expect(handedOver.every((l) => l.emailVerified)).toBe(true);
   });
 
   it("records the confirmed SDG focus per active project", () => {
@@ -90,10 +107,21 @@ describe("content/projects", () => {
     expect(bySlug.impactwithus).toEqual([17]);
   });
 
-  it("records SmileGreen's confirmed process stage and leaves the rest untracked", () => {
+  it("records the confirmed process stages and leaves the rest untracked", () => {
+    const withStage = new Set(["smilegreen", "resoap"]);
     for (const p of projects) {
-      expect(p.stage).toBe(p.slug === "smilegreen" ? "mvp" : null);
+      expect(p.stage).toBe(withStage.has(p.slug) ? "mvp" : null);
     }
+  });
+
+  it("gives ReSoap its logo and three process photos", () => {
+    const resoap = projects.find((p) => p.slug === "resoap")!;
+    expect(resoap.logo).toBe("/projects/resoap-logo.png");
+    expect(resoap.images).toEqual([
+      "/projects/resoap-herstellung.jpg",
+      "/projects/resoap-reifeprozess.jpg",
+      "/projects/resoap-fertige-seife.jpg",
+    ]);
   });
 
   it("links Mealyo's own site and SmileGreen's LinkedIn page, nothing invented", () => {

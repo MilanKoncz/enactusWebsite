@@ -39,7 +39,7 @@ type ProjectCopyKey = Parameters<ReturnType<typeof useTranslations<"Projects">>>
 type StageCopyKey = Parameters<ReturnType<typeof useTranslations<"Process.steps">>>[0];
 type SdgGoalCopyKey = Parameters<ReturnType<typeof useTranslations<"Sdg.goals">>>[0];
 
-function ProjectLeadCard({ lead }: { lead: ProjectLead }) {
+function ProjectLeadCard({ lead, unverifiedEmailHint }: { lead: ProjectLead; unverifiedEmailHint: string }) {
   return (
     <div className="flex items-center gap-3">
       <div className="relative w-16 shrink-0 overflow-hidden rounded-md aspect-3/4">
@@ -53,11 +53,32 @@ function ProjectLeadCard({ lead }: { lead: ProjectLead }) {
       </div>
       <div className="flex min-w-0 flex-col gap-1">
         <p className="text-body-m font-medium">{lead.name}</p>
-        {lead.email && (
-          <a href={`mailto:${lead.email}`} className="link-underline w-fit text-body-s opacity-80">
-            {lead.email}
-          </a>
-        )}
+        {/* A derived address (emailVerified: false) is still shown — it's
+            almost certainly right and useful — but marked as unconfirmed
+            rather than presented as fact, same convention as org.ts's
+            verified flags. It stays a real mailto: link: a visitor who
+            writes to it loses nothing if it bounces, and hiding it would
+            leave the lead with no contact route at all.
+
+            `break-all` and no `w-fit`: an address at this domain runs to ~38
+            characters with no space to wrap at, so a shrink-proof box pushed
+            the whole page sideways at 360px. Mealyo and ImpactWithUs were
+            already over by a few pixels before ReSoap's longer address made
+            it obvious. Breaking mid-address is a little ugly; a
+            horizontally scrolling page is worse and is ruled out by
+            CLAUDE.md's quality floor. */}
+        {lead.email &&
+          (lead.emailVerified ? (
+            <a href={`mailto:${lead.email}`} className="link-underline text-body-s break-all opacity-80">
+              {lead.email}
+            </a>
+          ) : (
+            <PlaceholderMark variant="unverified" hint={unverifiedEmailHint} className="text-body-s break-all">
+              <a href={`mailto:${lead.email}`} className="link-underline opacity-80">
+                {lead.email}
+              </a>
+            </PlaceholderMark>
+          ))}
         {lead.linkedinUrl && (
           <a
             href={lead.linkedinUrl}
@@ -168,7 +189,11 @@ export function ProjectDetailContent({ project, labels, className }: ProjectDeta
         {project.leads.length > 0 ? (
           <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:gap-10">
             {project.leads.map((lead) => (
-              <ProjectLeadCard key={lead.name} lead={lead} />
+              <ProjectLeadCard
+                key={lead.name}
+                lead={lead}
+                unverifiedEmailHint={tShared("unverifiedEmailHint")}
+              />
             ))}
           </div>
         ) : (

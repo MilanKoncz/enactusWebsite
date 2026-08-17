@@ -55,12 +55,27 @@ describe("ProjectsActive", () => {
     );
   });
 
-  it("marks a missing project lead as a placeholder instead of a blank field", async () => {
+  // Every active project has a named lead since ReSoap's handover
+  // (2026-08-17), so the missing-lead placeholder is exercised on the detail
+  // page against an archive project instead (ProjectDetailPage.test.tsx).
+  // What's still genuinely missing here is Mealyo's photos, and the point of
+  // the assertion is unchanged: a gap renders as a marked placeholder, never
+  // as an empty slot.
+  it("marks a missing project photo as a placeholder instead of a blank slot", async () => {
+    const user = userEvent.setup();
+    renderWithIntl(<ProjectsActive />);
+
+    await user.click(screen.getByRole("button", { name: /Mealyo/ }));
+    expect(screen.getAllByText(/FOTO/i).length).toBeGreaterThan(0);
+  });
+
+  it("shows ReSoap's handed-over leads and photos, with no placeholder left in that card", async () => {
     const user = userEvent.setup();
     renderWithIntl(<ProjectsActive />);
 
     await user.click(screen.getByRole("button", { name: /ReSoap/ }));
-    expect(screen.getAllByText("Angabe fehlt").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Heidi Hoffmann").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Nayab Sheikh").length).toBeGreaterThan(0);
   });
 
   it("closes the previously open card when a second one is opened", async () => {
