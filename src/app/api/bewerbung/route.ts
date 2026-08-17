@@ -8,7 +8,7 @@ import { sendApplicationConfirmation, sendApplicationNotification } from "@/lib/
 import { ApplicationPdfDocument } from "@/lib/applicationPdf";
 import { checkRateLimit } from "@/lib/rateLimit";
 import { clientIp } from "@/lib/requestIp";
-import { MIN_FILL_MS } from "@/lib/antiSpam";
+import { checkFormToken } from "@/lib/formToken";
 import { resolveApplicationSemester } from "@/lib/recruitingSemester";
 import { getRecruitingWindows } from "@/lib/recruitingWindows";
 import { recruitingPhaseAt } from "@/lib/recruitingStatus";
@@ -22,11 +22,15 @@ import { recruitingPhaseAt } from "@/lib/recruitingStatus";
  * already safe and the only thing left to do is record whether the notice
  * went out.
  *
- * Both anti-spam signals — the honeypot and the minimum-fill-time check —
- * resolve to the same response as a genuine success (200, `{ ok: true }`),
- * with nothing written and nothing sent. A bot gets no way to tell "you
- * were flagged" from "it worked", which is the whole point of a silent
- * signal: it stops being useful once it's distinguishable from success.
+ * Both anti-spam signals — the honeypot and the signed form-token's
+ * minimum-fill-time check (lib/formToken.ts) — resolve to the same response
+ * as a genuine success (200, `{ ok: true }`), with nothing written and
+ * nothing sent. A bot gets no way to tell "you were flagged" from "it
+ * worked", which is the whole point of a silent signal: it stops being
+ * useful once it's distinguishable from success. An *expired* token is not
+ * an anti-spam signal — it's what a genuine applicant gets from leaving the
+ * tab open too long — so that one case does get a real, distinguishable
+ * error.
  */
 export async function POST(request: NextRequest) {
   const rateLimit = await checkRateLimit("bewerbung", clientIp(request));
@@ -46,8 +50,12 @@ export async function POST(request: NextRequest) {
   }
   const data = parsed.data;
 
-  if (Date.now() - data.formRenderedAt < MIN_FILL_MS) {
+  const tokenStatus = checkFormToken(data.formToken);
+  if (tokenStatus === "invalid" || tokenStatus === "too_fast") {
     return NextResponse.json({ ok: true });
+  }
+  if (tokenStatus === "expired") {
+    return NextResponse.json({ ok: false, error: "form_expired" }, { status: 400 });
   }
 
   const recruitingWindows = await getRecruitingWindows();

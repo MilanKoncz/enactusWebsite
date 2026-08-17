@@ -994,7 +994,8 @@
         "submitPending": "Sending …",
         "submitSuccess": "Thanks for applying! We've received your application and will get back to you.",
         "submitError": "Your application couldn't be sent. Please try again, or write to us directly at {email}.",
-        "submitWindowClosed": "The application window just closed. Please reload the page to see the current status."
+        "submitWindowClosed": "The application window just closed. Please reload the page to see the current status.",
+        "submitFormExpired": "The form was open for too long. Please reload the page and submit your application again."
       }
     },
     "cta": {

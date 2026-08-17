@@ -10,8 +10,10 @@ Forms, data, privacy, performance, SEO, and testing detail.
 4. Email it via Resend to `info@unimannheim.enactus.team`.
 5. If the mail fails, the application is already persisted — log the error and
    still report success to the applicant, because their data is safe.
-6. Honeypot field plus a submission timing check. No CAPTCHA: it is an
-   accessibility and privacy problem.
+6. Honeypot field plus a submission timing check, enforced server-side
+   against a signed token (`GET /api/bewerbung/token`, `lib/formToken.ts`) —
+   not a client-supplied timestamp, which a script could set to anything.
+   No CAPTCHA: it is an accessibility and privacy problem.
 7. Free-text fields only, no file upload.
 8. The route rejects with 409 when no recruiting window is currently open —
    the form only renders while one is, but the route itself is public and

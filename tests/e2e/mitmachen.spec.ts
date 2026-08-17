@@ -86,6 +86,19 @@ test.describe("/mitmachen", () => {
     await page.route("**/api/bewerbung", (route) =>
       route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true }) }),
     );
+    // Also stubbed, not left to hit the real route: this decouples the test
+    // from whether FORM_TOKEN_SECRET happens to be set for this e2e run,
+    // and — since its issue time matches the faked clock below — makes the
+    // later fastForward(4000) actually exercise the intended
+    // minimum-fill-time gate rather than passing it by incidental clock skew.
+    const tokenIssuedAt = new Date("2026-09-05T12:00:00+02:00").getTime();
+    await page.route("**/api/bewerbung/token", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ token: `${tokenIssuedAt}.e2e-test-signature` }),
+      }),
+    );
     await page.clock.install({ time: new Date("2026-09-05T12:00:00+02:00") });
     await page.goto("/mitmachen");
 

@@ -1,9 +1,12 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "jest-axe";
 import { renderWithIntl } from "../../fixtures/intl";
 import { ApplicationForm, MIN_FILL_MS } from "@/components/sections/ApplicationForm";
+
+const TOKEN_ISSUED_AT = 1_700_000_000_000;
+const TOKEN = `${TOKEN_ISSUED_AT}.test-signature`;
 
 async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("Vorname"), "Jane");
@@ -21,27 +24,47 @@ async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole("checkbox", { name: /Datenschutzerklärung/ }));
 }
 
-function mockFetchOk() {
+// Every render of ApplicationForm now fetches a timing token on mount
+// (GET /api/bewerbung/token), so every test needs *some* fetch stub in
+// place — this branches on URL, so tests that only care about the eventual
+// POST don't have to know or care that a GET happens first.
+function stubFetch(handlePost: () => Response | Promise<Response>) {
   vi.stubGlobal(
     "fetch",
-    vi.fn().mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 })),
+    vi.fn((url: string) => {
+      if (typeof url === "string" && url.endsWith("/api/bewerbung/token")) {
+        return Promise.resolve(new Response(JSON.stringify({ token: TOKEN }), { status: 200 }));
+      }
+      return Promise.resolve(handlePost());
+    }),
   );
+}
+
+function mockFetchOk() {
+  stubFetch(() => new Response(JSON.stringify({ ok: true }), { status: 200 }));
 }
 
 function mockFetchFailure() {
-  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 500 })));
+  stubFetch(() => new Response(null, { status: 500 }));
 }
 
 function mockFetchWindowClosed() {
-  vi.stubGlobal(
-    "fetch",
-    vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ ok: false, error: "window_closed" }), { status: 409 }),
-    ),
-  );
+  stubFetch(() => new Response(JSON.stringify({ ok: false, error: "window_closed" }), { status: 409 }));
+}
+
+function postCallBody() {
+  const call = vi.mocked(fetch).mock.calls.find(([url]) => url === "/api/bewerbung");
+  return call ? JSON.parse((call[1] as RequestInit).body as string) : null;
 }
 
 describe("ApplicationForm", () => {
+  beforeEach(() => {
+    // Default stub so tests that don't care about submission behavior still
+    // have a token to fetch on mount — overridden by mockFetch* where a
+    // test needs specific POST behavior.
+    mockFetchOk();
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
@@ -88,26 +111,24 @@ describe("ApplicationForm", () => {
   });
 
   it("silently blocks a submission that arrives faster than a human could fill it in", async () => {
-    let now = 1_700_000_000_000;
+    let now = TOKEN_ISSUED_AT;
     vi.spyOn(Date, "now").mockImplementation(() => now);
-    mockFetchOk();
     const user = userEvent.setup();
     renderWithIntl(<ApplicationForm />);
 
     await fillRequiredFields(user);
-    // Time barely moves — well under MIN_FILL_MS since mount.
+    // Time barely moves — well under MIN_FILL_MS since the token was issued.
     now += 200;
     await user.click(screen.getByRole("button", { name: "Bewerbung absenden" }));
 
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Bewerbung absenden" })).toBeInTheDocument();
-    expect(fetch).not.toHaveBeenCalled();
+    expect(fetch).not.toHaveBeenCalledWith("/api/bewerbung", expect.anything());
   });
 
   it("posts to /api/bewerbung and shows a real success notice on a valid, sufficiently-timed submit", async () => {
-    let now = 1_700_000_000_000;
+    let now = TOKEN_ISSUED_AT;
     vi.spyOn(Date, "now").mockImplementation(() => now);
-    mockFetchOk();
     const user = userEvent.setup();
     renderWithIntl(<ApplicationForm />);
 
@@ -117,18 +138,12 @@ describe("ApplicationForm", () => {
 
     const notice = await screen.findByRole("status");
     expect(notice).toHaveTextContent("Danke für deine Bewerbung");
-    expect(fetch).toHaveBeenCalledWith(
-      "/api/bewerbung",
-      expect.objectContaining({ method: "POST" }),
-    );
-    const requestInit = vi.mocked(fetch).mock.calls[0]?.[1];
-    const body = JSON.parse(requestInit?.body as string);
-    expect(body).toMatchObject({ firstName: "Jane", locale: "de" });
-    expect(typeof body.formRenderedAt).toBe("number");
+    const body = postCallBody();
+    expect(body).toMatchObject({ firstName: "Jane", locale: "de", formToken: TOKEN });
   });
 
   it("shows an error and keeps the form filled in when the request fails", async () => {
-    let now = 1_700_000_000_000;
+    let now = TOKEN_ISSUED_AT;
     vi.spyOn(Date, "now").mockImplementation(() => now);
     mockFetchFailure();
     const user = userEvent.setup();
@@ -143,7 +158,7 @@ describe("ApplicationForm", () => {
   });
 
   it("shows a dedicated message, not the generic error, when the window closed mid-submit", async () => {
-    let now = 1_700_000_000_000;
+    let now = TOKEN_ISSUED_AT;
     vi.spyOn(Date, "now").mockImplementation(() => now);
     mockFetchWindowClosed();
     const user = userEvent.setup();

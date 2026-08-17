@@ -1,7 +1,6 @@
 // @vitest-environment node
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
-import { MIN_FILL_MS } from "@/lib/antiSpam";
 
 const insertApplication = vi.fn();
 const markApplicationMailed = vi.fn();
@@ -11,6 +10,7 @@ const sendApplicationConfirmation = vi.fn();
 const checkRateLimit = vi.fn();
 const renderToBuffer = vi.fn();
 const getRecruitingWindows = vi.fn();
+const checkFormToken = vi.fn();
 
 vi.mock("@/lib/db", () => ({
   insertApplication: (...args: unknown[]) => insertApplication(...args),
@@ -25,6 +25,14 @@ vi.mock("@/lib/mail", () => ({
 
 vi.mock("@/lib/rateLimit", () => ({
   checkRateLimit: (...args: unknown[]) => checkRateLimit(...args),
+}));
+
+// The route only ever sees checkFormToken's return value, never the token
+// string itself — the real signing/verification logic has its own unit
+// tests (tests/unit/lib/formToken.test.ts), so this mock just drives the
+// route's branching.
+vi.mock("@/lib/formToken", () => ({
+  checkFormToken: (...args: unknown[]) => checkFormToken(...args),
 }));
 
 // A window spanning far past to far future — every test below runs at the
@@ -81,7 +89,7 @@ function validPayload(overrides: Record<string, unknown> = {}) {
     consent: true,
     website: "",
     locale: "de",
-    formRenderedAt: Date.now() - MIN_FILL_MS - 1000,
+    formToken: "test-token",
     ...overrides,
   };
 }
@@ -97,6 +105,7 @@ function postRequest(body: unknown) {
 describe("POST /api/bewerbung", () => {
   beforeEach(() => {
     getRecruitingWindows.mockResolvedValue([OPEN_WINDOW]);
+    checkFormToken.mockReturnValue("valid");
   });
 
   afterEach(() => {
@@ -190,12 +199,37 @@ describe("POST /api/bewerbung", () => {
 
   it("silently accepts a too-fast submission without writing or mailing anything", async () => {
     checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
+    checkFormToken.mockReturnValue("too_fast");
 
     const { POST } = await import("@/app/api/bewerbung/route");
-    const response = await POST(postRequest(validPayload({ formRenderedAt: Date.now() })));
+    const response = await POST(postRequest(validPayload()));
 
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ ok: true });
+    expect(insertApplication).not.toHaveBeenCalled();
+  });
+
+  it("silently accepts a submission with a missing or tampered form token", async () => {
+    checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
+    checkFormToken.mockReturnValue("invalid");
+
+    const { POST } = await import("@/app/api/bewerbung/route");
+    const response = await POST(postRequest(validPayload()));
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true });
+    expect(insertApplication).not.toHaveBeenCalled();
+  });
+
+  it("rejects an expired form token with a real, distinguishable error", async () => {
+    checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
+    checkFormToken.mockReturnValue("expired");
+
+    const { POST } = await import("@/app/api/bewerbung/route");
+    const response = await POST(postRequest(validPayload()));
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ ok: false, error: "form_expired" });
     expect(insertApplication).not.toHaveBeenCalled();
   });
 

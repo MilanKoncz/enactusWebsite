@@ -69,6 +69,13 @@ its Zod validation, but no data — it's the type definition both the admin
 form and the public site's open/closed logic (`src/lib/recruitingStatus.ts`)
 read from, not a place to edit facts.
 
+Until an edit goes through the admin form, editing the table by hand won't
+show up on `/mitmachen` immediately — that page's cache
+(`lib/recruitingWindows.ts`) only self-invalidates via `revalidateTag`, which
+the admin mutation routes call and a manual `INSERT`/`UPDATE` doesn't. It
+resolves on its own within an hour (`revalidate: 3600`); to force it sooner,
+redeploy, or hit the route the admin form itself will eventually call.
+
 The public `/mitmachen` page reads the window list through a short-lived
 cache (`src/lib/recruitingWindows.ts`) rather than querying on every visit —
 a change in the admin area invalidates that cache immediately, so it never

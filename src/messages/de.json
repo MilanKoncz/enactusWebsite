@@ -994,7 +994,8 @@
         "submitPending": "Wird gesendet …",
         "submitSuccess": "Danke für deine Bewerbung! Wir haben sie erhalten und melden uns bei dir.",
         "submitError": "Deine Bewerbung konnte nicht gesendet werden. Bitte versuch es noch einmal oder schreib uns direkt an {email}.",
-        "submitWindowClosed": "Das Bewerbungsfenster wurde gerade eben geschlossen. Bitte lade die Seite neu, um den aktuellen Stand zu sehen."
+        "submitWindowClosed": "Das Bewerbungsfenster wurde gerade eben geschlossen. Bitte lade die Seite neu, um den aktuellen Stand zu sehen.",
+        "submitFormExpired": "Das Formular war zu lange geöffnet. Bitte lade die Seite neu und sende deine Bewerbung erneut ab."
       }
     },
     "cta": {

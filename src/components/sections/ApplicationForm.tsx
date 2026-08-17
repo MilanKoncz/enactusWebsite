@@ -36,22 +36,34 @@ type SubmitState = "idle" | "pending" | "success" | "error";
 // component never trusts its own validation as the last word. Honeypot and
 // timing check both fail silently (no state change at all): a bot gets no
 // error to learn from, and a real applicant should never be able to trigger
-// either one. `formRenderedAt` rides along outside react-hook-form's own
-// state, added at submit time, so the API route can re-check the same
-// minimum-fill-time signal — a client-only check is trivial to bypass by
-// calling the route directly.
+// either one. `formToken` rides along outside react-hook-form's own state —
+// fetched once from GET /api/bewerbung/token when this component mounts and
+// attached at submit time, so /api/bewerbung can verify the real elapsed
+// fill time itself (lib/formToken.ts) instead of trusting a client-supplied
+// number, which is trivial to fake by calling the route directly.
 export function ApplicationForm() {
   const t = useTranslations("MitmachenPage.application.form");
   const locale = useLocale();
   const [state, setState] = useState<SubmitState>("idle");
   const [submitError, setSubmitError] = useState<string | undefined>(undefined);
-  // Set in an effect, not the useRef initializer: reading the clock is an
-  // impure call, and doing that directly during render (as a useRef
-  // initializer runs) is flagged by react-hooks/purity even though the
-  // value is only ever read later, from an event handler.
-  const mountedAt = useRef<number | null>(null);
+  // Fetched in an effect, not read during render: it's a network call, and
+  // the token only needs to exist by the time a real applicant (who still
+  // has to fill in several required fields first) reaches the submit
+  // button — there's no need to block rendering the form on it.
+  const formToken = useRef<string | null>(null);
   useEffect(() => {
-    mountedAt.current = Date.now();
+    fetch("/api/bewerbung/token")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((body: { token?: string } | null) => {
+        if (body?.token) formToken.current = body.token;
+      })
+      .catch(() => {
+        // Left as null — onSubmit below treats a missing token exactly
+        // like a too-fast submission (silent no-op). A same-origin GET
+        // with no external dependency failing at all would mean the site
+        // itself is unreachable, at which point the real submit would fail
+        // the same way regardless.
+      });
   }, []);
   const {
     register,
@@ -64,14 +76,19 @@ export function ApplicationForm() {
 
   // Honeypot enforcement lives entirely in applicationFormSchema (`website`
   // must be empty) — handleSubmit simply won't call this for a filled one.
-  // The timing check reads `mountedAt.current` and only gates the actual
-  // submit, not validation itself — a too-fast submit of a genuinely
-  // invalid form still has to show the normal field errors, not silently do
-  // nothing.
+  // The timing check reads the token's own plaintext issue time (the part
+  // before the first ".") and only gates the actual submit, not validation
+  // itself — a too-fast submit of a genuinely invalid form still has to
+  // show the normal field errors, not silently do nothing. This is only a
+  // pre-flight courtesy to avoid an unnecessary request: /api/bewerbung
+  // re-checks the same threshold against the token's signature, which this
+  // component has no way to verify itself.
   async function onSubmit(data: ApplicationFormValues) {
-    if (mountedAt.current === null || Date.now() - mountedAt.current < MIN_FILL_MS) return;
+    const token = formToken.current;
+    const issuedAt = token ? Number(token.slice(0, token.indexOf("."))) : NaN;
+    if (!token || !Number.isFinite(issuedAt) || Date.now() - issuedAt < MIN_FILL_MS) return;
     setState("pending");
-    const result = await postJson("/api/bewerbung", { ...data, locale, formRenderedAt: mountedAt.current });
+    const result = await postJson("/api/bewerbung", { ...data, locale, formToken: token });
     if (result.ok) {
       setState("success");
       reset();
@@ -84,7 +101,7 @@ export function ApplicationForm() {
   // A plain function reference assigned to the form's `onSubmit` prop, not
   // `handleSubmit(onSubmit)` called directly in JSX: that call happens
   // during render, and react-hooks/refs flags any function reachable from
-  // there that reads a ref (`onSubmit` does, via `mountedAt`) as a possible
+  // there that reads a ref (`onSubmit` does, via `formToken`) as a possible
   // read-during-render. Deferring the `handleSubmit(onSubmit)` call itself
   // into a handler that only runs at actual submit time avoids that.
   function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
@@ -214,7 +231,11 @@ export function ApplicationForm() {
 
       {state === "error" && (
         <FormStatusMessage variant="error">
-          {submitError === "window_closed" ? t("submitWindowClosed") : t("submitError", { email: CONTACT_EMAIL })}
+          {submitError === "window_closed"
+            ? t("submitWindowClosed")
+            : submitError === "form_expired"
+              ? t("submitFormExpired")
+              : t("submitError", { email: CONTACT_EMAIL })}
         </FormStatusMessage>
       )}
 

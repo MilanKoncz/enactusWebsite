@@ -15,15 +15,16 @@ import { reminderSignupSchema } from "./reminderSignupSchema";
 
 const localeSchema = z.enum(["de", "en"]);
 
-// `formRenderedAt` is the one field with no equivalent in the client
-// schema: it's not something react-hook-form manages, just a timestamp
-// ApplicationForm.tsx attaches at submit time so /api/bewerbung can re-run
-// the same minimum-fill-time check server-side (lib/antiSpam.ts) — a
-// client-only timing check is trivial to skip by calling the route
-// directly with no delay at all.
+// `formToken` is the one field with no equivalent in the client schema:
+// it's not something react-hook-form manages, just an opaque, signed
+// timing token ApplicationForm.tsx fetches on mount (GET
+// /api/bewerbung/token) and attaches at submit time, so /api/bewerbung can
+// verify the real elapsed fill time server-side (lib/formToken.ts) — a
+// client-supplied timestamp is trivial to fake by calling the route
+// directly with any value at all.
 export const applicationRequestSchema = applicationFormSchema.extend({
   locale: localeSchema,
-  formRenderedAt: z.number(),
+  formToken: z.string(),
 });
 export type ApplicationRequest = z.infer<typeof applicationRequestSchema>;
 

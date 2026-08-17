@@ -89,6 +89,19 @@ the full list and current values.
   correct password. Generate with `openssl rand -hex 32`; unlike
   `ADMIN_PASSWORD`, nobody ever types this, so there's no tension between
   "random" and "memorable" to resolve.
+- `FORM_TOKEN_SECRET` — signs the application form's anti-spam timing token
+  (`lib/formToken.ts`). `GET /api/bewerbung/token` issues one to anyone
+  loading `/mitmachen`, and `POST /api/bewerbung` verifies it before
+  accepting a submission — replaces a client-supplied timestamp that a
+  script could set to anything at all. Deliberately its own variable rather
+  than derived from `ADMIN_SESSION_SECRET`: this token is handed to every
+  visitor of a public page, and tying it to the secret that gates applicant
+  data would be the same purpose-mixing mistake `ADMIN_SESSION_SECRET`
+  exists to avoid, just moved one level down. **Must be set in Vercel** (all
+  environments `/mitmachen` should accept applications from) — with it
+  unset, every submission is silently rejected the same way a genuinely
+  too-fast one is, indistinguishable from a bot being blocked. Generate with
+  `openssl rand -hex 32`.
 - `VERCEL_ENV` — **not** in `.env.example`: this is a Vercel System
   Environment Variable, only ever set by Vercel itself, never by hand. It
   gates indexing (`docs/engineering.md`'s SEO section,
