@@ -7,6 +7,12 @@ import { z } from "zod";
  * from — writing the same number in both a legal text and a SQL query
  * invites drift, so only one of them is allowed to be the source.
  *
+ * Every period is a rolling window measured from each row's own created_at
+ * (see lib/retentionCutoff.ts) — this matches the Datenschutzerklärung's
+ * wording exactly ("6 Monate" means 6 months from submission, not from some
+ * later, board-maintained event), and it can never silently stop enforcing
+ * itself the way an anchor tied to a recruiting window's close date could.
+ *
  * Every period carries `confirmedByBoard: false`: the board hasn't signed
  * off on these numbers yet (same open item as content/privacy.ts's own
  * review flag), but a stated period awaiting confirmation is more honest —
@@ -18,6 +24,12 @@ import { z } from "zod";
  * asked to keep, so a conservative default is applied regardless of
  * confirmation, same reasoning as GDPR's storage-limitation principle
  * (Art. 5(1)(e)) already cited elsewhere on the page.
+ *
+ * `rateLimitHits` is not privacy-relevant (it holds a hashed IP and a
+ * counter, not personal data tied to an identity) and isn't mentioned on
+ * the Datenschutz page, but it lives here anyway rather than as a second,
+ * hardcoded number in the cleanup route — the same "one source" reasoning
+ * that governs the other three.
  */
 
 const retentionPeriodSchema = z.object({
@@ -27,14 +39,10 @@ const retentionPeriodSchema = z.object({
 });
 
 const retentionSchema = z.object({
-  // Measured from the application window's closesAt, not from each row's
-  // own created_at — an application submitted on day one and one submitted
-  // on the last day belong to the same cycle and should expire together.
-  // See lib/retentionCutoff.ts's applicationRetentionCutoff for the
-  // fallback when no window is scheduled.
   applications: retentionPeriodSchema.extend({ months: z.number().int().positive() }),
   contactMessages: retentionPeriodSchema.extend({ months: z.number().int().positive() }),
   reminderSignupsUnconfirmed: retentionPeriodSchema.extend({ days: z.number().int().positive() }),
+  rateLimitHits: retentionPeriodSchema.extend({ days: z.number().int().positive() }),
 });
 export type Retention = z.infer<typeof retentionSchema>;
 
@@ -45,6 +53,9 @@ export const retention: Retention = retentionSchema.parse({
   // until the subscriber unsubscribes (Art. 6(1)(a) GDPR consent lasts
   // until withdrawn), so only the unconfirmed case needs a number here.
   reminderSignupsUnconfirmed: { days: 30, confirmedByBoard: false },
+  // Not a privacy period, a housekeeping one — always been 1 day, moved
+  // here from a hardcoded value in the cleanup route.
+  rateLimitHits: { days: 1, confirmedByBoard: true },
 });
 
 export { retentionSchema };

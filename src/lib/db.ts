@@ -175,8 +175,7 @@ export async function listApplicationsBySemester(recruitingSemester: string): Pr
   return (rows as Record<string, unknown>[]).map(toApplicationSummary);
 }
 
-export async function deleteExpiredApplications(cutoff: Date | null): Promise<number> {
-  if (cutoff === null) return 0;
+export async function deleteExpiredApplications(cutoff: Date): Promise<number> {
   const rows = await sql()`
     delete from applications where created_at <= ${cutoff.toISOString()} returning id
   `;

@@ -1,44 +1,51 @@
 import { retention } from "@/content/retention";
 
 /**
- * The single date past which an application row becomes deletable, or
- * `null` while nothing yet qualifies. Deliberately not "createdAt + 6
- * months" per row: every application submitted during one recruiting cycle
- * should expire together, on the same day, rather than trickling out of
- * the database one by one over the weeks a window was open — so the clock
- * starts at a window's close, not at each individual submission.
+ * Pure calendar cutoffs for the daily cleanup route (app/api/cron/cleanup):
+ * a row is deletable once it is older than its table's stated retention
+ * period, counted from that row's own created_at — nothing else factors in.
  *
- * `windowEnds` is every known window's `end` (content/recruiting.ts) —
- * content/recruiting.ts now holds a list, not one window, so retention has
- * to pick the right anchor among several cycles rather than assuming there
- * is only one. Callers can pass every window's end unfiltered: a window
- * whose own retention period hasn't elapsed yet (including one still open
- * or in the future) is filtered out below. Among the rest, this picks the
- * *latest* end date: any earlier window's applications were created before
- * that date too, so a single `created_at <= cutoff` DELETE (lib/db.ts)
- * still correctly sweeps every expired cycle in one statement, without
- * deleting a later, not-yet-expired cycle's rows.
+ * This used to anchor application retention to the latest *expired
+ * recruiting window* instead of each row's own age, so a cycle's
+ * applications expired together. That reads well, but it silently stops
+ * working the moment nobody enters the next window: with no later window to
+ * anchor to, the cutoff freezes at the last one ever added, and every
+ * application submitted after that point becomes permanently undeletable —
+ * a normal state for a board with yearly turnover, not an edge case. It also
+ * quietly computed something different from what the Datenschutzerklärung
+ * promises ("6 Monate"), which states a rolling period, not "6 months after
+ * the cycle closes". Calendar-only logic can't drift from either problem: it
+ * has no window to forget, and it matches the published text exactly.
  *
- * An empty list means no recruiting window is scheduled at all
- * (content/recruiting.ts's own empty-array case) — there's no cycle to
- * anchor to, so this falls back to a rolling per-row cutoff instead:
- * `now - 6 months`, recomputed on every call.
+ * The one thing this trades away: applications from the same recruiting
+ * cycle no longer expire on the same day — a submission on day one of a
+ * window and one on the last day now age out independently. That is an
+ * acceptable cost for a cutoff that can't silently stop enforcing itself.
  */
-export function applicationRetentionCutoff(now: Date, windowEnds: Date[]): Date | null {
-  const months = retention.applications.months;
+export function applicationRetentionCutoff(now: Date): Date {
+  return addMonths(now, -retention.applications.months);
+}
 
-  if (windowEnds.length === 0) {
-    return addMonths(now, -months);
-  }
+export function contactMessageRetentionCutoff(now: Date): Date {
+  return addMonths(now, -retention.contactMessages.months);
+}
 
-  const expired = windowEnds.filter((end) => now >= addMonths(end, months));
-  if (expired.length === 0) return null;
+export function reminderSignupRetentionCutoff(now: Date): Date {
+  return addDays(now, -retention.reminderSignupsUnconfirmed.days);
+}
 
-  return new Date(Math.max(...expired.map((end) => end.getTime())));
+export function rateLimitHitRetentionCutoff(now: Date): Date {
+  return addDays(now, -retention.rateLimitHits.days);
 }
 
 function addMonths(date: Date, months: number): Date {
   const result = new Date(date.getTime());
   result.setUTCMonth(result.getUTCMonth() + months);
+  return result;
+}
+
+function addDays(date: Date, days: number): Date {
+  const result = new Date(date.getTime());
+  result.setUTCDate(result.getUTCDate() + days);
   return result;
 }

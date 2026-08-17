@@ -7,6 +7,7 @@ describe("content/retention", () => {
       applications: { months: 6, confirmedByBoard: false },
       contactMessages: { months: 12, confirmedByBoard: false },
       reminderSignupsUnconfirmed: { days: 30, confirmedByBoard: false },
+      rateLimitHits: { days: 1, confirmedByBoard: true },
     });
   });
 
@@ -20,6 +21,7 @@ describe("content/retention", () => {
         applications: { months: 0, confirmedByBoard: false },
         contactMessages: { months: 12, confirmedByBoard: false },
         reminderSignupsUnconfirmed: { days: 30, confirmedByBoard: false },
+        rateLimitHits: { days: 1, confirmedByBoard: true },
       }),
     ).toThrow();
   });
@@ -30,6 +32,7 @@ describe("content/retention", () => {
         applications: { months: 6 },
         contactMessages: { months: 12, confirmedByBoard: false },
         reminderSignupsUnconfirmed: { days: 30, confirmedByBoard: false },
+        rateLimitHits: { days: 1, confirmedByBoard: true },
       }),
     ).toThrow();
   });

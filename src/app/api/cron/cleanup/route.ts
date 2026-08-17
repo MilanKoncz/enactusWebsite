@@ -7,9 +7,12 @@ import {
   deleteExpiredReminderSignups,
   pruneRateLimitHits,
 } from "@/lib/db";
-import { applicationRetentionCutoff } from "@/lib/retentionCutoff";
-import { retention } from "@/content/retention";
-import { recruitingWindows } from "@/content/recruiting";
+import {
+  applicationRetentionCutoff,
+  contactMessageRetentionCutoff,
+  reminderSignupRetentionCutoff,
+  rateLimitHitRetentionCutoff,
+} from "@/lib/retentionCutoff";
 
 /**
  * Enforces content/retention.ts, on a schedule — a stated retention period
@@ -43,23 +46,12 @@ export async function GET(request: NextRequest) {
   }
 
   const now = new Date();
-  const windowEnds = recruitingWindows.map((window) => new Date(window.end));
-
-  const applicationsCutoff = applicationRetentionCutoff(now, windowEnds);
-  const contactMessagesCutoff = new Date(now);
-  contactMessagesCutoff.setUTCMonth(contactMessagesCutoff.getUTCMonth() - retention.contactMessages.months);
-  const reminderUnconfirmedCutoff = new Date(now);
-  reminderUnconfirmedCutoff.setUTCDate(
-    reminderUnconfirmedCutoff.getUTCDate() - retention.reminderSignupsUnconfirmed.days,
-  );
-  const rateLimitCutoff = new Date(now);
-  rateLimitCutoff.setUTCDate(rateLimitCutoff.getUTCDate() - 1);
 
   const [applications, contactMessages, reminderSignups, rateLimitHits] = await Promise.allSettled([
-    deleteExpiredApplications(applicationsCutoff),
-    deleteExpiredContactMessages(contactMessagesCutoff),
-    deleteExpiredReminderSignups(reminderUnconfirmedCutoff),
-    pruneRateLimitHits(rateLimitCutoff),
+    deleteExpiredApplications(applicationRetentionCutoff(now)),
+    deleteExpiredContactMessages(contactMessageRetentionCutoff(now)),
+    deleteExpiredReminderSignups(reminderSignupRetentionCutoff(now)),
+    pruneRateLimitHits(rateLimitHitRetentionCutoff(now)),
   ]);
 
   const summary = {
