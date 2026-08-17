@@ -1,8 +1,8 @@
-// Writes one throwaway row to each of the four tables, reads it back,
-// checks the values round-tripped, then deletes it — against the real
-// Neon database, not a mock. This is the check AUFGABE C requires before
-// its commit: proof the schema and the driver actually work together, not
-// just that the SQL parses.
+// Writes one throwaway row to each table, reads it back, checks the values
+// round-tripped, then deletes it — against the real Neon database, not a
+// mock. This is the check to run before trusting any schema change: proof
+// the schema and the driver actually work together, not just that the SQL
+// parses.
 //
 // Usage: `node --env-file=.env.local scripts/db-verify.mjs`
 // (`npm run db:verify` wires that up.) Run `npm run db:migrate` first.
@@ -125,6 +125,46 @@ async function verifyReminderFiltering() {
   check("cleans up all three rows", deleted.length, 3);
 }
 
+async function verifyRecruitingWindows() {
+  console.log("\nrecruiting_windows");
+  const semester = `ZZ${String(Date.now()).slice(-2)}`; // doesn't match HWS/FSS on purpose, see below
+  const startsAt = "2099-01-01T00:00:00+01:00";
+  const endsAt = "2099-01-14T00:00:00+01:00";
+
+  let rejected = false;
+  try {
+    await sql`
+      insert into recruiting_windows (semester, starts_at, ends_at)
+      values (${semester}, ${startsAt}, ${endsAt})
+    `;
+  } catch {
+    rejected = true;
+  }
+  check("semester format check rejects a non-HWS/FSS label", rejected, true);
+
+  const validSemester = `HWS${String(Date.now()).slice(-2)}`;
+  const [inserted] = await sql`
+    insert into recruiting_windows (semester, starts_at, ends_at)
+    values (${validSemester}, ${startsAt}, ${endsAt})
+    returning *
+  `;
+  check("insert returns an id", typeof inserted.id, "string");
+
+  let endBeforeStartRejected = false;
+  try {
+    await sql`
+      insert into recruiting_windows (semester, starts_at, ends_at)
+      values (${`FSS${String(Date.now()).slice(-2)}`}, ${endsAt}, ${startsAt})
+    `;
+  } catch {
+    endBeforeStartRejected = true;
+  }
+  check("end-after-start check rejects an inverted window", endBeforeStartRejected, true);
+
+  const deleted = await sql`delete from recruiting_windows where id = ${inserted.id} returning id`;
+  check("delete removes exactly one row", deleted.length, 1);
+}
+
 async function verifyContactMessages() {
   console.log("\ncontact_messages");
   const email = `${MARKER}-contact@example.invalid`;
@@ -167,6 +207,7 @@ async function verifyRateLimitHits() {
 await verifyApplications();
 await verifyReminderSignups();
 await verifyReminderFiltering();
+await verifyRecruitingWindows();
 await verifyContactMessages();
 await verifyRateLimitHits();
 

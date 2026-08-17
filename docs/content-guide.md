@@ -56,13 +56,24 @@ key) if you forget one. A bio is prose, so it lives in messages, not in
 
 ## Update recruiting windows (application open/close dates)
 
-`src/content/recruiting.ts`'s `recruitingWindows` array. Each entry needs a
-`semester` label (e.g. `"FSS27"`), `start`, and `end` as ISO datetimes with
-an explicit UTC offset (copy the existing entry's shape — Germany's DST
-offset changes between `+01:00` and `+02:00` depending on the month). Add a
-new entry for a new cycle; do not edit past ones away. The site
-automatically shows whichever window contains "now", or the soonest future
-one if none does.
+Application windows live in the `recruiting_windows` table, not in a content
+file (as of 2026-08-17 — this replaces the old `recruitingWindows` array).
+Board-facing management is at `/admin/bewerbungsfenster`, gated the same way
+as `/admin/bewerbungen` (password from `ADMIN_PASSWORD`, see
+`docs/deployment.md`); until that section ships, add or edit a row directly
+against the table (`migrations/0003_recruiting_windows.sql` has the schema —
+`semester`, `starts_at`, `ends_at`), matching the `HWS26`/`FSS27`-style label
+format and making sure the new window doesn't overlap an existing one.
+`src/content/recruiting.ts` still holds the shared `RecruitingWindow` type and
+its Zod validation, but no data — it's the type definition both the admin
+form and the public site's open/closed logic (`src/lib/recruitingStatus.ts`)
+read from, not a place to edit facts.
+
+The public `/mitmachen` page reads the window list through a short-lived
+cache (`src/lib/recruitingWindows.ts`) rather than querying on every visit —
+a change in the admin area invalidates that cache immediately, so it never
+takes up to an hour to show up. The site automatically shows whichever window
+contains "now", or the soonest future one if none does.
 
 Every application gets tagged with the matching window's `semester` label
 automatically (`src/lib/recruitingSemester.ts`) — nothing else to update.

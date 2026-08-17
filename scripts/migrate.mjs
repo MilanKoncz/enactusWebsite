@@ -23,13 +23,26 @@ const migrationsDir = join(dirname(fileURLToPath(import.meta.url)), "..", "migra
 
 // The Neon HTTP driver runs one statement per call — a migration file with
 // several `create table`/`create index` statements has to be split before
-// each one is sent. Splitting on `;` is safe for the migrations this repo
-// writes: no string literal in any of them contains a semicolon.
+// each one is sent. Full-line `--` comments are stripped first: splitting
+// directly on `;` used to break the moment a comment's own prose contained
+// one ("...the shared type definition; the data lives here." in an earlier
+// draft of 0003_recruiting_windows.sql caught this in review) — the split
+// would land mid-sentence, and the back half of that comment (now missing
+// its leading `--`) would reach Postgres as if it were SQL. Stripping
+// comment lines before splitting removes the semicolon along with the rest
+// of the line, so it can never land inside a chunk boundary. This still
+// doesn't handle a semicolon inside a string literal or a trailing
+// same-line comment (`create table foo (); -- ok`) — neither appears in any
+// migration this repo writes, so it isn't handled, only avoided.
 function splitStatements(fileContents) {
-  return fileContents
+  const withoutLineComments = fileContents
+    .split("\n")
+    .filter((line) => !line.trim().startsWith("--"))
+    .join("\n");
+  return withoutLineComments
     .split(";")
     .map((statement) => statement.trim())
-    .filter((statement) => statement.length > 0 && !statement.split("\n").every((line) => line.trim().startsWith("--") || line.trim() === ""));
+    .filter((statement) => statement.length > 0);
 }
 
 async function main() {

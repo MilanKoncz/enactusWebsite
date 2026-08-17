@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { MIN_FILL_MS } from "@/lib/antiSpam";
 
@@ -10,6 +10,7 @@ const sendApplicationNotification = vi.fn();
 const sendApplicationConfirmation = vi.fn();
 const checkRateLimit = vi.fn();
 const renderToBuffer = vi.fn();
+const getRecruitingWindows = vi.fn();
 
 vi.mock("@/lib/db", () => ({
   insertApplication: (...args: unknown[]) => insertApplication(...args),
@@ -25,6 +26,16 @@ vi.mock("@/lib/mail", () => ({
 vi.mock("@/lib/rateLimit", () => ({
   checkRateLimit: (...args: unknown[]) => checkRateLimit(...args),
 }));
+
+// A window spanning far past to far future — every test below runs at the
+// real current time, and none of them are testing the window-open gate
+// (tests/integration/bewerbung-window.test.ts covers that), so this just
+// needs to always contain "now" and always resolve to the semester label
+// STORED_APPLICATION expects.
+vi.mock("@/lib/recruitingWindows", () => ({
+  getRecruitingWindows: (...args: unknown[]) => getRecruitingWindows(...args),
+}));
+const OPEN_WINDOW = { semester: "HWS26", start: "2000-01-01T00:00:00+00:00", end: "2100-01-01T00:00:00+00:00" };
 
 vi.mock("@react-pdf/renderer", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@react-pdf/renderer")>();
@@ -84,6 +95,10 @@ function postRequest(body: unknown) {
 }
 
 describe("POST /api/bewerbung", () => {
+  beforeEach(() => {
+    getRecruitingWindows.mockResolvedValue([OPEN_WINDOW]);
+  });
+
   afterEach(() => {
     vi.resetAllMocks();
   });

@@ -182,6 +182,86 @@ export async function deleteExpiredApplications(cutoff: Date): Promise<number> {
   return rows.length;
 }
 
+export type RecruitingWindowRow = {
+  id: string;
+  semester: string;
+  start: string;
+  end: string;
+  createdAt: Date;
+};
+
+function toRecruitingWindowRow(row: Record<string, unknown>): RecruitingWindowRow {
+  return {
+    id: row.id as string,
+    semester: row.semester as string,
+    // Kept as ISO strings, not Date objects: content/recruiting.ts's
+    // RecruitingWindow type (still the shared shape every pure function in
+    // lib/recruitingStatus.ts and lib/recruitingSemester.ts expects) stores
+    // start/end as ISO datetime strings with an explicit UTC offset.
+    start: (row.starts_at as Date).toISOString(),
+    end: (row.ends_at as Date).toISOString(),
+    createdAt: row.created_at as Date,
+  };
+}
+
+export async function listRecruitingWindows(): Promise<RecruitingWindowRow[]> {
+  const rows = await sql()`
+    select id, semester, starts_at, ends_at, created_at
+    from recruiting_windows
+    order by starts_at asc
+  `;
+  return (rows as Record<string, unknown>[]).map(toRecruitingWindowRow);
+}
+
+export async function findOverlappingRecruitingWindows(
+  startsAt: Date,
+  endsAt: Date,
+  excludeId?: string,
+): Promise<RecruitingWindowRow[]> {
+  const rows = await sql()`
+    select id, semester, starts_at, ends_at, created_at
+    from recruiting_windows
+    where tstzrange(starts_at, ends_at, '[]') && tstzrange(${startsAt.toISOString()}, ${endsAt.toISOString()}, '[]')
+      and (${excludeId ?? null}::uuid is null or id != ${excludeId ?? null}::uuid)
+  `;
+  return (rows as Record<string, unknown>[]).map(toRecruitingWindowRow);
+}
+
+export async function insertRecruitingWindow(
+  semester: string,
+  startsAt: Date,
+  endsAt: Date,
+): Promise<RecruitingWindowRow> {
+  const rows = await sql()`
+    insert into recruiting_windows (semester, starts_at, ends_at)
+    values (${semester}, ${startsAt.toISOString()}, ${endsAt.toISOString()})
+    returning id, semester, starts_at, ends_at, created_at
+  `;
+  return toRecruitingWindowRow(rows[0] as Record<string, unknown>);
+}
+
+export async function updateRecruitingWindow(
+  id: string,
+  semester: string,
+  startsAt: Date,
+  endsAt: Date,
+): Promise<RecruitingWindowRow | null> {
+  const rows = await sql()`
+    update recruiting_windows
+    set semester = ${semester}, starts_at = ${startsAt.toISOString()}, ends_at = ${endsAt.toISOString()}
+    where id = ${id}
+    returning id, semester, starts_at, ends_at, created_at
+  `;
+  return rows.length > 0 ? toRecruitingWindowRow(rows[0] as Record<string, unknown>) : null;
+}
+
+export async function deleteRecruitingWindow(id: string): Promise<boolean> {
+  const rows = await sql()`
+    delete from recruiting_windows where id = ${id} returning id
+  `;
+  return rows.length > 0;
+}
+
 export type ReminderSignupResult = {
   confirmed: boolean;
   confirmToken: string;

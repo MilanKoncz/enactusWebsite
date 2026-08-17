@@ -1,19 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { recruitingWindows, recruitingWindowSchema } from "@/content/recruiting";
+import { recruitingWindowSchema } from "@/content/recruiting";
 
 describe("content/recruiting", () => {
-  it("has the confirmed HWS26 application window in Europe/Berlin", () => {
-    expect(recruitingWindows).toEqual([
-      { semester: "HWS26", start: "2026-09-01T00:00:00+02:00", end: "2026-09-13T23:59:00+02:00" },
-    ]);
-  });
-
-  it("validates every exported window", () => {
-    for (const window of recruitingWindows) {
-      expect(() => recruitingWindowSchema.parse(window)).not.toThrow();
-    }
-  });
-
   it("accepts a window where end is after start", () => {
     expect(() =>
       recruitingWindowSchema.parse({
@@ -58,13 +46,27 @@ describe("content/recruiting", () => {
     ).toThrow();
   });
 
-  it("rejects a window with an empty semester label", () => {
-    expect(() =>
-      recruitingWindowSchema.parse({
-        semester: "",
-        start: "2026-09-01T00:00:00+02:00",
-        end: "2026-09-13T23:59:00+02:00",
-      }),
-    ).toThrow();
+  it("accepts HWS or FSS followed by a two-digit year", () => {
+    for (const semester of ["HWS26", "FSS27", "HWS99", "FSS00"]) {
+      expect(() =>
+        recruitingWindowSchema.parse({
+          semester,
+          start: "2026-09-01T00:00:00+02:00",
+          end: "2026-09-13T23:59:00+02:00",
+        }),
+      ).not.toThrow();
+    }
+  });
+
+  it("rejects a semester label that isn't HWS or FSS plus two digits", () => {
+    for (const semester of ["", "HWS", "HWS2026", "WS26", "hws26", "HWS26 "]) {
+      expect(() =>
+        recruitingWindowSchema.parse({
+          semester,
+          start: "2026-09-01T00:00:00+02:00",
+          end: "2026-09-13T23:59:00+02:00",
+        }),
+      ).toThrow();
+    }
   });
 });

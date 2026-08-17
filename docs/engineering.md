@@ -14,8 +14,11 @@ Forms, data, privacy, performance, SEO, and testing detail.
    accessibility and privacy problem.
 7. Free-text fields only, no file upload.
 
-Open/closed state comes from the application window in `content/recruiting.ts`.
-Closed → countdown plus reminder signup. Open → the form.
+Open/closed state comes from the `recruiting_windows` table (see
+`docs/content-guide.md`), read through a short-lived cache
+(`lib/recruitingWindows.ts`) so the page stays static rather than querying
+Neon on every visit. Closed → countdown plus reminder signup. Open → the
+form.
 
 ## Reminder list
 

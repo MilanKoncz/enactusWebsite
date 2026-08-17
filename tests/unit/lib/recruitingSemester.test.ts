@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { deriveSemesterLabel, resolveApplicationSemester } from "@/lib/recruitingSemester";
-import { recruitingWindows } from "@/content/recruiting";
+import type { RecruitingWindow } from "@/content/recruiting";
+
+const hws26: RecruitingWindow = {
+  semester: "HWS26",
+  start: "2026-09-01T00:00:00+02:00",
+  end: "2026-09-13T23:59:00+02:00",
+};
 
 describe("deriveSemesterLabel", () => {
   it("labels März through September as HWS of the current year", () => {
@@ -21,13 +27,16 @@ describe("deriveSemesterLabel", () => {
 
 describe("resolveApplicationSemester", () => {
   it("uses the matching window's label when the date falls inside it", () => {
-    const [hws26] = recruitingWindows;
     const inside = new Date(hws26.start);
-    expect(resolveApplicationSemester(inside)).toBe(hws26.semester);
+    expect(resolveApplicationSemester(inside, [hws26])).toBe(hws26.semester);
   });
 
   it("falls back to the derived label when the date matches no window", () => {
-    expect(resolveApplicationSemester(new Date("2026-06-01T00:00:00Z"))).toBe("HWS26");
-    expect(resolveApplicationSemester(new Date("2027-01-15T00:00:00Z"))).toBe("FSS27");
+    expect(resolveApplicationSemester(new Date("2026-06-01T00:00:00Z"), [hws26])).toBe("HWS26");
+    expect(resolveApplicationSemester(new Date("2027-01-15T00:00:00Z"), [hws26])).toBe("FSS27");
+  });
+
+  it("falls back to the derived label when there are no windows at all", () => {
+    expect(resolveApplicationSemester(new Date("2026-06-01T00:00:00Z"), [])).toBe("HWS26");
   });
 });

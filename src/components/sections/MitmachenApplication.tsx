@@ -8,6 +8,7 @@ import { ApplicationForm } from "./ApplicationForm";
 import { ReminderSignupForm } from "./ReminderSignupForm";
 import { useNow } from "@/lib/useNow";
 import { recruitingPhaseAt, currentOrNextRecruitingWindow } from "@/lib/recruitingStatus";
+import type { RecruitingWindow } from "@/content/recruiting";
 
 function remainingParts(targetMs: number, nowMs: number) {
   const totalSeconds = Math.floor(Math.max(0, targetMs - nowMs) / 1000);
@@ -36,12 +37,12 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
 // fact once, in words, so a screen reader isn't asked to re-announce a
 // number every tick (same non-announcing pattern as everywhere else ticking
 // content appears in this codebase).
-export function MitmachenApplication() {
+export function MitmachenApplication({ recruitingWindows }: { recruitingWindows: RecruitingWindow[] }) {
   const t = useTranslations("MitmachenPage.application");
   const locale = useLocale();
   const now = useNow();
-  const phase = recruitingPhaseAt(now);
-  const window = currentOrNextRecruitingWindow(now);
+  const phase = recruitingPhaseAt(now, recruitingWindows);
+  const window = currentOrNextRecruitingWindow(now, recruitingWindows);
 
   const opensAt = window ? new Date(window.start) : null;
   const closesAt = window ? new Date(window.end) : null;

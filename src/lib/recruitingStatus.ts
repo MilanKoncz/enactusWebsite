@@ -1,11 +1,11 @@
-import { recruitingWindows } from "@/content/recruiting";
 import type { RecruitingWindow } from "@/content/recruiting";
 
 /**
  * Where /mitmachen's application form gates between the countdown/reminder
- * state and the real form (docs/engineering.md). Pure functions of "now",
- * kept separate from the ticking clock (useNow.ts) so they're testable
- * without mocking timers or rendering a component.
+ * state and the real form (docs/engineering.md). Pure functions of "now"
+ * and an explicit window list, kept separate from the ticking clock
+ * (useNow.ts) and from where the windows come from (lib/recruitingWindows.ts)
+ * so they're testable without mocking timers, a database, or a cache.
  */
 export type RecruitingPhase = "before" | "open" | "after" | "unscheduled";
 
@@ -29,21 +29,18 @@ function nextUpcomingWindow(nowMs: number, windows: RecruitingWindow[]): Recruit
 // The window /mitmachen should display: the one "now" falls inside, else the
 // soonest one still ahead, else null once every known window has closed —
 // the "after" phase then shows a generic closed message rather than a stale
-// date (see ASSETS-TODO.md's note on a second cycle). Takes the window list
-// as a parameter (defaulting to the real content) so tests can exercise the
-// "several future windows" case without content/recruiting.ts needing a
-// second real, confirmed cycle to exist yet.
+// date.
 export function currentOrNextRecruitingWindow(
   nowMs: number,
-  windows: RecruitingWindow[] = recruitingWindows,
+  windows: RecruitingWindow[],
 ): RecruitingWindow | null {
   return windowContaining(nowMs, windows) ?? nextUpcomingWindow(nowMs, windows);
 }
 
-export function recruitingPhaseAt(nowMs: number): RecruitingPhase {
-  if (recruitingWindows.length === 0) return "unscheduled";
+export function recruitingPhaseAt(nowMs: number, windows: RecruitingWindow[]): RecruitingPhase {
+  if (windows.length === 0) return "unscheduled";
 
-  const window = currentOrNextRecruitingWindow(nowMs);
+  const window = currentOrNextRecruitingWindow(nowMs, windows);
   if (!window) return "after";
 
   const startMs = new Date(window.start).getTime();
