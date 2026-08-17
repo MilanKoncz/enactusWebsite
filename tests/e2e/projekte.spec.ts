@@ -100,8 +100,24 @@ test.describe("/projekte/archiv", () => {
 });
 
 test.describe("/projekte/[slug]", () => {
+  // A project detail page carries several full-size photos, and the default
+  // `waitUntil: "load"` waits for every one of their bytes — which twice
+  // exceeded the 30s test timeout on WebKit on a loaded CI runner, failing
+  // all three attempts and turning the build red for a reason that had
+  // nothing to do with the page. Neither assertion below needs the image
+  // data: axe reads the DOM and the CSSOM (alt text and ARIA are present
+  // from the markup, and the stylesheet blocks rendering so it is applied
+  // by DOMContentLoaded), and every photo sits in a CSS-sized box via
+  // next/image `fill`, so widths do not depend on the bytes arriving.
+  // Waiting for the heading confirms the page really rendered rather than
+  // just parsed.
+  async function openProject(page: import("@playwright/test").Page, slug: string) {
+    await page.goto(`/projekte/${slug}`, { waitUntil: "domcontentloaded" });
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  }
+
   test("has no automatically detectable accessibility violations", async ({ page }) => {
-    await page.goto("/projekte/smilegreen");
+    await openProject(page, "smilegreen");
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations).toEqual([]);
   });
@@ -115,7 +131,7 @@ test.describe("/projekte/[slug]", () => {
     page,
   }) => {
     for (const slug of ["smilegreen", "mealyo", "resoap", "impactwithus"]) {
-      await page.goto(`/projekte/${slug}`);
+      await openProject(page, slug);
       for (const width of [360, 768, 1280, 1920]) {
         await page.setViewportSize({ width, height: 900 });
         const { scrollWidth, clientWidth } = await page.evaluate(() => ({
