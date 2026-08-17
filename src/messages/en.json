@@ -1208,6 +1208,7 @@
         "contactMessages": "Contact messages",
         "reminderSignups": "Reminder list",
         "recruitingWindows": "Application windows",
+        "calendarEvents": "Calendar events",
         "rateLimitHits": "Rate-limit counters",
         "cronRuns": "Cron runs"
       }

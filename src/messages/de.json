@@ -1208,6 +1208,7 @@
         "contactMessages": "Kontaktanfragen",
         "reminderSignups": "Erinnerungsliste",
         "recruitingWindows": "Bewerbungsfenster",
+        "calendarEvents": "Termine",
         "rateLimitHits": "Rate-Limit-Zähler",
         "cronRuns": "Cron-Läufe"
       }

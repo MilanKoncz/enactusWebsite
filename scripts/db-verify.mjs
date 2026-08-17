@@ -212,6 +212,88 @@ async function verifyCronRuns() {
   check("delete removes exactly one row", deleted.length, 1);
 }
 
+async function verifyCalendarEvents() {
+  console.log("\ncalendar_events");
+
+  let categoryRejected = false;
+  try {
+    await sql`
+      insert into calendar_events (title, category, start_date)
+      values (${MARKER}, 'not-a-real-category', '2099-01-01')
+    `;
+  } catch {
+    categoryRejected = true;
+  }
+  check("category check rejects an unknown category", categoryRejected, true);
+
+  let blankTitleRejected = false;
+  try {
+    await sql`insert into calendar_events (title, category, start_date) values ('   ', 'socials', '2099-01-01')`;
+  } catch {
+    blankTitleRejected = true;
+  }
+  check("title check rejects a blank title", blankTitleRejected, true);
+
+  let endBeforeStartRejected = false;
+  try {
+    await sql`
+      insert into calendar_events (title, category, start_date, end_date)
+      values (${MARKER}, 'socials', '2099-01-10', '2099-01-01')
+    `;
+  } catch {
+    endBeforeStartRejected = true;
+  }
+  check("end-date check rejects an end date before the start date", endBeforeStartRejected, true);
+
+  let endTimeWithoutStartRejected = false;
+  try {
+    await sql`
+      insert into calendar_events (title, category, start_date, end_time)
+      values (${MARKER}, 'socials', '2099-01-01', '18:00')
+    `;
+  } catch {
+    endTimeWithoutStartRejected = true;
+  }
+  check("end-time check rejects an end time with no start time", endTimeWithoutStartRejected, true);
+
+  let sameDayEndBeforeStartRejected = false;
+  try {
+    await sql`
+      insert into calendar_events (title, category, start_date, start_time, end_time)
+      values (${MARKER}, 'socials', '2099-01-01', '18:00', '09:00')
+    `;
+  } catch {
+    sameDayEndBeforeStartRejected = true;
+  }
+  check(
+    "end-time check rejects an earlier end time on the same day",
+    sameDayEndBeforeStartRejected,
+    true,
+  );
+
+  // The one case the same-day rule must NOT reject: a multi-day event whose
+  // end time is earlier in the clock than its start time is still valid,
+  // because the two times fall on different calendar days.
+  const [multiDay] = await sql`
+    insert into calendar_events (title, category, start_date, end_date, start_time, end_time)
+    values (${MARKER}, 'socials', '2099-01-01', '2099-01-02', '18:00', '09:00')
+    returning id
+  `;
+  check("a multi-day event may end earlier in the clock than it started", typeof multiDay.id, "string");
+  await sql`delete from calendar_events where id = ${multiDay.id}`;
+
+  const [inserted] = await sql`
+    insert into calendar_events (title, title_en, category, start_date, description_en, tentative)
+    values (${MARKER}, ${`${MARKER}-en`}, 'innolab', '2099-01-01', ${`${MARKER}-desc-en`}, true)
+    returning *
+  `;
+  check("insert returns an id", typeof inserted.id, "string");
+  check("english columns round-trip", [inserted.title_en, inserted.tentative], [`${MARKER}-en`, true]);
+
+  const deleted = await sql`delete from calendar_events where id = ${inserted.id} returning id`;
+  check("delete removes exactly one row", deleted.length, 1);
+}
+
 async function verifyRateLimitHits() {
   console.log("\nrate_limit_hits");
   const bucket = MARKER;
@@ -251,6 +333,7 @@ await verifyApplications();
 await verifyReminderSignups();
 await verifyReminderFiltering();
 await verifyRecruitingWindows();
+await verifyCalendarEvents();
 await verifyContactMessages();
 await verifyCronRuns();
 await verifyRateLimitHits();

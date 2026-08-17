@@ -383,6 +383,145 @@ export async function deleteRecruitingWindow(id: string): Promise<boolean> {
   return rows.length > 0;
 }
 
+export type CalendarCategory =
+  | "innolab"
+  | "projekte"
+  | "journeys"
+  | "wettkaempfe"
+  | "socials"
+  | "workshops"
+  | "bewerbung";
+
+export type CalendarEventRow = {
+  id: string;
+  title: string;
+  titleEn: string | null;
+  category: CalendarCategory;
+  startDate: string;
+  endDate: string | null;
+  startTime: string | null;
+  endTime: string | null;
+  location: string | null;
+  description: string | null;
+  descriptionEn: string | null;
+  tentative: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type CalendarEventInput = {
+  title: string;
+  titleEn?: string;
+  category: CalendarCategory;
+  startDate: string;
+  endDate?: string;
+  startTime?: string;
+  endTime?: string;
+  location?: string;
+  description?: string;
+  descriptionEn?: string;
+  tentative: boolean;
+};
+
+// date/time columns are cast to text in every select below rather than left
+// as the driver's own Date/string parsing: `date` and `time` have no
+// timezone component in Postgres, but a JS Date object always carries one,
+// and letting the driver round-trip through Date risks silently shifting a
+// value by the server process's own timezone offset. Casting to text keeps
+// the exact "YYYY-MM-DD" / "HH:MM:SS" Postgres already stores.
+const CALENDAR_EVENT_COLUMNS = `
+  id, title, title_en, category, start_date::text as start_date,
+  end_date::text as end_date, start_time::text as start_time, end_time::text as end_time,
+  location, description, description_en, tentative, created_at, updated_at
+`;
+
+function toCalendarEventRow(row: Record<string, unknown>): CalendarEventRow {
+  return {
+    id: row.id as string,
+    title: row.title as string,
+    titleEn: (row.title_en as string | null) ?? null,
+    category: row.category as CalendarCategory,
+    startDate: row.start_date as string,
+    endDate: (row.end_date as string | null) ?? null,
+    // Postgres's text cast of `time` keeps seconds ("14:30:00"); trimmed to
+    // the "HH:MM" shape calendarEventSchema and the admin form both use.
+    startTime: row.start_time ? (row.start_time as string).slice(0, 5) : null,
+    endTime: row.end_time ? (row.end_time as string).slice(0, 5) : null,
+    location: (row.location as string | null) ?? null,
+    description: (row.description as string | null) ?? null,
+    descriptionEn: (row.description_en as string | null) ?? null,
+    tentative: row.tentative as boolean,
+    createdAt: row.created_at as Date,
+    updatedAt: row.updated_at as Date,
+  };
+}
+
+export async function listCalendarEvents(): Promise<CalendarEventRow[]> {
+  const rows = await sql().query(
+    `select ${CALENDAR_EVENT_COLUMNS} from calendar_events order by start_date asc, start_time asc nulls first`,
+  );
+  return (rows as Record<string, unknown>[]).map(toCalendarEventRow);
+}
+
+export async function findCalendarEventById(id: string): Promise<CalendarEventRow | null> {
+  const rows = await sql().query(`select ${CALENDAR_EVENT_COLUMNS} from calendar_events where id = $1`, [id]);
+  return rows.length > 0 ? toCalendarEventRow(rows[0] as Record<string, unknown>) : null;
+}
+
+export async function insertCalendarEvent(input: CalendarEventInput): Promise<CalendarEventRow> {
+  const rows = await sql()`
+    insert into calendar_events (
+      title, title_en, category, start_date, end_date, start_time, end_time,
+      location, description, description_en, tentative
+    ) values (
+      ${input.title}, ${input.titleEn ?? null}, ${input.category}, ${input.startDate},
+      ${input.endDate ?? null}, ${input.startTime ?? null}, ${input.endTime ?? null},
+      ${input.location ?? null}, ${input.description ?? null}, ${input.descriptionEn ?? null},
+      ${input.tentative}
+    )
+    returning id
+  `;
+  // Re-read through the text-cast select rather than adding a second
+  // `returning` clause with the same casts spelled out again — one place
+  // defines how a row is shaped coming out of this table.
+  const created = await findCalendarEventById((rows[0] as Record<string, unknown>).id as string);
+  if (!created) throw new Error("Inserted calendar event could not be re-read");
+  return created;
+}
+
+export async function updateCalendarEvent(
+  id: string,
+  input: CalendarEventInput,
+): Promise<CalendarEventRow | null> {
+  const rows = await sql()`
+    update calendar_events
+    set
+      title = ${input.title},
+      title_en = ${input.titleEn ?? null},
+      category = ${input.category},
+      start_date = ${input.startDate},
+      end_date = ${input.endDate ?? null},
+      start_time = ${input.startTime ?? null},
+      end_time = ${input.endTime ?? null},
+      location = ${input.location ?? null},
+      description = ${input.description ?? null},
+      description_en = ${input.descriptionEn ?? null},
+      tentative = ${input.tentative},
+      updated_at = now()
+    where id = ${id}
+    returning id
+  `;
+  if (rows.length === 0) return null;
+  return findCalendarEventById(id);
+}
+
+export async function deleteCalendarEvent(id: string): Promise<boolean> {
+  const rows = await sql()`
+    delete from calendar_events where id = ${id} returning id
+  `;
+  return rows.length > 0;
+}
+
 export type ReminderSignupResult = {
   id: string;
   confirmed: boolean;
@@ -817,6 +956,7 @@ export type TableCounts = {
   contactMessages: number;
   reminderSignups: number;
   recruitingWindows: number;
+  calendarEvents: number;
   rateLimitHits: number;
   cronRuns: number;
 };
@@ -828,6 +968,7 @@ export async function countRowsPerTable(): Promise<TableCounts> {
       (select count(*)::int from contact_messages) as contact_messages,
       (select count(*)::int from reminder_signups) as reminder_signups,
       (select count(*)::int from recruiting_windows) as recruiting_windows,
+      (select count(*)::int from calendar_events) as calendar_events,
       (select count(*)::int from rate_limit_hits) as rate_limit_hits,
       (select count(*)::int from cron_runs) as cron_runs
   `;
@@ -837,6 +978,7 @@ export async function countRowsPerTable(): Promise<TableCounts> {
     contactMessages: row.contact_messages as number,
     reminderSignups: row.reminder_signups as number,
     recruitingWindows: row.recruiting_windows as number,
+    calendarEvents: row.calendar_events as number,
     rateLimitHits: row.rate_limit_hits as number,
     cronRuns: row.cron_runs as number,
   };

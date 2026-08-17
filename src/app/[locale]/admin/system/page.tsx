@@ -27,6 +27,7 @@ const TABLE_KEYS = [
   "contactMessages",
   "reminderSignups",
   "recruitingWindows",
+  "calendarEvents",
   "rateLimitHits",
   "cronRuns",
 ] as const;
