@@ -11,6 +11,7 @@ import { clientIp } from "@/lib/requestIp";
 import { MIN_FILL_MS } from "@/lib/antiSpam";
 import { resolveApplicationSemester } from "@/lib/recruitingSemester";
 import { getRecruitingWindows } from "@/lib/recruitingWindows";
+import { recruitingPhaseAt } from "@/lib/recruitingStatus";
 
 /**
  * The load-bearing ordering, per docs/engineering.md: validate, then write
@@ -50,6 +51,17 @@ export async function POST(request: NextRequest) {
   }
 
   const recruitingWindows = await getRecruitingWindows();
+
+  // The form only renders while a window is open (MitmachenApplication.tsx),
+  // but that's a client-side gate on a page that can sit open in a tab for
+  // hours — the route itself is public and reachable regardless of what the
+  // page currently shows, so it has to enforce the same rule server-side.
+  // Unlike the honeypot and timing checks above, this isn't a spam signal —
+  // a request that fails it gets a real, distinguishable error, since the
+  // applicant did nothing wrong.
+  if (recruitingPhaseAt(Date.now(), recruitingWindows) !== "open") {
+    return NextResponse.json({ ok: false, error: "window_closed" }, { status: 409 });
+  }
 
   let application;
   try {

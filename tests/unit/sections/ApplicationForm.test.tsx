@@ -32,6 +32,15 @@ function mockFetchFailure() {
   vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 500 })));
 }
 
+function mockFetchWindowClosed() {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ ok: false, error: "window_closed" }), { status: 409 }),
+    ),
+  );
+}
+
 describe("ApplicationForm", () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -131,6 +140,22 @@ describe("ApplicationForm", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent("teamvorstand@unimannheim.enactus.team");
     expect(screen.getByLabelText("Vorname")).toHaveValue("Jane");
+  });
+
+  it("shows a dedicated message, not the generic error, when the window closed mid-submit", async () => {
+    let now = 1_700_000_000_000;
+    vi.spyOn(Date, "now").mockImplementation(() => now);
+    mockFetchWindowClosed();
+    const user = userEvent.setup();
+    renderWithIntl(<ApplicationForm />);
+
+    await fillRequiredFields(user);
+    now += MIN_FILL_MS + 500;
+    await user.click(screen.getByRole("button", { name: "Bewerbung absenden" }));
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("Das Bewerbungsfenster wurde gerade eben geschlossen");
+    expect(alert).not.toHaveTextContent("teamvorstand@unimannheim.enactus.team");
   });
 
   it("has no accessibility violations", async () => {

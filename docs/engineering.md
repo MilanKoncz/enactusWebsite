@@ -13,6 +13,9 @@ Forms, data, privacy, performance, SEO, and testing detail.
 6. Honeypot field plus a submission timing check. No CAPTCHA: it is an
    accessibility and privacy problem.
 7. Free-text fields only, no file upload.
+8. The route rejects with 409 when no recruiting window is currently open —
+   the form only renders while one is, but the route itself is public and
+   reachable regardless of what a page already open in some tab still shows.
 
 Open/closed state comes from the `recruiting_windows` table (see
 `docs/content-guide.md`), read through a short-lived cache

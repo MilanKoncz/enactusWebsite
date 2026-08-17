@@ -44,6 +44,7 @@ export function ApplicationForm() {
   const t = useTranslations("MitmachenPage.application.form");
   const locale = useLocale();
   const [state, setState] = useState<SubmitState>("idle");
+  const [submitError, setSubmitError] = useState<string | undefined>(undefined);
   // Set in an effect, not the useRef initializer: reading the clock is an
   // impure call, and doing that directly during render (as a useRef
   // initializer runs) is flagged by react-hooks/purity even though the
@@ -75,6 +76,7 @@ export function ApplicationForm() {
       setState("success");
       reset();
     } else {
+      setSubmitError(result.error);
       setState("error");
     }
   }
@@ -211,7 +213,9 @@ export function ApplicationForm() {
       </div>
 
       {state === "error" && (
-        <FormStatusMessage variant="error">{t("submitError", { email: CONTACT_EMAIL })}</FormStatusMessage>
+        <FormStatusMessage variant="error">
+          {submitError === "window_closed" ? t("submitWindowClosed") : t("submitError", { email: CONTACT_EMAIL })}
+        </FormStatusMessage>
       )}
 
       <Button type="submit" className="self-start" loading={state === "pending"}>

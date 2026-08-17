@@ -208,4 +208,30 @@ describe("POST /api/bewerbung", () => {
     expect(response.status).toBe(429);
     expect(insertApplication).not.toHaveBeenCalled();
   });
+
+  it("rejects a submission with 409 when no recruiting window is open, and writes nothing", async () => {
+    checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
+    getRecruitingWindows.mockResolvedValue([
+      { semester: "HWS20", start: "2020-01-01T00:00:00+00:00", end: "2020-01-14T00:00:00+00:00" },
+    ]);
+
+    const { POST } = await import("@/app/api/bewerbung/route");
+    const response = await POST(postRequest(validPayload()));
+
+    expect(response.status).toBe(409);
+    expect(await response.json()).toEqual({ ok: false, error: "window_closed" });
+    expect(insertApplication).not.toHaveBeenCalled();
+    expect(sendApplicationNotification).not.toHaveBeenCalled();
+  });
+
+  it("rejects a submission with 409 when no window is scheduled at all", async () => {
+    checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
+    getRecruitingWindows.mockResolvedValue([]);
+
+    const { POST } = await import("@/app/api/bewerbung/route");
+    const response = await POST(postRequest(validPayload()));
+
+    expect(response.status).toBe(409);
+    expect(insertApplication).not.toHaveBeenCalled();
+  });
 });
