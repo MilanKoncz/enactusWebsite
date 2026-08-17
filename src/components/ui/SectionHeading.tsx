@@ -20,7 +20,13 @@ export function SectionHeading({ eyebrow, title, lead, as = "h2", className }: S
   return (
     <div className={cn("flex flex-col gap-4", className)}>
       <Eyebrow>{eyebrow}</Eyebrow>
-      <Heading className="text-display-3 font-display">{title}</Heading>
+      {/* `break-words` only takes effect for a word that cannot fit its line
+          at all, so it changes nothing for headings that already fit — but
+          German compounds set at display size do overflow 360px on their
+          own ("Bewerbungsfenster" needs 371px in a 328px column), and an
+          overflowing heading pushes the whole document sideways, which the
+          quality floor in CLAUDE.md rules out. */}
+      <Heading className="text-display-3 font-display break-words">{title}</Heading>
       {lead && <p className="text-body-l">{lead}</p>}
     </div>
   );

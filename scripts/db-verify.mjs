@@ -190,6 +190,28 @@ async function verifyContactMessages() {
   check("delete removes exactly one row", deleted.length, 1);
 }
 
+async function verifyCronRuns() {
+  console.log("\ncron_runs");
+  const [started] = await sql`insert into cron_runs (job) values (${MARKER}) returning *`;
+  check("a new run starts as not-ok", started.ok, false);
+  check("a new run has no finished_at yet", started.finished_at, null);
+
+  await sql`
+    update cron_runs set finished_at = now(), ok = true, deleted_applications = 2,
+      pruned_rate_limit_hits = 7, error = null
+    where id = ${started.id}
+  `;
+  const [finished] = await sql`select * from cron_runs where id = ${started.id}`;
+  check("finishing a run records ok and the counts", [finished.ok, finished.deleted_applications], [true, 2]);
+  check("pruned counter round-trips", finished.pruned_rate_limit_hits, 7);
+
+  const recent = await sql`select id from cron_runs where job = ${MARKER} order by started_at desc limit 1`;
+  check("most-recent-first ordering finds the run", recent.length, 1);
+
+  const deleted = await sql`delete from cron_runs where job = ${MARKER} returning id`;
+  check("delete removes exactly one row", deleted.length, 1);
+}
+
 async function verifyRateLimitHits() {
   console.log("\nrate_limit_hits");
   const bucket = MARKER;
@@ -230,6 +252,7 @@ await verifyReminderSignups();
 await verifyReminderFiltering();
 await verifyRecruitingWindows();
 await verifyContactMessages();
+await verifyCronRuns();
 await verifyRateLimitHits();
 
 console.log(`\n${failures === 0 ? "All checks passed." : `${failures} check(s) failed.`}`);

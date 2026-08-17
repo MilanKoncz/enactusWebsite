@@ -1152,6 +1152,64 @@
         "subject": "Betreff",
         "mailStatus": "Mailstatus"
       }
+    },
+    "deletionRequests": {
+      "title": "Löschanfragen",
+      "lead": "Für Auskunfts- und Löschbegehren nach Art. 15 und 17 DSGVO. Suche nach einer E-Mail-Adresse über Bewerbungen, Kontaktanfragen und Erinnerungsliste.",
+      "emailLabel": "E-Mail-Adresse",
+      "emailHint": "Genau die Adresse aus dem Begehren.",
+      "search": "Suchen",
+      "resultsHeading": "Gefundene Daten zu {email}",
+      "noMatches": "Zu dieser Adresse ist nichts gespeichert.",
+      "showRaw": "Alle gespeicherten Felder anzeigen",
+      "tables": {
+        "applications": "Bewerbungen",
+        "contactMessages": "Kontaktanfragen",
+        "reminderSignups": "Erinnerungsliste"
+      },
+      "deleteWarning": "Löschen ist endgültig und lässt sich nicht rückgängig machen. Es gibt kein Backup, aus dem diese Zeilen zurückkämen.",
+      "confirmLabel": "Adresse zur Bestätigung erneut eingeben",
+      "confirmHint": "Muss mit der gesuchten Adresse übereinstimmen.",
+      "delete": "Endgültig löschen",
+      "deleted": "Gelöscht: {applications} Bewerbungen, {contactMessages} Kontaktanfragen, {reminderSignups} Einträge der Erinnerungsliste.",
+      "errorSearch": "Die Suche hat nicht geklappt. Bitte versuch es noch einmal.",
+      "errorDelete": "Das Löschen hat nicht geklappt. Bitte versuch es noch einmal.",
+      "errorMismatch": "Die beiden Adressen stimmen nicht überein. Es wurde nichts gelöscht."
+    },
+    "system": {
+      "title": "Systemstatus",
+      "lead": "Läuft die Löschroutine, sind Datenbank und Resend erreichbar, wie viele Zeilen liegen wo.",
+      "cronHeading": "Löschroutine",
+      "lastRun": "Letzte Ausführung",
+      "nextDue": "Nächste planmäßig fällig",
+      "never": "noch nie",
+      "cronStale": "Die Löschroutine lief seit über 48 Stunden nicht mehr — zuletzt am {when}. Damit wird die in der Datenschutzerklärung genannte Aufbewahrungsfrist gerade nicht durchgesetzt. Cron-Jobs im Vercel-Dashboard prüfen.",
+      "cronNeverRan": "Die Löschroutine ist noch nie gelaufen. Damit wird die in der Datenschutzerklärung genannte Aufbewahrungsfrist gerade nicht durchgesetzt. Cron-Jobs im Vercel-Dashboard prüfen.",
+      "noRuns": "Noch keine Ausführung verzeichnet.",
+      "ok": "erfolgreich",
+      "failed": "fehlgeschlagen",
+      "deletedCounts": "{applications} Bew. / {contactMessages} Kont. / {reminderSignups} Erin. / {rateLimitHits} Limits",
+      "columns": {
+        "startedAt": "Gestartet",
+        "result": "Ergebnis",
+        "deleted": "Gelöscht",
+        "error": "Fehler"
+      },
+      "servicesHeading": "Erreichbarkeit",
+      "database": "Datenbank (Neon)",
+      "resend": "Mailversand (Resend)",
+      "reachable": "erreichbar",
+      "unreachable": "nicht erreichbar",
+      "rowsHeading": "Zeilen je Tabelle",
+      "rowsUnavailable": "Zeilenzahlen nicht abrufbar, weil die Datenbank nicht erreichbar ist.",
+      "tables": {
+        "applications": "Bewerbungen",
+        "contactMessages": "Kontaktanfragen",
+        "reminderSignups": "Erinnerungsliste",
+        "recruitingWindows": "Bewerbungsfenster",
+        "rateLimitHits": "Rate-Limit-Zähler",
+        "cronRuns": "Cron-Läufe"
+      }
     }
   },
   "ImageLightbox": {

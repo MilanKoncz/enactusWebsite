@@ -278,6 +278,91 @@ export async function updateRecruitingWindow(
   return rows.length > 0 ? toRecruitingWindowRow(rows[0] as Record<string, unknown>) : null;
 }
 
+/**
+ * Everything stored about one email address, across all three form tables —
+ * the query behind /admin/loeschanfragen, which exists to answer GDPR
+ * Art. 15 (what do you have on me) and Art. 17 (delete it).
+ *
+ * Unlike every other admin list, this one returns the *full* rows: an
+ * access request is precisely a request for all of it, so narrowing the
+ * select here would make the answer incomplete. That's also why it's keyed
+ * by an exact address the board was given rather than a search — this is a
+ * lookup for a named person, not a way to browse applicants.
+ *
+ * Case-insensitive: addresses are compared with lower(), because someone
+ * writing in from Jane@Example.com about the data they submitted as
+ * jane@example.com is the same person and would otherwise be told nothing
+ * is stored.
+ */
+export type PersonalDataMatches = {
+  applications: Application[];
+  contactMessages: ContactMessage[];
+  reminderSignups: ReminderSignupSummary[];
+};
+
+export async function findPersonalDataByEmail(email: string): Promise<PersonalDataMatches> {
+  const needle = email.trim().toLowerCase();
+
+  const applicationRows = await sql()`select * from applications where lower(email) = ${needle}`;
+  const contactRows = await sql()`
+    select id, created_at, name, email, subject, message, locale from contact_messages
+    where lower(email) = ${needle}
+  `;
+  const reminderRows = await sql()`
+    select id, created_at, email, confirmed, confirmed_at, unsubscribed_at, mail_status
+    from reminder_signups where lower(email) = ${needle}
+  `;
+
+  return {
+    applications: (applicationRows as Record<string, unknown>[]).map(toApplication),
+    contactMessages: (contactRows as Record<string, unknown>[]).map((row) => ({
+      id: row.id as string,
+      createdAt: row.created_at as Date,
+      name: row.name as string,
+      email: row.email as string,
+      subject: (row.subject as string | null) ?? undefined,
+      message: row.message as string,
+      locale: row.locale as Locale,
+    })),
+    reminderSignups: (reminderRows as Record<string, unknown>[]).map((row) => ({
+      id: row.id as string,
+      createdAt: row.created_at as Date,
+      email: row.email as string,
+      confirmed: row.confirmed as boolean,
+      confirmedAt: (row.confirmed_at as Date | null) ?? null,
+      unsubscribedAt: (row.unsubscribed_at as Date | null) ?? null,
+      mailStatus: row.mail_status as MailStatus,
+    })),
+  };
+}
+
+export type DeletedCounts = { applications: number; contactMessages: number; reminderSignups: number };
+
+// Three statements rather than one, because they're three tables — but note
+// there is no transaction: if the second fails, the first has already
+// happened. That's the right failure mode for a deletion request, where
+// having deleted *more* than the caller saw confirmed is the safe direction
+// and a partial delete can simply be repeated.
+export async function deletePersonalDataByEmail(email: string): Promise<DeletedCounts> {
+  const needle = email.trim().toLowerCase();
+
+  const applications = await sql()`
+    delete from applications where lower(email) = ${needle} returning id
+  `;
+  const contactMessages = await sql()`
+    delete from contact_messages where lower(email) = ${needle} returning id
+  `;
+  const reminderSignups = await sql()`
+    delete from reminder_signups where lower(email) = ${needle} returning id
+  `;
+
+  return {
+    applications: applications.length,
+    contactMessages: contactMessages.length,
+    reminderSignups: reminderSignups.length,
+  };
+}
+
 // Postgres 23505 = unique_violation. Recognised here rather than in a route
 // so callers don't have to know the driver's error shape: entering the same
 // semester label twice is an ordinary mistake that deserves a clear
@@ -640,6 +725,121 @@ export async function listFailedMails(): Promise<FailedMail[]> {
     label: row.label as string,
     mailError: (row.mail_error as string | null) ?? null,
   }));
+}
+
+/**
+ * The cron audit trail (migrations/0005). Written by /api/cron/cleanup and
+ * read by /admin/system, which is the only reason it exists: Vercel keeps
+ * runtime logs for a day on this plan, so "has the retention routine run
+ * lately?" was unanswerable after that — and the job has already missed a
+ * scheduled slot once without anything noticing.
+ */
+export type CronRun = {
+  id: string;
+  job: string;
+  startedAt: Date;
+  finishedAt: Date | null;
+  ok: boolean;
+  deletedApplications: number;
+  deletedContactMessages: number;
+  deletedReminderSignups: number;
+  prunedRateLimitHits: number;
+  error: string | null;
+};
+
+function toCronRun(row: Record<string, unknown>): CronRun {
+  return {
+    id: row.id as string,
+    job: row.job as string,
+    startedAt: row.started_at as Date,
+    finishedAt: (row.finished_at as Date | null) ?? null,
+    ok: row.ok as boolean,
+    deletedApplications: row.deleted_applications as number,
+    deletedContactMessages: row.deleted_contact_messages as number,
+    deletedReminderSignups: row.deleted_reminder_signups as number,
+    prunedRateLimitHits: row.pruned_rate_limit_hits as number,
+    error: (row.error as string | null) ?? null,
+  };
+}
+
+// Written before the deletes run, not after: a run that dies partway through
+// still leaves a row, with ok = false and no finished_at. Recording only
+// completed runs would make a crash look exactly like a run that never
+// started, which is the distinction this table exists to make.
+export async function startCronRun(job: string): Promise<string> {
+  const rows = await sql()`insert into cron_runs (job) values (${job}) returning id`;
+  return (rows[0] as Record<string, unknown>).id as string;
+}
+
+export async function finishCronRun(
+  id: string,
+  counts: {
+    applications: number | null;
+    contactMessages: number | null;
+    reminderSignups: number | null;
+    rateLimitHits: number | null;
+  },
+  error: string | null,
+): Promise<void> {
+  await sql()`
+    update cron_runs set
+      finished_at = now(),
+      ok = ${error === null},
+      deleted_applications = ${counts.applications ?? 0},
+      deleted_contact_messages = ${counts.contactMessages ?? 0},
+      deleted_reminder_signups = ${counts.reminderSignups ?? 0},
+      pruned_rate_limit_hits = ${counts.rateLimitHits ?? 0},
+      error = ${error}
+    where id = ${id}
+  `;
+}
+
+export async function listCronRuns(limit = 10): Promise<CronRun[]> {
+  const rows = await sql()`
+    select id, job, started_at, finished_at, ok, deleted_applications,
+           deleted_contact_messages, deleted_reminder_signups,
+           pruned_rate_limit_hits, error
+    from cron_runs
+    order by started_at desc
+    limit ${limit}
+  `;
+  return (rows as Record<string, unknown>[]).map(toCronRun);
+}
+
+/**
+ * Row counts per table, for /admin/system. `count(*)` on tables this size
+ * is trivially cheap, and one query keeps it to a single round trip.
+ * Doubles as the database reachability check: if this resolves, Neon is
+ * answering — no separate ping needed.
+ */
+export type TableCounts = {
+  applications: number;
+  contactMessages: number;
+  reminderSignups: number;
+  recruitingWindows: number;
+  rateLimitHits: number;
+  cronRuns: number;
+};
+
+export async function countRowsPerTable(): Promise<TableCounts> {
+  const rows = await sql()`
+    select
+      (select count(*)::int from applications) as applications,
+      (select count(*)::int from contact_messages) as contact_messages,
+      (select count(*)::int from reminder_signups) as reminder_signups,
+      (select count(*)::int from recruiting_windows) as recruiting_windows,
+      (select count(*)::int from rate_limit_hits) as rate_limit_hits,
+      (select count(*)::int from cron_runs) as cron_runs
+  `;
+  const row = rows[0] as Record<string, unknown>;
+  return {
+    applications: row.applications as number,
+    contactMessages: row.contact_messages as number,
+    reminderSignups: row.reminder_signups as number,
+    recruitingWindows: row.recruiting_windows as number,
+    rateLimitHits: row.rate_limit_hits as number,
+    cronRuns: row.cron_runs as number,
+  };
 }
 
 // A plain read, no write — checkRateLimit (rateLimit.ts) calls this first

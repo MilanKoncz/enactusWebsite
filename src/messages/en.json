@@ -1152,6 +1152,64 @@
         "subject": "Subject",
         "mailStatus": "Mail status"
       }
+    },
+    "deletionRequests": {
+      "title": "Deletion requests",
+      "lead": "For access and erasure requests under GDPR Art. 15 and 17. Search one email address across applications, contact messages, and the reminder list.",
+      "emailLabel": "Email address",
+      "emailHint": "Exactly the address from the request.",
+      "search": "Search",
+      "resultsHeading": "Data found for {email}",
+      "noMatches": "Nothing is stored for this address.",
+      "showRaw": "Show every stored field",
+      "tables": {
+        "applications": "Applications",
+        "contactMessages": "Contact messages",
+        "reminderSignups": "Reminder list"
+      },
+      "deleteWarning": "Deleting is final and cannot be undone. There is no backup these rows would come back from.",
+      "confirmLabel": "Re-enter the address to confirm",
+      "confirmHint": "Must match the address you searched for.",
+      "delete": "Delete permanently",
+      "deleted": "Deleted: {applications} applications, {contactMessages} contact messages, {reminderSignups} reminder-list entries.",
+      "errorSearch": "The search didn't work. Please try again.",
+      "errorDelete": "The deletion didn't work. Please try again.",
+      "errorMismatch": "The two addresses don't match. Nothing was deleted."
+    },
+    "system": {
+      "title": "System status",
+      "lead": "Whether the cleanup routine is running, whether the database and Resend are reachable, and how many rows are where.",
+      "cronHeading": "Cleanup routine",
+      "lastRun": "Last run",
+      "nextDue": "Next scheduled run",
+      "never": "never",
+      "cronStale": "The cleanup routine hasn't run in over 48 hours — last on {when}. The retention period stated in the privacy policy is currently not being enforced. Check Cron Jobs in the Vercel dashboard.",
+      "cronNeverRan": "The cleanup routine has never run. The retention period stated in the privacy policy is currently not being enforced. Check Cron Jobs in the Vercel dashboard.",
+      "noRuns": "No run recorded yet.",
+      "ok": "succeeded",
+      "failed": "failed",
+      "deletedCounts": "{applications} appl. / {contactMessages} cont. / {reminderSignups} rem. / {rateLimitHits} limits",
+      "columns": {
+        "startedAt": "Started",
+        "result": "Result",
+        "deleted": "Deleted",
+        "error": "Error"
+      },
+      "servicesHeading": "Reachability",
+      "database": "Database (Neon)",
+      "resend": "Mail delivery (Resend)",
+      "reachable": "reachable",
+      "unreachable": "unreachable",
+      "rowsHeading": "Rows per table",
+      "rowsUnavailable": "Row counts unavailable because the database is unreachable.",
+      "tables": {
+        "applications": "Applications",
+        "contactMessages": "Contact messages",
+        "reminderSignups": "Reminder list",
+        "recruitingWindows": "Application windows",
+        "rateLimitHits": "Rate-limit counters",
+        "cronRuns": "Cron runs"
+      }
     }
   },
   "ImageLightbox": {

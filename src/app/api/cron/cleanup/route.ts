@@ -5,7 +5,9 @@ import {
   deleteExpiredApplications,
   deleteExpiredContactMessages,
   deleteExpiredReminderSignups,
+  finishCronRun,
   pruneRateLimitHits,
+  startCronRun,
 } from "@/lib/db";
 import {
   applicationRetentionCutoff,
@@ -47,6 +49,16 @@ export async function GET(request: NextRequest) {
 
   const now = new Date();
 
+  // Recorded before the work starts, so a run that dies partway through
+  // still leaves evidence it was attempted (cron_runs, migrations/0005).
+  // Wrapped because the audit trail must never be the thing that stops the
+  // cleanup from happening: if this insert fails, the deletes still run,
+  // just unrecorded.
+  const runId = await startCronRun("cleanup").catch((error: unknown) => {
+    console.error("Failed to record the start of the cleanup run", error);
+    return null;
+  });
+
   const [applications, contactMessages, reminderSignups, rateLimitHits] = await Promise.allSettled([
     deleteExpiredApplications(applicationRetentionCutoff(now)),
     deleteExpiredContactMessages(contactMessageRetentionCutoff(now)),
@@ -61,8 +73,21 @@ export async function GET(request: NextRequest) {
     rateLimitHits: rateLimitHits.status === "fulfilled" ? rateLimitHits.value : null,
   };
 
+  const failures: string[] = [];
   for (const [name, result] of Object.entries({ applications, contactMessages, reminderSignups, rateLimitHits })) {
-    if (result.status === "rejected") console.error(`Cleanup step "${name}" failed`, result.reason);
+    if (result.status === "rejected") {
+      console.error(`Cleanup step "${name}" failed`, result.reason);
+      const reason = result.reason instanceof Error ? result.reason.message : String(result.reason);
+      failures.push(`${name}: ${reason}`);
+    }
+  }
+
+  if (runId) {
+    await finishCronRun(runId, summary, failures.length > 0 ? failures.join("; ") : null).catch(
+      (error: unknown) => {
+        console.error("Failed to record the end of the cleanup run", error);
+      },
+    );
   }
 
   return NextResponse.json({ ok: true, deleted: summary });
