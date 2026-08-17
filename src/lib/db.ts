@@ -223,6 +223,19 @@ export async function listRecruitingWindows(): Promise<RecruitingWindowRow[]> {
   return (rows as Record<string, unknown>[]).map(toRecruitingWindowRow);
 }
 
+// Answered by Postgres rather than by comparing dates in the page: reading
+// the clock during a server component's render is impure (the
+// react-hooks/purity rule rejects it, rightly), and the database's `now()`
+// is the same clock /api/cron/cleanup and the window checks already compare
+// against — so there's one authoritative answer to "is anything still
+// ahead?" instead of one per process.
+export async function countFutureRecruitingWindows(): Promise<number> {
+  const rows = await sql()`
+    select count(*)::int as count from recruiting_windows where ends_at > now()
+  `;
+  return (rows[0] as Record<string, unknown>).count as number;
+}
+
 export async function findOverlappingRecruitingWindows(
   startsAt: Date,
   endsAt: Date,
@@ -263,6 +276,19 @@ export async function updateRecruitingWindow(
     returning id, semester, starts_at, ends_at, created_at
   `;
   return rows.length > 0 ? toRecruitingWindowRow(rows[0] as Record<string, unknown>) : null;
+}
+
+// Postgres 23505 = unique_violation. Recognised here rather than in a route
+// so callers don't have to know the driver's error shape: entering the same
+// semester label twice is an ordinary mistake that deserves a clear
+// conflict, not a 500 that reads like the site is broken.
+export function isUniqueViolation(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    (error as { code?: unknown }).code === "23505"
+  );
 }
 
 export async function deleteRecruitingWindow(id: string): Promise<boolean> {

@@ -1092,6 +1092,38 @@
         "contact_messages": "Contact message",
         "reminder_signups": "Reminder"
       }
+    },
+    "recruitingWindows": {
+      "title": "Application windows",
+      "lead": "When applications are possible. Changes take effect on /mitmachen immediately.",
+      "empty": "No application window on record.",
+      "noFutureWindow": "There is no future application window on record. /mitmachen will say \"closed\" indefinitely until one is created.",
+      "createHeading": "Create a window",
+      "editHeading": "Edit window",
+      "semesterLabel": "Semester",
+      "semesterHint": "Format HWS26 or FSS27.",
+      "startLabel": "Start",
+      "endLabel": "End",
+      "timezoneNote": "All times in Europe/Berlin, regardless of where you are.",
+      "create": "Create",
+      "saveChanges": "Save changes",
+      "cancelEdit": "Cancel",
+      "edit": "Edit",
+      "delete": "Delete",
+      "confirmDelete": "Really delete the {semester} application window?",
+      "errorGeneric": "That didn't work. Please try again.",
+      "errorOverlaps": "This window overlaps an existing one.",
+      "errorOverlapsWith": "This window overlaps {semester}.",
+      "errorDuplicateSemester": "There is already a window for this semester.",
+      "errorSemesterFormat": "Format HWS26 or FSS27.",
+      "errorEndBeforeStart": "The end must be after the start.",
+      "errorDateRequired": "Please give a date and time.",
+      "columns": {
+        "semester": "Semester",
+        "start": "Start",
+        "end": "End",
+        "action": "Action"
+      }
     }
   },
   "ImageLightbox": {

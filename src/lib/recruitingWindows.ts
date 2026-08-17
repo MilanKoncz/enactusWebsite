@@ -23,6 +23,19 @@ import type { RecruitingWindow } from "@/content/recruiting";
  */
 export const RECRUITING_WINDOWS_TAG = "recruiting-windows";
 
+/**
+ * Next 16's `revalidateTag` takes a cache-life profile as a second
+ * argument; `{ expire: 0 }` means "don't serve this stale at all", which is
+ * what an admin edit needs — the board changes a date and reloads
+ * /mitmachen expecting to see it. `updateTag` would read better but is
+ * Server-Action-only, and the admin mutations are route handlers.
+ *
+ * Exported as a constant rather than repeated at each call site so all
+ * three mutations (create, edit, delete) can't drift to different
+ * staleness.
+ */
+export const RECRUITING_WINDOWS_REVALIDATE = { expire: 0 } as const;
+
 async function loadRecruitingWindows(): Promise<RecruitingWindow[]> {
   try {
     const rows = await listRecruitingWindows();

@@ -1092,6 +1092,38 @@
         "contact_messages": "Kontaktanfrage",
         "reminder_signups": "Erinnerung"
       }
+    },
+    "recruitingWindows": {
+      "title": "Bewerbungsfenster",
+      "lead": "Wann Bewerbungen möglich sind. Änderungen wirken sofort auf /mitmachen.",
+      "empty": "Kein Bewerbungsfenster eingetragen.",
+      "noFutureWindow": "Es ist kein zukünftiges Bewerbungsfenster eingetragen. /mitmachen zeigt dauerhaft „geschlossen“, bis eines angelegt wird.",
+      "createHeading": "Fenster anlegen",
+      "editHeading": "Fenster bearbeiten",
+      "semesterLabel": "Semester",
+      "semesterHint": "Format HWS26 oder FSS27.",
+      "startLabel": "Beginn",
+      "endLabel": "Ende",
+      "timezoneNote": "Alle Zeiten in Europe/Berlin, unabhängig davon, wo du gerade bist.",
+      "create": "Anlegen",
+      "saveChanges": "Änderungen speichern",
+      "cancelEdit": "Abbrechen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "confirmDelete": "Bewerbungsfenster {semester} wirklich löschen?",
+      "errorGeneric": "Das hat nicht geklappt. Bitte versuch es noch einmal.",
+      "errorOverlaps": "Das Fenster überschneidet sich mit einem bestehenden.",
+      "errorOverlapsWith": "Das Fenster überschneidet sich mit {semester}.",
+      "errorDuplicateSemester": "Für dieses Semester gibt es schon ein Fenster.",
+      "errorSemesterFormat": "Format HWS26 oder FSS27.",
+      "errorEndBeforeStart": "Das Ende muss nach dem Beginn liegen.",
+      "errorDateRequired": "Bitte gib Datum und Uhrzeit an.",
+      "columns": {
+        "semester": "Semester",
+        "start": "Beginn",
+        "end": "Ende",
+        "action": "Aktion"
+      }
     }
   },
   "ImageLightbox": {
