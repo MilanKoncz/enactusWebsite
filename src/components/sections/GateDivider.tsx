@@ -3,6 +3,7 @@ import { GateMarker } from "@/components/ui/GateMarker";
 import { Section } from "@/components/ui/Section";
 import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import type { ThreadStop } from "@/components/motion/threadRoute";
+import { cn } from "@/lib/cn";
 
 type LabelledDivider = {
   label: string;
@@ -26,9 +27,18 @@ export type GateDividerProps = LabelledDivider | BareDivider;
 // Only ever placed inside a light run of the page — a surface change is
 // already a seam, so this divider never sits at one (docs/design-system.md:
 // the gate marker as the divider between major homepage sections).
+//
+// A bare divider (no label — only "gate-kpis" today) renders no visible
+// content of its own, just the thread passing through in a short straight
+// line: its only job is to be a seam, not to occupy a section's worth of
+// space. Giving it the same py-10 md:py-16 as a labelled gate stacked an
+// extra 5-8rem of empty space on top of PartnerMarquee's own bottom padding
+// and HomeKpis's own top padding — the page's most visible whitespace gap.
+// A labelled divider keeps the taller padding: its GateMarker is real
+// content that needs room to breathe.
 export function GateDivider({ label, stop }: GateDividerProps) {
   return (
-    <Section className="relative isolate py-10 md:py-16">
+    <Section className={cn("relative isolate", label ? "py-10 md:py-16" : "py-4 md:py-6")}>
       {stop && <ThreadSegment stop={stop} />}
       {label && (
         <Container className="relative">

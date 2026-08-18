@@ -42,12 +42,12 @@ export function Faq() {
                       {t(`${entry.key}.question` as FaqCopyKey)}
                       <ChevronDown
                         aria-hidden="true"
-                        className="size-4 shrink-0 transition-transform duration-[var(--duration-fast)] ease-signature group-data-[state=open]:rotate-180"
+                        className="size-4 shrink-0 transition-transform duration-[var(--duration-calm)] ease-signature group-data-[state=open]:rotate-180"
                       />
                     </Accordion.Trigger>
                   </Accordion.Header>
-                  <Accordion.Content className="pb-4 text-body-s opacity-80">
-                    {t(`${entry.key}.answer` as FaqCopyKey)}
+                  <Accordion.Content className="overflow-hidden text-body-s opacity-80 data-[state=closed]:animate-[accordion-up_var(--duration-calm)_var(--ease-grow)] data-[state=open]:animate-[accordion-down_var(--duration-calm)_var(--ease-grow)]">
+                    <p className="pb-4">{t(`${entry.key}.answer` as FaqCopyKey)}</p>
                   </Accordion.Content>
                 </Accordion.Item>
               ))}

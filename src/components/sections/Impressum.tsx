@@ -29,7 +29,7 @@ export function Impressum() {
 
   return (
     <Section>
-      <Container className="flex flex-col gap-10 py-12">
+      <Container className="flex flex-col gap-10">
         <SectionHeading as="h1" eyebrow={t("eyebrow")} title={t("title")} />
         {locale === "en" && <p className="max-w-prose text-body-m opacity-80">{t("enNotice")}</p>}
         <dl className="flex max-w-prose flex-col gap-6">

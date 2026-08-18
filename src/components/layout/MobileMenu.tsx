@@ -57,7 +57,7 @@ export function MobileMenu({ className }: MobileMenuProps) {
         <Dialog.Content
           data-surface="ink"
           aria-describedby={undefined}
-          className="fixed inset-0 z-50 flex flex-col gap-10 overflow-y-auto bg-ink px-4 py-6 text-paper"
+          className="fixed inset-0 z-50 flex flex-col gap-10 overflow-y-auto bg-ink px-4 py-6 text-paper data-[state=closed]:animate-[mobile-menu-out_var(--duration-fast)_var(--ease-signature)] data-[state=open]:animate-[mobile-menu-in_var(--duration-fast)_var(--ease-signature)]"
         >
           <Dialog.Title className="sr-only">{t("mobileMenuLabel")}</Dialog.Title>
           <div className="flex items-center justify-between">

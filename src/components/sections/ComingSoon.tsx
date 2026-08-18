@@ -16,7 +16,7 @@ export function ComingSoon({ title, description }: ComingSoonProps) {
 
   return (
     <Section>
-      <Container className="flex flex-col gap-4 py-12 text-center">
+      <Container className="flex flex-col gap-4 text-center">
         <Eyebrow>{t("eyebrow")}</Eyebrow>
         <h1 className="text-display-3 font-display">{title}</h1>
         <p className="text-body-l opacity-60">{description ?? t("note")}</p>

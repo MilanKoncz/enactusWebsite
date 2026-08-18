@@ -22,7 +22,7 @@ export default async function NotFound() {
 
   return (
     <Section surface="ink">
-      <Container className="flex min-h-[60vh] flex-col items-center justify-center gap-6 py-24 text-center">
+      <Container className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
         <p aria-hidden="true" className="text-display-1 font-display leading-none text-gold">
           404
         </p>

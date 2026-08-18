@@ -300,6 +300,58 @@ h6 {
   }
 }
 
+/* FAQ accordion (Faq.tsx) open/close. Radix measures the content element's
+   own rendered height into --radix-accordion-content-height and keeps it
+   live across resizes, so this animates to a real value instead of a
+   hand-measured one. Height is otherwise off-limits for animation
+   (docs/design-system.md motion rule 5), but this is the documented
+   exception's same risk class as the header's scroll-compact padding: a
+   discrete, user-triggered toggle on one element, not a continuous or
+   scroll-linked effect — reduced motion still collapses it to an instant
+   state change via the blanket animation-duration override above. */
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+/* Mobile menu (MobileMenu.tsx) open/close. Transform and opacity only, keyed
+   off Radix Dialog.Content's own data-state — reduced motion is the same
+   blanket animation-duration override above, not a separate rule. */
+@keyframes mobile-menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes mobile-menu-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
 @keyframes thread-draw {
   from {
     clip-path: inset(0 0 100% 0);
@@ -453,13 +505,31 @@ h6 {
     transition: transform var(--duration-calm) var(--ease-signature);
   }
 
-  /* Prose links (Footer, NotFound's "back home") — an underline that grows
-     in from the left instead of an instant text-decoration toggle. The
-     pseudo-element, not text-decoration-line, is what makes the grow-in
-     animatable at all: text-decoration has no transitionable "length". */
+  /* Prose links (Footer, NotFound's "back home", every text link in a
+     content area) — a dotted gold rule marks the link at rest, since a
+     link only distinguishable by a hover reveal is invisible to the many
+     visitors on Instagram-referred mobile traffic who never hover at all
+     (docs/design-system.md: "hover enhances, hover never hides"). Hover
+     fills it in to a solid line rather than swapping styles outright: the
+     dotted ::before stays put and the solid ::after grows over it via
+     --ease-grow, so the dotted rule visibly "becomes" the solid one. Both
+     pseudo-elements, not text-decoration-line: text-decoration has no
+     transitionable "length" for the grow-in, and a dotted
+     text-decoration-style can't sit under a growing solid one on the same
+     property at all. */
   .link-underline {
     position: relative;
     text-decoration: none;
+  }
+
+  .link-underline::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.15em;
+    width: 100%;
+    height: 0;
+    border-top: 1px dotted var(--color-gold);
   }
 
   .link-underline::after {

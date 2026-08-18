@@ -112,7 +112,7 @@ export function Datenschutz() {
 
   return (
     <Section>
-      <Container className="flex flex-col gap-10 py-12">
+      <Container className="flex flex-col gap-10">
         <SectionHeading as="h1" eyebrow={t("eyebrow")} title={t("title")} />
 
         <p className="text-mono-s font-mono uppercase opacity-60">{t("effectiveDate")}</p>

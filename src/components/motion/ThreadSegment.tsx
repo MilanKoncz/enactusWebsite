@@ -22,12 +22,18 @@ export type ThreadSegmentProps = {
 // lets threadRoute.ts's waypoints line up exactly at each seam.
 // vector-effect="non-scaling-stroke" keeps the stroke width uniform despite
 // that non-uniform scaling, instead of rendering as a squashed ellipse. The
-// desktop path stays 2px, matching GateMarker's rule; the mobile path drops
-// to 1px — a hairline that sits close to the text column (threadRoute.ts's
-// MOBILE_AXIS) without reading as another rule competing with GateMarker's
-// own. The scroll reveal is a clip on this svg rather than a
-// stroke-dasharray on the path — see .thread-reveal in globals.css for why
-// the two can't be combined.
+// scroll reveal is a clip on this svg rather than a stroke-dasharray on the
+// path — see .thread-reveal in globals.css for why the two can't be
+// combined.
+//
+// Below md the thread doesn't render at all (board feedback) — not a
+// narrower version of itself, gone outright: `hidden md:block` on the svg
+// root, the same CSS-only switch EventCalendar's two views use, never a
+// useMediaQuery hook whose SSR snapshot would flash it in for one frame.
+// threadRoute.ts's "narrow" waypoints stay defined and tested — they're the
+// data this used to render with mobile's own 1px hairline (MOBILE_AXIS etc.),
+// kept in case that decision is revisited — but nothing here reads them
+// anymore.
 //
 // Purely decorative: aria-hidden, no tabindex, no interactive content, and
 // `pointer-events: none` so it can never intercept a click meant for the
@@ -40,7 +46,7 @@ export function ThreadSegment({ stop, className }: ThreadSegmentProps) {
       viewBox="0 0 100 100"
       preserveAspectRatio="none"
       className={cn(
-        "thread-reveal pointer-events-none absolute inset-0 -z-10 h-full w-full",
+        "thread-reveal pointer-events-none absolute inset-0 -z-10 hidden h-full w-full md:block",
         className,
       )}
     >
@@ -49,15 +55,6 @@ export function ThreadSegment({ stop, className }: ThreadSegmentProps) {
         vectorEffect="non-scaling-stroke"
         strokeWidth={2}
         fill="none"
-        className="hidden md:block"
-        style={{ stroke: "var(--thread-stroke)" }}
-      />
-      <path
-        d={pathFor(stop, "narrow")}
-        vectorEffect="non-scaling-stroke"
-        strokeWidth={1}
-        fill="none"
-        className="md:hidden"
         style={{ stroke: "var(--thread-stroke)" }}
       />
     </svg>
