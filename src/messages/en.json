@@ -160,6 +160,10 @@
       "cellLabel": "{date}, {count, plural, =0 {no events} one {1 event} other {# events}}",
       "todayMarker": "Today",
       "jumpedNote": "Nothing is on in {emptyMonth}. The calendar starts in {targetMonth}."
+    },
+    "agenda": {
+      "expandLabel": "Show more",
+      "collapseLabel": "Show less"
     }
   },
   "CalendarCategories": {

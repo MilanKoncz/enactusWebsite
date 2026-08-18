@@ -1,40 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
-import { ChevronUp } from "lucide-react";
-import { Card } from "@/components/ui/Card";
+import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { CategoryBadge, CATEGORY_LEFT_BORDER_CLASS } from "@/components/ui/CategoryBadge";
-import { AddToCalendarLink, EventMeta, EventRow, TentativeNote } from "@/components/ui/EventDetails";
+import { CategoryBadge } from "@/components/ui/CategoryBadge";
 import { EventCalendarGrid } from "@/components/sections/EventCalendarGrid";
+import { EventAgenda } from "@/components/sections/EventAgenda";
 import { cn } from "@/lib/cn";
-import { useNow } from "@/lib/useNow";
-import { formatEventDate, formatMonthHeading } from "@/lib/calendarFormat";
-import {
-  countdownFor,
-  filterByCategories,
-  groupByMonth,
-  isPastEvent,
-  nextUpcomingEvent,
-  splitMonthGroups,
-  visibleCategories,
-} from "@/lib/calendarAgenda";
+import { filterByCategories, visibleCategories } from "@/lib/calendarAgenda";
 import type { CalendarCategory, CalendarEvent } from "@/content/calendar";
 
 export type EventCalendarProps = {
   events: CalendarEvent[];
   /**
-   * The server's own render-time clock (epoch ms) — used for everything
-   * that decides *which* content shows (the highlighted event, which
-   * months collapse behind "earlier events", which rows dim as past).
-   * Baked into the page's HTML the same way initialRecruitingWindows is, so
-   * the first client render agrees with the server exactly and nothing
-   * visibly reorganises itself right after hydration. useNow()'s own
-   * ticking clock (below) drives only the countdown phrase's text, never
-   * which event or month is shown — see its own comment.
+   * The server's own render-time clock (epoch ms) — used by both views for
+   * everything that decides *which* content shows (the highlighted event,
+   * which day is "today", which rows dim as past). Baked into the page's
+   * HTML the same way initialRecruitingWindows is, so the first client
+   * render agrees with the server exactly and nothing visibly reorganises
+   * itself right after hydration.
    */
   initialNowMs: number;
 };
@@ -42,9 +28,7 @@ export type EventCalendarProps = {
 export function EventCalendar({ events, initialNowMs }: EventCalendarProps) {
   const t = useTranslations("EventCalendar");
   const tCategories = useTranslations("CalendarCategories");
-  const locale = useLocale();
   const [selected, setSelected] = useState<CalendarCategory[]>([]);
-  const [showEarlier, setShowEarlier] = useState(false);
   const [liveEvents, setLiveEvents] = useState(events);
 
   useEffect(() => {
@@ -60,39 +44,14 @@ export function EventCalendar({ events, initialNowMs }: EventCalendarProps) {
       });
   }, []);
 
-  // useNow ticks from 0 (server/pre-mount) to the real clock — never used
-  // to pick *what* is shown (see initialNowMs above), only whether the
-  // countdown phrase is allowed to render at all: 0 means "not mounted
-  // yet", and the countdown stays hidden rather than showing a nonsense
-  // day count computed against the Unix epoch.
-  const now = useNow(60_000);
-  const mounted = now > 0;
-
   const categories = visibleCategories(liveEvents);
   const filtered = filterByCategories(liveEvents, selected);
-  const highlighted = nextUpcomingEvent(filtered, initialNowMs);
-  // The highlighted card already shows this event in full — repeating it a
-  // second time immediately below, in the grouped list, would read as a
-  // rendering mistake rather than emphasis.
-  const eventsForList = highlighted ? filtered.filter((event) => event.id !== highlighted.id) : filtered;
-  const groups = groupByMonth(eventsForList);
-  const { earlierMonths, currentAndLaterMonths } = splitMonthGroups(groups, initialNowMs);
 
   function toggleCategory(category: CalendarCategory) {
     setSelected((previous) =>
       previous.includes(category) ? previous.filter((c) => c !== category) : [...previous, category],
     );
   }
-
-  const countdown = highlighted && mounted ? countdownFor(highlighted, now) : null;
-  const countdownLabel =
-    countdown?.state === "today"
-      ? t("highlight.today")
-      : countdown?.state === "tomorrow"
-        ? t("highlight.tomorrow")
-        : countdown?.state === "future"
-          ? t("highlight.inDays", { days: countdown.days })
-          : null;
 
   return (
     <Section className="relative isolate">
@@ -162,92 +121,13 @@ export function EventCalendar({ events, initialNowMs }: EventCalendarProps) {
                     grid would flash in only after hydration on desktop)
                     nor mounting one view lazily is used — a hidden
                     md:block/md:hidden pair costs nothing here and keeps
-                    the desktop view present in the very first paint. */}
+                    the right view present in the very first paint on
+                    either breakpoint. */}
                 <div className="hidden md:block">
                   <EventCalendarGrid events={filtered} initialNowMs={initialNowMs} />
                 </div>
-                <div className="flex flex-col gap-10 md:hidden">
-                {highlighted && (
-                  <Card
-                    className={cn(
-                      "flex flex-col gap-3 border-l-4 p-6",
-                      CATEGORY_LEFT_BORDER_CLASS[highlighted.category],
-                      highlighted.tentative && "border-dashed border-gold",
-                    )}
-                  >
-                    <p className="font-mono text-mono-xs uppercase opacity-60">{t("highlight.eyebrow")}</p>
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <h3 className="text-heading-2 font-display">{highlighted.title}</h3>
-                      <CategoryBadge category={highlighted.category} />
-                    </div>
-                    <p className="text-body-l">{formatEventDate(highlighted, locale)}</p>
-                    {countdownLabel && (
-                      <p className="font-mono text-mono-s uppercase opacity-60">{countdownLabel}</p>
-                    )}
-                    <EventMeta event={highlighted} />
-                    {highlighted.tentative && <TentativeNote label={t("tentativeLabel")} />}
-                    <AddToCalendarLink eventId={highlighted.id} label={t("addToCalendar")} size="md" />
-                  </Card>
-                )}
-
-                {earlierMonths.length > 0 && (
-                  <button
-                    type="button"
-                    aria-expanded={showEarlier}
-                    onClick={() => setShowEarlier((value) => !value)}
-                    className="flex items-center gap-2 self-start rounded-sm py-1 font-mono text-mono-s uppercase opacity-60 transition-[opacity,transform] duration-[var(--duration-fast)] ease-signature hover:opacity-100 focus-visible:opacity-100"
-                  >
-                    <ChevronUp
-                      aria-hidden="true"
-                      className={cn(
-                        "size-4 shrink-0 transition-transform duration-[var(--duration-fast)] ease-signature",
-                        !showEarlier && "rotate-180",
-                      )}
-                    />
-                    {t("earlierMonths")}
-                  </button>
-                )}
-
-                {showEarlier &&
-                  earlierMonths.map((group) => (
-                    <div key={group.monthKey} className="flex flex-col gap-4">
-                      <h3 className="font-mono text-mono-s uppercase opacity-60">
-                        {formatMonthHeading(group.monthKey, locale)}
-                      </h3>
-                      <ul className="flex flex-col gap-3">
-                        {group.events.map((event) => (
-                          <EventRow
-                            key={event.id}
-                            event={event}
-                            past
-                            locale={locale}
-                            tentativeLabel={t("tentativeLabel")}
-                            addToCalendarLabel={t("addToCalendar")}
-                          />
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-
-                {currentAndLaterMonths.map((group) => (
-                  <div key={group.monthKey} className="flex flex-col gap-4">
-                    <h3 className="font-mono text-mono-s uppercase opacity-60">
-                      {formatMonthHeading(group.monthKey, locale)}
-                    </h3>
-                    <ul className="flex flex-col gap-3">
-                      {group.events.map((event) => (
-                        <EventRow
-                          key={event.id}
-                          event={event}
-                          past={isPastEvent(event, initialNowMs)}
-                          locale={locale}
-                          tentativeLabel={t("tentativeLabel")}
-                          addToCalendarLabel={t("addToCalendar")}
-                        />
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+                <div className="md:hidden">
+                  <EventAgenda events={filtered} initialNowMs={initialNowMs} />
                 </div>
               </>
             )}

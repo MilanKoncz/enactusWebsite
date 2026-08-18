@@ -96,6 +96,20 @@ function mockCalendarEvents(page: Page, events: unknown[]) {
   );
 }
 
+// The homepage bakes its calendar data into the static page at build time
+// (see the file's own top comment), so the very first paint reflects
+// whatever real, board-managed events existed at that build — not yet this
+// test's own mock. Every test needs the page to have settled onto the mock
+// before asserting anything, or a query can transiently match real data too
+// (this is what "waiting for the month to reach the mocked event's own
+// month" below, and this helper, both guard against).
+async function gotoWithCalendar(page: Page, events: unknown[]) {
+  await mockCalendarEvents(page, events);
+  const settled = page.waitForResponse((response) => response.url().includes("/api/calendar-events"));
+  await page.goto("/");
+  await settled;
+}
+
 // The month grid (>=md) and the agenda list (<md) render at the same time —
 // only one is ever visible, switched purely by CSS (EventCalendar.tsx's own
 // comment explains why: a hidden md:block/md:hidden pair, not a media-query
@@ -145,8 +159,7 @@ test.describe("homepage event calendar", () => {
     }
 
     test("shows exactly seven weekday column headers", async ({ page }) => {
-      await mockCalendarEvents(page, [GRID_EVENT]);
-      await page.goto("/");
+      await gotoWithCalendar(page, [GRID_EVENT]);
       await expect(page.getByRole("columnheader")).toHaveCount(7);
     });
 
@@ -171,8 +184,7 @@ test.describe("homepage event calendar", () => {
     }
 
     test("opens a day's events below the grid on click", async ({ page }) => {
-      await mockCalendarEvents(page, [GRID_EVENT]);
-      await page.goto("/");
+      await gotoWithCalendar(page, [GRID_EVENT]);
       await expect(monthHeadingLocator(page)).toHaveText(currentMonthLabel);
 
       await gridCellFor(page, GRID_EVENT.startDate).click();
@@ -181,8 +193,7 @@ test.describe("homepage event calendar", () => {
     });
 
     test("moves the roving focus with arrow keys and opens the day list with Enter", async ({ page }) => {
-      await mockCalendarEvents(page, [GRID_EVENT]);
-      await page.goto("/");
+      await gotoWithCalendar(page, [GRID_EVENT]);
       await expect(monthHeadingLocator(page)).toHaveText(currentMonthLabel);
 
       const start = page.locator('[role="gridcell"][tabindex="0"]');
@@ -195,8 +206,7 @@ test.describe("homepage event calendar", () => {
     });
 
     test("returns to the current month, with today selected, via the Heute button", async ({ page }) => {
-      await mockCalendarEvents(page, [GRID_EVENT]);
-      await page.goto("/");
+      await gotoWithCalendar(page, [GRID_EVENT]);
 
       const monthHeading = monthHeadingLocator(page);
       await expect(monthHeading).toHaveText(currentMonthLabel);
@@ -211,32 +221,45 @@ test.describe("homepage event calendar", () => {
     });
 
     test("has no automatically detectable accessibility violations", async ({ page }) => {
-      await mockCalendarEvents(page, [GRID_EVENT]);
-      await page.goto("/");
+      await gotoWithCalendar(page, [GRID_EVENT]);
       const results = await new AxeBuilder({ page }).analyze();
       expect(results.violations).toEqual([]);
     });
   });
 
-  // Still the full, unabridged agenda list at this point (it becomes the
-  // compact one-line-per-event mobile view in a follow-up commit) — these
-  // tests just confirm it still works, scoped to the viewport it's actually
-  // visible at now that the grid owns >=md.
+  // The compact mobile agenda: one collapsed line per event (day, color
+  // dot, title), the next upcoming one marked in place with a gold edge and
+  // a countdown rather than pulled into a separate card, and time/location/
+  // the full category badge/the ICS button held back behind a per-row
+  // disclosure until it's expanded.
   test.describe("Agenda (unter md)", () => {
     test.use({ viewport: { width: 390, height: 844 } });
 
-    test("highlights the soonest upcoming event with its date, category, and location", async ({ page }) => {
-      await mockCalendarEvents(page, ALL_EVENTS);
-      await page.goto("/");
+    test("marks the soonest upcoming event in place, with a countdown, no separate card", async ({ page }) => {
+      await gotoWithCalendar(page, ALL_EVENTS);
 
-      const highlight = page.getByRole("heading", { name: "Ideathon" });
-      await highlight.scrollIntoViewIfNeeded();
-      await expect(highlight).toBeVisible();
+      const row = page.getByRole("button", { name: /Ideathon/ });
+      await row.scrollIntoViewIfNeeded();
+      await expect(row).toBeVisible();
+      await expect(row.locator("..")).toHaveClass(/border-l-gold/);
+    });
+
+    test("keeps time, location, and the ICS link hidden until the row is expanded", async ({ page }) => {
+      await gotoWithCalendar(page, ALL_EVENTS);
+
+      const row = page.getByRole("button", { name: /Ideathon/ });
+      await row.scrollIntoViewIfNeeded();
+      await expect(row).toHaveAttribute("aria-expanded", "false");
+      await expect(page.getByText("Mannheim", { exact: true })).not.toBeVisible();
+
+      await row.click();
+      await expect(row).toHaveAttribute("aria-expanded", "true");
       await expect(page.getByText("Mannheim", { exact: true })).toBeVisible();
     });
 
-    test("links 'Zum Kalender hinzufügen' at the highlighted event's own ics route", async ({ page }) => {
-      await mockCalendarEvents(page, ALL_EVENTS);
+    test("links 'Zum Kalender hinzufügen' at the highlighted event's own ics route, once expanded", async ({
+      page,
+    }) => {
       // The route's own behaviour (folding, escaping, DTSTART/DTEND,
       // headers, the 404/500 cases) is covered end to end against real
       // request/response objects by tests/unit/lib/ics.test.ts and
@@ -245,31 +268,38 @@ test.describe("homepage event calendar", () => {
       // request bypasses normal fetch/XHR interception on some download
       // paths), so this only proves the rendered link's own wiring — that it
       // exists, is reachable, and points at the correct event's route.
-      await page.goto("/");
+      await gotoWithCalendar(page, ALL_EVENTS);
+
+      const row = page.getByRole("button", { name: /Ideathon/ });
+      await row.scrollIntoViewIfNeeded();
+      await row.click();
 
       const link = page.getByRole("link", { name: /Zum Kalender hinzufügen/ }).first();
-      await link.scrollIntoViewIfNeeded();
       await expect(link).toHaveAttribute("href", `/api/kalender/${NEXT_EVENT.id}/ics`);
     });
 
     test("narrows the agenda to a selected category via the filter chips", async ({ page }) => {
-      await mockCalendarEvents(page, ALL_EVENTS);
-      await page.goto("/");
+      await gotoWithCalendar(page, ALL_EVENTS);
 
-      const chip = page.getByRole("button", { name: /Bewerbung/ });
+      // Scoped to the filter row itself — an agenda row's own disclosure
+      // button also carries its event's category name as sr-only text (so
+      // it announces the category even collapsed), which otherwise collides
+      // with a bare getByRole("button", { name: /Bewerbung/ }) query.
+      const chip = page.getByRole("group", { name: "Nach Kategorie filtern" }).getByRole("button", {
+        name: /Bewerbung/,
+      });
       await chip.scrollIntoViewIfNeeded();
       await chip.click();
       await expect(chip).toHaveAttribute("aria-pressed", "true");
 
       await expect(page.getByText("Kick-off")).toBeVisible();
-      await expect(page.getByRole("heading", { name: "Ideathon" })).not.toBeVisible();
+      await expect(page.getByRole("button", { name: /Ideathon/ })).not.toBeVisible();
     });
 
     test("keeps a month before the current one collapsed until 'Frühere Termine' is opened", async ({
       page,
     }) => {
-      await mockCalendarEvents(page, ALL_EVENTS);
-      await page.goto("/");
+      await gotoWithCalendar(page, ALL_EVENTS);
 
       await expect(page.getByText("Q-Summit")).not.toBeVisible();
 
@@ -281,17 +311,22 @@ test.describe("homepage event calendar", () => {
       await expect(page.getByText("Q-Summit")).toBeVisible();
     });
 
-    test("marks a tentative event with its explanatory note", async ({ page }) => {
-      await mockCalendarEvents(page, ALL_EVENTS);
-      await page.goto("/");
+    test("marks a tentative event with a dashed border, its explanatory note visible once expanded", async ({
+      page,
+    }) => {
+      await gotoWithCalendar(page, ALL_EVENTS);
 
-      await expect(page.getByText("Termin steht noch nicht fest").first()).toBeVisible();
+      const row = page.getByRole("button", { name: /ConnectUs/ });
+      await row.scrollIntoViewIfNeeded();
+      await expect(row.locator("..")).toHaveClass(/border-dashed/);
+
+      await row.click();
+      await expect(page.getByText("Termin steht noch nicht fest")).toBeVisible();
     });
   });
 
   test("shows a friendly empty state when the calendar has no events at all", async ({ page }) => {
-    await mockCalendarEvents(page, []);
-    await page.goto("/");
+    await gotoWithCalendar(page, []);
 
     await expect(page.getByText("Aktuell stehen keine Termine im Kalender.")).toBeVisible();
   });
@@ -300,7 +335,7 @@ test.describe("homepage event calendar", () => {
     page,
   }) => {
     await page.setViewportSize({ width: 360, height: 800 });
-    await mockCalendarEvents(page, [
+    await gotoWithCalendar(page, [
       NEXT_EVENT,
       LATER_EVENT,
       PAST_EVENT,
@@ -309,7 +344,6 @@ test.describe("homepage event calendar", () => {
       { ...NEXT_EVENT, id: "66666666-6666-6666-6666-666666666666", category: "journeys", title: "Journey" },
       { ...NEXT_EVENT, id: "77777777-7777-7777-7777-777777777777", category: "workshops", title: "Workshop" },
     ]);
-    await page.goto("/");
 
     const { scrollWidth, clientWidth } = await page.evaluate(() => ({
       scrollWidth: document.documentElement.scrollWidth,
@@ -324,8 +358,7 @@ test.describe("homepage event calendar", () => {
     // ring rendered just outside a chip's border box used to be cut off at
     // the row's own top/bottom edge whenever there wasn't enough padding to
     // hold it.
-    await mockCalendarEvents(page, ALL_EVENTS);
-    await page.goto("/");
+    await gotoWithCalendar(page, ALL_EVENTS);
 
     const row = page.getByRole("group", { name: "Nach Kategorie filtern" });
     const chip = row.getByRole("button").first();
@@ -343,8 +376,7 @@ test.describe("homepage event calendar", () => {
   });
 
   test("has no automatically detectable accessibility violations", async ({ page }) => {
-    await mockCalendarEvents(page, ALL_EVENTS);
-    await page.goto("/");
+    await gotoWithCalendar(page, ALL_EVENTS);
     const results = await new AxeBuilder({ page }).analyze();
     expect(results.violations).toEqual([]);
   });
