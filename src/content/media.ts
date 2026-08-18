@@ -2,10 +2,10 @@ import { z } from "zod";
 
 /**
  * The homepage hero's video/poster/mobile-image triple. Video and poster are
- * real (board media handover, 2026-08-16); mobileImageSrc still has no still
- * frame, so the hero shows no image below the `md` breakpoint (see
- * ASSETS-TODO.md). width/height match the delivered video's aspect ratio.
- * `sources` holds one entry per encoded format (e.g. webm, mp4).
+ * real (board media handover, 2026-08-16); mobileImageSrc still has no
+ * dedicated still frame, so HomeHero falls back to posterSrc below the `md`
+ * breakpoint (see ASSETS-TODO.md). width/height match the delivered video's
+ * aspect ratio. `sources` holds one entry per encoded format (e.g. webm, mp4).
  */
 
 const videoSourceSchema = z.object({

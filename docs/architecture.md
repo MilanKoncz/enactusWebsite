@@ -76,9 +76,13 @@ one. `admin` is a separate group precisely so it does *not* get that chrome.
 This is the one boundary to internalize before changing anything:
 
 - **`src/content/*.ts`** holds structure and facts that aren't prose: board
-  roster, project list, KPÍs, partner tiers, the recruiting window. Every
-  file is Zod-validated, so a typo during a board handover fails the build
-  loudly instead of breaking a page silently.
+  roster, project list, KPIs, partner tiers, the calendar's category list.
+  Every file is Zod-validated, so a typo during a board handover fails the
+  build loudly instead of breaking a page silently. Data the board edits
+  often — application windows, calendar events — has moved out of
+  `content/` into the database instead, managed from the matching admin
+  page rather than a code change; `docs/content-guide.md` says which is
+  which per feature.
 - **`src/messages/{de,en}.json`** holds every word a visitor reads:
   headlines, button labels, error messages, FAQ answers, even the bios and
   descriptions *for* the people/projects listed in `content/`.
@@ -115,10 +119,10 @@ limiting, is in `docs/engineering.md`.
 
 ## The admin area
 
-Eight sections under `[locale]/admin` — applications, failed mails,
-application windows, the reminder list, contact messages, deletion
-requests, system status, plus an overview. Full list and what each is for:
-`docs/deployment.md`'s "The admin area".
+Nine sections under `[locale]/admin` — applications, failed mails,
+application windows, calendar events, the reminder list, contact messages,
+deletion requests, system status, plus an overview. Full list and what each
+is for: `docs/deployment.md`'s "The admin area".
 
 Gated by comparing a password (`ADMIN_PASSWORD`) against a signed, httpOnly
 session cookie (`src/lib/adminAuth.ts`, signed with `ADMIN_SESSION_SECRET`)
@@ -129,9 +133,12 @@ each page's own query. Excluded from `robots.ts` and `sitemap.ts`, with
 `noindex` metadata besides, and `proxy.ts` 404s the `/en` variants.
 
 `src/components/admin/` holds the pieces shared across sections
-(`AdminNav`, `AdminTable`, `AdminLogin`, and the client components that
-perform mutations). `ADMIN_SECTIONS` in `adminSections.ts` is the single
-list the nav and the overview both read.
+(`AdminNav`, `AdminTable`, `AdminLogin`, `StatusIndicator` for the
+ok/warning/error/neutral color+icon+text vocabulary, and the client
+components that perform mutations). `ADMIN_SECTIONS` in `adminSections.ts`
+is the single list the nav and the overview both read — each entry also
+carries its own lucide icon, so the two can't drift to different icons for
+the same section.
 
 ## Testing layers
 

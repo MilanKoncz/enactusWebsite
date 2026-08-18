@@ -192,18 +192,25 @@ nothing for the deployed site.
 
 `/admin` (German URLs only — `proxy.ts` returns 404 for the `/en`-prefixed
 variants, since board tooling has no translated UI worth a second URL).
-Eight sections, all behind the same gate:
+Nine sections, all behind the same gate:
 
 | Path | What it's for |
 | --- | --- |
-| `/admin` | Overview linking every section |
+| `/admin` | Overview linking every section, plus a compact status bar (applications in the running window, failed mails, whether a future application window is scheduled, last cron run, next calendar event) |
 | `/admin/bewerbungen` | Applications by recruiting semester, CSV per group |
 | `/admin/mails` | Every failed send across all three tables, with a resend |
 | `/admin/bewerbungsfenster` | Create, edit, delete application windows |
+| `/admin/termine` | Create, edit, delete the homepage's calendar events |
 | `/admin/erinnerungen` | Reminder list, confirmed/unconfirmed/unsubscribed, CSV |
 | `/admin/kontakt` | Contact messages and their delivery status |
 | `/admin/loeschanfragen` | GDPR Art. 15 and 17 for one address |
 | `/admin/system` | Cron history, dependency reachability, row counts |
+
+Status everywhere — the overview bar, `/admin/system`, and the mail-status
+column on `/admin/bewerbungen` and `/admin/kontakt` — goes through one shared
+`StatusIndicator` component (`components/admin/StatusIndicator.tsx`): four
+levels (ok/warning/error/neutral), each pairing a color with an icon and the
+label text, never color alone.
 
 Gated by `ADMIN_PASSWORD` with the session cookie signed by
 `ADMIN_SESSION_SECRET` (both above) — no account system, one shared
