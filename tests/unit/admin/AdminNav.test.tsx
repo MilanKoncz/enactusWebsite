@@ -41,6 +41,15 @@ describe("AdminNav", () => {
     expect(overview).not.toHaveAttribute("aria-current");
   });
 
+  it("gives every link, including the overview, its own icon", () => {
+    mockPathname.mockReturnValue("/admin");
+    renderWithIntl(<AdminNav />);
+
+    for (const link of screen.getAllByRole("link")) {
+      expect(link.querySelector("svg")).toBeInTheDocument();
+    }
+  });
+
   it("exposes itself as a named navigation landmark", () => {
     mockPathname.mockReturnValue("/admin");
     renderWithIntl(<AdminNav />);

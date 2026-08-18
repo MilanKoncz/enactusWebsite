@@ -5,6 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { AdminLogin } from "@/components/admin/AdminLogin";
 import { AdminTable } from "@/components/admin/AdminTable";
+import { MailStatusIndicator } from "@/components/admin/StatusIndicator";
 import { isAdminAuthenticated } from "@/lib/adminSession";
 import { listContactMessages } from "@/lib/db";
 
@@ -55,7 +56,11 @@ export default async function AdminContactMessagesPage({ params }: PageProps) {
               <span className="opacity-60">{message.email}</span>
             </span>,
             message.subject ?? "—",
-            t(`mailStatus.${message.mailStatus}`),
+            <MailStatusIndicator
+              key="mailStatus"
+              status={message.mailStatus}
+              label={t(`mailStatus.${message.mailStatus}`)}
+            />,
           ],
         }))}
       />

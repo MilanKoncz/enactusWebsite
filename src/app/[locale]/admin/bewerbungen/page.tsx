@@ -6,6 +6,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { RawLink } from "@/lib/navigation";
 import { AdminLogin } from "@/components/admin/AdminLogin";
 import { AdminTable } from "@/components/admin/AdminTable";
+import { MailStatusIndicator } from "@/components/admin/StatusIndicator";
 import { isAdminAuthenticated } from "@/lib/adminSession";
 import { listApplications } from "@/lib/db";
 import { groupApplicationsBySemester } from "@/lib/adminApplications";
@@ -72,7 +73,11 @@ export default async function AdminBewerbungenPage({ params }: PageProps) {
                 application.email,
                 application.studyProgram,
                 dateFormatter.format(application.createdAt),
-                t(`mailStatus.${application.mailStatus}`),
+                <MailStatusIndicator
+                  key="mailStatus"
+                  status={application.mailStatus}
+                  label={t(`mailStatus.${application.mailStatus}`)}
+                />,
               ],
             }))}
           />

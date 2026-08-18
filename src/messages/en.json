@@ -1088,6 +1088,22 @@
         "contactMessages": "Incoming contact messages with their delivery status.",
         "deletionRequests": "Find and delete personal data for an address (GDPR Art. 15 and 17).",
         "system": "Last cron run, database and Resend reachability, row counts."
+      },
+      "statusBar": {
+        "applicationsHeading": "Applications in the running window",
+        "applicationsNoWindow": "No window open",
+        "failedMailsHeading": "Failed mails",
+        "failedMailsOk": "All delivered",
+        "failedMailsWarning": "{count} to review",
+        "futureWindowHeading": "Next application window",
+        "futureWindowOk": "Scheduled",
+        "futureWindowWarning": "Not scheduled yet",
+        "cronHeading": "Deletion routine",
+        "cronOk": "Last ran on {when}",
+        "cronNeverRan": "Never ran",
+        "cronStaleLabel": "Hasn't run since {when}",
+        "nextEventHeading": "Next event",
+        "nextEventEmpty": "No events scheduled"
       }
     },
     "applications": {

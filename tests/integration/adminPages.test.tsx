@@ -11,11 +11,19 @@ import { renderWithIntl } from "../fixtures/intl";
  */
 const listApplications = vi.fn();
 const listCalendarEvents = vi.fn();
+const listFailedMails = vi.fn();
+const listCronRuns = vi.fn();
+const listRecruitingWindows = vi.fn();
+const countFutureRecruitingWindows = vi.fn();
 const cookieGet = vi.fn();
 
 vi.mock("@/lib/db", () => ({
   listApplications: (...args: unknown[]) => listApplications(...args),
   listCalendarEvents: (...args: unknown[]) => listCalendarEvents(...args),
+  listFailedMails: (...args: unknown[]) => listFailedMails(...args),
+  listCronRuns: (...args: unknown[]) => listCronRuns(...args),
+  listRecruitingWindows: (...args: unknown[]) => listRecruitingWindows(...args),
+  countFutureRecruitingWindows: (...args: unknown[]) => countFutureRecruitingWindows(...args),
 }));
 
 vi.mock("next/headers", () => ({
@@ -53,6 +61,14 @@ function params() {
 
 beforeEach(() => {
   process.env.ADMIN_SESSION_SECRET = "a-signing-secret-for-page-tests";
+  // Sensible empty defaults for the overview page's status bar — only the
+  // tests that actually assert on these values override them.
+  listApplications.mockResolvedValue([]);
+  listCalendarEvents.mockResolvedValue([]);
+  listFailedMails.mockResolvedValue([]);
+  listCronRuns.mockResolvedValue([]);
+  listRecruitingWindows.mockResolvedValue([]);
+  countFutureRecruitingWindows.mockResolvedValue(0);
 });
 
 afterEach(() => {
@@ -196,6 +212,8 @@ describe("/admin (overview page)", () => {
     const tree = await Page({ params: params() });
 
     expect(JSON.stringify(tree)).not.toContain("/admin/loeschanfragen");
+    expect(listApplications).not.toHaveBeenCalled();
+    expect(listFailedMails).not.toHaveBeenCalled();
   });
 
   it("links every admin section once authenticated", async () => {
@@ -206,8 +224,37 @@ describe("/admin (overview page)", () => {
 
     const { ADMIN_SECTIONS } = await import("@/components/admin/adminSections");
     for (const section of ADMIN_SECTIONS) {
-      const links = screen.getAllByRole("link").map((link) => link.getAttribute("href"));
-      expect(links).toContain(section.href);
+      const links = screen.getAllByRole("link");
+      const hrefs = links.map((link) => link.getAttribute("href"));
+      expect(hrefs).toContain(section.href);
+      const link = links.find((candidate) => candidate.getAttribute("href") === section.href)!;
+      expect(link.querySelector("svg")).toBeInTheDocument();
     }
+  });
+
+  it("shows the status bar's real figures once authenticated", async () => {
+    cookieGet.mockReturnValue({ value: await validSessionCookie() });
+    listApplications.mockResolvedValue([
+      { ...APPLICATION, recruitingSemester: "HWS26" },
+      { ...APPLICATION, id: "2", recruitingSemester: "HWS26" },
+    ]);
+    listFailedMails.mockResolvedValue([{ source: "applications", id: "1" }]);
+    listRecruitingWindows.mockResolvedValue([
+      { id: "w1", semester: "HWS26", start: "2000-01-01T00:00:00Z", end: "2099-01-01T00:00:00Z" },
+    ]);
+    countFutureRecruitingWindows.mockResolvedValue(0);
+    listCronRuns.mockResolvedValue([]);
+    listCalendarEvents.mockResolvedValue([]);
+
+    const { default: Page } = await import("@/app/[locale]/admin/page");
+    render(await Page({ params: params() }));
+
+    // Two applications in the (mocked, always-open) HWS26 window.
+    expect(screen.getByText("2")).toBeInTheDocument();
+    expect(screen.getByText("HWS26")).toBeInTheDocument();
+    // One failed mail, reported as needing attention.
+    expect(screen.getByText("1 zu prüfen")).toBeInTheDocument();
+    // No future window scheduled — the warning tier, not silently absent.
+    expect(screen.getByText("Noch nicht eingetragen")).toBeInTheDocument();
   });
 });

@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { requireLocale, resolveLocale } from "@/i18n/requireLocale";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Card } from "@/components/ui/Card";
 import { AdminLogin } from "@/components/admin/AdminLogin";
 import { AdminTable } from "@/components/admin/AdminTable";
+import { StatusIndicator } from "@/components/admin/StatusIndicator";
 import { isAdminAuthenticated } from "@/lib/adminSession";
 import { countRowsPerTable, listCronRuns } from "@/lib/db";
 import type { CronRun, TableCounts } from "@/lib/db";
@@ -117,7 +118,11 @@ export default async function AdminSystemPage({ params }: PageProps) {
             key: run.id,
             cells: [
               dateFormatter.format(run.startedAt),
-              <StatusPill key="ok" ok={run.ok} okLabel={t("system.ok")} failLabel={t("system.failed")} />,
+              <StatusIndicator
+                key="ok"
+                level={run.ok ? "ok" : "error"}
+                label={run.ok ? t("system.ok") : t("system.failed")}
+              />,
               <span key="counts" className="font-mono text-mono-s">
                 {t("system.deletedCounts", {
                   applications: run.deletedApplications,
@@ -138,25 +143,21 @@ export default async function AdminSystemPage({ params }: PageProps) {
         <h2 className="text-heading-3 font-display">{t("system.servicesHeading")}</h2>
         <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <li>
-            <Card className="flex items-start gap-3">
-              <StatusIcon ok={databaseReachable} />
-              <span>
-                <span className="block text-body-m">{t("system.database")}</span>
-                <span className="block text-body-s opacity-60">
-                  {databaseReachable ? t("system.reachable") : t("system.unreachable")}
-                </span>
-              </span>
+            <Card className="flex flex-col gap-1">
+              <span className="text-body-m">{t("system.database")}</span>
+              <StatusIndicator
+                level={databaseReachable ? "ok" : "error"}
+                label={databaseReachable ? t("system.reachable") : t("system.unreachable")}
+              />
             </Card>
           </li>
           <li>
-            <Card className="flex items-start gap-3">
-              <StatusIcon ok={resend.reachable} />
-              <span>
-                <span className="block text-body-m">{t("system.resend")}</span>
-                <span className="block text-body-s opacity-60">
-                  {resend.reachable ? t("system.reachable") : (resend.detail ?? t("system.unreachable"))}
-                </span>
-              </span>
+            <Card className="flex flex-col gap-1">
+              <span className="text-body-m">{t("system.resend")}</span>
+              <StatusIndicator
+                level={resend.reachable ? "ok" : "error"}
+                label={resend.reachable ? t("system.reachable") : (resend.detail ?? t("system.unreachable"))}
+              />
             </Card>
           </li>
         </ul>
@@ -179,16 +180,4 @@ export default async function AdminSystemPage({ params }: PageProps) {
       </section>
     </Container>
   );
-}
-
-function StatusIcon({ ok }: { ok: boolean }) {
-  return ok ? (
-    <CheckCircle2 aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-moss" />
-  ) : (
-    <XCircle aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-oxblood" />
-  );
-}
-
-function StatusPill({ ok, okLabel, failLabel }: { ok: boolean; okLabel: string; failLabel: string }) {
-  return <span className={ok ? "text-moss" : "text-oxblood"}>{ok ? okLabel : failLabel}</span>;
 }

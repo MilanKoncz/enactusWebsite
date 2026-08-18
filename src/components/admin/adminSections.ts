@@ -1,7 +1,19 @@
+import {
+  Activity,
+  BellRing,
+  CalendarDays,
+  CalendarRange,
+  FileText,
+  MailWarning,
+  MessageSquare,
+  Trash2,
+} from "lucide-react";
+
 /**
  * The admin area's sections, in navigation order. One list, read by both
  * the layout's nav (AdminNav.tsx) and the overview page — so a new section
- * can't appear in one and be missing from the other.
+ * can't appear in one and be missing from the other, and so its icon can't
+ * drift between the two either.
  *
  * `as const` is load-bearing, not decoration: `messageKey` has to be a
  * union of string literals rather than `string`, or next-intl's typed
@@ -15,14 +27,14 @@
  * hrefs for RawLink, not next-intl routes.
  */
 export const ADMIN_SECTIONS = [
-  { href: "/admin/bewerbungen", messageKey: "applications" },
-  { href: "/admin/mails", messageKey: "failedMails" },
-  { href: "/admin/bewerbungsfenster", messageKey: "recruitingWindows" },
-  { href: "/admin/termine", messageKey: "calendarEvents" },
-  { href: "/admin/erinnerungen", messageKey: "reminders" },
-  { href: "/admin/kontakt", messageKey: "contactMessages" },
-  { href: "/admin/loeschanfragen", messageKey: "deletionRequests" },
-  { href: "/admin/system", messageKey: "system" },
+  { href: "/admin/bewerbungen", messageKey: "applications", icon: FileText },
+  { href: "/admin/mails", messageKey: "failedMails", icon: MailWarning },
+  { href: "/admin/bewerbungsfenster", messageKey: "recruitingWindows", icon: CalendarRange },
+  { href: "/admin/termine", messageKey: "calendarEvents", icon: CalendarDays },
+  { href: "/admin/erinnerungen", messageKey: "reminders", icon: BellRing },
+  { href: "/admin/kontakt", messageKey: "contactMessages", icon: MessageSquare },
+  { href: "/admin/loeschanfragen", messageKey: "deletionRequests", icon: Trash2 },
+  { href: "/admin/system", messageKey: "system", icon: Activity },
 ] as const;
 
 export type AdminSection = (typeof ADMIN_SECTIONS)[number];

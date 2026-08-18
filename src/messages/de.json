@@ -1088,6 +1088,22 @@
         "contactMessages": "Eingegangene Kontaktanfragen mit Versandstatus.",
         "deletionRequests": "Personenbezogene Daten zu einer Adresse suchen und löschen (Art. 15 und 17 DSGVO).",
         "system": "Letzte Cron-Ausführung, Erreichbarkeit von Datenbank und Resend, Zeilenzahlen."
+      },
+      "statusBar": {
+        "applicationsHeading": "Bewerbungen im laufenden Fenster",
+        "applicationsNoWindow": "Kein Fenster offen",
+        "failedMailsHeading": "Fehlgeschlagene Mails",
+        "failedMailsOk": "Alle zugestellt",
+        "failedMailsWarning": "{count} zu prüfen",
+        "futureWindowHeading": "Nächstes Bewerbungsfenster",
+        "futureWindowOk": "Eingetragen",
+        "futureWindowWarning": "Noch nicht eingetragen",
+        "cronHeading": "Löschroutine",
+        "cronOk": "Zuletzt am {when}",
+        "cronNeverRan": "Noch nie gelaufen",
+        "cronStaleLabel": "Seit {when} nicht mehr gelaufen",
+        "nextEventHeading": "Nächster Termin",
+        "nextEventEmpty": "Keine Termine eingetragen"
       }
     },
     "applications": {

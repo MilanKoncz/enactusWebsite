@@ -228,6 +228,34 @@ the run ends, not left behind as permanent documentation.
   Bereich", Einwilligung) und der Erfolgszustand nach Absenden — alle lesbar,
   keine Überlappung, kein Overflow. Nichts zu reparieren; hier bestätigt,
   nicht neu gebaut.
+- **Aufgabe C fertig, CI grün.** Ab hier: Aufgabe D (Adminbereich aufwerten).
+- **D: ein gemeinsames Status-Vokabular statt zwei lokaler.** Neue
+  `components/admin/StatusIndicator.tsx` mit vier Stufen (ok/warning/
+  error/neutral), jede mit eigenem Icon UND eigener Farbe UND dem
+  übergebenen Text — Farbe ist nirgends allein das Signal. `/admin/system`s
+  bisherige lokale `StatusIcon`/`StatusPill` (nur ok/fail) darauf umgestellt,
+  `MailStatusIndicator` (pending→neutral, sent→ok, failed→error) neu in
+  `/admin/bewerbungen` und `/admin/kontakt`s Mailstatus-Spalte eingesetzt,
+  die bisher reiner Text ohne jede Farbe war.
+- **D: Icons zentral in `adminSections.ts` statt separat in `AdminNav.tsx`
+  gepflegt.** Jeder der acht Bereiche trägt sein Icon jetzt direkt am
+  Registry-Eintrag (`Record`-Typ zwingt ohnehin zur Vollständigkeit) — `AdminNav`
+  und die Übersichtsseite lesen `section.icon` statt zwei Kopien derselben
+  Zuordnung zu riskieren.
+- **D: neue Statusleiste auf `/admin`** — genau die fünf im Auftrag genannten
+  Signale (Bewerbungen im laufenden Fenster, fehlgeschlagene Mails,
+  zukünftiges Bewerbungsfenster vorhanden, Löschroutine zuletzt gelaufen,
+  nächster Termin), als eigene, datenlose Präsentationskomponente
+  (`AdminStatusBar.tsx`) — die Seite holt und verrechnet die Daten
+  (jede Abfrage einzeln abgesichert, eine fehlschlagende darf die anderen
+  vier nicht mitreißen, gleiches Muster wie `/admin/system`), die Komponente
+  rendert nur. „Kein Fenster offen" und „kein Termin" sind neutral (Uhr-Icon),
+  nicht rot — es ist kein Fehler, nur eine Tatsache.
+- **D: bei 390px an allen neun Adminseiten geprüft** (Session-Cookie direkt
+  gesetzt, nicht über das Login-Formular, um keinen echten Login-Versuch zu
+  brauchen) — kein Seiten-Scroll zur Seite irgendwo; einzelne breite Tabellen
+  scrollen weiterhin nur innerhalb ihres eigenen Rahmens
+  (`AdminTable`s dokumentiertes, bestehendes Verhalten, nicht neu).
 - **`Date.now()` vs `new Date().getTime()` und die purity lint.** Both
   `page.tsx` (A3) and `admin/termine/page.tsx` (A5) needed "now" outside a
   component; `Date.now()` directly in a component body trips
