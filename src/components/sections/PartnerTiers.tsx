@@ -1,10 +1,11 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
+import { GateMarker } from "@/components/ui/GateMarker";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { partners } from "@/content/partners";
+import { partners, type Partner } from "@/content/partners";
 
 // Canonical order, not the order tiers happen to appear in content/partners.ts
 // — "Advisor" is a real fourth model (see the old site's own "Modelle einer
@@ -26,6 +27,12 @@ const TIER_MESSAGE_KEY: Record<TierKey, "knowledge" | "flagship" | "sponsoring" 
 // (CLAUDE.md's brief for this page) — every tier gets its own real
 // description of what that partnership model actually involves, pulled
 // from the old site, before the logos ever appear.
+//
+// Each tier heading is a GateMarker rather than a plain <h3> — the same
+// heading-as-signature-element pattern PartnerIntro's four benefit cards
+// already use. Its rule doubles as the separator the board asked for
+// between tiers: no extra divider element needed when the heading itself
+// carries one.
 export function PartnerTiers() {
   const t = useTranslations("PartnerPage");
   const tTiers = useTranslations("PartnerPage.tiers");
@@ -40,42 +47,19 @@ export function PartnerTiers() {
           const tierPartners = partners.filter((partner) => partner.tier === tier);
           return (
             <div key={tier} className="flex flex-col gap-6">
-              <div className="flex flex-col gap-2">
-                <h3 className="text-heading-2 font-display">{tTiers(`${key}.title`)}</h3>
+              <div className="flex flex-col gap-3">
+                <GateMarker as="h3" label={tTiers(`${key}.title`)} />
                 <p className="max-w-prose text-body-s opacity-70">{tTiers(`${key}.description`)}</p>
               </div>
               {tierPartners.length > 0 ? (
-                <ul className="flex flex-wrap gap-x-10 gap-y-6">
+                // Equal-height fields (h-32) so a wide landscape logo and a
+                // near-square mark render at the same visual weight instead
+                // of whichever format happens to be tallest dictating the
+                // row's height — board feedback: logos were too small and
+                // the grid felt cramped.
+                <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                   {tierPartners.map((partner) => (
-                    <li key={partner.slug}>
-                      {partner.url ? (
-                        <a
-                          href={partner.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={tTiers("websiteLabel", { name: partner.name })}
-                          className="flex flex-col items-center gap-2 transition-transform duration-[var(--duration-fast)] ease-signature hover:-translate-y-px focus-visible:-translate-y-px"
-                        >
-                          {partner.logo && (
-                            <span className="relative block h-12 w-40">
-                              <Image src={partner.logo} alt="" fill className="object-contain" />
-                            </span>
-                          )}
-                          <span className="text-body-s font-medium">{partner.name}</span>
-                        </a>
-                      ) : (
-                        <div className="flex flex-col items-center gap-2">
-                          {partner.logo && (
-                            <span className="relative block h-12 w-40">
-                              <Image src={partner.logo} alt="" fill className="object-contain" />
-                            </span>
-                          )}
-                          <PlaceholderMark hint={tPlaceholder("missingHint")} className="text-body-s font-medium">
-                            {partner.name}
-                          </PlaceholderMark>
-                        </div>
-                      )}
-                    </li>
+                    <TierLogo key={partner.slug} partner={partner} websiteLabel={tTiers("websiteLabel", { name: partner.name })} placeholderHint={tPlaceholder("missingHint")} />
                   ))}
                 </ul>
               ) : (
@@ -88,5 +72,57 @@ export function PartnerTiers() {
         })}
       </Container>
     </Section>
+  );
+}
+
+// A confirmed partner (has a url) is a clean, big logo tile — no caption,
+// same restraint as the homepage marquee. An unconfirmed one (mcei — see
+// content/partners.ts) keeps the visible PlaceholderMark name it always
+// had: the point of that mark is to flag "not linked because unverified,"
+// which a caption-less tile would quietly lose.
+function TierLogo({
+  partner,
+  websiteLabel,
+  placeholderHint,
+}: {
+  partner: Partner;
+  websiteLabel: string;
+  placeholderHint: string;
+}) {
+  const logo = partner.logo && (
+    <span className="relative block h-full w-full">
+      <Image
+        src={partner.logo}
+        alt=""
+        fill
+        sizes="(min-width: 1024px) 20vw, (min-width: 640px) 28vw, 40vw"
+        className="object-contain"
+      />
+    </span>
+  );
+
+  if (partner.url) {
+    return (
+      <li className="flex h-32 items-center justify-center rounded-md border border-ink/10 bg-paper p-6">
+        <a
+          href={partner.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={websiteLabel}
+          className="flex h-full w-full items-center justify-center transition-transform duration-[var(--duration-fast)] ease-signature hover:-translate-y-px focus-visible:-translate-y-px"
+        >
+          {logo || <span className="text-body-s font-medium">{partner.name}</span>}
+        </a>
+      </li>
+    );
+  }
+
+  return (
+    <li className="flex h-32 flex-col items-center justify-center gap-2 rounded-md border border-ink/10 bg-paper p-4">
+      {logo}
+      <PlaceholderMark hint={placeholderHint} className="text-body-s font-medium">
+        {partner.name}
+      </PlaceholderMark>
+    </li>
   );
 }
