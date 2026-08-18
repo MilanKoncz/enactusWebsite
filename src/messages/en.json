@@ -9,6 +9,7 @@
     "prozess": "Process",
     "projekte": "Projects",
     "events": "Events",
+    "termine": "Calendar",
     "partner": "Partners",
     "kontakt": "Contact",
     "mitmachen": "Get involved",
@@ -64,7 +65,6 @@
   },
   "Home": {
     "dividers": {
-      "calendar": "Events",
       "alumni": "Voices from the network",
       "board": "Board"
     }

@@ -225,9 +225,9 @@ export function EventCalendarGrid({ events, initialNowMs }: EventCalendarGridPro
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h3 id={monthHeadingId} aria-live="polite" className="text-heading-2 font-display">
+        <h2 id={monthHeadingId} aria-live="polite" className="text-heading-2 font-display">
           {formatMonthHeading(viewMonth, locale)}
-        </h3>
+        </h2>
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -375,7 +375,7 @@ export function EventCalendarGrid({ events, initialNowMs }: EventCalendarGridPro
 
       {selectedDate && (
         <div className="flex flex-col gap-4">
-          <h4 className="text-heading-3 font-display">{t("grid.dayHeading", { date: formatDayLong(selectedDate, locale) })}</h4>
+          <h3 className="text-heading-3 font-display">{t("grid.dayHeading", { date: formatDayLong(selectedDate, locale) })}</h3>
           {dayEvents.length === 0 ? (
             <p className="rounded-md border border-dashed border-ink/20 p-6 text-center text-body-m opacity-60">
               {t("grid.dayEmpty")}

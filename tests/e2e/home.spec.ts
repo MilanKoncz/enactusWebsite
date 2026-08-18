@@ -305,7 +305,7 @@ test.describe("the golden thread", () => {
     await page.goto("/");
     expect(await page.locator("svg[data-thread]").count()).toBeGreaterThan(0);
 
-    for (const path of ["/projekte", "/events", "/partner", "/kontakt", "/prozess"]) {
+    for (const path of ["/projekte", "/events", "/termine", "/partner", "/kontakt", "/prozess"]) {
       await page.goto(path);
       expect(await page.locator("svg[data-thread]").count(), `${path} still draws the thread`).toBe(
         0,

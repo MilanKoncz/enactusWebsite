@@ -13,4 +13,36 @@ export const routing = defineRouting({
   localeDetection: false,
   // No read path for it once detection is off — keeps the site cookieless.
   localeCookie: false,
+  // Every route needs an entry here once any route does — next-intl types
+  // Link/getPathname/usePathname strictly against this map's keys as soon as
+  // it's non-empty, so a route left out here isn't just untranslated, it's a
+  // type error at every Link callsite. /termine is the one entry that
+  // actually differs per locale; everything else keeps an identical slug.
+  pathnames: {
+    "/": "/",
+    "/prozess": "/prozess",
+    "/projekte": "/projekte",
+    "/projekte/archiv": "/projekte/archiv",
+    "/projekte/[slug]": "/projekte/[slug]",
+    "/events": "/events",
+    "/termine": {
+      de: "/termine",
+      en: "/calendar",
+    },
+    "/partner": "/partner",
+    "/kontakt": "/kontakt",
+    "/mitmachen": "/mitmachen",
+    "/impressum": "/impressum",
+    "/datenschutz": "/datenschutz",
+    "/styleguide": "/styleguide",
+    "/admin": "/admin",
+    "/admin/mails": "/admin/mails",
+    "/admin/bewerbungsfenster": "/admin/bewerbungsfenster",
+    "/admin/erinnerungen": "/admin/erinnerungen",
+    "/admin/loeschanfragen": "/admin/loeschanfragen",
+    "/admin/termine": "/admin/termine",
+    "/admin/kontakt": "/admin/kontakt",
+    "/admin/bewerbungen": "/admin/bewerbungen",
+    "/admin/system": "/admin/system",
+  },
 });

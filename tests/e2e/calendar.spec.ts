@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
 /**
- * The homepage bakes its calendar data into the static page at build time
+ * /termine bakes its calendar data into the static page at build time
  * (by design — `next build` must succeed without a database, see
  * lib/calendarEvents.ts's fail-soft loader). EventCalendar.tsx re-fetches
  * the same data client-side on mount specifically so tests like these have
@@ -96,17 +96,17 @@ function mockCalendarEvents(page: Page, events: unknown[]) {
   );
 }
 
-// The homepage bakes its calendar data into the static page at build time
-// (see the file's own top comment), so the very first paint reflects
-// whatever real, board-managed events existed at that build — not yet this
-// test's own mock. Every test needs the page to have settled onto the mock
-// before asserting anything, or a query can transiently match real data too
-// (this is what "waiting for the month to reach the mocked event's own
-// month" below, and this helper, both guard against).
+// /termine bakes its calendar data into the static page at build time (see
+// the file's own top comment), so the very first paint reflects whatever
+// real, board-managed events existed at that build — not yet this test's own
+// mock. Every test needs the page to have settled onto the mock before
+// asserting anything, or a query can transiently match real data too (this
+// is what "waiting for the month to reach the mocked event's own month"
+// below, and this helper, both guard against).
 async function gotoWithCalendar(page: Page, events: unknown[]) {
   await mockCalendarEvents(page, events);
   const settled = page.waitForResponse((response) => response.url().includes("/api/calendar-events"));
-  await page.goto("/");
+  await page.goto("/termine");
   await settled;
 }
 
@@ -119,7 +119,7 @@ async function gotoWithCalendar(page: Page, events: unknown[]) {
 // project (Desktop Chromium or Mobile Safari) happens to run it, so both
 // views get real cross-engine coverage rather than only ever being tested
 // in the engine whose project viewport already happened to match.
-test.describe("homepage event calendar", () => {
+test.describe("/termine event calendar", () => {
   test.describe("Monatsraster (ab md)", () => {
     test.use({ viewport: { width: 1280, height: 900 } });
 
@@ -180,7 +180,7 @@ test.describe("homepage event calendar", () => {
     // level-3 heading query would also match several other section
     // headings (Pillars, Benefits) that happen to share the level.
     function monthHeadingLocator(page: Page) {
-      return page.locator('h3[aria-live="polite"]');
+      return page.locator('h2[aria-live="polite"]');
     }
 
     test("opens a day's events below the grid on click", async ({ page }) => {

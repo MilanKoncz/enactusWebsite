@@ -56,7 +56,9 @@ export function EventCalendar({ events, initialNowMs }: EventCalendarProps) {
   return (
     <Section className="relative isolate">
       <Container className="relative flex flex-col gap-10">
-        <SectionHeading eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
+        {/* /termine has no separate intro section — same reasoning as
+            EventsIntro.tsx: this carries the page's one h1. */}
+        <SectionHeading as="h1" eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
 
         {liveEvents.length === 0 ? (
           <p className="rounded-md border border-dashed border-ink/20 p-6 text-center text-body-m opacity-60">

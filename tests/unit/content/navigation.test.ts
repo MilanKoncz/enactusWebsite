@@ -6,11 +6,12 @@ describe("content/navigation", () => {
     expect(mainNav.some((item) => item.key === "home")).toBe(false);
   });
 
-  it("lists exactly the five header nav items in order", () => {
+  it("lists exactly the six header nav items in order", () => {
     expect(mainNav.map((item) => item.key)).toEqual([
       "prozess",
       "projekte",
       "events",
+      "termine",
       "partner",
       "kontakt",
     ]);
@@ -22,8 +23,8 @@ describe("content/navigation", () => {
     }
   });
 
-  it("lists Partner and Prozess under the footer's association column — no dedicated team route", () => {
-    expect(footerColumns.association.map((item) => item.key)).toEqual(["partner", "prozess"]);
+  it("lists Partner, Prozess and Termine under the footer's association column — no dedicated team route", () => {
+    expect(footerColumns.association.map((item) => item.key)).toEqual(["partner", "prozess", "termine"]);
   });
 
   it("lists Impressum and Datenschutz under the legal column", () => {

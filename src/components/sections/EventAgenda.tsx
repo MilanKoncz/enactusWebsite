@@ -165,7 +165,7 @@ export function EventAgenda({ events, initialNowMs }: EventAgendaProps) {
       {showEarlier &&
         earlierMonths.map((group) => (
           <div key={group.monthKey} className="flex flex-col gap-3">
-            <h3 className="font-mono text-mono-s uppercase opacity-60">{formatMonthHeading(group.monthKey, locale)}</h3>
+            <h2 className="font-mono text-mono-s uppercase opacity-60">{formatMonthHeading(group.monthKey, locale)}</h2>
             <ul className="flex flex-col gap-2">
               {group.events.map((event) => (
                 <AgendaRow
@@ -185,7 +185,7 @@ export function EventAgenda({ events, initialNowMs }: EventAgendaProps) {
 
       {currentAndLaterMonths.map((group) => (
         <div key={group.monthKey} className="flex flex-col gap-3">
-          <h3 className="font-mono text-mono-s uppercase opacity-60">{formatMonthHeading(group.monthKey, locale)}</h3>
+          <h2 className="font-mono text-mono-s uppercase opacity-60">{formatMonthHeading(group.monthKey, locale)}</h2>
           <ul className="flex flex-col gap-2">
             {group.events.map((event) => (
               <AgendaRow

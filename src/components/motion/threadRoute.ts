@@ -4,8 +4,6 @@ export type ThreadStop =
   | "kpis"
   | "pillars"
   | "benefits"
-  | "gate-calendar"
-  | "calendar"
   | "gate-alumni"
   | "alumni"
   | "gate-board"
@@ -115,18 +113,6 @@ const ROUTES: Record<ThreadStop, Record<ThreadWidth, Waypoints>> = {
     wide: { from: 86, bow: 64, to: 50 },
     narrow: narrowAt(7),
   },
-  "gate-calendar": {
-    wide: { from: 50, bow: 50, to: 50 },
-    narrow: narrowAt(MOBILE_AXIS),
-  },
-  // A calmer excursion than its neighbours on purpose: the calendar is a
-  // list to read, not a moment to look at, so the thread only drifts
-  // gently through it rather than repeating benefits' wide swing to the
-  // right.
-  calendar: {
-    wide: { from: 50, bow: 35, to: 50 },
-    narrow: narrowAt(5),
-  },
   "gate-alumni": {
     wide: { from: 50, bow: 50, to: 50 },
     narrow: narrowAt(MOBILE_AXIS),
@@ -158,8 +144,6 @@ export const HOME_STOPS: ThreadStop[] = [
   "kpis",
   "pillars",
   "benefits",
-  "gate-calendar",
-  "calendar",
   "gate-alumni",
   "alumni",
   "gate-board",

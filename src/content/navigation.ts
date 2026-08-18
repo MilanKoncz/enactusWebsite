@@ -11,6 +11,7 @@ const routeKeySchema = z.enum([
   "prozess",
   "projekte",
   "events",
+  "termine",
   "partner",
   "kontakt",
   "mitmachen",
@@ -21,35 +22,46 @@ export type RouteKey = z.infer<typeof routeKeySchema>;
 
 const hrefSchema = z.string().startsWith("/");
 
-const routesSchema = z.record(routeKeySchema, hrefSchema);
-export const routes = routesSchema.parse({
+// Written as a literal object (not the zod-inferred, string-widened result of
+// .parse()) so each key keeps its own literal path type — that's what lets
+// `<Link href={routes.termine}>` type-check against next-intl's pathnames
+// union in routing.ts without a cast. routesSchema.parse() below still runs,
+// purely as a build-time assertion that every value actually starts with
+// "/"; its return value is discarded on purpose.
+const ROUTE_HREFS = {
   home: "/",
   prozess: "/prozess",
   projekte: "/projekte",
   events: "/events",
+  termine: "/termine",
   partner: "/partner",
   kontakt: "/kontakt",
   mitmachen: "/mitmachen",
   impressum: "/impressum",
   datenschutz: "/datenschutz",
-} satisfies Record<RouteKey, string>);
+} as const satisfies Record<RouteKey, string>;
 
-const navItemSchema = z.object({
-  key: routeKeySchema,
-  href: hrefSchema,
-});
-export type NavItem = z.infer<typeof navItemSchema>;
+const routesSchema = z.record(routeKeySchema, hrefSchema);
+routesSchema.parse(ROUTE_HREFS);
+export const routes = ROUTE_HREFS;
 
-function navItem(key: RouteKey): NavItem {
-  return navItemSchema.parse({ key, href: routes[key] });
+export type NavItem = {
+  key: RouteKey;
+  href: (typeof ROUTE_HREFS)[RouteKey];
+};
+
+function navItem<K extends RouteKey>(key: K): { key: K; href: (typeof ROUTE_HREFS)[K] } {
+  return { key, href: routes[key] };
 }
 
-// The five header items. Deliberately no "home" entry — the logo is the home
-// link, per the brief ("bewusst KEIN separater Home-Menüpunkt").
+// The six header items. Deliberately no "home" entry — the logo is the home
+// link, per the brief ("bewusst KEIN separater Home-Menüpunkt"). "Termine"
+// sits right after "Events" (docs/content-guide.md).
 export const mainNav: NavItem[] = [
   navItem("prozess"),
   navItem("projekte"),
   navItem("events"),
+  navItem("termine"),
   navItem("partner"),
   navItem("kontakt"),
 ];
@@ -58,7 +70,7 @@ export const mainNav: NavItem[] = [
 // grid (see docs/engineering.md's old-URL redirect map — the old site's
 // /team now redirects to / instead of a same-named page here).
 export const footerColumns = {
-  association: [navItem("partner"), navItem("prozess")],
+  association: [navItem("partner"), navItem("prozess"), navItem("termine")],
   legal: [navItem("impressum"), navItem("datenschutz")],
 } as const;
 

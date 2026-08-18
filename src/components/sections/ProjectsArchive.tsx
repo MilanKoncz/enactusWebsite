@@ -34,7 +34,7 @@ export function ProjectsArchive() {
           {archivedProjects.map((project) => (
             <li key={project.slug}>
               <Link
-                href={`/projekte/${project.slug}`}
+                href={{ pathname: "/projekte/[slug]", params: { slug: project.slug } }}
                 className="flex h-full flex-col gap-4 rounded-md border border-ink/10 bg-paper p-5 transition-[border-color,transform] duration-[var(--duration-fast)] ease-signature hover:-translate-y-px hover:border-ink/20 focus-visible:-translate-y-px focus-visible:border-ink/20"
               >
                 <div className="relative">

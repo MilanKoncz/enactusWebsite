@@ -14,4 +14,9 @@ describe("localizedPath", () => {
   it("maps the root path to exactly /en, not /en/", () => {
     expect(localizedPath("/", "en")).toBe("/en");
   });
+
+  it("translates the one route whose English slug differs from German", () => {
+    expect(localizedPath("/termine", "de")).toBe("/termine");
+    expect(localizedPath("/termine", "en")).toBe("/en/calendar");
+  });
 });
