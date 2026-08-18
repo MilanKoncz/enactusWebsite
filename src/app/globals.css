@@ -413,6 +413,81 @@ h6 {
     }
   }
 
+  /* Pillars ("Was uns einzigartig macht") supporting text — title stays
+     visible at rest; the lead sentence and detail line are what this class
+     hides. A deliberate, board-confirmed reversal of the "always visible"
+     fix .hover-grow's own comment above describes (benefits and /mitmachen
+     keep that fix; only pillars changes back), so a desktop card now shows
+     just its photo and heading at rest.
+
+     Base rule is fully visible — the same no-JS/no-`animation-timeline`/
+     reduced-motion fallback `.reveal` and `.hover-grow` use, so nothing here
+     is ever `display:none` or `visibility:hidden`: a screen reader always
+     gets the sentence read out regardless of the pointer/hover state below,
+     since opacity alone never removes content from the accessibility tree.
+
+     Desktop hides it behind hover/focus, same three-part guard as
+     `.hover-grow` (`hover:hover`, `min-width:768px`, `prefers-reduced-
+     motion:no-preference` — touch, keyboard-only-on-a-touch-device, and
+     reduced motion all keep it always-on), transitioning over
+     --duration-calm rather than --duration-fast: this is a state the reader
+     chose to reveal, not a passing hover response.
+
+     Below `md` there's no hover to reveal it with, so a scroll-driven
+     animation unfolds it once the card reaches the viewport instead, reusing
+     the same `reveal` keyframe `.reveal` uses for this row's own entrance —
+     but as a *named* view-timeline (`--pillar-reveal`), not the bare
+     `view()` shorthand `.reveal` uses. The anonymous `view()` timeline
+     resolves against the animated element's own nearest ancestor scroll
+     container, and this card's `overflow-hidden` (needed to crop the photo
+     to the card's rounded corners) *is* one — so on this element `view()`
+     would measure visibility against that small clipped box instead of the
+     actual page scroller, reporting "fully visible" from first paint
+     regardless of real scroll position. Naming the timeline on the card
+     itself sidesteps that: the search for an ancestor scroll container then
+     starts one level higher, past the very box causing the problem, and
+     finds the real page scroller the way `.reveal` does implicitly. Once
+     revealed it stays revealed for the rest of a normal top-to-bottom
+     scroll — the reader would have to scroll back up past the card's own
+     entry point to see it collapse again, the same characteristic `.reveal`
+     and `.thread-reveal` above already accept. */
+  .pillar-detail {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (hover: hover) and (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+    .pillar-detail {
+      opacity: 0;
+      transform: translateY(0.5rem);
+      transition:
+        opacity var(--duration-calm) var(--ease-signature),
+        transform var(--duration-calm) var(--ease-signature);
+    }
+
+    .group:hover .pillar-detail,
+    .group:focus-within .pillar-detail {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+      .pillar-reveal-source {
+        view-timeline-name: --pillar-reveal;
+      }
+
+      .pillar-detail {
+        opacity: 0;
+        transform: translateY(1rem);
+        animation: reveal linear both;
+        animation-timeline: --pillar-reveal;
+        animation-range: entry 0% cover 30%;
+      }
+    }
+  }
+
   /* Board portraits' LinkedIn mark (BoardGrid.tsx). Visible and in place by
      default — the safe fallback for touch (no hover to enhance), keyboard
      use without a hovering pointer, and reduced motion. Only inside

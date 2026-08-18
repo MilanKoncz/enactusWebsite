@@ -53,20 +53,22 @@ describe("Pillars", () => {
     ).toBeInTheDocument();
   });
 
-  // No tab stop on the column: it holds nothing interactive now that the
-  // detail sentence is permanent, and a focus stop that only grows a box is
-  // noise in the tab order.
-  it("adds no tab stop of its own around a pillar column", () => {
+  // A tab stop on every column: the lead and detail text reveal on hover or
+  // keyboard focus (board decision, 2026-08-18), so a keyboard user needs
+  // something to focus to trigger the same reveal a mouse user gets from
+  // hovering.
+  it("adds a tab stop to every pillar column, one per pillar", () => {
     const { container } = renderWithIntl(<Pillars />);
-    expect(container.querySelectorAll('[tabindex="0"]')).toHaveLength(0);
+    expect(container.querySelectorAll('[tabindex="0"]')).toHaveLength(pillars.length);
   });
 
-  it("grows the column on hover instead of revealing anything", () => {
+  it("grows the column on hover and marks the lead/detail text as the group's hover-revealed content", () => {
     renderWithIntl(<Pillars />);
-    const column = screen
-      .getByRole("heading", { level: 3, name: "ESG-Charakter" })
-      .closest(".hover-grow");
+    const heading = screen.getByRole("heading", { level: 3, name: "ESG-Charakter" });
+    const column = heading.closest(".hover-grow");
     expect(column).toBeInTheDocument();
+    expect(column).toHaveClass("group");
+    expect(column!.querySelector(".pillar-detail")).toBeInTheDocument();
   });
 
   it("renders each column's background photo", () => {

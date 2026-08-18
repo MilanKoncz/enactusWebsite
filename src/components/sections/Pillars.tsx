@@ -45,14 +45,26 @@ export const PILLAR_IMAGE_FIT: Record<PillarKey, "cover" | "contain"> = {
 export const PILLAR_OVERLAY_OPACITY_CLASS = "bg-ink/85";
 export const PILLAR_OVERLAY_OPACITY = 0.85;
 
-// Title, lead, and the supporting detail sentence are all always visible.
-// Hover grows the column slightly and does nothing else (.hover-grow in
-// globals.css) — it used to fade the detail in, which hid real content from
-// exactly the desktop visitors who could trigger it. The scroll entrance
-// (Reveal) wraps the whole three-column row, so it reads as one arrival, not
-// three staggered ones. Each column doubles GateMarker as its own h3 — the
-// gold rule and mono label carry the heading instead of a separate, larger
-// one repeating the same two or three words right below it.
+// Board decision, 2026-08-18: back to a hover/focus reveal for this section
+// specifically (docs/design-system.md's "hover enhances, hover never hides"
+// still governs benefits and /mitmachen, which keep the always-visible fix —
+// this is a named, scoped exception, not a reopening of that rule). At rest
+// a desktop card now shows only its photo and heading; the lead sentence and
+// detail line reveal on hover or keyboard focus (.pillar-detail in
+// globals.css, transitioning over --duration-calm). Below `md`, with no
+// hover to reveal it, the same text unfolds via a scroll-driven
+// `animation-timeline: view()` animation instead, once the card reaches the
+// viewport. Both paths keep the text permanently in the accessibility tree —
+// only opacity/transform move, never `display`/`visibility` — and reduced
+// motion shows it immediately and permanently on every width.
+//
+// `tabIndex={0}` on the column is what makes the reveal reachable without a
+// pointer: without it, a keyboard user would have no way to trigger the
+// hover-only state at all. The scroll entrance (Reveal) still wraps the
+// whole three-column row, so it reads as one arrival, not three staggered
+// ones. Each column doubles GateMarker as its own h3 — the gold rule and
+// mono label carry the heading instead of a separate, larger one repeating
+// the same two or three words right below it.
 //
 // Each column now carries its own background photo (content/pillars.ts),
 // with the dark scrim above sitting between the photo and the text so
@@ -71,7 +83,8 @@ export function Pillars() {
           {pillars.map((pillar) => (
             <div
               key={pillar.key}
-              className="hover-grow relative isolate flex flex-col gap-4 overflow-hidden rounded-md bg-ink p-6"
+              tabIndex={0}
+              className="hover-grow group pillar-reveal-source relative isolate flex flex-col gap-4 overflow-hidden rounded-md bg-ink p-6"
             >
               {pillar.image && (
                 <>
@@ -95,23 +108,25 @@ export function Pillars() {
                   photo) decides the paint order instead. */}
               <div className="relative flex flex-col gap-4">
                 <GateMarker as="h3" label={t(`${pillar.key}.title`)} />
-                <p className="text-body-l">
-                  {pillar.key === "esg"
-                    ? t.rich("esg.lead", {
-                        sdgLink: (chunks) => (
-                          <a
-                            href="https://sdgs.un.org/goals"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="link-underline"
-                          >
-                            {chunks}
-                          </a>
-                        ),
-                      })
-                    : t(`${pillar.key}.lead`)}
-                </p>
-                <DetailText>{t(`${pillar.key}.detail`)}</DetailText>
+                <div className="pillar-detail flex flex-col gap-4">
+                  <p className="text-body-l">
+                    {pillar.key === "esg"
+                      ? t.rich("esg.lead", {
+                          sdgLink: (chunks) => (
+                            <a
+                              href="https://sdgs.un.org/goals"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="link-underline"
+                            >
+                              {chunks}
+                            </a>
+                          ),
+                        })
+                      : t(`${pillar.key}.lead`)}
+                  </p>
+                  <DetailText>{t(`${pillar.key}.detail`)}</DetailText>
+                </div>
               </div>
             </div>
           ))}
