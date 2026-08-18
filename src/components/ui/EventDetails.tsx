@@ -1,6 +1,8 @@
 import { CalendarPlus, MapPin } from "lucide-react";
 import { buttonClasses } from "@/components/ui/Button";
-import { formatEventTime } from "@/lib/calendarFormat";
+import { CategoryBadge } from "@/components/ui/CategoryBadge";
+import { cn } from "@/lib/cn";
+import { formatEventDate, formatEventTime } from "@/lib/calendarFormat";
 import type { CalendarEvent } from "@/content/calendar";
 
 /**
@@ -49,5 +51,53 @@ export function AddToCalendarLink({
       <CalendarPlus aria-hidden="true" className="size-4 shrink-0" />
       {label}
     </a>
+  );
+}
+
+/**
+ * One full event row — title, date, category, meta, and (for an upcoming
+ * event) the ICS button. Shared by the agenda list and the month grid's
+ * selected-day list, the two places a calendar event ever renders in full;
+ * past events dim their title and meta text to ink/60 on paper (this
+ * project's documented minimum for muted text) but keep the category badge
+ * — icon, name, and color — at full strength: a graphical label reads fine
+ * at full saturation even once the words around it go quiet
+ * (docs/design-system.md's "Calendar category colors" section).
+ */
+export function EventRow({
+  event,
+  past,
+  locale,
+  tentativeLabel,
+  addToCalendarLabel,
+}: {
+  event: CalendarEvent;
+  past: boolean;
+  locale: string;
+  tentativeLabel: string;
+  addToCalendarLabel: string;
+}) {
+  return (
+    <li
+      className={cn(
+        "flex flex-col gap-2 rounded-md border border-ink/10 p-4",
+        event.tentative && "border-dashed border-gold",
+      )}
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className={cn("flex flex-col gap-1", past && "opacity-60")}>
+          <p className="text-body-l font-medium">{event.title}</p>
+          <p className="text-body-s">{formatEventDate(event, locale)}</p>
+        </div>
+        <CategoryBadge category={event.category} past={past} />
+      </div>
+      <div className={cn(past && "opacity-60")}>
+        <EventMeta event={event} />
+      </div>
+      {event.tentative && <TentativeNote label={tentativeLabel} />}
+      {/* Adding a past event to a calendar app has no use — the button
+          only appears once a row is still ahead of "today". */}
+      {!past && <AddToCalendarLink eventId={event.id} label={addToCalendarLabel} size="sm" />}
+    </li>
   );
 }

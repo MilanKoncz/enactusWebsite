@@ -147,6 +147,19 @@
       "today": "today",
       "tomorrow": "tomorrow",
       "inDays": "in {days} days"
+    },
+    "grid": {
+      "label": "Month calendar",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "today": "Today",
+      "dayHeading": "Events on {date}",
+      "dayEmpty": "No events on this day.",
+      "moreEvents": "+{count}",
+      "moreEventsLabel": "{count} more events",
+      "cellLabel": "{date}, {count, plural, =0 {no events} one {1 event} other {# events}}",
+      "todayMarker": "Today",
+      "jumpedNote": "Nothing is on in {emptyMonth}. The calendar starts in {targetMonth}."
     }
   },
   "CalendarCategories": {

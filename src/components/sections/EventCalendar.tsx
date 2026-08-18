@@ -8,7 +8,8 @@ import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { CategoryBadge, CATEGORY_LEFT_BORDER_CLASS } from "@/components/ui/CategoryBadge";
-import { AddToCalendarLink, EventMeta, TentativeNote } from "@/components/ui/EventDetails";
+import { AddToCalendarLink, EventMeta, EventRow, TentativeNote } from "@/components/ui/EventDetails";
+import { EventCalendarGrid } from "@/components/sections/EventCalendarGrid";
 import { cn } from "@/lib/cn";
 import { useNow } from "@/lib/useNow";
 import { formatEventDate, formatMonthHeading } from "@/lib/calendarFormat";
@@ -22,45 +23,6 @@ import {
   visibleCategories,
 } from "@/lib/calendarAgenda";
 import type { CalendarCategory, CalendarEvent } from "@/content/calendar";
-
-/**
- * One row of the agenda list. Past events dim their title and meta text to
- * ink/60 on paper (this project's documented minimum for muted text) but
- * keep the category badge — icon, name, and color — at full strength: a
- * graphical label reads fine at full saturation even once the words around
- * it go quiet (docs/design-system.md's "Calendar category colors" section).
- */
-function EventRow({ event, past, locale, tentativeLabel, addToCalendarLabel }: {
-  event: CalendarEvent;
-  past: boolean;
-  locale: string;
-  tentativeLabel: string;
-  addToCalendarLabel: string;
-}) {
-  return (
-    <li
-      className={cn(
-        "flex flex-col gap-2 rounded-md border border-ink/10 p-4",
-        event.tentative && "border-dashed border-gold",
-      )}
-    >
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className={cn("flex flex-col gap-1", past && "opacity-60")}>
-          <p className="text-body-l font-medium">{event.title}</p>
-          <p className="text-body-s">{formatEventDate(event, locale)}</p>
-        </div>
-        <CategoryBadge category={event.category} past={past} />
-      </div>
-      <div className={cn(past && "opacity-60")}>
-        <EventMeta event={event} />
-      </div>
-      {event.tentative && <TentativeNote label={tentativeLabel} />}
-      {/* Adding a past event to a calendar app has no use — the button
-          only appears once a row is still ahead of "today". */}
-      {!past && <AddToCalendarLink eventId={event.id} label={addToCalendarLabel} size="sm" />}
-    </li>
-  );
-}
 
 export type EventCalendarProps = {
   events: CalendarEvent[];
@@ -194,7 +156,17 @@ export function EventCalendar({ events, initialNowMs }: EventCalendarProps) {
                 {t("emptyFiltered")}
               </p>
             ) : (
-              <div className="flex flex-col gap-10">
+              <>
+                {/* Both views render at once; only one is ever visible.
+                    Neither useMediaQuery (server snapshot false, so the
+                    grid would flash in only after hydration on desktop)
+                    nor mounting one view lazily is used — a hidden
+                    md:block/md:hidden pair costs nothing here and keeps
+                    the desktop view present in the very first paint. */}
+                <div className="hidden md:block">
+                  <EventCalendarGrid events={filtered} initialNowMs={initialNowMs} />
+                </div>
+                <div className="flex flex-col gap-10 md:hidden">
                 {highlighted && (
                   <Card
                     className={cn(
@@ -276,7 +248,8 @@ export function EventCalendar({ events, initialNowMs }: EventCalendarProps) {
                     </ul>
                   </div>
                 ))}
-              </div>
+                </div>
+              </>
             )}
           </>
         )}

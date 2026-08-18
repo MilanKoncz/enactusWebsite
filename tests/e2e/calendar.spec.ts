@@ -96,68 +96,197 @@ function mockCalendarEvents(page: Page, events: unknown[]) {
   );
 }
 
+// The month grid (>=md) and the agenda list (<md) render at the same time —
+// only one is ever visible, switched purely by CSS (EventCalendar.tsx's own
+// comment explains why: a hidden md:block/md:hidden pair, not a media-query
+// hook, so the desktop view never flashes in only after hydration). A real
+// browser actually applies that CSS, unlike jsdom, so each describe block
+// below forces the viewport its own view needs — independent of which
+// project (Desktop Chromium or Mobile Safari) happens to run it, so both
+// views get real cross-engine coverage rather than only ever being tested
+// in the engine whose project viewport already happened to match.
 test.describe("homepage event calendar", () => {
-  test("highlights the soonest upcoming event with its date, category, and location", async ({ page }) => {
-    await mockCalendarEvents(page, ALL_EVENTS);
-    await page.goto("/");
+  test.describe("Monatsraster (ab md)", () => {
+    test.use({ viewport: { width: 1280, height: 900 } });
 
-    const highlight = page.getByRole("heading", { name: "Ideathon" });
-    await highlight.scrollIntoViewIfNeeded();
-    await expect(highlight).toBeVisible();
-    await expect(page.getByText("Mannheim", { exact: true })).toBeVisible();
+    // A small, near-certain-to-land-in-the-current-month offset — the grid
+    // opens on "today"'s own month by default, and a 2-day offset only ever
+    // risks crossing into the next month on the last couple of days of any
+    // given month, the same residual looseness PAST_EVENT's -45 days above
+    // already accepts elsewhere in this file.
+    const GRID_EVENT = {
+      id: "88888888-8888-8888-8888-888888888888",
+      title: "Ideathon",
+      titleEn: null,
+      category: "innolab",
+      startDate: isoDate(2),
+      endDate: null,
+      startTime: null,
+      endTime: null,
+      location: "Mannheim",
+      description: null,
+      descriptionEn: null,
+      tentative: false,
+    };
+
+    // Matches the exact day-plus-month-plus-year string the component's own
+    // cellLabel uses — day-of-month alone isn't unique within one 42-day
+    // grid, since trailing padding from the following month can repeat the
+    // same low day numbers (e.g. both "28. Februar" and "2. März" showing
+    // in the same view), so this has to include the month name too.
+    function gridCellFor(page: Page, iso: string) {
+      const label = new Intl.DateTimeFormat("de", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC",
+      }).format(new Date(`${iso}T00:00:00Z`));
+      return page.getByRole("gridcell", { name: new RegExp(`^${label}`) });
+    }
+
+    test("shows exactly seven weekday column headers", async ({ page }) => {
+      await mockCalendarEvents(page, [GRID_EVENT]);
+      await page.goto("/");
+      await expect(page.getByRole("columnheader")).toHaveCount(7);
+    });
+
+    // The homepage bakes its calendar data into the static page at build
+    // time (see the file's own top comment) — this component's initial
+    // month choice reflects that real, build-time snapshot for one instant,
+    // then settles once EventCalendar's client-side re-fetch replaces it
+    // with this test's mock. Every test below waits for that settle first,
+    // via the month heading actually reaching the mocked event's own month,
+    // rather than assuming the first paint already reflects the mock.
+    const currentMonthLabel = new Intl.DateTimeFormat("de", {
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(new Date(`${isoDate(0).slice(0, 7)}-01T00:00:00Z`));
+
+    // aria-live="polite" is unique to this heading on the page — a plain
+    // level-3 heading query would also match several other section
+    // headings (Pillars, Benefits) that happen to share the level.
+    function monthHeadingLocator(page: Page) {
+      return page.locator('h3[aria-live="polite"]');
+    }
+
+    test("opens a day's events below the grid on click", async ({ page }) => {
+      await mockCalendarEvents(page, [GRID_EVENT]);
+      await page.goto("/");
+      await expect(monthHeadingLocator(page)).toHaveText(currentMonthLabel);
+
+      await gridCellFor(page, GRID_EVENT.startDate).click();
+      await expect(page.getByRole("heading", { name: /^Termine am/ })).toBeVisible();
+      await expect(page.locator("p", { hasText: "Ideathon" })).toBeVisible();
+    });
+
+    test("moves the roving focus with arrow keys and opens the day list with Enter", async ({ page }) => {
+      await mockCalendarEvents(page, [GRID_EVENT]);
+      await page.goto("/");
+      await expect(monthHeadingLocator(page)).toHaveText(currentMonthLabel);
+
+      const start = page.locator('[role="gridcell"][tabindex="0"]');
+      await start.focus();
+      await page.keyboard.press("ArrowRight");
+      await page.keyboard.press("ArrowRight");
+      await page.keyboard.press("Enter");
+
+      await expect(page.locator("p", { hasText: "Ideathon" })).toBeVisible();
+    });
+
+    test("returns to the current month, with today selected, via the Heute button", async ({ page }) => {
+      await mockCalendarEvents(page, [GRID_EVENT]);
+      await page.goto("/");
+
+      const monthHeading = monthHeadingLocator(page);
+      await expect(monthHeading).toHaveText(currentMonthLabel);
+
+      await page.getByRole("button", { name: "Nächster Monat" }).click();
+      await page.getByRole("button", { name: "Nächster Monat" }).click();
+      await expect(monthHeading).not.toHaveText(currentMonthLabel);
+
+      await page.getByRole("button", { name: "Heute" }).click();
+      await expect(monthHeading).toHaveText(currentMonthLabel);
+      await expect(page.locator('[role="gridcell"][aria-selected="true"]')).toHaveCount(1);
+    });
+
+    test("has no automatically detectable accessibility violations", async ({ page }) => {
+      await mockCalendarEvents(page, [GRID_EVENT]);
+      await page.goto("/");
+      const results = await new AxeBuilder({ page }).analyze();
+      expect(results.violations).toEqual([]);
+    });
   });
 
-  test("links 'Zum Kalender hinzufügen' at the highlighted event's own ics route", async ({ page }) => {
-    await mockCalendarEvents(page, ALL_EVENTS);
-    // The route's own behaviour (folding, escaping, DTSTART/DTEND,
-    // headers, the 404/500 cases) is covered end to end against real
-    // request/response objects by tests/unit/lib/ics.test.ts and
-    // tests/integration/calendarIcs.test.ts. A forced-download anchor click
-    // isn't reliably interceptable via page.route() in every engine (the
-    // request bypasses normal fetch/XHR interception on some download
-    // paths), so this only proves the rendered link's own wiring — that it
-    // exists, is reachable, and points at the correct event's route.
-    await page.goto("/");
+  // Still the full, unabridged agenda list at this point (it becomes the
+  // compact one-line-per-event mobile view in a follow-up commit) — these
+  // tests just confirm it still works, scoped to the viewport it's actually
+  // visible at now that the grid owns >=md.
+  test.describe("Agenda (unter md)", () => {
+    test.use({ viewport: { width: 390, height: 844 } });
 
-    const link = page.getByRole("link", { name: /Zum Kalender hinzufügen/ }).first();
-    await link.scrollIntoViewIfNeeded();
-    await expect(link).toHaveAttribute("href", `/api/kalender/${NEXT_EVENT.id}/ics`);
-  });
+    test("highlights the soonest upcoming event with its date, category, and location", async ({ page }) => {
+      await mockCalendarEvents(page, ALL_EVENTS);
+      await page.goto("/");
 
-  test("narrows the agenda to a selected category via the filter chips", async ({ page }) => {
-    await mockCalendarEvents(page, ALL_EVENTS);
-    await page.goto("/");
+      const highlight = page.getByRole("heading", { name: "Ideathon" });
+      await highlight.scrollIntoViewIfNeeded();
+      await expect(highlight).toBeVisible();
+      await expect(page.getByText("Mannheim", { exact: true })).toBeVisible();
+    });
 
-    const chip = page.getByRole("button", { name: /Bewerbung/ });
-    await chip.scrollIntoViewIfNeeded();
-    await chip.click();
-    await expect(chip).toHaveAttribute("aria-pressed", "true");
+    test("links 'Zum Kalender hinzufügen' at the highlighted event's own ics route", async ({ page }) => {
+      await mockCalendarEvents(page, ALL_EVENTS);
+      // The route's own behaviour (folding, escaping, DTSTART/DTEND,
+      // headers, the 404/500 cases) is covered end to end against real
+      // request/response objects by tests/unit/lib/ics.test.ts and
+      // tests/integration/calendarIcs.test.ts. A forced-download anchor click
+      // isn't reliably interceptable via page.route() in every engine (the
+      // request bypasses normal fetch/XHR interception on some download
+      // paths), so this only proves the rendered link's own wiring — that it
+      // exists, is reachable, and points at the correct event's route.
+      await page.goto("/");
 
-    await expect(page.getByText("Kick-off")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Ideathon" })).not.toBeVisible();
-  });
+      const link = page.getByRole("link", { name: /Zum Kalender hinzufügen/ }).first();
+      await link.scrollIntoViewIfNeeded();
+      await expect(link).toHaveAttribute("href", `/api/kalender/${NEXT_EVENT.id}/ics`);
+    });
 
-  test("keeps a month before the current one collapsed until 'Frühere Termine' is opened", async ({
-    page,
-  }) => {
-    await mockCalendarEvents(page, ALL_EVENTS);
-    await page.goto("/");
+    test("narrows the agenda to a selected category via the filter chips", async ({ page }) => {
+      await mockCalendarEvents(page, ALL_EVENTS);
+      await page.goto("/");
 
-    await expect(page.getByText("Q-Summit")).not.toBeVisible();
+      const chip = page.getByRole("button", { name: /Bewerbung/ });
+      await chip.scrollIntoViewIfNeeded();
+      await chip.click();
+      await expect(chip).toHaveAttribute("aria-pressed", "true");
 
-    const toggle = page.getByRole("button", { name: "Frühere Termine" });
-    await toggle.scrollIntoViewIfNeeded();
-    await expect(toggle).toHaveAttribute("aria-expanded", "false");
-    await toggle.click();
-    await expect(toggle).toHaveAttribute("aria-expanded", "true");
-    await expect(page.getByText("Q-Summit")).toBeVisible();
-  });
+      await expect(page.getByText("Kick-off")).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Ideathon" })).not.toBeVisible();
+    });
 
-  test("marks a tentative event with its explanatory note", async ({ page }) => {
-    await mockCalendarEvents(page, ALL_EVENTS);
-    await page.goto("/");
+    test("keeps a month before the current one collapsed until 'Frühere Termine' is opened", async ({
+      page,
+    }) => {
+      await mockCalendarEvents(page, ALL_EVENTS);
+      await page.goto("/");
 
-    await expect(page.getByText("Termin steht noch nicht fest").first()).toBeVisible();
+      await expect(page.getByText("Q-Summit")).not.toBeVisible();
+
+      const toggle = page.getByRole("button", { name: "Frühere Termine" });
+      await toggle.scrollIntoViewIfNeeded();
+      await expect(toggle).toHaveAttribute("aria-expanded", "false");
+      await toggle.click();
+      await expect(toggle).toHaveAttribute("aria-expanded", "true");
+      await expect(page.getByText("Q-Summit")).toBeVisible();
+    });
+
+    test("marks a tentative event with its explanatory note", async ({ page }) => {
+      await mockCalendarEvents(page, ALL_EVENTS);
+      await page.goto("/");
+
+      await expect(page.getByText("Termin steht noch nicht fest").first()).toBeVisible();
+    });
   });
 
   test("shows a friendly empty state when the calendar has no events at all", async ({ page }) => {

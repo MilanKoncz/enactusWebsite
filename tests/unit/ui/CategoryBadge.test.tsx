@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 import { screen } from "@testing-library/react";
 import { axe } from "jest-axe";
 import { renderWithIntl } from "../../fixtures/intl";
-import { CategoryBadge } from "@/components/ui/CategoryBadge";
+import {
+  CATEGORY_BAR_CLASS,
+  CATEGORY_BAR_TENTATIVE_CLASS,
+  CategoryBadge,
+} from "@/components/ui/CategoryBadge";
 import { CALENDAR_CATEGORIES } from "@/content/calendar";
 import de from "@/messages/de.json";
 
@@ -46,6 +50,20 @@ describe("CategoryBadge", () => {
     const badge = screen.getByText("Wettkämpfe").closest("span")!;
     expect(badge).toHaveClass("bg-cal-wettkaempfe");
     expect(badge).toHaveClass("text-ink/70");
+  });
+
+  it("gives every category a solid month-grid bar color, wettkaempfe included", () => {
+    for (const category of CALENDAR_CATEGORIES) {
+      expect(CATEGORY_BAR_CLASS[category]).toContain(`bg-cal-${category}`);
+    }
+  });
+
+  it("outlines rather than fills a tentative event's bar, in the same category color", () => {
+    for (const category of CALENDAR_CATEGORIES) {
+      const tentative = CATEGORY_BAR_TENTATIVE_CLASS[category];
+      expect(tentative).toContain(`border-cal-${category}`);
+      expect(tentative).not.toContain(`bg-cal-${category}`);
+    }
   });
 
   it("has no accessibility violations in the filled or outline state", async () => {

@@ -18,7 +18,11 @@ import { CALENDAR_CATEGORIES } from "@/content/calendar";
  * members actually care about (a 00:00 application deadline).
  */
 
-function todayInSiteTimezone(nowMs: number): string {
+// Exported for the month grid (components/sections/EventCalendarGrid.tsx),
+// which needs "today" as its own plain date string — for the grid's "today"
+// marker and its default selected day — not just the derived month key
+// currentMonthKey already gives below.
+export function todayInSiteTimezone(nowMs: number): string {
   // en-CA formats as YYYY-MM-DD directly — the same trick
   // lib/recruitingTime.ts's instantToWallClock uses, without needing the
   // time-of-day parts this only needs a date from.

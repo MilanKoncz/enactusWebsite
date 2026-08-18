@@ -60,6 +60,39 @@ export const CATEGORY_LEFT_BORDER_CLASS: Record<CalendarCategory, string> = {
   bewerbung: "border-l-cal-bewerbung",
 };
 
+/**
+ * A category's color as a solid block — the month grid's day bars and the
+ * compact agenda's day dot both read straight from this, so a category
+ * never carries a different color between the two views. Unlike
+ * `CATEGORY_CLASSES` above, every category is filled here, `wettkaempfe`
+ * included: a 6px bar or a small dot has no room for an outline-plus-text
+ * treatment; it is the one place color really is the only signal, which is
+ * fine at this size precisely because the day list underneath always spells
+ * out the category name in text besides.
+ */
+export const CATEGORY_BAR_CLASS: Record<CalendarCategory, string> = {
+  innolab: "bg-cal-innolab",
+  projekte: "bg-cal-projekte",
+  journeys: "bg-cal-journeys",
+  wettkaempfe: "bg-cal-wettkaempfe",
+  socials: "bg-cal-socials",
+  workshops: "bg-cal-workshops",
+  bewerbung: "bg-cal-bewerbung",
+};
+
+/** A tentative event's grid bar, outlined rather than filled — the same
+ * fill-vs-outline distinction `tentative` already gets elsewhere (a dashed
+ * gold border on its card/row), carried down to bar size. */
+export const CATEGORY_BAR_TENTATIVE_CLASS: Record<CalendarCategory, string> = {
+  innolab: "border border-cal-innolab bg-transparent",
+  projekte: "border border-cal-projekte bg-transparent",
+  journeys: "border border-cal-journeys bg-transparent",
+  wettkaempfe: "border border-cal-wettkaempfe bg-transparent",
+  socials: "border border-cal-socials bg-transparent",
+  workshops: "border border-cal-workshops bg-transparent",
+  bewerbung: "border border-cal-bewerbung bg-transparent",
+};
+
 export type CategoryBadgeProps = {
   category: CalendarCategory;
   /** The event this badge labels is in the past — see the comment above. */

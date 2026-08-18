@@ -147,6 +147,19 @@
       "today": "heute",
       "tomorrow": "morgen",
       "inDays": "in {days} Tagen"
+    },
+    "grid": {
+      "label": "Monatskalender",
+      "previousMonth": "Vorheriger Monat",
+      "nextMonth": "Nächster Monat",
+      "today": "Heute",
+      "dayHeading": "Termine am {date}",
+      "dayEmpty": "Keine Termine an diesem Tag.",
+      "moreEvents": "+{count}",
+      "moreEventsLabel": "{count} weitere Termine",
+      "cellLabel": "{date}, {count, plural, =0 {keine Termine} one {1 Termin} other {# Termine}}",
+      "todayMarker": "Heute",
+      "jumpedNote": "Im {emptyMonth} steht nichts an. Der Kalender beginnt im {targetMonth}."
     }
   },
   "CalendarCategories": {
