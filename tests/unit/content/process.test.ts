@@ -1,5 +1,8 @@
+import { statSync } from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  projectGuide,
   projectGuideSchema,
   projectStageSchema,
   stageKeySchema,
@@ -7,6 +10,13 @@ import {
   stepSchema,
   steps,
 } from "@/content/process";
+
+// Same "X,Y MB" shape content/process.ts's fileSizeLabel uses — kept in one
+// place so the drift test below and the content file can never quietly
+// disagree on the formatting rule itself.
+function formatSizeLabel(bytes: number): string {
+  return `${(bytes / 1_000_000).toFixed(1).replace(".", ",")} MB`;
+}
 
 describe("content/process", () => {
   it("lists the eight process steps in order", () => {
@@ -23,22 +33,20 @@ describe("content/process", () => {
     expect(steps.map((s) => s.order)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
   });
 
-  it("alternates milestone and phase, starting and ending on a milestone-then-phase pair", () => {
-    expect(steps.map((s) => s.kind)).toEqual([
-      "milestone",
-      "phase",
-      "milestone",
-      "phase",
-      "milestone",
-      "phase",
-      "milestone",
-      "phase",
-    ]);
+  it("marks the exact three board-confirmed gates as milestones, everything else as a phase", () => {
+    const milestones = steps.filter((s) => s.kind === "milestone").map((s) => s.key);
+    expect(milestones).toEqual(["innoGating", "operationsGating", "spinoff"]);
+
+    const phases = steps.filter((s) => s.kind === "phase").map((s) => s.key);
+    expect(phases).toEqual(["kickOff", "ideation", "mvp", "implementation", "startup"]);
   });
 
-  it("marks the exact four board-given milestones as milestones", () => {
-    const milestones = steps.filter((s) => s.kind === "milestone").map((s) => s.key);
-    expect(milestones).toEqual(["kickOff", "innoGating", "operationsGating", "spinoff"]);
+  it("gives a checklist to every step except kickOff and ideation", () => {
+    const withChecklist = steps.filter((s) => s.hasChecklist).map((s) => s.key);
+    expect(withChecklist).toEqual(["innoGating", "mvp", "operationsGating", "implementation", "spinoff", "startup"]);
+
+    const withoutChecklist = steps.filter((s) => !s.hasChecklist).map((s) => s.key);
+    expect(withoutChecklist).toEqual(["kickOff", "ideation"]);
   });
 
   it("treats every step's own name and position as board-confirmed", () => {
@@ -54,12 +62,13 @@ describe("content/process", () => {
     expect(() =>
       stepSchema.parse({
         key: "kickOff",
-        kind: "milestone",
+        kind: "phase",
         order: 1,
         confirmed: true,
         icon: "flag",
         title: "Process.steps.kickOff.title",
         short: "Process.steps.kickOff.short",
+        hasChecklist: false,
       }),
     ).not.toThrow();
   });
@@ -74,6 +83,7 @@ describe("content/process", () => {
         icon: "flag",
         title: "Process.steps.scaling.title",
         short: "Process.steps.scaling.short",
+        hasChecklist: false,
       }),
     ).toThrow();
   });
@@ -82,12 +92,13 @@ describe("content/process", () => {
     expect(() =>
       stepSchema.parse({
         key: "kickOff",
-        kind: "milestone",
+        kind: "phase",
         order: 1,
         confirmed: true,
         icon: "not-a-real-icon",
         title: "Process.steps.kickOff.title",
         short: "Process.steps.kickOff.short",
+        hasChecklist: false,
       }),
     ).toThrow();
   });
@@ -133,9 +144,23 @@ describe("content/process", () => {
       projectGuideSchema.parse({
         available: true,
         href: "/downloads/project-guide.pdf",
-        fileSizeLabel: "2.4 MB",
+        fileSizeLabel: "2,4 MB",
         updatedAt: "2026-07-27",
       }),
     ).not.toThrow();
+  });
+
+  it("is available with a real file whose on-disk size matches the label exactly", () => {
+    expect(projectGuide.available).toBe(true);
+    expect(projectGuide.href).toBe("/downloads/enactus-mannheim-project-guide.pdf");
+
+    const filePath = path.join(process.cwd(), "public", projectGuide.href!.replace(/^\//, ""));
+    const { size } = statSync(filePath);
+
+    // Under 5 MB, per the board's size target for a file that opens in the
+    // browser rather than downloading — fails loudly if a future swap
+    // regresses back toward the original 16.7 MB handover.
+    expect(size).toBeLessThan(5_000_000);
+    expect(projectGuide.fileSizeLabel).toBe(formatSizeLabel(size));
   });
 });

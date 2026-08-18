@@ -11,21 +11,18 @@ describe("ProjectGuideDownload", () => {
     expect(screen.getByRole("heading", { name: "Project Guide" })).toBeInTheDocument();
   });
 
-  it("disables the download button while the PDF is unavailable", () => {
-    expect(projectGuide.available).toBe(false);
+  it("links straight to the real PDF, opening in a new tab", () => {
+    expect(projectGuide.available).toBe(true);
     renderWithIntl(<ProjectGuideDownload />);
-    expect(screen.getByRole("button", { name: "Project Guide herunterladen" })).toBeDisabled();
+    const link = screen.getByRole("link", { name: "Project Guide herunterladen" });
+    expect(link).toHaveAttribute("href", projectGuide.href);
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
   });
 
-  it("makes the unavailability reason reachable via the button's accessible description", () => {
+  it("shows the file format and size next to the download link", () => {
     renderWithIntl(<ProjectGuideDownload />);
-    const button = screen.getByRole("button", { name: "Project Guide herunterladen" });
-    const describedBy = button.getAttribute("aria-describedby");
-    expect(describedBy).toBeTruthy();
-
-    const hint = document.getElementById(describedBy!);
-    expect(hint).toHaveTextContent("Der Project Guide ist noch nicht verfügbar.");
-    expect(hint).toBeVisible();
+    expect(screen.getByText(`PDF · ${projectGuide.fileSizeLabel}`)).toBeInTheDocument();
   });
 
   it("has no accessibility violations", async () => {

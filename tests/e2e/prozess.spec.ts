@@ -26,11 +26,11 @@ test.describe("/prozess", () => {
     page,
     isMobile,
   }) => {
-    test.skip(isMobile, "the compressed layout is a desktop-width claim, checked against the horizontal grid");
+    test.skip(isMobile, "the compressed layout is a desktop-width claim, checked against the horizontal line");
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto("/prozess");
 
-    const first = page.getByRole("button", { name: /Kick-Off/ });
+    const first = page.getByRole("button", { name: /Kick-off/ });
     const last = page.getByRole("button", { name: /Startup/ });
     await first.scrollIntoViewIfNeeded();
     const firstBox = await first.boundingBox();
@@ -38,13 +38,43 @@ test.describe("/prozess", () => {
     expect(Math.abs(firstBox!.y - lastBox!.y)).toBeLessThan(400);
   });
 
+  test("desktop: every station, including the two without a checklist, is a toggle button", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, "ab lg every station gains a panel — the mobile-only static case is covered separately");
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto("/prozess");
+
+    const kickOff = page.getByRole("button", { name: /Kick-off/ });
+    await expect(kickOff).toHaveAttribute("aria-expanded", "false");
+    await kickOff.focus();
+    await expect(kickOff).toHaveAttribute("aria-expanded", "true");
+  });
+
+  test("mobile: a station without a checklist renders as plain text, not a toggle button", async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!isMobile, "below lg is where kickOff/ideation drop the panel — covered separately ab lg");
+    await page.goto("/prozess");
+
+    // "Kick-off" appears several times in the DOM at once (Marker renders
+    // both the ab-lg and below-lg presentation so the CSS switch between
+    // them never needs a client-only breakpoint check) — .and() narrows to
+    // the one instance the real CSS engine actually shows on this viewport.
+    const visibleKickOff = page.getByText("Kick-off", { exact: true }).and(page.locator(":visible"));
+    await expect(visibleKickOff).toHaveCount(1);
+    await expect(page.getByRole("button", { name: /Kick-off/ })).toHaveCount(0);
+  });
+
   test("opening a station's checklist never moves a neighboring station", async ({
     page,
     isMobile,
   }) => {
     await page.goto("/prozess");
-    const first = page.getByRole("button", { name: /Kick-Off/ });
-    const second = page.getByRole("button", { name: /Ideation-Phase/ });
+    const first = page.getByRole("button", { name: /Inno-Gating/ });
+    const second = page.getByRole("button", { name: /MVP-Phase/ });
     await first.scrollIntoViewIfNeeded();
 
     const before = await second.boundingBox();
@@ -64,12 +94,12 @@ test.describe("/prozess", () => {
   }) => {
     test.skip(!isMobile, "hover/focus reveal on desktop is covered separately");
     await page.goto("/prozess");
-    const button = page.getByRole("button", { name: /Kick-Off/ });
+    const button = page.getByRole("button", { name: /Inno-Gating/ });
     await button.scrollIntoViewIfNeeded();
 
     const panelId = await button.getAttribute("aria-controls");
     const panel = page.locator(`[id="${panelId}"]`);
-    await expect(panel).toContainText("PRÜFPUNKT_1");
+    await expect(panel).toContainText("Problem-Solution-Fit");
     await expect(panel).toHaveCSS("opacity", "0");
 
     await button.tap();

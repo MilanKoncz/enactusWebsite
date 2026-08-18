@@ -223,66 +223,46 @@
       "milestoneLabel": "Milestone",
       "phaseLabel": "Phase",
       "criteriaLabel": "Gating criteria",
-      "benefitsLabel": "Benefits",
-      "criteriaHint": "This gating criterion hasn't been set by the board yet.",
-      "draftHint": "This text is a draft, not yet approved by the board."
+      "benefitsLabel": "Benefits"
     },
     "steps": {
       "kickOff": {
         "title": "Kick-off",
-        "short": "The team pitches its idea to the board and the InnoLab.",
-        "checklist": ["CRITERION_1", "CRITERION_2", "CRITERION_3"]
+        "short": "We give the starting signal and pass on the knowledge you need for ideation and project work."
       },
       "ideation": {
         "title": "Ideation phase (InnoLab)",
-        "short": "The team sharpens the idea, target group, and business model in the InnoLab.",
-        "checklist": [
-          "Close coaching from experienced InnoLab mentors.",
-          "Ideas get tested before any resources are committed.",
-          "Direct access to workshops on business modeling and market validation."
-        ]
+        "short": "As a team, you and others develop a problem-solution fit for a problem you actually care about."
       },
       "innoGating": {
-        "title": "Inno Gating",
-        "short": "The board decides whether the project moves into the MVP phase.",
-        "checklist": ["CRITERION_1", "CRITERION_2", "CRITERION_3"]
+        "title": "Inno-Gating",
+        "short": "The board and advisors assess how feasible your idea is and decide whether you can move on to the MVP phase.",
+        "checklist": ["Problem-solution fit", "Business model outline", "Need validation"]
       },
       "mvp": {
         "title": "MVP phase",
-        "short": "The team builds and tests a first working prototype.",
-        "checklist": [
-          "Budget for a first prototype from the association's funds.",
-          "Feedback from real users before launch.",
-          "Close exchange with the board ahead of Operations Gating."
-        ]
+        "short": "Your team develops a detailed business plan, a brand, and a prototype or pilot project.",
+        "checklist": ["Prize money", "Network access", "Advisory"]
       },
       "operationsGating": {
-        "title": "Operations Gating",
-        "short": "The board decides whether the project moves into execution.",
-        "checklist": ["CRITERION_1", "CRITERION_2", "CRITERION_3"]
+        "title": "Operations-Gating",
+        "short": "The board and advisors assess your progress again. If your plan and execution convince us, we're ready to take you on as a real project.",
+        "checklist": ["Stakeholder assessment", "Member-to-solution fit", "Prototype/simulation"]
       },
       "implementation": {
-        "title": "Execution",
-        "short": "The team runs the project operationally as its own unit.",
-        "checklist": [
-          "Full operational responsibility for budget, team, and results.",
-          "Access to the association's partner network and infrastructure.",
-          "Regular coaching from the board and experienced alumni."
-        ]
+        "title": "Project phase",
+        "short": "Your team puts your plan into practice, without carrying the personal risk.",
+        "checklist": ["Funding", "Supportive ops team", "Free Claude access"]
       },
       "spinoff": {
-        "title": "Spin-off",
-        "short": "The project spins off as an independent company.",
-        "checklist": ["CRITERION_1", "CRITERION_2", "CRITERION_3"]
+        "title": "Legal gating/spin-off",
+        "short": "If spinning off is the project's goal, it can happen once the project's success is stable.",
+        "checklist": ["Finished product", "Watertight business model", "Financing strategy"]
       },
       "startup": {
         "title": "Startup",
-        "short": "The former project continues as an independent company.",
-        "checklist": [
-          "An independent company with its own legal form and team.",
-          "Continued access to the Enactus alumni network.",
-          "Visibility as a reference project in competitions and with partners."
-        ]
+        "short": "The project then stands on its own, for example as its own company, independent of the association.",
+        "checklist": ["Legal advice", "Business/operations support", "Network support"]
       }
     },
     "guide": {
@@ -290,6 +270,7 @@
       "title": "Project Guide",
       "lead": "The full process as a PDF, to read at your own pace.",
       "cta": "Download the Project Guide",
+      "fileInfo": "PDF · {size}",
       "unavailableHint": "The Project Guide isn't available yet."
     },
     "cta": {

@@ -35,8 +35,22 @@ export function GateMarker({ label, variant = "milestone", as = "div", className
           Section's surface (globals.css), so this stays correct on ink. */}
       <span
         className={cn(
-          "whitespace-nowrap font-mono text-mono-m uppercase",
-          isDivider && "bg-[var(--surface-bg)] px-3",
+          // No whitespace-nowrap: every existing label is short enough to
+          // stay on one line regardless, but /prozess's timeline (ProcessTimeline.tsx)
+          // has titles ("Legal-Gating/Ausgründung") wider than the fixed
+          // column they sit in ab lg — those need to wrap onto a second line
+          // rather than overflow into the next station, and there's no
+          // per-instance way to opt into wrapping from the outside (this
+          // span's own className isn't exposed as a prop).
+          // break-words is the fallback for a word overflow-wrap alone can't
+          // place well (see [hyphens:auto] below); [hyphens:auto] relies on
+          // the page's lang attribute (app/[locale]/layout.tsx) to hyphenate
+          // at real German/English syllable boundaries first, which reads
+          // far better than an arbitrary character-width break when a label
+          // like "Legal-Gating/Ausgründung" has to wrap in a narrow column
+          // (ProcessTimeline.tsx's ab-lg track).
+          "break-words font-mono text-mono-m uppercase [hyphens:auto]",
+          isDivider && "bg-[var(--surface-bg)] px-3 text-center",
         )}
       >
         {label}

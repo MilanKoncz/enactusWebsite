@@ -223,66 +223,46 @@
       "milestoneLabel": "Meilenstein",
       "phaseLabel": "Phase",
       "criteriaLabel": "Prüfpunkte",
-      "benefitsLabel": "Vorteile",
-      "criteriaHint": "Dieses Prüfkriterium ist noch nicht vom Vorstand festgelegt.",
-      "draftHint": "Dieser Text ist ein Entwurf, noch nicht vom Vorstand freigegeben."
+      "benefitsLabel": "Vorteile"
     },
     "steps": {
       "kickOff": {
-        "title": "Kick-Off",
-        "short": "Das Team stellt seine Idee dem Vorstand und dem InnoLab vor.",
-        "checklist": ["PRÜFPUNKT_1", "PRÜFPUNKT_2", "PRÜFPUNKT_3"]
+        "title": "Kick-off",
+        "short": "Wir geben den Startschuss und vermitteln euch das nötige Wissen für Ideenfindung und Projektarbeit."
       },
       "ideation": {
         "title": "Ideation-Phase (InnoLab)",
-        "short": "Das Team schärft Idee, Zielgruppe und Geschäftsmodell im InnoLab.",
-        "checklist": [
-          "Enge Betreuung durch erfahrene Coaches aus dem InnoLab-Team.",
-          "Ideen werden getestet, bevor Ressourcen gebunden werden.",
-          "Direkter Zugang zu Workshops zu Geschäftsmodell und Marktvalidierung."
-        ]
+        "short": "Im Team entwickelt ihr gemeinsam mit anderen einen Problem-Solution-Fit für ein Problem, das euch interessiert."
       },
       "innoGating": {
-        "title": "Inno Gating",
-        "short": "Der Vorstand entscheidet, ob das Projekt in die MVP-Phase geht.",
-        "checklist": ["PRÜFPUNKT_1", "PRÜFPUNKT_2", "PRÜFPUNKT_3"]
+        "title": "Inno-Gating",
+        "short": "Vorstand und Advisor bewerten die Umsetzbarkeit eurer Idee und entscheiden, ob ihr in die MVP-Phase vorrücken könnt.",
+        "checklist": ["Problem-Solution-Fit", "Businessmodell-Outline", "Needvalidierung"]
       },
       "mvp": {
         "title": "MVP-Phase",
-        "short": "Das Team baut und testet einen ersten funktionierenden Prototyp.",
-        "checklist": [
-          "Budget für einen ersten Prototyp aus dem Vereinsbudget.",
-          "Feedback von echten Nutzer:innen schon vor dem Launch.",
-          "Enger Austausch mit dem Vorstand zur Vorbereitung auf das Operations Gating."
-        ]
+        "short": "Euer Team entwickelt einen detaillierten Businessplan, ein Branding und einen Prototyp oder ein Pilotprojekt.",
+        "checklist": ["Preisgeld", "Netzwerkzugang", "Advisory"]
       },
       "operationsGating": {
-        "title": "Operations Gating",
-        "short": "Der Vorstand entscheidet, ob das Projekt in die Umsetzung geht.",
-        "checklist": ["PRÜFPUNKT_1", "PRÜFPUNKT_2", "PRÜFPUNKT_3"]
+        "title": "Operations-Gating",
+        "short": "Erneut beurteilen Vorstand und Advisor euren Fortschritt. Überzeugen euer Plan und die Umsetzung, sind wir bereit, euch als richtiges Projekt aufzunehmen.",
+        "checklist": ["Stakeholder-Assessment", "Member-to-Solution-Fit", "Prototyp/Simulation"]
       },
       "implementation": {
-        "title": "Projektumsetzung",
-        "short": "Das Team führt das Projekt operativ als eigenständige Einheit.",
-        "checklist": [
-          "Volle operative Verantwortung für Budget, Team und Ergebnisse.",
-          "Zugriff auf das Partnernetzwerk und die Infrastruktur des Vereins.",
-          "Regelmäßiges Coaching durch Vorstand und erfahrene Alumni."
-        ]
+        "title": "Projektphase",
+        "short": "Euer Team setzt euren Plan in die Tat um, ohne das persönliche Risiko zu tragen.",
+        "checklist": ["Funding", "Unterstützendes Ops-Team", "Kostenloser Claude-Zugang"]
       },
       "spinoff": {
-        "title": "Ausgründung",
-        "short": "Das Projekt wird als eigenständiges Unternehmen ausgegründet.",
-        "checklist": ["PRÜFPUNKT_1", "PRÜFPUNKT_2", "PRÜFPUNKT_3"]
+        "title": "Legal-Gating/Ausgründung",
+        "short": "Ist eine Ausgründung das Ziel des Projekts, kann sie bei stabilem Projekterfolg erfolgen.",
+        "checklist": ["Fertiges Produkt", "Wasserdichtes Businessmodell", "Finanzierungsstrategie"]
       },
       "startup": {
         "title": "Startup",
-        "short": "Das ehemalige Projekt läuft als unabhängiges Unternehmen weiter.",
-        "checklist": [
-          "Eigenständiges Unternehmen mit eigener Rechtsform und eigenem Team.",
-          "Weiterhin Zugang zum Enactus-Alumni-Netzwerk.",
-          "Sichtbarkeit als Referenzprojekt bei Wettbewerben und gegenüber Partnern."
-        ]
+        "short": "Dann steht das Projekt selbstständig da, etwa als eigene Kapitalgesellschaft, losgelöst vom Verein.",
+        "checklist": ["Rechtsberatung", "Betriebswirtschaftliche Unterstützung", "Netzwerk-Support"]
       }
     },
     "guide": {
@@ -290,6 +270,7 @@
       "title": "Project Guide",
       "lead": "Der komplette Prozess als PDF zum Nachlesen.",
       "cta": "Project Guide herunterladen",
+      "fileInfo": "PDF · {size}",
       "unavailableHint": "Der Project Guide ist noch nicht verfügbar."
     },
     "cta": {

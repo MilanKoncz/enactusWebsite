@@ -143,9 +143,14 @@ entries note in a comment why a given one was hard to verify automatically.
   `.answer"` in messages.
 - Events calendar: see "Update the event calendar (Termine)" above — the
   `calendar_events` table, not a content file.
-- Process-page gate checklists: `messages/{de,en}.json`'s
-  `"Process.steps.<milestone>.checklist"` — never invent a checkpoint; leave
-  the placeholder tokens (`PRÜFPUNKT_n`) until the board confirms one.
+- Process-page checklists: `messages/{de,en}.json`'s
+  `"Process.steps.<key>.checklist"` — a gate's gating criteria or a phase's
+  benefits, board-confirmed text like any other message key. Two of the
+  eight steps (`kickOff`, `ideation`) intentionally have no checklist at
+  all — `content/process.ts`'s `hasChecklist` flag controls whether
+  `ProcessTimeline.tsx` renders a panel for a step, so a step without one
+  never needs an empty or invented array. Never add a checklist item that
+  isn't board-confirmed.
 
 ## Translate a string / add English copy
 
