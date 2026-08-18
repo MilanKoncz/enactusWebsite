@@ -277,21 +277,27 @@ h6 {
   }
 }
 
+/* -90deg/+90deg is the tool arc's own baseline turn (ToolOrbit.tsx: an open
+   arc facing sideways, not a static rotate() layered on top of this same
+   animated property), with the same ±8deg sway as before on top of that
+   baseline. Shifting both keyframes by the same 90deg in opposite
+   directions keeps them summing to exactly zero at every point in the
+   cycle, same as before the arc was turned — see ToolOrbit.tsx. */
 @keyframes orbit-sway {
   from {
-    transform: rotate(-8deg);
+    transform: rotate(-98deg);
   }
   to {
-    transform: rotate(8deg);
+    transform: rotate(-82deg);
   }
 }
 
 @keyframes orbit-counter-sway {
   from {
-    transform: rotate(8deg);
+    transform: rotate(98deg);
   }
   to {
-    transform: rotate(-8deg);
+    transform: rotate(82deg);
   }
 }
 

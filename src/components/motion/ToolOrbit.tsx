@@ -47,6 +47,30 @@ function positionFor(index: number, count: number): { x: number; y: number } {
 
 const ARC_PATH = `M ${CENTRE_X - RADIUS},${CENTRE_Y} A ${RADIUS},${RADIUS} 0 0 1 ${CENTRE_X + RADIUS},${CENTRE_Y}`;
 
+// The dome above is drawn and positioned exactly as if it still sat flat on
+// its own bottom-centre hub (CENTRE_X, CENTRE_Y) — every position above this
+// point is unchanged from that flat layout. The whole stage is then turned
+// into an open arc facing sideways by a -90deg rotation (CSS: negative is
+// counterclockwise, "to the left") around that same hub, baked straight into
+// the orbit-sway keyframes (globals.css) rather than a separate static
+// transform: an animation targeting `transform` replaces the property
+// outright each frame, so it can't be layered on top of an unrelated static
+// rotate() on the same element the way two independent CSS properties could
+// stack. orbit-counter-sway is shifted by the exact opposite baseline
+// (+90deg) for the same reason it already existed — cancelling the stage's
+// rotation exactly, so every logo stays upright through the turn instead of
+// swinging with it.
+//
+// Rotating a WIDTH×HEIGHT box by exactly 90 degrees always swaps its
+// bounding box to HEIGHT×WIDTH, whatever the hub's own position inside it —
+// so the outer, unanimated wrapper below reserves HEIGHT×WIDTH of layout
+// space (tall, not wide), and the inner stage is offset by
+// (HEIGHT - CENTRE_X, WIDTH / 2 - CENTRE_Y) so the hub lands exactly where
+// the rotated dome needs it: the vertical centre of the new box's right
+// edge, with the arc opening out to the left of it.
+const STAGE_LEFT = HEIGHT - CENTRE_X;
+const STAGE_TOP = WIDTH / 2 - CENTRE_Y;
+
 // Purely decorative (aria-hidden — content/tools.ts) — a CSS-only sway, no
 // JavaScript, transform only (docs/design-system.md motion rule 5). A gold
 // 2px arc, the same weight as the gate marker's rule and the golden thread,
@@ -58,20 +82,27 @@ const ARC_PATH = `M ${CENTRE_X - RADIUS},${CENTRE_Y} A ${RADIUS},${RADIUS} 0 0 1
 // hangs off: an arm rotated to the far end of the arc took its logo with it,
 // which is why Claude used to sit upside down and Canva at a slant. The only
 // rotation left on a logo is orbit-counter-sway, which cancels the stage's
-// sway exactly, so it stays upright the whole way through.
+// sway (and now its baseline turn) exactly, so it stays upright the whole
+// way through.
 //
 // Under prefers-reduced-motion, globals.css's blanket override collapses
 // both animations to a single near-instant iteration ending at their final
-// keyframe (+8deg stage sway, -8deg counter-sway) — the two cancel out, so
-// every logo still lands upright, just uniformly offset by a harmless fixed
-// 8°, evenly spaced exactly as before rather than bunched up or reset to a
-// stray mid-animation frame.
+// keyframe (-82deg stage sway, 82deg counter-sway) — the two still cancel
+// out exactly, so every logo lands upright, just uniformly offset by a
+// harmless fixed few degrees, evenly spaced exactly as before rather than
+// bunched up or reset to a stray mid-animation frame.
 export function ToolOrbit() {
   return (
-    <div aria-hidden="true" className="relative" style={{ width: WIDTH, height: HEIGHT }}>
+    <div aria-hidden="true" className="relative" style={{ width: HEIGHT, height: WIDTH }}>
       <div
-        className="absolute inset-0 animate-orbit-sway"
-        style={{ transformOrigin: `${CENTRE_X}px ${CENTRE_Y}px` }}
+        className="absolute animate-orbit-sway"
+        style={{
+          left: STAGE_LEFT,
+          top: STAGE_TOP,
+          width: WIDTH,
+          height: HEIGHT,
+          transformOrigin: `${CENTRE_X}px ${CENTRE_Y}px`,
+        }}
       >
         <svg
           viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
