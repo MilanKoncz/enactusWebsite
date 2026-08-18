@@ -72,8 +72,14 @@ function narrowAt(bow: number): Waypoints {
 }
 
 const ROUTES: Record<ThreadStop, Record<ThreadWidth, Waypoints>> = {
+  // A wider swing than the original {42, 46, 50}: that 8-point range read as
+  // a dead-straight line running through the whole logo band and into the
+  // gate below it — the visible curve only really started once `kpis`' own
+  // swing began beneath the gate. Widening just this stop's amplitude (not
+  // the gate's, which stays vertical by design) makes the thread read as
+  // swinging the whole way from the marquee down to the gate seam instead.
   partners: {
-    wide: { from: 42, bow: 46, to: 50 },
+    wide: { from: 25, bow: 34, to: 50 },
     narrow: narrowAt(5),
   },
   "gate-kpis": {
@@ -93,8 +99,20 @@ const ROUTES: Record<ThreadStop, Record<ThreadWidth, Waypoints>> = {
   // the tool arc (ToolOrbit), which is also a 2px gold curve. Two of them
   // overlapping read as one broken line rather than as two elements, so the
   // thread clears the arc's band before the arc begins.
+  //
+  // 64 was measured, not eyeballed, against the rendered card grid and the
+  // arc's bounding box at every desktop width from `lg` to 2560px: this
+  // section's card column and the arc are both real DOM boxes inside a
+  // max-w-content Container, while this coordinate is a percentage of the
+  // full section width — so the safe gap between them sits at a different
+  // percentage at 1280px (62.8%-67.8%) than at 1920px (58.5%-61.9%), and no
+  // single value clears both boxes at every width without touching either.
+  // The deliberate choice: never cross the card text — 64 stays clear of it
+  // at every measured width — and accept that past ~1600px the thread's own
+  // curve brushes past the arc's stroke instead, decoration meeting
+  // decoration rather than decoration meeting copy.
   benefits: {
-    wide: { from: 86, bow: 58, to: 50 },
+    wide: { from: 86, bow: 64, to: 50 },
     narrow: narrowAt(7),
   },
   "gate-calendar": {
