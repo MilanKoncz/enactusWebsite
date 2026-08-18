@@ -61,9 +61,19 @@ export function HomeHero() {
             surface and 6.4:1 against the worst case the video can produce —
             a fully white frame behind the 80% ink scrim — so it clears AA at
             both ends. Only the rotating term takes it; the prefix stays
-            white, which is what makes the term read as the emphasis. */}
-        <h1 className="text-display-3 font-display">
-          {t("prefix")} <RotatingText terms={rotating} className="text-gold" />
+            white, which is what makes the term read as the emphasis.
+
+            The prefix and the rotating term each get their own centered
+            line: four terms of very different widths (Entrepreneurship,
+            Community, Sustainability, Impact) made a single centered line
+            visibly lurch sideways every rotation, since the visible glyphs
+            were never actually centered under a box sized to the longest
+            term. Two independently centered lines fix that — each line's
+            own content decides its width, so the term grows and shrinks
+            around a fixed centre instead of sliding past it. */}
+        <h1 className="flex flex-col items-center text-display-3 font-display">
+          <span>{t("prefix")}</span>{" "}
+          <RotatingText terms={rotating} className="text-gold" />
         </h1>
         <Button href="/mitmachen" variant="glass" size="lg">
           {t("cta")}

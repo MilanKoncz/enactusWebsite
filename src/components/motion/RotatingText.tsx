@@ -17,10 +17,13 @@ type Phase = "typing" | "holding" | "deleting" | "pausing";
 
 // Typewriter effect (board feedback: match the old site's hero — type a
 // term, hold, delete, move to the next one, cursor blinking throughout).
-// The box is sized to the longest term via the same CSS Grid stacking trick
-// the old crossfade version used (a same-cell invisible sizer forces the
-// track's width from first paint, so the shrinking/growing typed text can
-// never shift surrounding layout) — see the grid comment below. Under
+// Deliberately no fixed-width reservation (that used to size the box to the
+// longest term via a CSS Grid stacking trick): on its own centered line, a
+// box reserved at the longest term's width left visible dead space beside
+// every shorter term instead of letting the word actually sit centered.
+// `min-h-[1lh]` (the same reserved-height pattern HomeKpis.tsx uses for its
+// detail line) keeps the row one line tall from first paint instead, so
+// nothing below the hero's rotating term can shift vertically. Under
 // prefers-reduced-motion the typing loop never starts at all (a timer-driven
 // text mutation, unlike the caret's blink, isn't something a CSS media query
 // can stop on its own) and the first term is shown fully typed and static.
@@ -89,21 +92,11 @@ export function RotatingText({
     return () => window.clearTimeout(timeoutId);
   }, [reducedMotion, terms, typingMs, deletingMs, holdMs, pauseMs]);
 
-  const longestTerm = terms.reduce((longest, term) => (term.length > longest.length ? term : longest), "");
   const visibleText = reducedMotion ? (terms[0] ?? "") : typed;
 
   return (
-    // Both children share col-start-1/row-start-1 so CSS Grid sizes the
-    // track to the widest one placed in it (the full-length sizer) even
-    // though the typed text is usually shorter — the box is as wide as the
-    // longest term from first paint, and typing/deleting can never shift
-    // anything around it (docs/design-system.md motion rule 5: no
-    // animating width/height, and this sidesteps the need to).
-    <span className={cn("inline-grid text-left", className)}>
-      <span aria-hidden="true" className="invisible col-start-1 row-start-1 whitespace-pre">
-        {longestTerm}
-      </span>
-      <span aria-hidden="true" className="col-start-1 row-start-1 whitespace-pre">
+    <span className={cn("block min-h-[1lh]", className)}>
+      <span aria-hidden="true" className="whitespace-nowrap">
         {visibleText}
         <span aria-hidden="true" className="-mr-[2px] inline-block w-[2px] translate-y-[0.05em] animate-caret-blink bg-gold align-middle" />
       </span>

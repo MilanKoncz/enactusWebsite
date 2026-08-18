@@ -7,7 +7,7 @@ import { RotatingText } from "@/components/motion/RotatingText";
 const TIMING = { typingMs: 10, deletingMs: 5, holdMs: 20, pauseMs: 5 };
 
 function visibleText(container: HTMLElement): string {
-  const layer = container.querySelectorAll('[aria-hidden="true"].col-start-1')[1];
+  const layer = container.querySelector('[aria-hidden="true"].whitespace-nowrap');
   return layer?.firstChild?.textContent ?? "";
 }
 
@@ -81,11 +81,16 @@ describe("RotatingText", () => {
     expect(visibleText(container)).toBe("AB");
   });
 
-  it("sizes the box to the longest term via an invisible same-cell sizer, so typing never shifts layout", () => {
+  it("reserves one line's height from first paint, so typing never shifts layout vertically", () => {
     mockMatchMedia(false);
     const { container } = render(<RotatingText terms={["A", "LONGEST"]} {...TIMING} />);
-    const sizer = container.querySelector(".invisible");
-    expect(sizer).toHaveTextContent("LONGEST");
+    expect(container.firstElementChild).toHaveClass("min-h-[1lh]");
+  });
+
+  it("never reserves a fixed width, so a short term sits centered instead of beside dead space", () => {
+    mockMatchMedia(false);
+    const { container } = render(<RotatingText terms={["A", "LONGEST"]} {...TIMING} />);
+    expect(container.querySelector(".invisible")).not.toBeInTheDocument();
   });
 
   it("hides the animated layers from assistive technology and exposes exactly one stable sentence instead", () => {
