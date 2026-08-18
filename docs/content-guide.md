@@ -54,6 +54,17 @@ key) if you forget one. A bio is prose, so it lives in messages, not in
   referenced directly in `images` — leave a field `null`/`[]` rather than
   pointing at a file that doesn't exist yet.
 
+## Add or edit a STAR project (the eight former flagships on `/projekte`)
+
+`src/content/stars.ts`, separate from `projects.ts` — a STAR entry is a
+former flagship shown near the bottom of `/projekte`, not a current or
+archived project card. `logo` is a real file under `public/stars/` (two of
+eight have one so far); `description` is a message key under
+`"Stars.<key>.description"`. If a STAR project also has its own
+`projects.ts` archive entry for the same real-world project (as Moufense
+does), point both `logo` fields at the same file rather than duplicating it
+under two paths.
+
 ## Update recruiting windows (application open/close dates)
 
 Application windows live in the `recruiting_windows` table, not in a content
@@ -82,10 +93,12 @@ dashed border and a note on the public page instead of a firm date.
 Titles and descriptions are entered in German; the optional English fields
 fall back to the German text when left blank — the board maintains this
 table directly, and a second-language pass wasn't asked for. A change is
-live on the homepage immediately, the same cache-invalidation-on-save
-arrangement as the recruiting windows above.
+live on **`/termine`** (English: `/en/calendar`) immediately, the same
+cache-invalidation-on-save arrangement as the recruiting windows above. The
+calendar moved off the homepage onto this dedicated page on 2026-08-18 — it
+had grown into the homepage's biggest single section.
 
-The homepage shows the same event data two ways depending on screen width —
+`/termine` shows the same event data two ways depending on screen width —
 a month grid from tablet width up, a compact one-line-per-event list below
 that — so don't be surprised if a laptop and a phone show a genuinely
 different layout for the same table; see `docs/design-system.md`'s "Two
@@ -128,6 +141,14 @@ resend. `/admin` links every section; `docs/deployment.md` describes them.
   `src/content/network.ts` — re-confirm against `enactus.de/network` before
   editing, these are network-wide, not this club's own numbers.
 - Founding year in the footer: `src/content/org.ts`.
+
+## Edit the four Enactus Germany event cards on `/events`
+
+`src/content/egEvents.ts` — a fixed set of four (`nc`/`esa`/`oew`/`twe`),
+same shape as `content/eventFormats.ts`. Each holds only `order` and a real
+photo under `public/events/`; the abbreviation, title, and description are
+message keys under `"EgEvents.<key>.abbreviation"` / `.title` / `.description`
+in `de.json`/`en.json`, plus an `.imageAlt` describing the photo itself.
 
 ## Add or edit a partner
 

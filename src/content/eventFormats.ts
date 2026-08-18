@@ -2,12 +2,15 @@ import { z } from "zod";
 
 /**
  * The four event formats shown on /events: Socials, Workshops,
- * Teamwochenende, Gala — a fixed, confirmed set of four (same reasoning as
- * content/pillars.ts's three homepage pillars), not to be confused with
- * that unrelated file. `title` is real (the four names above, given
- * directly); the longer `detail` copy is not — see ASSETS-TODO.md. Both
- * live in messages/{locale}.json under "EventFormats.<key>"; this file only
- * holds the key, display order, and image slot.
+ * Teamwochenende, Semesterabschluss — a fixed, confirmed set of four (same
+ * reasoning as content/pillars.ts's three homepage pillars), not to be
+ * confused with that unrelated file. `title` and `detail` are both real,
+ * board-confirmed copy, live in messages/{locale}.json under
+ * "EventFormats.<key>"; this file only holds the key, display order, and
+ * image slot. The `gala` key stays as-is even though the board-confirmed
+ * title changed to "Semesterabschluss"/"End of semester" — same reasoning
+ * as `teamweekend` displaying as "Teamwochenende": the internal key doesn't
+ * need to match the display title.
  *
  * `journeys` was the fourth format until 2026-08-16 — dropped in favor of
  * `gala` per board feedback: the trip history already gets its own detailed
