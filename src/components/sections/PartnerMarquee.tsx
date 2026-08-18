@@ -34,7 +34,16 @@ export function PartnerMarquee() {
   const track = [...partners, ...partners];
 
   return (
-    <Section className="relative isolate pt-16 pb-10">
+    // pt-16 pb-10 needs the same md: variant as Section's own default
+    // (py-16 md:py-24) to actually win at md and up — an unscoped utility
+    // can't override a scoped one of the same property once the viewport
+    // crosses that breakpoint, it just loses silently (docs/design-system.md,
+    // "Watch out for": the same class of bug already found on Impressum and
+    // Datenschutz). Without the repeated md: variants here, this section
+    // quietly fell back to the full py-24 bottom padding on every screen
+    // that matters, stacking on top of the bare gate divider's own padding
+    // and HomeKpis's own top padding for the page's next most visible gap.
+    <Section className="relative isolate pt-16 pb-10 md:pt-16 md:pb-10">
       <ThreadSegment stop="partners" />
       <Container className="relative">
         <Eyebrow>{t("eyebrow")}</Eyebrow>

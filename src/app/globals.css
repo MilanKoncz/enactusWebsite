@@ -118,13 +118,15 @@
   /* Container — the one central width constraint. max-w-content. */
   --container-content: 80rem;
 
-  /* Partner logo band. Speed is chosen so a full loop reads as ambient
-     motion, not a race — see PartnerMarquee. `reverse` plays the same
-     -50% keyframe backward (board feedback: reverse the band's direction) —
-     cheaper and less error-prone than authoring a second keyframe, and the
-     duplicated-track trick that makes the loop seamless works identically
-     played in either direction. */
-  --animate-marquee: marquee 45s linear infinite reverse;
+  /* Partner logo band. --marquee-duration is a named constant rather than a
+     bare number in the animation shorthand, so the loop's speed reads as an
+     intentional value, not a magic number — see PartnerMarquee. `reverse`
+     plays the same -50% keyframe backward (board feedback: reverse the
+     band's direction) — cheaper and less error-prone than authoring a
+     second keyframe, and the duplicated-track trick that makes the loop
+     seamless works identically played in either direction. */
+  --marquee-duration: 90s;
+  --animate-marquee: marquee var(--marquee-duration) linear infinite reverse;
 
   /* Hero typewriter caret (RotatingText) — a steady blink, independent of
      however long the current term takes to type. Ends each cycle at
