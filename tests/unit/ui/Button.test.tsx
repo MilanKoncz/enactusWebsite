@@ -20,6 +20,14 @@ describe("buttonClasses", () => {
 });
 
 describe("Button", () => {
+  // The default (md) size's own padding rounds to 42px tall — 2px short of
+  // the 44px touch-target floor found during the mobile subpage pass
+  // (kontakt's "Nachricht senden", mitmachen's "Erinnerung aktivieren").
+  it("meets the 44px touch-target floor at the default size", () => {
+    render(<Button>Absenden</Button>);
+    expect(screen.getByRole("button", { name: "Absenden" })).toHaveClass("min-h-11");
+  });
+
   it("renders as a native button by default", () => {
     render(<Button>Bewerbung absenden</Button>);
     expect(screen.getByRole("button", { name: "Bewerbung absenden" })).toBeInTheDocument();

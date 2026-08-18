@@ -43,7 +43,9 @@ const VARIANT_CLASSES: Record<ButtonVariant, string> = {
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {
   sm: "gap-2 px-4 py-1 text-body-s",
-  md: "gap-2 px-6 py-2 text-body-m",
+  // min-h-11 (44px) is the touch-target floor this size is checked
+  // against — its own padding alone rounds to 42px, 2px short.
+  md: "min-h-11 gap-2 px-6 py-2 text-body-m",
   lg: "gap-3 px-10 py-3 text-body-l",
 };
 

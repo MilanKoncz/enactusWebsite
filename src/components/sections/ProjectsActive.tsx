@@ -72,16 +72,21 @@ function ProjectCard({ project, isOpen, onToggle }: ProjectCardProps) {
         ) : (
           <Placeholder kind="Logo" label={project.name} ratio="1 / 1" className="size-14 shrink-0 p-2" />
         )}
+        {/* Name and status share a row that's free to wrap on its own,
+            separate from the one-liner below: badge + chevron used to sit
+            in the same row as the one-liner, which at 360px left the
+            one-liner only ~80px to wrap in — a couple of words per line.
+            The one-liner now always gets the column's full width. */}
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <p className="text-body-l font-medium">
-            {project.name}
-            <span className="sr-only"> — {isOpen ? tPage("collapseLabel") : tPage("expandLabel")}</span>
-          </p>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <p className="text-body-l font-medium">
+              {project.name}
+              <span className="sr-only"> — {isOpen ? tPage("collapseLabel") : tPage("expandLabel")}</span>
+            </p>
+            <Badge status={project.status}>{tStatus(project.status)}</Badge>
+          </div>
           <p className="text-body-s opacity-70">{t(`${project.slug}.oneLiner` as ProjectCopyKey)}</p>
         </div>
-        <Badge status={project.status} className="shrink-0">
-          {tStatus(project.status)}
-        </Badge>
         <ChevronDown
           aria-hidden="true"
           className={cn(

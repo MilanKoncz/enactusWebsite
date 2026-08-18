@@ -21,9 +21,27 @@ type FormatCopyKey = Parameters<ReturnType<typeof useTranslations<"EventFormats"
 // (teamweekend) render through the exact same tile shape — a real image
 // swaps in for the dashed Placeholder without changing the surrounding
 // layout, so a photo landing later never reflows the grid around it.
-function FormatMedia({ format, title, ratio, className }: { format: EventFormat; title: string; ratio: string; className?: string }) {
+//
+// `compact` drops the placeholder's own label (the format's title, e.g.
+// "Teamwochenende"): the accordion trigger already shows that same title as
+// real text right beside this tile, and there is no room for a 14-character
+// word inside a 56px icon-sized box — it overflowed the tile and ran into
+// the title text next to it before this was added.
+function FormatMedia({
+  format,
+  title,
+  ratio,
+  className,
+  compact = false,
+}: {
+  format: EventFormat;
+  title: string;
+  ratio: string;
+  className?: string;
+  compact?: boolean;
+}) {
   if (!format.image) {
-    return <Placeholder kind="Bild" label={title} ratio={ratio} className={className} />;
+    return <Placeholder kind="Bild" label={compact ? undefined : title} ratio={ratio} className={className} />;
   }
   return (
     <div className={cn("relative overflow-hidden rounded-md", className)} style={{ aspectRatio: ratio }}>
@@ -111,6 +129,7 @@ export function EventFormats() {
                         format={format}
                         title={title}
                         ratio="1 / 1"
+                        compact
                         className={format.image ? "size-14 shrink-0" : "size-14 shrink-0 p-2"}
                       />
                       <span className="font-mono text-mono-s uppercase">{title}</span>

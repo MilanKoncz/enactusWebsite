@@ -13,6 +13,14 @@ function getFocusables(dialog: HTMLElement) {
 }
 
 describe("MobileMenu", () => {
+  // p-2 around the 24px icon used to land at 40px square — under the 44px
+  // touch-target floor found during the mobile subpage pass.
+  it("meets the 44px touch-target floor on the open trigger", () => {
+    mockPathname.mockReturnValue("/");
+    renderWithIntl(<MobileMenu />);
+    expect(screen.getByRole("button", { name: "Menü öffnen" })).toHaveClass("p-2.5");
+  });
+
   it("opens when the trigger is activated with Enter", async () => {
     mockPathname.mockReturnValue("/");
     const user = userEvent.setup();

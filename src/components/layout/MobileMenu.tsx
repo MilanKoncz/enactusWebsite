@@ -19,8 +19,10 @@ export type MobileMenuProps = {
 // text, depending on HeaderOverlay's state) and inside the fullscreen dialog
 // (always paper-on-ink) — a hover tint has to work against whichever surface
 // currentColor resolves to, not just one of them.
+// p-2.5 around a 24px icon lands the box at 44px square — the touch-target
+// floor this pass checked for, not an arbitrary padding choice.
 const MENU_BUTTON_CLASSES =
-  "inline-flex items-center justify-center rounded-md p-2 transition-[background-color,transform] duration-[var(--duration-fast)] ease-signature hover:-translate-y-px hover:scale-[1.02] hover:bg-current/10 focus-visible:-translate-y-px focus-visible:scale-[1.02] focus-visible:bg-current/10 active:translate-y-0 active:scale-[0.99] active:bg-current/15";
+  "inline-flex items-center justify-center rounded-md p-2.5 transition-[background-color,transform] duration-[var(--duration-fast)] ease-signature hover:-translate-y-px hover:scale-[1.02] hover:bg-current/10 focus-visible:-translate-y-px focus-visible:scale-[1.02] focus-visible:bg-current/10 active:translate-y-0 active:scale-[0.99] active:bg-current/15";
 
 // Radix Dialog gives focus trap, Escape-to-close, scroll lock, and focus
 // return to the trigger for free (Content forces trapFocus, can't be

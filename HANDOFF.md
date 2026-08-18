@@ -183,6 +183,51 @@ the run ends, not left behind as permanent documentation.
   danach gezielt über die PID auf Port 3000 (`netstat` + `taskkill /PID`).
   Falls auf dieser Maschine parallel etwas anderes in Node lief, ist das der
   Moment, an dem es gestoppt wurde.
+- **Aufgabe B fertig, CI grün.** Ab hier: Aufgabe C (Mobile-Durchgang
+  Unterseiten, 360px) — /projekte, /projekte/archiv, /events, /partner,
+  /kontakt, /mitmachen, /prozess.
+- **C: `/projekte` — Projektbeschreibung lief auf ~80px Spaltenbreite
+  zusammen, ein bis zwei Wörter pro Zeile.** `ProjectsActive.tsx`s
+  Kartenzeile hatte Logo, Name+OneLiner-Spalte, Badge und Chevron alle in
+  EINER Reihe; bei 360px blieb für die `flex-1`-Textspalte nach Logo
+  (56px) + Badge (~80px) + Chevron (20px) + drei `gap-4` nur noch gut
+  70–80px übrig. Umgebaut: Name und Badge teilen sich jetzt eine eigene,
+  umbrechende Zeile, der OneLiner bekommt darunter immer die volle
+  Spaltenbreite — unabhängig vom Badge, nicht nur auf Mobile bezogen (die
+  Umstellung ist auch am Desktop unauffällig richtig, kein Sonderfall
+  nötig).
+- **C: `/events` — Platzhalter-Text lief aus einer 56px-Box heraus, direkt in
+  den Titeltext daneben hinein.** Der Accordion-Trigger für „Teamwochenende"
+  (noch ohne Foto, siehe ASSETS-TODO.md) zeigte `Placeholder kind="Bild"
+  label={title}` in einer `size-14`-Box — für ein 14-Zeichen-Wort ohne jede
+  Chance, dort hineinzupassen, und der Titel steht ohnehin schon als echter
+  Text direkt daneben. `Placeholder.label` jetzt optional gemacht (Regression
+  für andere Aufrufer ausgeschlossen — alle bestehenden übergeben weiter ein
+  Label, dort ändert sich nichts), `FormatMedia` bekommt ein `compact`-Flag,
+  das für den Accordion-Fall das Label weglässt; die Placeholder-Box selbst
+  bekommt zusätzlich `overflow-hidden` als Sicherheitsnetz gegen den nächsten
+  ähnlichen Fall. Regressionstest ergänzt.
+- **C: zwei Touch-Ziele unter 44px gefunden und global behoben** (beide
+  Shared Components, die auf allen sieben geprüften Seiten erscheinen, nicht
+  Seiten-spezifische Bugs): Header-Hamburger-Button 40×40 → `p-2.5` um den
+  24px-Icon macht 44×44; `Button`s Standardgröße (`size="md"`, u. a. „Nachricht
+  senden", „Erinnerung aktivieren", „Project Guide herunterladen") landete
+  bei 42px Höhe, jetzt mit `min-h-11` (44px) abgesichert. Footer-Links (Text
+  in einem Absatz-Kontext, WCAG 2.5.8 nimmt Inline-Textlinks ausdrücklich
+  aus) und die Consent-Checkbox (16×16, aber komplett von einem
+  klickbaren `<label>`-Satz umschlossen, siehe ApplicationForm.tsx) bewusst
+  nicht angefasst — beides keine echten Bedienprobleme, nur Messartefakte
+  einer Prüfung, die ausschließlich das native Element misst.
+- **C: `/prozess`-Timeline und `/mitmachen`-Formular bei 360px vollständig
+  durchgespielt, keine weiteren Bugs gefunden.** Timeline: alle acht
+  Stationen, Klick öffnet die Prüfpunkte-Box sauber, keine Überlappung.
+  Formular (mit gemocktem offenem Bewerbungsfenster getestet, da das echte
+  erst am 01.09. öffnet): alle Textfelder, die Wunschbereich-Mehrfachauswahl
+  (2-spaltig, keine abgeschnittenen Labels), die Consent-Checkbox, jede
+  einzelne Fehlermeldung (Pflichtfelder, Mindestlänge, „mindestens einen
+  Bereich", Einwilligung) und der Erfolgszustand nach Absenden — alle lesbar,
+  keine Überlappung, kein Overflow. Nichts zu reparieren; hier bestätigt,
+  nicht neu gebaut.
 - **`Date.now()` vs `new Date().getTime()` und die purity lint.** Both
   `page.tsx` (A3) and `admin/termine/page.tsx` (A5) needed "now" outside a
   component; `Date.now()` directly in a component body trips

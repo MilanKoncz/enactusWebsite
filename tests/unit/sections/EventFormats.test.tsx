@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "jest-axe";
 import { renderWithIntl } from "../../fixtures/intl";
@@ -67,6 +67,17 @@ describe("EventFormats", () => {
     await user.click(workshops);
     expect(workshops).toHaveAttribute("aria-expanded", "true");
     expect(socials).toHaveAttribute("aria-expanded", "false");
+  });
+
+  // Regression: the accordion trigger's placeholder used to repeat the
+  // format's own title as its inner label — inside a 56px icon-sized box,
+  // "Teamwochenende" had nowhere to go but overflow into the title text
+  // sitting right next to it. The title is real text on the trigger
+  // already; the placeholder itself only needs to say "Bild" is missing.
+  it("never repeats a format's title inside its own tiny accordion placeholder", () => {
+    renderWithIntl(<EventFormats />);
+    const accordionTrigger = screen.getByRole("button", { name: "Teamwochenende" });
+    expect(within(accordionTrigger).getAllByText("Teamwochenende")).toHaveLength(1);
   });
 
   it("has no accessibility violations", async () => {
