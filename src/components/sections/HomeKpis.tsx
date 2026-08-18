@@ -7,17 +7,19 @@ import { Section } from "@/components/ui/Section";
 import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { kpis, type KpiKey } from "@/content/kpis";
 
-type KpiFormat = "count" | "atLeastCount" | "atLeastCurrency" | "topRank";
+type KpiFormat = "count" | "atLeastCount" | "atLeastCurrency" | "topRank" | "unitCount";
 
 // funding and projectIterations are lower bounds ("mehr als"), rendered with
-// a leading ">"; worldRanking is a rank, rendered with a leading "Top" —
+// a leading ">"; worldRanking is a rank, rendered with a leading "Top"; the
+// spin-off count carries its own unit word ("5 Projekte") since "5" alone,
+// beside a label reading "Gegründet/Übergeben", read as an orphaned digit —
 // see content/kpis.ts.
 const KPI_FORMAT: Record<KpiKey, KpiFormat> = {
   projectIterations: "atLeastCount",
   funding: "atLeastCurrency",
   nationalChampionships: "count",
   worldRanking: "topRank",
-  spinoffs: "count",
+  spinoffs: "unitCount",
 };
 
 // Five static figures, deliberately not animated (docs/design-system.md:
@@ -43,6 +45,8 @@ export function HomeKpis() {
         return `>${format.number(value)}`;
       case "topRank":
         return t("topRankFormat", { value: format.number(value) });
+      case "unitCount":
+        return t("spinoffsFormat", { value: format.number(value) });
       default:
         return format.number(value);
     }
@@ -80,8 +84,18 @@ export function HomeKpis() {
                     (">150.000 €") runs past either one and collides with its
                     neighbour, confirmed by measuring the rendered width, not
                     eyeballed. display-3 (2.5rem) is the size that clears both
-                    narrow cases. */}
-                <p className="text-display-3 font-display sm:text-display-2 lg:text-display-3">
+                    narrow cases. The spin-off tile's "5 Projekte" is wider
+                    than every other tile's figure at exactly the width the
+                    five-column row gets tightest (lg, before lg:text-display-3
+                    would apply) — heading-1 (2rem) is the one step down that
+                    still clears the column there; every other breakpoint
+                    keeps the same size as the rest of the row. */}
+                <p
+                  className={cn(
+                    "text-display-3 font-display sm:text-display-2 lg:text-display-3",
+                    isLast && "lg:text-heading-1",
+                  )}
+                >
                   {kpi.verified ? (
                     formatted
                   ) : (
@@ -96,10 +110,13 @@ export function HomeKpis() {
                     than invented, kept at one line's height so adding it
                     later doesn't reflow the grid. worldRanking is the first
                     figure to actually use it (the field size the rank was
-                    measured against). */}
-                <p className="min-h-[1lh] text-body-s opacity-60">
+                    measured against). Same treatment as the label above it
+                    (Eyebrow: Geist Mono, uppercase, the same size and
+                    tracking) rather than body copy — it reads as a footnote
+                    to the label, not as a second sentence. */}
+                <Eyebrow className="min-h-[1lh]">
                   {kpi.key === "worldRanking" ? t("worldRankingDetail") : null}
-                </p>
+                </Eyebrow>
               </div>
             );
           })}

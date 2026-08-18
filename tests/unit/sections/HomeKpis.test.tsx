@@ -14,15 +14,20 @@ describe("HomeKpis", () => {
   it("renders all five KPI labels in the requested order", () => {
     renderWithIntl(<HomeKpis />);
     const labels = screen
-      .getAllByText(/Projektiterationen|Eingeworbenes Funding|Nationale Meistertitel|Weltweit|Gegründet & Übergeben/)
+      .getAllByText(/Projektiterationen|Eingeworbenes Funding|Nationale Meistertitel|Weltweit|Gegründet\/Übergeben/)
       .map((el) => el.textContent);
     expect(labels).toEqual([
       "Projektiterationen",
       "Eingeworbenes Funding",
       "Nationale Meistertitel",
       "Weltweit",
-      "Gegründet & Übergeben",
+      "Gegründet/Übergeben",
     ]);
+  });
+
+  it("renders the spin-off count with its unit word, not a bare digit", () => {
+    renderWithIntl(<HomeKpis />);
+    expect(screen.getByText("5 Projekte")).toBeInTheDocument();
   });
 
   it("renders the world-ranking figure with a 'Top' prefix and its field-size detail", () => {

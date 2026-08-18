@@ -84,9 +84,10 @@
       "funding": "Funding raised",
       "nationalChampionships": "National championships",
       "worldRanking": "Worldwide",
-      "spinoffs": "Founded & handed over"
+      "spinoffs": "Founded/handed over"
     },
     "topRankFormat": "Top {value}",
+    "spinoffsFormat": "{value} projects",
     "worldRankingDetail": "out of 1,000+ teams"
   },
   "Pillars": {

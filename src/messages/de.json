@@ -84,9 +84,10 @@
       "funding": "Eingeworbenes Funding",
       "nationalChampionships": "Nationale Meistertitel",
       "worldRanking": "Weltweit",
-      "spinoffs": "Gegründet & Übergeben"
+      "spinoffs": "Gegründet/Übergeben"
     },
     "topRankFormat": "Top {value}",
+    "spinoffsFormat": "{value} Projekte",
     "worldRankingDetail": "von über 1.000 Teams"
   },
   "Pillars": {

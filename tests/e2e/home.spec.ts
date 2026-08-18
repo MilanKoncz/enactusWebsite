@@ -34,7 +34,7 @@ test.describe("homepage", () => {
       "Eingeworbenes Funding",
       "Nationale Meistertitel",
       "Weltweit",
-      "Gegründet & Übergeben",
+      "Gegründet/Übergeben",
     ];
     const boxes = [];
     for (const label of labels) {
