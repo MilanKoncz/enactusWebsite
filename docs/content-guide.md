@@ -85,6 +85,12 @@ table directly, and a second-language pass wasn't asked for. A change is
 live on the homepage immediately, the same cache-invalidation-on-save
 arrangement as the recruiting windows above.
 
+The homepage shows the same event data two ways depending on screen width —
+a month grid from tablet width up, a compact one-line-per-event list below
+that — so don't be surprised if a laptop and a phone show a genuinely
+different layout for the same table; see `docs/design-system.md`'s "Two
+views, one set of rules" for what each looks like.
+
 The page also warns, standing, when no window with a future end date exists:
 that's the state in which `/mitmachen` says "closed" indefinitely.
 

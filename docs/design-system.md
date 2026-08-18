@@ -120,6 +120,44 @@ the usual 60% — measured against this particular fill, `ink`/60 is 4.30:1
 (fails AA), `ink`/70 is 5.78:1. Both figures are asserted in
 `tests/unit/contrast.test.ts` so neither value drifts unnoticed.
 
+**The bar and dot, the same colors again.** `CATEGORY_BAR_CLASS` fills every
+category solidly, `wettkaempfe` included — a 6px month-grid bar or a 2px
+agenda dot has no room for the badge's outline-plus-text treatment, so at
+this size color really is the only signal, which is fine only because the
+day list underneath always spells the category out in text besides.
+`CATEGORY_BAR_TENTATIVE_CLASS` outlines rather than fills a tentative
+event's bar — the same fill-vs-outline logic the dashed gold border already
+carries elsewhere for `tentative`, applied at bar size.
+
+## Two views, one set of rules
+
+The homepage calendar (`EventCalendar.tsx`) is two components, not one: a
+month grid (`EventCalendarGrid.tsx`) from `md` up, and a compact agenda list
+(`EventAgenda.tsx`) below it. Both render at once and are switched purely by
+CSS (`hidden md:block` / `md:hidden`) — never by a `useMediaQuery` hook,
+whose SSR snapshot is `false` and would show the agenda to a desktop visitor
+for one frame after hydration. Everything upstream of the two views — the
+filter chips, the category taxonomy, past-event dimming, the tentative
+treatment, the ICS download — is shared and applies identically to both;
+neither view gets its own variant of a rule documented above.
+
+**The grid** is a classic Monday-first month, always six weeks tall so a
+month change never resizes the page. A day carries at most three stacked
+bars before a plain `+N` mono count takes over; clicking or activating a day
+lists its events in full underneath the grid, never in an overlay. Today is
+marked by a small dot, ink on paper and gold only once the day is also
+selected (ink background) — gold on paper measures 1.47:1, too faint for a
+meaningful marker, so the surface decides the color the same way it decides
+everything else gold touches in this document.
+
+**The agenda** collapses each event to one line — day, category dot, title —
+and holds time, location, the full badge, and the ICS button behind a
+per-row disclosure (`aria-expanded`, not a hover reveal: see "Hover
+enhances, hover never hides" below). The next upcoming event is marked in
+place with a gold left edge and a countdown, not pulled into a separate
+card the way it used to be — one fewer visual pattern for the same
+information.
+
 ## Typography
 
 - **Display — Instrument Serif.** Headlines only, large, tight tracking. Never
