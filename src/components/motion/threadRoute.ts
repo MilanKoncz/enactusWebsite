@@ -34,7 +34,7 @@ type Waypoints = {
  * 2026-08-16; repeating it on every page turned the one memorable element
  * into wallpaper, so those stops are gone rather than commented out.
  *
- * Amplitude is chosen per stop, not globally: preserveAspectRatio="none"
+ * `wide` amplitude is chosen per stop, not globally: preserveAspectRatio="none"
  * scales x and y independently, so the same x-swing reads as a sharp zigzag
  * in a short section (the partner band, the gate dividers) and as an
  * imperceptible drift in a tall one. Gate-divider stops stay perfectly
@@ -50,23 +50,43 @@ type Waypoints = {
  * left; kpis/pillars/benefits (the one excursion between gate-kpis and
  * gate-alumni) swings right; alumni swings back left; board/cta (the final
  * excursion, page ends before another gate closes it) swings right again.
+ *
+ * `narrow` (below `md`) is a deliberately different shape, not a scaled-down
+ * `wide`: a thread sweeping from ~40 to ~93 across a 360px screen would
+ * repeatedly cross straight through left-aligned body copy. Mobile instead
+ * pins the axis at MOBILE_AXIS (~8% of the viewport — just past the
+ * container's own left inset, `--container-inset`'s 1rem/16px floor, so the
+ * thread runs immediately beside where text starts, the way GateMarker's own
+ * `border-l-2` sits immediately beside its label, never "beside" reading as
+ * "through"), with every stop's `from`/`to` locked to that axis — the seam
+ * math is then trivially continuous — and only the `bow` wandering a few
+ * points per section for a small, per-section "breath". It never bows past
+ * the axis into the content column (bow ≤ MOBILE_AXIS throughout), only
+ * toward the true edge, so it can't drift into the column even at its
+ * widest. Stroke width for this variant drops to 1px in ThreadSegment.tsx.
  */
+const MOBILE_AXIS = 8;
+
+function narrowAt(bow: number): Waypoints {
+  return { from: MOBILE_AXIS, bow, to: MOBILE_AXIS };
+}
+
 const ROUTES: Record<ThreadStop, Record<ThreadWidth, Waypoints>> = {
   partners: {
     wide: { from: 42, bow: 46, to: 50 },
-    narrow: { from: 40, bow: 45, to: 50 },
+    narrow: narrowAt(5),
   },
   "gate-kpis": {
     wide: { from: 50, bow: 50, to: 50 },
-    narrow: { from: 50, bow: 50, to: 50 },
+    narrow: narrowAt(MOBILE_AXIS),
   },
   kpis: {
     wide: { from: 50, bow: 70, to: 82 },
-    narrow: { from: 50, bow: 78, to: 90 },
+    narrow: narrowAt(6),
   },
   pillars: {
     wide: { from: 82, bow: 74, to: 86 },
-    narrow: { from: 90, bow: 86, to: 93 },
+    narrow: narrowAt(4),
   },
   // The bow crosses back toward the centre earlier than the amplitude alone
   // would suggest: at `lg` and up, the right-hand third of this section is
@@ -75,40 +95,39 @@ const ROUTES: Record<ThreadStop, Record<ThreadWidth, Waypoints>> = {
   // thread clears the arc's band before the arc begins.
   benefits: {
     wide: { from: 86, bow: 58, to: 50 },
-    narrow: { from: 93, bow: 84, to: 50 },
+    narrow: narrowAt(7),
   },
   "gate-calendar": {
     wide: { from: 50, bow: 50, to: 50 },
-    narrow: { from: 50, bow: 50, to: 50 },
+    narrow: narrowAt(MOBILE_AXIS),
   },
   // A calmer excursion than its neighbours on purpose: the calendar is a
   // list to read, not a moment to look at, so the thread only drifts
   // gently through it rather than repeating benefits' wide swing to the
-  // right — the same "amplitude chosen per section" rule the mobile pass
-  // applies, just already true at desktop width here.
+  // right.
   calendar: {
     wide: { from: 50, bow: 35, to: 50 },
-    narrow: { from: 50, bow: 25, to: 50 },
+    narrow: narrowAt(5),
   },
   "gate-alumni": {
     wide: { from: 50, bow: 50, to: 50 },
-    narrow: { from: 50, bow: 50, to: 50 },
+    narrow: narrowAt(MOBILE_AXIS),
   },
   alumni: {
     wide: { from: 50, bow: 20, to: 50 },
-    narrow: { from: 50, bow: 12, to: 50 },
+    narrow: narrowAt(6),
   },
   "gate-board": {
     wide: { from: 50, bow: 50, to: 50 },
-    narrow: { from: 50, bow: 50, to: 50 },
+    narrow: narrowAt(MOBILE_AXIS),
   },
   board: {
     wide: { from: 50, bow: 72, to: 84 },
-    narrow: { from: 50, bow: 80, to: 92 },
+    narrow: narrowAt(4),
   },
   cta: {
     wide: { from: 84, bow: 76, to: 78 },
-    narrow: { from: 92, bow: 86, to: 88 },
+    narrow: narrowAt(6),
   },
 };
 

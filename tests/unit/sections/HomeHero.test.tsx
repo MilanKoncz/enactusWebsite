@@ -62,6 +62,15 @@ describe("HomeHero", () => {
     expect(container.querySelector("video")).toBeNull();
   });
 
+  it("shows the video's own poster as a static image below md, not an empty fill", () => {
+    mockIntersectionObserver();
+    mockMatchMedia(false);
+    const { container } = renderWithIntl(<HomeHero />);
+    const posterImage = container.querySelector('img[src*="hero-poster.jpg"]');
+    expect(posterImage).toBeInTheDocument();
+    expect(posterImage).toHaveClass("md:hidden");
+  });
+
   it("renders the hero video with the real poster and source at desktop width", () => {
     mockIntersectionObserver();
     mockMatchMedia(true);

@@ -124,7 +124,66 @@ the run ends, not left behind as permanent documentation.
   when a fully native, already-accessible alternative existed felt like the
   wrong side of "ask when ambiguous" to guess through unattended — noted
   here instead of adding it silently.
-- **`Date.now()` vs `new Date().getTime()` and the purity lint.** Both
+- **Aufgabe A ist fertig, alle sechs Commits grün auf CI** (Migration+Schema,
+  Kalenderfarben, Timezone-Isolation, Startseiten-Sektion, ICS, Admin,
+  Seed-Migration). Ab hier: Aufgabe B (Mobile-Durchgang Startseite).
+- **B: "Eyebrow, Überschrift und Buttons zentriert" war schon erfüllt, nicht
+  neu umgesetzt.** Geprüft an allen Homepage-Sektionen: nur der Hero hat
+  Eyebrow/Überschrift/Button überhaupt als eine zusammengehörige Einheit —
+  und der war schon zentriert, vor jeder Änderung dieses Durchgangs. Jede
+  andere Sektion (`SectionHeading`) ist absichtlich linksbündig, seit jeher,
+  und trägt keinen eigenen Button. Eine Umstellung dort wäre ein
+  eigenständiges, nicht angefragtes Redesign von einem Dutzend Sektionen
+  gewesen — nicht gemacht, hier nur festgehalten, dass die Regel bereits
+  zutrifft und nicht weiter verändert wurde.
+- **B: Hero auf 78vh, Logo/Abstände verkleinert, Poster-Fallback.**
+  `HomeHero.tsx`: `h-[78vh] md:h-auto`, `Container` wird `flex-1` +
+  `justify-center` (bei `md:h-auto` ein No-op, da kein Platz zum Wachsen
+  übrig bleibt — Desktop bleibt pixelgleich). `pt-36 pb-24/36` wurde zu
+  `pt-16 pb-10 md:pt-36 md:pb-36`, Logo von `h-28` auf `h-20` (nur die
+  Mobile-Stufe, `sm:`/`md:`/`lg:` unverändert). Fehlendes
+  `mobileImageSrc` (ASSETS-TODO.md) fällt jetzt auf `heroMedia.posterSrc`
+  zurück statt auf gar kein Bild — echtes Standbild statt Navy-Fläche,
+  verifiziert per Screenshot bei 360/390px.
+- **B: Tool-Halbkreis → statisches 2×2-Raster unter `md`, Bogen ab `md`
+  (vorher `lg`).** "Tablet" als `md` (768px) gelesen, nicht `lg` (1024px) —
+  ab da ist real Platz für den animierten Bogen neben der zweispaltigen
+  Benefits-Grid. Raster nutzt dieselben vier Logos (`content/tools.ts`),
+  `aria-hidden`, kein neues Content-File.
+- **B: Goldener Faden auf Mobile — vollständig neu berechnete `narrow`-Route,
+  keine bloße Skalierung.** Die alte `narrow`-Route driftete wie die
+  Desktop-Version quer über die Seite (z. B. Benefits: 93→50); eine simple
+  "durch drei geteilte" Version davon hätte den Faden immer noch mitten durch
+  linksbündigen Fließtext laufen lassen. Stattdessen: `MOBILE_AXIS = 8`
+  (≈8 % der Viewportbreite, wie gefordert), jede Sektion beginnt und endet
+  narrow-seitig exakt dort (macht die Nahtstetigkeit trivial), nur der `bow`
+  wandert pro Sektion 4–7 Punkte — und **nie über die Achse hinaus** in die
+  Textspalte hinein, nur Richtung Bildschirmkante. Damit bleibt der Faden
+  durchgehend links neben dem Text, nie durch ihn hindurch, verifiziert per
+  Screenshot bei 360px (Benefits, Kalender). Gate-Stops liegen narrow-seitig
+  jetzt ebenfalls bei 8 statt 50 — sonst würde der Faden an jedem Gate von der
+  Kante zurück zur Mitte springen. Strichstärke auf der `narrow`-Path von 2px
+  auf 1px.
+- **B: Sektionsabstände vereinheitlicht in `Section.tsx` selbst**, nicht pro
+  Sektion: `py-24` → `py-16 md:py-24` — die eine gemeinsame Stelle, an der
+  praktisch jede Sektion ihren vertikalen Rhythmus zieht. `GateDivider`
+  (eigene, bewusst kompaktere Rolle) auf `py-10 md:py-16` mitgezogen, damit er
+  auf Mobile weiterhin sichtbar kürzer bleibt als eine volle Sektion.
+  `PartnerMarquee`s eigene, schon immer abweichende Werte (`pt-16 pb-10`,
+  für das schmale Logoband) unangetastet gelassen — kein Symptom, sondern
+  bereits die bewusste Ausnahme.
+- **B: KPI-/Säulen-Fixes aus den letzten beiden Commits gegengeprüft** — per
+  Screenshot bei 360px, beide sauber (keine Überlappung, Kartentext lesbar
+  über dem Hintergrundfoto), auch mit dem neuen `py-16`-Rhythmus.
+- **Vorsicht, eigener Fehler:** Beim Server-Neustart für die Screenshot-
+  Verifikation wurde einmal `taskkill /F /IM node.exe` verwendet — das
+  beendet **alle** Node-Prozesse auf der Maschine, nicht nur den
+  Dev-Server dieses Projekts. Funktional folgenlos für dieses Repo, aber zu
+  grobkörnig für eine unbeaufsichtigte Aktion; jeder weitere Neustart lief
+  danach gezielt über die PID auf Port 3000 (`netstat` + `taskkill /PID`).
+  Falls auf dieser Maschine parallel etwas anderes in Node lief, ist das der
+  Moment, an dem es gestoppt wurde.
+- **`Date.now()` vs `new Date().getTime()` und die purity lint.** Both
   `page.tsx` (A3) and `admin/termine/page.tsx` (A5) needed "now" outside a
   component; `Date.now()` directly in a component body trips
   `react-hooks/purity`'s impure-call check (confirmed: it did not fire for

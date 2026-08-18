@@ -20,11 +20,14 @@ export type ThreadSegmentProps = {
 // and y to 0-100% of its height, independently — that's what makes x a
 // percentage comparable across sections of different heights, which is what
 // lets threadRoute.ts's waypoints line up exactly at each seam.
-// vector-effect="non-scaling-stroke" keeps the 2px stroke width uniform
-// despite that non-uniform scaling, matching GateMarker's 2px rule instead
-// of rendering as a squashed ellipse. The scroll reveal is a clip on this
-// svg rather than a stroke-dasharray on the path — see .thread-reveal in
-// globals.css for why the two can't be combined.
+// vector-effect="non-scaling-stroke" keeps the stroke width uniform despite
+// that non-uniform scaling, instead of rendering as a squashed ellipse. The
+// desktop path stays 2px, matching GateMarker's rule; the mobile path drops
+// to 1px — a hairline that sits close to the text column (threadRoute.ts's
+// MOBILE_AXIS) without reading as another rule competing with GateMarker's
+// own. The scroll reveal is a clip on this svg rather than a
+// stroke-dasharray on the path — see .thread-reveal in globals.css for why
+// the two can't be combined.
 //
 // Purely decorative: aria-hidden, no tabindex, no interactive content, and
 // `pointer-events: none` so it can never intercept a click meant for the
@@ -52,7 +55,7 @@ export function ThreadSegment({ stop, className }: ThreadSegmentProps) {
       <path
         d={pathFor(stop, "narrow")}
         vectorEffect="non-scaling-stroke"
-        strokeWidth={2}
+        strokeWidth={1}
         fill="none"
         className="md:hidden"
         style={{ stroke: "var(--thread-stroke)" }}

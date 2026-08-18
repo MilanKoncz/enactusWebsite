@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Card } from "@/components/ui/Card";
 import { Container } from "@/components/ui/Container";
@@ -7,6 +8,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { ToolOrbit } from "@/components/motion/ToolOrbit";
 import { benefits } from "@/content/benefits";
+import { tools } from "@/content/tools";
 
 // Same always-visible detail text as Pillars (DetailText), denser grid, no
 // gate marker — that motif belongs to the pillars, one signature element,
@@ -16,10 +18,12 @@ import { benefits } from "@/content/benefits";
 // interactive is only noise in the tab order now that the text is always
 // there.
 //
-// ToolOrbit sits beside the grid on large screens only (board feedback: a
-// decorative flourish, not information — dropped below `lg` rather than
-// squeezed into a cramped static row, per the brief's own "either drop it or
-// reduce it to a static row on mobile" allowance).
+// The animated arc (ToolOrbit) is kept from `md` up — a real tablet, not
+// just "not a phone" — and replaced below that by a static 2×2 grid of the
+// same four logos: a decorative flourish is worth animating once there's
+// room for it beside the cards, but on a phone it's worth keeping only as
+// plain, unanimated information (board brief: "either drop it or reduce it
+// to a static row on mobile").
 export function Benefits() {
   const t = useTranslations("Benefits");
 
@@ -28,6 +32,13 @@ export function Benefits() {
       <ThreadSegment stop="benefits" />
       <Container className="relative flex flex-col gap-12">
         <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
+        <div className="grid grid-cols-2 gap-6 md:hidden" aria-hidden="true">
+          {tools.map((toolItem) => (
+            <div key={toolItem.key} className="relative h-14 w-full">
+              <Image src={toolItem.logo} alt="" fill sizes="160px" className="object-contain" />
+            </div>
+          ))}
+        </div>
         {/* The orbit is a sibling of the grid, not of the whole column: it
             centres against the cards themselves, so it reads as belonging to
             them instead of floating somewhere beside the section. */}
@@ -41,7 +52,7 @@ export function Benefits() {
               </Card>
             ))}
           </div>
-          <div className="hidden shrink-0 lg:block">
+          <div className="hidden shrink-0 md:block">
             <ToolOrbit />
           </div>
         </div>

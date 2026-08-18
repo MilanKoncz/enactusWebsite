@@ -31,14 +31,37 @@ describe("threadRoute", () => {
     ]);
   });
 
-  it("keeps the four gate-divider stops perfectly vertical, in both widths", () => {
+  it("keeps the four gate-divider stops perfectly vertical at the desktop centre (50)", () => {
     for (const stop of ["gate-kpis", "gate-calendar", "gate-alumni", "gate-board"] as const) {
-      for (const width of WIDTHS) {
-        const { from, bow, to } = waypointsFor(stop, width);
-        expect(from).toBe(50);
-        expect(bow).toBe(50);
-        expect(to).toBe(50);
-      }
+      const { from, bow, to } = waypointsFor(stop, "wide");
+      expect(from).toBe(50);
+      expect(bow).toBe(50);
+      expect(to).toBe(50);
+    }
+  });
+
+  it("keeps the four gate-divider stops perfectly vertical at the mobile axis (8) too", () => {
+    for (const stop of ["gate-kpis", "gate-calendar", "gate-alumni", "gate-board"] as const) {
+      const { from, bow, to } = waypointsFor(stop, "narrow");
+      expect(from).toBe(8);
+      expect(bow).toBe(8);
+      expect(to).toBe(8);
+    }
+  });
+
+  it("pins every mobile stop's from/to to the shared left-edge axis (8)", () => {
+    for (const stop of HOME_STOPS) {
+      const { from, to } = waypointsFor(stop, "narrow");
+      expect(from).toBe(8);
+      expect(to).toBe(8);
+    }
+  });
+
+  it("never bows a mobile stop past the axis into the text column", () => {
+    for (const stop of HOME_STOPS) {
+      const { bow } = waypointsFor(stop, "narrow");
+      expect(bow).toBeLessThanOrEqual(8);
+      expect(bow).toBeGreaterThan(0);
     }
   });
 

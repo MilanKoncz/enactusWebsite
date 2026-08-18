@@ -28,7 +28,7 @@ export type GateDividerProps = LabelledDivider | BareDivider;
 // the gate marker as the divider between major homepage sections).
 export function GateDivider({ label, stop }: GateDividerProps) {
   return (
-    <Section className="relative isolate py-16">
+    <Section className="relative isolate py-10 md:py-16">
       {stop && <ThreadSegment stop={stop} />}
       {label && (
         <Container className="relative">

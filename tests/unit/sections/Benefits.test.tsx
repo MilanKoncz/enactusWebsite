@@ -59,6 +59,20 @@ describe("Benefits", () => {
     expect(card).toBeInTheDocument();
   });
 
+  it("shows a static 2×2 grid of the tool logos below md, hidden at md and up", () => {
+    const { container } = renderWithIntl(<Benefits />);
+    const grid = container.querySelector(".grid.grid-cols-2.md\\:hidden");
+    expect(grid).toBeInTheDocument();
+    expect(grid).toHaveAttribute("aria-hidden", "true");
+    expect(grid!.querySelectorAll("img")).toHaveLength(4);
+  });
+
+  it("keeps the animated arc hidden below md and visible from md up", () => {
+    const { container } = renderWithIntl(<Benefits />);
+    const orbitWrapper = container.querySelector(".hidden.shrink-0.md\\:block");
+    expect(orbitWrapper).toBeInTheDocument();
+  });
+
   it("has no accessibility violations", async () => {
     const { container } = renderWithIntl(<Benefits />);
     expect(await axe(container)).toHaveNoViolations();

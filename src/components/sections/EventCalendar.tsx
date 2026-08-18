@@ -216,29 +216,38 @@ export function EventCalendar({ events, initialNowMs }: EventCalendarProps) {
         ) : (
           <>
             {categories.length > 0 && (
-              <div
-                role="group"
-                aria-label={t("filterLabel")}
-                className="flex gap-3 overflow-x-auto contain-content pb-1"
-              >
-                {categories.map((category) => {
-                  const pressed = selected.includes(category);
-                  return (
-                    <button
-                      key={category}
-                      type="button"
-                      aria-pressed={pressed}
-                      onClick={() => toggleCategory(category)}
-                      className="shrink-0 rounded-sm transition-transform duration-[var(--duration-fast)] ease-signature hover:-translate-y-px focus-visible:-translate-y-px"
-                    >
-                      <CategoryBadge
-                        category={category}
-                        className={cn(pressed && "ring-2 ring-ink/30 ring-offset-1 ring-offset-paper")}
-                      />
-                      <span className="sr-only"> ({tCategories(category)})</span>
-                    </button>
-                  );
-                })}
+              // The fade is a static hint, not a scroll-position-aware one:
+              // simple, and enough to signal "more chips this way" without a
+              // scroll listener for what's otherwise a two-second glance.
+              <div className="relative">
+                <div
+                  role="group"
+                  aria-label={t("filterLabel")}
+                  className="flex gap-3 overflow-x-auto contain-content pb-1"
+                >
+                  {categories.map((category) => {
+                    const pressed = selected.includes(category);
+                    return (
+                      <button
+                        key={category}
+                        type="button"
+                        aria-pressed={pressed}
+                        onClick={() => toggleCategory(category)}
+                        className="shrink-0 rounded-sm transition-transform duration-[var(--duration-fast)] ease-signature hover:-translate-y-px focus-visible:-translate-y-px"
+                      >
+                        <CategoryBadge
+                          category={category}
+                          className={cn(pressed && "ring-2 ring-ink/30 ring-offset-1 ring-offset-paper")}
+                        />
+                        <span className="sr-only"> ({tCategories(category)})</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-paper to-transparent sm:hidden"
+                />
               </div>
             )}
 
