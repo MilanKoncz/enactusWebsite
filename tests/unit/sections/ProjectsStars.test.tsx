@@ -9,10 +9,14 @@ import { stars } from "@/content/stars";
 describe("ProjectsStars", () => {
   it("renders all eight stars by name", () => {
     renderWithIntl(<ProjectsStars />);
-    // Each name appears twice: once as the logo placeholder's label, once
-    // as the name caption below it — same pattern as BoardGrid's portraits.
+    // Without a real logo, the name appears twice: once as the logo
+    // placeholder's label, once as the name caption below it — same pattern
+    // as BoardGrid's portraits. Blauherz and Moufense have a real logo now,
+    // rendered with an empty alt (the caption already names it), so their
+    // name appears only once.
     for (const star of stars) {
-      expect(screen.getAllByText(star.name).length).toBeGreaterThanOrEqual(2);
+      const expected = star.logo ? 1 : 2;
+      expect(screen.getAllByText(star.name).length).toBeGreaterThanOrEqual(expected);
     }
   });
 

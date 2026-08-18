@@ -37,9 +37,12 @@ describe("content/stars", () => {
     }
   });
 
-  it("leaves logo null until confirmed", () => {
-    for (const s of stars) {
-      expect(s.logo).toBeNull();
+  it("has real logos for Blauherz and Moufense, null for the rest", () => {
+    const byKey = Object.fromEntries(stars.map((s) => [s.key, s.logo]));
+    expect(byKey.STAR_1).toBe("/stars/blauherz-logo.png");
+    expect(byKey.STAR_2).toBe("/stars/moufense-logo.png");
+    for (const key of ["STAR_3", "STAR_4", "STAR_5", "STAR_6", "STAR_7", "STAR_8"]) {
+      expect(byKey[key]).toBeNull();
     }
   });
 

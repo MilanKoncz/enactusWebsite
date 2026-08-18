@@ -1,4 +1,5 @@
 import { Archive } from "lucide-react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/Badge";
 import { Container } from "@/components/ui/Container";
@@ -26,7 +27,13 @@ export function ProjectsStars() {
         <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {stars.map((star) => (
             <li key={star.key} className="flex flex-col gap-3 rounded-md border border-ink/10 bg-paper p-4">
-              <Placeholder kind="Logo" label={star.name} ratio="1 / 1" className="p-2" />
+              {star.logo ? (
+                <span className="relative block w-full aspect-square">
+                  <Image src={star.logo} alt="" fill sizes="25vw" className="object-contain p-2" />
+                </span>
+              ) : (
+                <Placeholder kind="Logo" label={star.name} ratio="1 / 1" className="p-2" />
+              )}
               <p className="text-body-m font-medium">{star.name}</p>
               <p className="text-body-s opacity-70">{tStars(`${star.key}.description` as StarCopyKey)}</p>
               {star.status && <Badge status={star.status}>{tStatus(star.status)}</Badge>}

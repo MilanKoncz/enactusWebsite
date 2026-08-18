@@ -140,7 +140,9 @@ describe("content/projects", () => {
 
   it("points every asset path at a rooted public path", () => {
     for (const p of projects) {
-      if (p.logo) expect(p.logo).toMatch(/^\/projects\//);
+      // moufense's logo lives under /stars/ — the same file content/stars.ts's
+      // STAR_2 entry points at, since it's the same historical project.
+      if (p.logo) expect(p.logo).toMatch(p.slug === "moufense" ? /^\/stars\// : /^\/projects\//);
       for (const image of p.images) expect(image).toMatch(/^\/projects\//);
       for (const lead of p.leads) {
         if (lead.photo) expect(lead.photo).toMatch(/^\/projects\//);
@@ -158,12 +160,22 @@ describe("content/projects", () => {
     for (const p of projects) {
       expect(p.year).toBeNull();
     }
-    for (const p of projects.filter((p) => p.status !== "active")) {
+    // afya and moufense are the two archive exceptions: their real logo
+    // files were matched by name from a board media handover, unlike every
+    // other archive project. moufense's logo is the same file as the
+    // STAR_2 entry in content/stars.ts — the same historical project shown
+    // in two different sections of the site.
+    const logoExceptions = ["afya", "moufense"];
+    for (const p of projects.filter((p) => p.status !== "active" && !logoExceptions.includes(p.slug))) {
       expect(p.logo).toBeNull();
       expect(p.images).toEqual([]);
       expect(p.sdgs).toEqual([]);
       expect(p.leads).toEqual([]);
     }
+    const afya = projects.find((p) => p.slug === "afya")!;
+    expect(afya.logo).toBe("/projects/afya-logo.png");
+    const moufense = projects.find((p) => p.slug === "moufense")!;
+    expect(moufense.logo).toBe("/stars/moufense-logo.png");
   });
 
   it("validates every exported project against the schema", () => {

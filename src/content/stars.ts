@@ -51,12 +51,13 @@ function star(input: {
   name: string;
   status: z.infer<typeof projectStatusSchema> | null;
   verified: boolean;
+  logo?: string | null;
   youtubeId?: string | null;
 }): Star {
   return starSchema.parse({
     key: input.key,
     name: input.name,
-    logo: null,
+    logo: input.logo ?? null,
     description: `Stars.${input.key}.description`,
     status: input.status,
     verified: input.verified,
@@ -65,8 +66,15 @@ function star(input: {
 }
 
 export const stars: Star[] = [
-  star({ key: "STAR_1", name: "Blauherz", status: "spinoff", verified: true }),
-  star({ key: "STAR_2", name: "Moufense", status: "cancelled", verified: true, youtubeId: "9Ord09u363s" }),
+  star({ key: "STAR_1", name: "Blauherz", status: "spinoff", verified: true, logo: "/stars/blauherz-logo.png" }),
+  star({
+    key: "STAR_2",
+    name: "Moufense",
+    status: "cancelled",
+    verified: true,
+    logo: "/stars/moufense-logo.png",
+    youtubeId: "9Ord09u363s",
+  }),
   star({ key: "STAR_3", name: "effishent", status: "cancelled", verified: true }),
   star({ key: "STAR_4", name: "Sanagua", status: "spinoff", verified: true }),
   star({ key: "STAR_5", name: "Back on Track", status: "cancelled", verified: true }),

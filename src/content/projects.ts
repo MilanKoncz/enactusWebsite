@@ -198,6 +198,7 @@ export const projects: Project[] = [
     name: "ImpactWithUs",
     status: "active",
     logo: "/projects/impactwithus-logo.png",
+    images: ["/projects/impactwithus-workshop.jpg"],
     sdgs: [17],
     leads: [
       {
@@ -215,9 +216,9 @@ export const projects: Project[] = [
   project({ slug: "sun-n-soil", name: "Sun n' Soil", status: "cancelled" }),
   project({ slug: "green-heat", name: "Green Heat", status: "cancelled" }),
   project({ slug: "reverze", name: "ReverZe", status: "cancelled" }),
-  project({ slug: "afya", name: "Afya", status: "cancelled" }),
+  project({ slug: "afya", name: "Afya", status: "cancelled", logo: "/projects/afya-logo.png" }),
   project({ slug: "mushroom", name: "mushROOM", status: "cancelled" }),
-  project({ slug: "moufense", name: "Moufense", status: "cancelled" }),
+  project({ slug: "moufense", name: "Moufense", status: "cancelled", logo: "/stars/moufense-logo.png" }),
   project({ slug: "greenscape", name: "Greenscape", status: "cancelled" }),
 ];
 
