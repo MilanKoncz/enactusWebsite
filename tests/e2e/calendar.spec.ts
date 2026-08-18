@@ -239,8 +239,12 @@ test.describe("homepage event calendar", () => {
       await gotoWithCalendar(page, ALL_EVENTS);
 
       const row = page.getByRole("button", { name: /Ideathon/ });
-      await row.scrollIntoViewIfNeeded();
+      // Waits for the client-side re-fetch to have actually re-rendered
+      // (gotoWithCalendar only confirms the network response arrived, not
+      // that React has committed the update yet) before any interaction —
+      // otherwise this can transiently query the pre-fetch, build-time DOM.
       await expect(row).toBeVisible();
+      await row.scrollIntoViewIfNeeded();
       await expect(row.locator("..")).toHaveClass(/border-l-gold/);
     });
 
@@ -248,6 +252,7 @@ test.describe("homepage event calendar", () => {
       await gotoWithCalendar(page, ALL_EVENTS);
 
       const row = page.getByRole("button", { name: /Ideathon/ });
+      await expect(row).toBeVisible();
       await row.scrollIntoViewIfNeeded();
       await expect(row).toHaveAttribute("aria-expanded", "false");
       await expect(page.getByText("Mannheim", { exact: true })).not.toBeVisible();
@@ -271,6 +276,7 @@ test.describe("homepage event calendar", () => {
       await gotoWithCalendar(page, ALL_EVENTS);
 
       const row = page.getByRole("button", { name: /Ideathon/ });
+      await expect(row).toBeVisible();
       await row.scrollIntoViewIfNeeded();
       await row.click();
 
@@ -288,6 +294,7 @@ test.describe("homepage event calendar", () => {
       const chip = page.getByRole("group", { name: "Nach Kategorie filtern" }).getByRole("button", {
         name: /Bewerbung/,
       });
+      await expect(chip).toBeVisible();
       await chip.scrollIntoViewIfNeeded();
       await chip.click();
       await expect(chip).toHaveAttribute("aria-pressed", "true");
@@ -304,6 +311,7 @@ test.describe("homepage event calendar", () => {
       await expect(page.getByText("Q-Summit")).not.toBeVisible();
 
       const toggle = page.getByRole("button", { name: "Frühere Termine" });
+      await expect(toggle).toBeVisible();
       await toggle.scrollIntoViewIfNeeded();
       await expect(toggle).toHaveAttribute("aria-expanded", "false");
       await toggle.click();
@@ -317,6 +325,7 @@ test.describe("homepage event calendar", () => {
       await gotoWithCalendar(page, ALL_EVENTS);
 
       const row = page.getByRole("button", { name: /ConnectUs/ });
+      await expect(row).toBeVisible();
       await row.scrollIntoViewIfNeeded();
       await expect(row.locator("..")).toHaveClass(/border-dashed/);
 
