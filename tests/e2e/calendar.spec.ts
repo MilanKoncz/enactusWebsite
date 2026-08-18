@@ -189,6 +189,30 @@ test.describe("homepage event calendar", () => {
     expect(scrollWidth).toBeLessThanOrEqual(clientWidth);
   });
 
+  test("keeps a focused filter chip's focus ring fully inside the chip row, not clipped", async ({ page }) => {
+    // Regression for the row's own vertical clipping: overflow-x-auto forces
+    // overflow-y to "auto" too (see the component's comment), so a focus
+    // ring rendered just outside a chip's border box used to be cut off at
+    // the row's own top/bottom edge whenever there wasn't enough padding to
+    // hold it.
+    await mockCalendarEvents(page, ALL_EVENTS);
+    await page.goto("/");
+
+    const row = page.getByRole("group", { name: "Nach Kategorie filtern" });
+    const chip = row.getByRole("button").first();
+    await chip.focus();
+
+    const [rowBox, chipBox] = await Promise.all([row.boundingBox(), chip.boundingBox()]);
+    expect(rowBox).not.toBeNull();
+    expect(chipBox).not.toBeNull();
+    // The chip's own box (not the focus ring, which boundingBox() doesn't
+    // capture) must sit inside the row with room to spare above and below —
+    // that spare room is exactly where the ring paints.
+    expect(chipBox!.y).toBeGreaterThan(rowBox!.y);
+    expect(chipBox!.y + chipBox!.height).toBeLessThan(rowBox!.y + rowBox!.height);
+    expect(await row.evaluate((element) => element.scrollHeight <= element.clientHeight)).toBe(true);
+  });
+
   test("has no automatically detectable accessibility violations", async ({ page }) => {
     await mockCalendarEvents(page, ALL_EVENTS);
     await page.goto("/");

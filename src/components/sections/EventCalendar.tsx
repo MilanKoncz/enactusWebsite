@@ -223,7 +223,17 @@ export function EventCalendar({ events, initialNowMs }: EventCalendarProps) {
                 <div
                   role="group"
                   aria-label={t("filterLabel")}
-                  className="flex gap-3 overflow-x-auto contain-content pb-1"
+                  // contain-content (paint containment) used to clip this
+                  // track at its own padding edge — including a focused
+                  // chip's outline and a pressed chip's ring, which need a
+                  // few px above/below the row to render at all. overflow-x
+                  // forces overflow-y to the same "auto" (the CSS spec ties
+                  // the two together once either axis isn't "visible"), so
+                  // the fix isn't the contain property, it's giving the
+                  // clipped box enough padding to hold what paints outside
+                  // the chips themselves. -my-2 cancels the added padding's
+                  // effect on the surrounding gap-10 rhythm.
+                  className="flex gap-3 overflow-x-auto contain-content py-2 -my-2"
                 >
                   {categories.map((category) => {
                     const pressed = selected.includes(category);
