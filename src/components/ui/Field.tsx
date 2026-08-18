@@ -13,6 +13,12 @@ type FieldOwnProps = {
 
 type FieldAsInput = FieldOwnProps & {
   as?: "input";
+  /** Rendered inside the input's own relative wrapper, absolutely positioned
+      on the right — same slot the select branch already reserves for its
+      chevron, just interactive here (the password field's show/hide
+      toggle). Adds the matching right-hand padding to the control itself so
+      typed text never runs under it. */
+  endAdornment?: ReactNode;
 } & Omit<ComponentPropsWithoutRef<"input">, keyof FieldOwnProps | "as">;
 
 type FieldAsTextarea = FieldOwnProps & {
@@ -79,16 +85,24 @@ export const Field = forwardRef<
       </div>
     );
   } else {
-    const { as, ...inputProps } = rest;
-    control = (
+    const { as, endAdornment, ...inputProps } = rest;
+    const inputEl = (
       <input
         ref={ref as Ref<HTMLInputElement>}
         id={controlId}
         aria-invalid={Boolean(error)}
         aria-describedby={describedBy}
-        className={controlClassName}
+        className={cn(controlClassName, endAdornment && "pr-10")}
         {...inputProps}
       />
+    );
+    control = endAdornment ? (
+      <div className="relative">
+        {inputEl}
+        <div className="absolute right-2 top-1/2 -translate-y-1/2">{endAdornment}</div>
+      </div>
+    ) : (
+      inputEl
     );
   }
 

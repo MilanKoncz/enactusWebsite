@@ -498,19 +498,19 @@
       "lead": "Um die Zusammenarbeit zwischen uns und unseren Partnern wirkungsvoll zu gestalten, bieten wir eine Vielzahl von individuellen Partnerschaftsmodellen.",
       "knowledge": {
         "title": "Knowledge Partner",
-        "description": "Unsere Knowledge Partner unterstützen uns mit hochklassiger Expertise in verschiedensten Bereichen. Während sie uns bei Herausforderungen in Projekt- und Vereinsarbeit beratend zur Seite stehen, vermitteln sie unserem Team in Workshops und Input-Vorträgen wichtige Fähigkeiten für unsere Arbeit."
+        "description": "Knowledge Partner bringen Expertise aus ihrem Fachgebiet ein: Sie beraten uns bei Herausforderungen in Projekt- und Vereinsarbeit und vermitteln unserem Team in Workshops und Vorträgen wichtige Fähigkeiten."
       },
       "flagship": {
         "title": "Flagship Partner",
-        "description": "Unsere Flagship Partner unterstützen uns regelmäßig mit finanziellen und ideellen Ressourcen. Durch sie erhalten unsere Mitglieder wertvolle Expertise bei der Projektarbeit im Verein. Gleichzeitig fördern sie mit finanziellen Ressourcen die Entwicklung und Implementierung innovativer Projektideen."
+        "description": "Flagship Partner unterstützen uns regelmäßig mit finanziellen und ideellen Ressourcen, geben unseren Mitgliedern wertvolle Expertise für die Projektarbeit und fördern so die Entwicklung und Umsetzung innovativer Projektideen."
       },
       "sponsoring": {
         "title": "Sponsoring Partner",
-        "description": "Unsere Sponsoring Partner unterstützen uns mit Geld- und Sachleistungen in der Projektarbeit. Mit ihrer Unterstützung können wir in die Entwicklung und den Ausbau unserer Innovationen investieren und laufende Kosten innerhalb unseres Vereins decken."
+        "description": "Sponsoring Partner unterstützen unsere Projektarbeit mit Geld- und Sachleistungen. Damit investieren wir in die Entwicklung unserer Innovationen und decken laufende Kosten des Vereins."
       },
       "advisor": {
         "title": "Advisor",
-        "description": "Unsere Advisor:innen sind selbst in Start-ups oder führenden Unternehmen tätig und unterstützen uns in der Projektarbeit und unserem Innovationsprozess. Sie stehen unserem Team regelmäßig bei Herausforderungen und strategischer Planung zur Seite und unterstützen uns mit ihrer Expertise und ihrem Netzwerk."
+        "description": "Unsere Advisor:innen sind selbst in Start-ups oder führenden Unternehmen tätig. Sie begleiten unseren Innovationsprozess, stehen dem Team bei strategischer Planung zur Seite und bringen ihre Expertise und ihr Netzwerk ein."
       },
       "advisorEmptyHint": "Noch kein Advisor-Partner öffentlich bestätigt.",
       "websiteLabel": "Website von {name} öffnet in neuem Tab"
@@ -1067,6 +1067,7 @@
   "Admin": {
     "eyebrow": "Admin",
     "logout": "Abmelden",
+    "backToSite": "Zur Website",
     "credit": "Designed and built by Milan Koncz",
     "mailStatus": {
       "pending": "ausstehend",
@@ -1083,12 +1084,20 @@
       "reminders": "Erinnerungsliste",
       "contactMessages": "Kontaktanfragen",
       "deletionRequests": "Löschanfragen",
-      "system": "Systemstatus"
+      "system": "Systemstatus",
+      "groups": {
+        "application": "Bewerbung",
+        "communication": "Kommunikation",
+        "content": "Inhalte",
+        "system": "System"
+      }
     },
     "login": {
       "eyebrow": "Admin",
       "title": "Anmelden",
       "passwordLabel": "Passwort",
+      "showPassword": "Passwort anzeigen",
+      "hidePassword": "Passwort verbergen",
       "submit": "Anmelden",
       "error": "Falsches Passwort.",
       "rateLimited": "Zu viele Versuche. Bitte später erneut versuchen."

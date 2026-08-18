@@ -70,6 +70,20 @@ describe("Field", () => {
     expect(input).toHaveValue("Ada Lovelace");
   });
 
+  it("renders an endAdornment inside the input's own relative wrapper, padding the control clear of it", () => {
+    render(
+      <Field
+        label="Passwort"
+        name="password"
+        type="password"
+        endAdornment={<button type="button">Anzeigen</button>}
+      />,
+    );
+    const input = screen.getByLabelText("Passwort");
+    expect(input).toHaveClass("pr-10");
+    expect(screen.getByRole("button", { name: "Anzeigen" })).toBeInTheDocument();
+  });
+
   it("has no accessibility violations for input, textarea, select and error states", async () => {
     const { container } = render(
       <>

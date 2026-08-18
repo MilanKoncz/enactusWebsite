@@ -498,19 +498,19 @@
       "lead": "To make working with our partners as effective as possible, we offer a range of individual partnership models.",
       "knowledge": {
         "title": "Knowledge Partner",
-        "description": "Our Knowledge Partners support us with top-tier expertise across many fields. They advise us on challenges in project and club work, and pass on key skills to our team through workshops and talks."
+        "description": "Knowledge Partners bring expertise from their own field: they advise us on challenges in project and club work, and teach our team key skills through workshops and talks."
       },
       "flagship": {
         "title": "Flagship Partner",
-        "description": "Our Flagship Partners support us regularly with financial and non-financial resources. Through them, our members gain valuable expertise for project work, while their funding drives the development and implementation of innovative project ideas."
+        "description": "Flagship Partners regularly support us with financial and non-financial resources, give our members valuable expertise for project work, and fund the development and rollout of innovative project ideas."
       },
       "sponsoring": {
         "title": "Sponsoring Partner",
-        "description": "Our Sponsoring Partners support us with money and in-kind contributions to project work. Their support lets us invest in developing and scaling our innovations and cover our club's running costs."
+        "description": "Sponsoring Partners support our project work with money and in-kind contributions, letting us invest in developing our innovations and cover the club's running costs."
       },
       "advisor": {
         "title": "Advisor",
-        "description": "Our advisors work in start-ups or leading companies themselves and support us in project work and our innovation process. They regularly stand by our team on challenges and strategic planning, contributing their expertise and network."
+        "description": "Our advisors work in start-ups or leading companies themselves. They guide our innovation process, support the team on strategic planning, and contribute their expertise and network."
       },
       "advisorEmptyHint": "No Advisor partner confirmed publicly yet.",
       "websiteLabel": "{name}'s website opens in a new tab"
@@ -1067,6 +1067,7 @@
   "Admin": {
     "eyebrow": "Admin",
     "logout": "Log out",
+    "backToSite": "Back to the site",
     "credit": "Designed and built by Milan Koncz",
     "mailStatus": {
       "pending": "pending",
@@ -1083,12 +1084,20 @@
       "reminders": "Reminder list",
       "contactMessages": "Contact messages",
       "deletionRequests": "Deletion requests",
-      "system": "System status"
+      "system": "System status",
+      "groups": {
+        "application": "Applications",
+        "communication": "Communication",
+        "content": "Content",
+        "system": "System"
+      }
     },
     "login": {
       "eyebrow": "Admin",
       "title": "Sign in",
       "passwordLabel": "Password",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
       "submit": "Sign in",
       "error": "Wrong password.",
       "rateLimited": "Too many attempts. Please try again later."

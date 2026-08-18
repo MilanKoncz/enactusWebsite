@@ -62,4 +62,15 @@ describe("AdminNav", () => {
     const { container } = renderWithIntl(<AdminNav />);
     expect(await axe(container)).toHaveNoViolations();
   });
+
+  it("groups the overview under System, alongside deletion requests and system status", () => {
+    mockPathname.mockReturnValue("/admin");
+    renderWithIntl(<AdminNav />);
+
+    expect(screen.getByText("System")).toBeInTheDocument();
+    const systemGroup = screen.getByText("System").closest("li");
+    expect(systemGroup).not.toBeNull();
+    const linkNames = Array.from(systemGroup!.querySelectorAll("a")).map((a) => a.textContent);
+    expect(linkNames).toEqual(["Übersicht", "Löschanfragen", "Systemstatus"]);
+  });
 });

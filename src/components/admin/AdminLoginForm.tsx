@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { Eye, EyeOff } from "lucide-react";
 import { Field } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
 
@@ -11,6 +12,7 @@ export function AdminLoginForm() {
   const t = useTranslations("Admin.login");
   const router = useRouter();
   const [password, setPassword] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -50,12 +52,23 @@ export function AdminLoginForm() {
     <form onSubmit={handleSubmit} className="flex max-w-sm flex-col gap-6">
       <Field
         label={t("passwordLabel")}
-        type="password"
+        type={passwordVisible ? "text" : "password"}
         autoComplete="current-password"
         value={password}
         onChange={(event) => setPassword(event.target.value)}
         required
         error={error ?? undefined}
+        endAdornment={
+          <button
+            type="button"
+            aria-pressed={passwordVisible}
+            aria-label={passwordVisible ? t("hidePassword") : t("showPassword")}
+            onClick={() => setPasswordVisible((visible) => !visible)}
+            className="rounded-md p-1 text-ink/60 transition-colors duration-[var(--duration-fast)] hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2"
+          >
+            {passwordVisible ? <EyeOff aria-hidden="true" className="size-4" /> : <Eye aria-hidden="true" className="size-4" />}
+          </button>
+        }
       />
       <Button type="submit" loading={submitting}>
         {t("submit")}

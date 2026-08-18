@@ -10,6 +10,17 @@ import {
 } from "lucide-react";
 
 /**
+ * The four groups the sidebar nav (AdminNav.tsx) clusters sections under —
+ * board feedback: nine items in one header row read as clutter. Order here
+ * is the order groups render in; `AdminNav` renders the overview link
+ * (not part of this list — see below) as the first item of `system`, since
+ * it's the fourth of the board's named groups ("System: Übersicht,
+ * Löschanfragen, Systemstatus").
+ */
+export const ADMIN_GROUPS = ["application", "communication", "content", "system"] as const;
+export type AdminGroup = (typeof ADMIN_GROUPS)[number];
+
+/**
  * The admin area's sections, in navigation order. One list, read by both
  * the layout's nav (AdminNav.tsx) and the overview page — so a new section
  * can't appear in one and be missing from the other, and so its icon can't
@@ -27,14 +38,19 @@ import {
  * hrefs for RawLink, not next-intl routes.
  */
 export const ADMIN_SECTIONS = [
-  { href: "/admin/bewerbungen", messageKey: "applications", icon: FileText },
-  { href: "/admin/mails", messageKey: "failedMails", icon: MailWarning },
-  { href: "/admin/bewerbungsfenster", messageKey: "recruitingWindows", icon: CalendarRange },
-  { href: "/admin/termine", messageKey: "calendarEvents", icon: CalendarDays },
-  { href: "/admin/erinnerungen", messageKey: "reminders", icon: BellRing },
-  { href: "/admin/kontakt", messageKey: "contactMessages", icon: MessageSquare },
-  { href: "/admin/loeschanfragen", messageKey: "deletionRequests", icon: Trash2 },
-  { href: "/admin/system", messageKey: "system", icon: Activity },
-] as const;
+  { href: "/admin/bewerbungen", messageKey: "applications", icon: FileText, group: "application" },
+  { href: "/admin/bewerbungsfenster", messageKey: "recruitingWindows", icon: CalendarRange, group: "application" },
+  { href: "/admin/erinnerungen", messageKey: "reminders", icon: BellRing, group: "application" },
+  { href: "/admin/kontakt", messageKey: "contactMessages", icon: MessageSquare, group: "communication" },
+  { href: "/admin/mails", messageKey: "failedMails", icon: MailWarning, group: "communication" },
+  { href: "/admin/termine", messageKey: "calendarEvents", icon: CalendarDays, group: "content" },
+  { href: "/admin/loeschanfragen", messageKey: "deletionRequests", icon: Trash2, group: "system" },
+  { href: "/admin/system", messageKey: "system", icon: Activity, group: "system" },
+] as const satisfies ReadonlyArray<{
+  href: string;
+  messageKey: string;
+  icon: unknown;
+  group: AdminGroup;
+}>;
 
 export type AdminSection = (typeof ADMIN_SECTIONS)[number];
