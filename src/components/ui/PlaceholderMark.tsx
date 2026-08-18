@@ -32,7 +32,7 @@ export function PlaceholderMark({ variant = "missing", hint, children, className
   return (
     <span title={hint} className={cn(VARIANT_CLASSES[variant], className)}>
       {children}
-      <span className="sr-only"> — {hint}</span>
+      <span className="sr-only">. {hint}</span>
     </span>
   );
 }

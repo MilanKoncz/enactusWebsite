@@ -95,12 +95,12 @@
     "esg": {
       "title": "ESG-Charakter",
       "lead": "Jedes Projekt zahlt auf ein <sdgLink>UN-Nachhaltigkeitsziel</sdgLink> ein, nicht nur auf eine Geschäftsidee.",
-      "detail": "Wir wählen Projekte danach aus, welches SDG sie voranbringen — Wirkung ist die Eintrittskarte, nicht ein Zusatz am Ende."
+      "detail": "Wir wählen Projekte danach aus, welches SDG sie voranbringen. Wirkung ist die Eintrittskarte, nicht ein Zusatz am Ende."
     },
     "execution": {
       "title": "Risikofreies Umsetzen",
       "lead": "Ihr gründet ein echtes Unternehmen, ohne das persönliche Risiko einer Gründung zu tragen.",
-      "detail": "Der Verein trägt Haftung, Struktur und Prozess — ihr bringt die Idee, das Team und die Umsetzung."
+      "detail": "Der Verein trägt Haftung, Struktur und Prozess. Ihr bringt die Idee, das Team und die Umsetzung."
     },
     "network": {
       "title": "Internationales Netzwerk",
@@ -135,7 +135,7 @@
   "EventCalendar": {
     "eyebrow": "Termine",
     "title": "Was als Nächstes ansteht",
-    "lead": "Der Semesterplan auf einen Blick — von der Bewerbung bis zum nächsten Wettkampf.",
+    "lead": "Der Semesterplan auf einen Blick, von der Bewerbung bis zum nächsten Wettkampf.",
     "filterLabel": "Nach Kategorie filtern",
     "earlierMonths": "Frühere Termine",
     "empty": "Aktuell stehen keine Termine im Kalender.",
@@ -150,7 +150,7 @@
     }
   },
   "CalendarCategories": {
-    "innolab": "Inno Lab",
+    "innolab": "InnoLab",
     "projekte": "Projekte",
     "journeys": "Journeys",
     "wettkaempfe": "Wettkämpfe",
@@ -192,7 +192,7 @@
   "ClosingCta": {
     "eyebrow": "Nächster Schritt",
     "title": "Werde Teil des nächsten Projekts",
-    "lead": "Bewirb dich, wenn du wirklich etwas umsetzen willst — nicht nur darüber reden.",
+    "lead": "Bewirb dich, wenn du wirklich etwas umsetzen willst, nicht nur darüber reden.",
     "primaryCta": "Jetzt bewerben",
     "secondaryCta": "Prozess kennenlernen"
   },
@@ -402,12 +402,12 @@
       "16": "Frieden, Gerechtigkeit und starke Institutionen",
       "17": "Partnerschaften zur Erreichung der Ziele"
     },
-    "linkLabel": "SDG {number} — {name}, mehr auf sdgs.un.org erfahren"
+    "linkLabel": "SDG {number}, {name}, mehr auf sdgs.un.org erfahren"
   },
   "ProjectsArchivePage": {
     "eyebrow": "Archiv",
     "title": "Projekt-Archiv",
-    "lead": "Alle Projekte, die Enactus Mannheim seit der Gründung durchlaufen hat — inklusive der Ausgründungen.",
+    "lead": "Alle Projekte, die Enactus Mannheim seit der Gründung durchlaufen hat, inklusive der Ausgründungen.",
     "yearMissingHint": "Das Jahr ist noch nicht bestätigt.",
     "backLabel": "Zurück zu den aktuellen Projekten"
   },
@@ -530,7 +530,7 @@
   "KontaktPage": {
     "eyebrow": "Kontakt",
     "title": "Sprechen wir.",
-    "lead": "Fragen zu einer Bewerbung, einem Projekt oder einer Partnerschaft? Schau zuerst in die FAQ — oder schreib uns direkt.",
+    "lead": "Fragen zu einer Bewerbung, einem Projekt oder einer Partnerschaft? Schau zuerst in die FAQ, oder schreib uns direkt.",
     "faq": {
       "heading": "Häufige Fragen",
       "categories": {
@@ -620,7 +620,7 @@
     },
     "pauline-machtolf": {
       "role": "Head of Business Development bei GoodJobs",
-      "quote": "Enactus Mannheim ist für mich immer wie heimkommen – zu einer tollen, generationenübergreifenden Familie."
+      "quote": "Enactus Mannheim ist für mich immer wie heimkommen, zu einer tollen, generationenübergreifenden Familie."
     },
     "alexander-mueller": {
       "role": "Doktorand am Lehrstuhl für Marketing und Innovation",
@@ -639,7 +639,7 @@
       "description": "Moufense ist eine Anti-Moskito-Bodylotion gegen Malaria in Togo, deren Wirksamkeit das Institut Biogents in Regensburg bestätigt hat. Der Vertrieb lief über die Kopeme Group; 2021 gewann das Projekt den National Cup."
     },
     "STAR_3": {
-      "description": "effishent betrieb Aquaponik in Togo — die symbiotische Zucht von Fisch und Gemüse in einem geschlossenen Wasserkreislauf. Das Verfahren war so gestaltet, dass es sich auch Entwicklungsländer leisten können."
+      "description": "effishent betrieb Aquaponik in Togo, die symbiotische Zucht von Fisch und Gemüse in einem geschlossenen Wasserkreislauf. Das Verfahren war so gestaltet, dass es sich auch Entwicklungsländer leisten können."
     },
     "STAR_4": {
       "description": "Sanagua verschaffte der Bevölkerung von Arica, Chile, Zugang zu sauberem und günstigem Trinkwasser. Das Projekt wurde erfolgreich ausgegründet."
@@ -666,10 +666,10 @@
   "Impressum": {
     "eyebrow": "Rechtliches",
     "title": "Impressum",
-    "enNotice": "This legal notice (Impressum) is required under German law and is provided in German only — this is standard, legally safer practice for a German association.",
+    "enNotice": "This legal notice (Impressum) is required under German law and is provided in German only. This is standard, legally safer practice for a German association.",
     "operatorLabel": "Diensteanbieter",
     "representativesLabel": "Vertreten durch",
-    "representativesHint": "Diese Namen sind noch nicht vom Vorstand bestätigt — die bisherige Datenschutzerklärung nennt einen anderen Vorstand.",
+    "representativesHint": "Diese Namen sind noch nicht vom Vorstand bestätigt. Die bisherige Datenschutzerklärung nennt einen anderen Vorstand.",
     "registerLabel": "Registereintrag",
     "contactLabel": "Kontakt",
     "responsibleLabel": "Inhaltlich verantwortlich gemäß § 18 Abs. 2 MStV",
@@ -680,13 +680,13 @@
     "eyebrow": "Rechtliches",
     "title": "Datenschutzerklärung",
     "effectiveDate": "Stand: August 2026",
-    "draftNotice": "Entwurf — diese Erklärung ist noch nicht vom Datenschutzbeauftragten von Enactus Germany geprüft und freigegeben.",
+    "draftNotice": "Entwurf. Diese Erklärung ist noch nicht vom Datenschutzbeauftragten von Enactus Germany geprüft und freigegeben.",
     "reviewedNotice": "Zuletzt geprüft am {date} durch den Datenschutzbeauftragten von Enactus Germany.",
     "scope": {
       "title": "Geltungsbereich",
       "body": [
         "Diese Erklärung beschreibt, welche personenbezogenen Daten wir beim Besuch dieser Website verarbeiten, zu welchem Zweck, auf welcher Rechtsgrundlage und wie lange wir sie speichern.",
-        "Sie gilt für sämtliche Unterseiten dieser Website einschließlich des Bewerbungsformulars, der Erinnerungsliste und des Kontaktformulars. Für verlinkte Websites Dritter — etwa die Seiten unserer Projekte, Partner oder von Enactus Germany — gelten deren eigene Datenschutzerklärungen."
+        "Sie gilt für sämtliche Unterseiten dieser Website einschließlich des Bewerbungsformulars, der Erinnerungsliste und des Kontaktformulars. Für verlinkte Websites Dritter, etwa die Seiten unserer Projekte, Partner oder von Enactus Germany, gelten deren eigene Datenschutzerklärungen."
       ]
     },
     "responsible": {
@@ -725,18 +725,18 @@
     "email": {
       "title": "E-Mail-Versand",
       "body": [
-        "Für den Versand automatisch erzeugter E-Mails — Bewerbungsbestätigung, Weiterleitung von Kontaktanfragen, Bestätigungsmail der Erinnerungsliste — nutzen wir den Dienst Resend (Plus Five Five, Inc., USA). Der Versand erfolgt über die Region Irland („eu-west-1“) und damit innerhalb der Europäischen Union.",
+        "Für den Versand automatisch erzeugter E-Mails nutzen wir den Dienst Resend (Plus Five Five, Inc., USA). Dazu zählen die Bewerbungsbestätigung, die Weiterleitung von Kontaktanfragen und die Bestätigungsmail der Erinnerungsliste. Der Versand erfolgt über die Region Irland („eu-west-1“) und damit innerhalb der Europäischen Union.",
         "Übermittelt werden die E-Mail-Adresse der empfangenden Person sowie der Inhalt der jeweiligen Nachricht.",
         "Unsere E-Mails enthalten kein Öffnungs-Tracking, kein Klick-Tracking und keine Zählpixel. Die entsprechenden Funktionen des Dienstes sind bewusst deaktiviert. Links in unseren E-Mails führen direkt zum Ziel und werden nicht über einen Zwischendienst umgeleitet."
       ],
       "legalBasisLabel": "Rechtsgrundlage",
-      "legalBasis": "Dieselbe wie für die jeweils zugrunde liegende Anfrage — siehe die Abschnitte zum Bewerbungs-, Erinnerungs- und Kontaktformular."
+      "legalBasis": "Dieselbe wie für die jeweils zugrunde liegende Anfrage. Siehe die Abschnitte zum Bewerbungs-, Erinnerungs- und Kontaktformular."
     },
     "analytics": {
       "title": "Reichweitenmessung",
       "body": [
         "Wir nutzen Vercel Analytics zur anonymen Auswertung der Seitenaufrufe. Der Dienst setzt keine Cookies, speichert keine Kennungen auf deinem Gerät und erstellt keine geräteübergreifenden Profile. Erhoben werden ausschließlich aggregierte Angaben wie aufgerufene Seite, ungefähre Herkunftsregion auf Länderebene, Gerätetyp und verweisende Seite.",
-        "Ein Rückschluss auf einzelne Personen ist uns damit nicht möglich. Weil keine Informationen auf deinem Endgerät gespeichert oder ausgelesen werden, ist keine Einwilligung nach § 25 TDDDG erforderlich — deshalb zeigt diese Website auch keinen Cookie-Banner."
+        "Ein Rückschluss auf einzelne Personen ist uns damit nicht möglich. Weil keine Informationen auf deinem Endgerät gespeichert oder ausgelesen werden, ist keine Einwilligung nach § 25 TDDDG erforderlich. Deshalb zeigt diese Website auch keinen Cookie-Banner."
       ],
       "legalBasisLabel": "Rechtsgrundlage",
       "legalBasis": "Art. 6 Abs. 1 lit. f DSGVO. Unser berechtigtes Interesse liegt darin, zu verstehen, welche Inhalte genutzt werden, um die Website verbessern zu können."
@@ -767,7 +767,7 @@
         "Angabe, wie du auf uns aufmerksam geworden bist",
         "Zeitpunkt deiner Einwilligung"
       ],
-      "noUpload": "Es gibt keinen Datei-Upload. Angaben, die üblicherweise in einem Lebenslauf stehen, erheben wir ausschließlich als strukturierte Formularfelder. Wir bitten dich, keine Angaben zu besonderen Kategorien personenbezogener Daten nach Art. 9 DSGVO zu machen — etwa zu Gesundheit, religiöser oder weltanschaulicher Überzeugung, politischer Meinung oder sexueller Orientierung. Solche Angaben sind für die Auswahl nicht erforderlich.",
+      "noUpload": "Es gibt keinen Datei-Upload. Angaben, die üblicherweise in einem Lebenslauf stehen, erheben wir ausschließlich als strukturierte Formularfelder. Wir bitten dich, keine Angaben zu besonderen Kategorien personenbezogener Daten nach Art. 9 DSGVO zu machen, etwa zu Gesundheit, religiöser oder weltanschaulicher Überzeugung, politischer Meinung oder sexueller Orientierung. Solche Angaben sind für die Auswahl nicht erforderlich.",
       "purposeLabel": "Zweck",
       "purpose": "Prüfung und Bearbeitung deiner Bewerbung sowie Kontaktaufnahme im Rahmen des Auswahlverfahrens.",
       "legalBasisLabel": "Rechtsgrundlage",
@@ -809,7 +809,7 @@
         "eine Begrenzung der Anzahl von Einsendungen je Absender innerhalb eines Zeitfensters"
       ],
       "ipHandling": "Für die Begrenzung speichern wir deine IP-Adresse ausschließlich als kryptografischen Hashwert, aus dem sich die ursprüngliche Adresse nicht zurückrechnen lässt. Diese Werte werden nach Ablauf des jeweiligen Zeitfensters automatisch gelöscht.",
-      "noCaptcha": "Ein Captcha setzen wir bewusst nicht ein — es wäre eine Barriere für Menschen mit Behinderung und würde zusätzliche Daten an Dritte übermitteln.",
+      "noCaptcha": "Ein Captcha setzen wir bewusst nicht ein. Es wäre eine Barriere für Menschen mit Behinderung und würde zusätzliche Daten an Dritte übermitteln.",
       "legalBasisLabel": "Rechtsgrundlage",
       "legalBasis": "Art. 6 Abs. 1 lit. f DSGVO. Unser berechtigtes Interesse liegt im Schutz unserer Systeme vor missbräuchlicher Nutzung."
     },
@@ -843,7 +843,7 @@
       ],
       "dpaNote": "Mit allen genannten Anbietern bestehen Verträge zur Auftragsverarbeitung.",
       "transferLabel": "Drittlandbezug",
-      "transfer": "Die genannten Unternehmen haben ihren Sitz in den Vereinigten Staaten. Die Verarbeitung findet zwar innerhalb der Europäischen Union statt, ein Zugriff aus den USA — etwa im Rahmen von Wartung und Support — lässt sich jedoch nicht vollständig ausschließen. Für diesen Fall haben wir mit den Anbietern die Standardvertragsklauseln der Europäischen Kommission nach Art. 46 Abs. 2 lit. c DSGVO vereinbart."
+      "transfer": "Die genannten Unternehmen haben ihren Sitz in den Vereinigten Staaten. Die Verarbeitung findet zwar innerhalb der Europäischen Union statt, ein Zugriff aus den USA, etwa im Rahmen von Wartung und Support, lässt sich jedoch nicht vollständig ausschließen. Für diesen Fall haben wir mit den Anbietern die Standardvertragsklauseln der Europäischen Kommission nach Art. 46 Abs. 2 lit. c DSGVO vereinbart."
     },
     "automatedDecisions": {
       "title": "Keine automatisierte Entscheidungsfindung",
@@ -883,29 +883,29 @@
     "fit": {
       "eyebrow": "Mitmachen",
       "title": "Bring dich ein.",
-      "lead": "Was wir erwarten, was du bekommst — und warum du nicht alles davon mitbringen musst.",
+      "lead": "Was wir erwarten, was du bekommst, und warum du nicht alles davon mitbringen musst.",
       "expectationsHeading": "Was wir von dir erwarten",
       "offersHeading": "Was du bekommst",
       "expectations": {
         "agency": {
           "title": "Agency",
           "lead": "Die Fähigkeit, eine Situation einzuschätzen, zu entscheiden und zu handeln.",
-          "detail": "Wir erwarten nicht, dass du alle Antworten kennst — sondern dass du anfängst, wenn eine Entscheidung ansteht, statt auf Anweisung zu warten."
+          "detail": "Wir erwarten nicht, dass du alle Antworten kennst, sondern dass du anfängst, wenn eine Entscheidung ansteht, statt auf Anweisung zu warten."
         },
         "time": {
           "title": "Echte Zeit",
           "lead": "Ein spürbarer Zeitaufwand neben dem Studium, gerade in intensiven Projektphasen.",
-          "detail": "Wie viel genau hängt von deiner Rolle ab — sprich das offen im Bewerbungsgespräch an."
+          "detail": "Wie viel genau hängt von deiner Rolle ab. Sprich das offen im Bewerbungsgespräch an."
         },
         "ownership": {
           "title": "Verantwortung",
           "lead": "Du übernimmst einen Bereich und stehst für dessen Ergebnis gerade.",
-          "detail": "Kein Praktikum, das nebenherläuft — du entscheidest operativ mit."
+          "detail": "Kein Praktikum, das nebenherläuft. Du entscheidest operativ mit."
         },
         "teamwork": {
           "title": "Teamfähigkeit",
           "lead": "Du arbeitest eng mit anderen zusammen und nimmst Feedback offen an.",
-          "detail": "Projekte laufen im Team, nicht im Alleingang — auch Kritik gehört dazu."
+          "detail": "Projekte laufen im Team, nicht im Alleingang. Auch Kritik gehört dazu."
         }
       },
       "offers": {
@@ -922,17 +922,17 @@
         "mentoring": {
           "title": "Coaching",
           "lead": "Regelmäßiger Austausch mit Vorstand und erfahrenen Alumni.",
-          "detail": "Du bist bei Entscheidungen nicht allein — Erfahrung aus dem Team steht dir zur Seite."
+          "detail": "Du bist bei Entscheidungen nicht allein. Erfahrung aus dem Team steht dir zur Seite."
         },
         "growth": {
           "title": "Praxiswissen",
-          "lead": "Skills, die im Studium selten drankommen — von Vertrieb bis Recht.",
+          "lead": "Skills, die im Studium selten drankommen, von Vertrieb bis Recht.",
           "detail": "Wissen, das sofort gebraucht wird, nicht nur Theorie."
         }
       },
       "fitNote": {
         "lead": "Du musst nicht alles davon mitbringen.",
-        "detail": "Rund 80 % Übereinstimmung reicht für eine gute Passung — jedes Skillset hilft uns weiter."
+        "detail": "Rund 80 % Übereinstimmung reicht für eine gute Passung. Jedes Skillset hilft uns weiter."
       }
     },
     "timeline": {
@@ -982,7 +982,7 @@
         "consentError": "Bitte bestätige die Einwilligung.",
         "submitLabel": "Erinnerung aktivieren",
         "submitPending": "Wird aktiviert …",
-        "submitSuccess": "Fast geschafft — bitte bestätige die E-Mail, die wir dir gerade geschickt haben.",
+        "submitSuccess": "Fast geschafft. Bitte bestätige die E-Mail, die wir dir gerade geschickt haben.",
         "submitError": "Die Anmeldung hat nicht geklappt. Bitte versuch es noch einmal."
       },
       "form": {
@@ -1081,7 +1081,7 @@
       "lead": "Interne Werkzeuge für den Vorstand. Kein Bereich hier ist öffentlich erreichbar.",
       "sections": {
         "applications": "Alle Bewerbungen, nach Semester gruppiert, mit CSV-Export je Zyklus.",
-        "failedMails": "Datensätze, deren Mailversand gescheitert ist — mit Fehlertext und erneutem Versand.",
+        "failedMails": "Datensätze, deren Mailversand gescheitert ist, mit Fehlertext und erneutem Versand.",
         "recruitingWindows": "Bewerbungsfenster anlegen, bearbeiten und löschen.",
         "calendarEvents": "Termine anlegen, bearbeiten und löschen.",
         "reminders": "Wer sich für die Erinnerung eingetragen hat, bestätigt und unbestätigt.",
@@ -1120,7 +1120,7 @@
     },
     "failedMails": {
       "title": "Fehlgeschlagene Mails",
-      "lead": "Alle Datensätze, deren Benachrichtigung nicht rausgegangen ist. Die Daten selbst sind gespeichert — nur der Versand hat gefehlt.",
+      "lead": "Alle Datensätze, deren Benachrichtigung nicht rausgegangen ist. Die Daten selbst sind gespeichert, nur der Versand hat gefehlt.",
       "empty": "Kein fehlgeschlagener Versand.",
       "resend": "Erneut senden",
       "resent": "Gesendet.",
@@ -1266,7 +1266,7 @@
       "lastRun": "Letzte Ausführung",
       "nextDue": "Nächste planmäßig fällig",
       "never": "noch nie",
-      "cronStale": "Die Löschroutine lief seit über 48 Stunden nicht mehr — zuletzt am {when}. Damit wird die in der Datenschutzerklärung genannte Aufbewahrungsfrist gerade nicht durchgesetzt. Cron-Jobs im Vercel-Dashboard prüfen.",
+      "cronStale": "Die Löschroutine lief seit über 48 Stunden nicht mehr, zuletzt am {when}. Damit wird die in der Datenschutzerklärung genannte Aufbewahrungsfrist gerade nicht durchgesetzt. Cron-Jobs im Vercel-Dashboard prüfen.",
       "cronNeverRan": "Die Löschroutine ist noch nie gelaufen. Damit wird die in der Datenschutzerklärung genannte Aufbewahrungsfrist gerade nicht durchgesetzt. Cron-Jobs im Vercel-Dashboard prüfen.",
       "noRuns": "Noch keine Ausführung verzeichnet.",
       "ok": "erfolgreich",

@@ -126,7 +126,13 @@ the usual 60% — measured against this particular fill, `ink`/60 is 4.30:1
   below 28px. Never for UI or labels. It is the voice for statements, not for
   structure.
 - **Body and UI — Geist.** All copy, navigation, buttons, forms.
-- **Data and eyebrows — Geist Mono.** Uppercase, wide tracking, small.
+- **Data and eyebrows — Geist Mono.** Uppercase, wide tracking, small. One
+  named exception: the calendar's `CategoryBadge` (`ui/CategoryBadge.tsx`)
+  stays mixed-case, because forcing caps on the `innolab` category would
+  render it "INNOLAB" and lose the mid-word capital that spells the name
+  "InnoLab". The other six category labels are already written in the case
+  they render in (`Projekte`, `Wettkämpfe`, ...), so dropping the transform
+  changes nothing for them.
 
 The type scale is defined once in `@theme`. Never write arbitrary `text-[42px]`
 values in a component. If a size is missing from the scale, add it to the scale.

@@ -48,7 +48,7 @@ describe("Pillars", () => {
     renderWithIntl(<Pillars />);
     expect(
       screen.getByText(
-        "Wir wählen Projekte danach aus, welches SDG sie voranbringen — Wirkung ist die Eintrittskarte, nicht ein Zusatz am Ende.",
+        "Wir wählen Projekte danach aus, welches SDG sie voranbringen. Wirkung ist die Eintrittskarte, nicht ein Zusatz am Ende.",
       ),
     ).toBeInTheDocument();
   });

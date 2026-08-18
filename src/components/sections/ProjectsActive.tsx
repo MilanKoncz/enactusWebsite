@@ -81,7 +81,12 @@ function ProjectCard({ project, isOpen, onToggle }: ProjectCardProps) {
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <p className="text-body-l font-medium">
               {project.name}
-              <span className="sr-only"> — {isOpen ? tPage("collapseLabel") : tPage("expandLabel")}</span>
+              {/* No separator character needed before the label: the browser's
+                  own accessible-name computation always joins a button's
+                  child nodes with a normalizing space, even when the source
+                  has none between this span and the name text above it —
+                  unlike plain DOM textContent, which only concatenates. */}
+              <span className="sr-only">{isOpen ? tPage("collapseLabel") : tPage("expandLabel")}</span>
             </p>
             <Badge status={project.status}>{tStatus(project.status)}</Badge>
           </div>

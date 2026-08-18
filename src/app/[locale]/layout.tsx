@@ -29,7 +29,7 @@ export function generateStaticParams() {
 export const metadata: Metadata = {
   title: {
     default: "Enactus Mannheim",
-    template: "%s — Enactus Mannheim",
+    template: "%s, Enactus Mannheim",
   },
   description: "Enactus Mannheim e.V.",
 };

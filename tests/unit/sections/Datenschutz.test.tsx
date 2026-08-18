@@ -23,7 +23,7 @@ describe("Datenschutz", () => {
   it("shows the draft notice while unreviewed, and never a reviewed notice", () => {
     expect(privacyReviewStatus.reviewed).toBe(false);
     renderWithIntl(<Datenschutz />);
-    expect(screen.getByText(/^Entwurf —/)).toBeInTheDocument();
+    expect(screen.getByText(/^Entwurf\./)).toBeInTheDocument();
     expect(screen.queryByText(/Zuletzt geprüft am/)).not.toBeInTheDocument();
   });
 

@@ -57,7 +57,7 @@ export const org: Org = orgSchema.parse({
   // see ASSETS-TODO.md.
   foundingYear: { year: 2003, verified: false },
   registeredOffice: "P4 9, 68161 Mannheim",
-  registerEntry: "Amtsgericht Mannheim – Vereinsregister – VR 700965",
+  registerEntry: "Amtsgericht Mannheim, Vereinsregister VR 700965",
   // Board-confirmed 2026-08-15 — see the field comment above for the vacant
   // third seat.
   legalRepresentatives: {

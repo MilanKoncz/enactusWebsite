@@ -11,7 +11,7 @@ describe("ClosingCta", () => {
       screen.getByRole("heading", { level: 2, name: "Werde Teil des nächsten Projekts" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Bewirb dich, wenn du wirklich etwas umsetzen willst — nicht nur darüber reden."),
+      screen.getByText("Bewirb dich, wenn du wirklich etwas umsetzen willst, nicht nur darüber reden."),
     ).toBeInTheDocument();
   });
 

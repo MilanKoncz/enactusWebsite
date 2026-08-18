@@ -84,7 +84,7 @@ function ProjectLeadCard({ lead, unverifiedEmailHint }: { lead: ProjectLead; unv
             href={lead.linkedinUrl}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`LinkedIn — ${lead.name}`}
+            aria-label={`LinkedIn, ${lead.name}`}
             className="link-underline w-fit font-mono text-mono-xs uppercase opacity-70"
           >
             LinkedIn
@@ -149,7 +149,7 @@ export function ProjectDetailContent({ project, labels, className }: ProjectDeta
                         aria-label={tSdg("linkLabel", { number: goal, name })}
                         className="link-underline text-body-m"
                       >
-                        SDG {goal} — {name}
+                        SDG {goal}, {name}
                       </a>
                     </li>
                   );
@@ -209,7 +209,7 @@ export function ProjectDetailContent({ project, labels, className }: ProjectDeta
             href={project.externalUrl}
             eyebrow={labels.externalLinkLabel}
             title={formatDomain(project.externalUrl)}
-            ariaLabel={`${labels.externalLinkLabel} — ${formatDomain(project.externalUrl)}`}
+            ariaLabel={`${labels.externalLinkLabel}, ${formatDomain(project.externalUrl)}`}
             className="w-full sm:w-auto sm:min-w-64"
           />
         ) : (

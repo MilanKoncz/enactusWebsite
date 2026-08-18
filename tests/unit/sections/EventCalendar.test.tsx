@@ -57,7 +57,7 @@ describe("EventCalendar", () => {
 
     expect(screen.getByRole("heading", { name: "Ideathon" })).toBeInTheDocument();
     expect(screen.getByText("17. September 2026")).toBeInTheDocument();
-    expect(screen.getAllByText("Inno Lab").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("InnoLab").length).toBeGreaterThan(0);
   });
 
   it("shows the countdown phrase once the real clock is available", () => {
@@ -100,7 +100,7 @@ describe("EventCalendar", () => {
     const events = [event({ startDate: "2026-09-17", title: "Ideathon", category: "innolab" })];
     renderWithIntl(<EventCalendar events={events} initialNowMs={NOW} />);
 
-    expect(screen.getByRole("button", { name: /Inno Lab/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /InnoLab/ })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Wettkämpfe/ })).not.toBeInTheDocument();
   });
 
@@ -112,7 +112,7 @@ describe("EventCalendar", () => {
     ];
     renderWithIntl(<EventCalendar events={events} initialNowMs={NOW} />);
 
-    const chip = screen.getByRole("button", { name: /Inno Lab/ });
+    const chip = screen.getByRole("button", { name: /InnoLab/ });
     expect(chip).toHaveAttribute("aria-pressed", "false");
 
     await user.click(chip);
@@ -133,7 +133,7 @@ describe("EventCalendar", () => {
     ];
     renderWithIntl(<EventCalendar events={events} initialNowMs={NOW} />);
 
-    await user.click(screen.getByRole("button", { name: /Inno Lab/ }));
+    await user.click(screen.getByRole("button", { name: /InnoLab/ }));
     await user.click(screen.getByRole("button", { name: /Bewerbung/ }));
 
     expect(screen.getByText("Ideathon")).toBeInTheDocument();

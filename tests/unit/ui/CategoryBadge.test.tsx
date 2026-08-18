@@ -17,6 +17,12 @@ describe("CategoryBadge", () => {
     }
   });
 
+  it("never forces the label to uppercase, so InnoLab keeps its mid-word capital", () => {
+    renderWithIntl(<CategoryBadge category="innolab" />);
+    const badge = screen.getByText("InnoLab").closest("span")!;
+    expect(badge).not.toHaveClass("uppercase");
+  });
+
   it("fills wettkaempfe with gold and ink text — the one filled category", () => {
     renderWithIntl(<CategoryBadge category="wettkaempfe" />);
     const badge = screen.getByText("Wettkämpfe").closest("span")!;

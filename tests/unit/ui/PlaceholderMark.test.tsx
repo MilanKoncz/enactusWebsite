@@ -36,7 +36,7 @@ describe("PlaceholderMark", () => {
   it("appends the hint as visually-hidden text for screen readers", () => {
     render(<PlaceholderMark hint="Diese Angabe ist noch nicht verfügbar.">PARTNER_1</PlaceholderMark>);
     const mark = screen.getByText("PARTNER_1").closest("span")!;
-    expect(mark).toHaveTextContent("PARTNER_1 — Diese Angabe ist noch nicht verfügbar.");
+    expect(mark).toHaveTextContent("PARTNER_1. Diese Angabe ist noch nicht verfügbar.");
     expect(mark.querySelector(".sr-only")).toHaveTextContent("Diese Angabe ist noch nicht verfügbar.");
   });
 

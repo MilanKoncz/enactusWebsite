@@ -74,7 +74,11 @@ export function CategoryBadge({ category, past = false, className, ...props }: C
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 whitespace-nowrap rounded-sm px-2.5 py-1 font-mono text-mono-xs uppercase",
+        // Not uppercase, unlike this project's other mono labels
+        // (docs/design-system.md's Typography section) — the one named
+        // exception is "InnoLab", where forcing caps would render it as
+        // "INNOLAB" and lose the mid-word capital that spells the name.
+        "inline-flex items-center gap-1.5 whitespace-nowrap rounded-sm px-2.5 py-1 font-mono text-mono-xs",
         past && isWettkaempfe ? PAST_WETTKAEMPFE_CLASSES : CATEGORY_CLASSES[category],
         className,
       )}

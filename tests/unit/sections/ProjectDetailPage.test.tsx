@@ -72,7 +72,7 @@ describe("ProjectDetailPage", () => {
       13: "Maßnahmen zum Klimaschutz",
     };
     for (const [goal, name] of Object.entries(goalNames)) {
-      const link = screen.getByText(`SDG ${goal} — ${name}`).closest("a");
+      const link = screen.getByText(`SDG ${goal}, ${name}`).closest("a");
       expect(link).toHaveAttribute("href", "https://sdgs.un.org/goals");
       expect(link).toHaveAttribute("target", "_blank");
       expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
@@ -95,7 +95,7 @@ describe("ProjectDetailPage", () => {
 
   it("links a project's own website when there is one, showing its domain", () => {
     renderWithIntl(<ProjectDetailPage project={mealyo} />);
-    const link = screen.getByRole("link", { name: "Projektwebsite besuchen — mealyo.de" });
+    const link = screen.getByRole("link", { name: "Projektwebsite besuchen, mealyo.de" });
     expect(link).toHaveAttribute("href", "https://mealyo.de");
     expect(link).toHaveTextContent("mealyo.de");
   });
