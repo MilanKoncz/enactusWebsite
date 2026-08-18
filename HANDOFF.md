@@ -109,3 +109,29 @@ the run ends, not left behind as permanent documentation.
   headers) is covered by `tests/unit/lib/ics.test.ts` (30 cases) and
   `tests/integration/calendarIcs.test.ts` (5 cases) against real
   request/response objects.
+- **A5 design call: the category picker is a radio-chip group, not a native
+  `<select>`.** The brief asked for "Auswahl mit Farbpunkt und Icon je
+  Option" — no browser can render an icon or a color swatch inside an
+  `<option>` element, so a real dropdown could only ever show plain
+  category names, quietly failing that requirement. Seven fixed categories
+  is few enough that showing every one at once, each with its real
+  `CategoryBadge` (icon + color + name), as a native radio group (visually
+  hidden `<input type="radio">` + `<label>` wrapping the badge, `peer`
+  classes for the checked ring) satisfies the requirement literally and
+  needed no new dependency. Considered `@radix-ui/react-select` (Radix is
+  already the project's sanctioned path for custom primitives beyond native
+  HTML) and rejected it: a new dependency for one seven-item admin picker
+  when a fully native, already-accessible alternative existed felt like the
+  wrong side of "ask when ambiguous" to guess through unattended — noted
+  here instead of adding it silently.
+- **`Date.now()` vs `new Date().getTime()` and the purity lint.** Both
+  `page.tsx` (A3) and `admin/termine/page.tsx` (A5) needed "now" outside a
+  component; `Date.now()` directly in a component body trips
+  `react-hooks/purity`'s impure-call check (confirmed: it did not fire for
+  `new Date()` in the pre-existing `admin/system/page.tsx`, but did fire for
+  the equivalent `Date.now()`). `page.tsx` moved the read into
+  `lib/calendarEvents.ts`'s `getServerNowMs()`, a plain function outside any
+  component. `admin/termine/page.tsx` uses `new Date().getTime()` directly,
+  matching the exact pattern `admin/system/page.tsx` already ships — both
+  clear lint; noted so a future edit doesn't "simplify" one back to
+  `Date.now()` and reintroduce the failure.

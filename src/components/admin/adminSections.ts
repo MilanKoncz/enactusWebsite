@@ -18,6 +18,7 @@ export const ADMIN_SECTIONS = [
   { href: "/admin/bewerbungen", messageKey: "applications" },
   { href: "/admin/mails", messageKey: "failedMails" },
   { href: "/admin/bewerbungsfenster", messageKey: "recruitingWindows" },
+  { href: "/admin/termine", messageKey: "calendarEvents" },
   { href: "/admin/erinnerungen", messageKey: "reminders" },
   { href: "/admin/kontakt", messageKey: "contactMessages" },
   { href: "/admin/loeschanfragen", messageKey: "deletionRequests" },

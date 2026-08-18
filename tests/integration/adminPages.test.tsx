@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { renderWithIntl } from "../fixtures/intl";
 
 /**
  * Closes the one gap REVIEW.md found in the test suite: every existing
@@ -9,10 +10,12 @@ import { render, screen } from "@testing-library/react";
  * can't be answered with data that merely happens to be hidden.
  */
 const listApplications = vi.fn();
+const listCalendarEvents = vi.fn();
 const cookieGet = vi.fn();
 
 vi.mock("@/lib/db", () => ({
   listApplications: (...args: unknown[]) => listApplications(...args),
+  listCalendarEvents: (...args: unknown[]) => listCalendarEvents(...args),
 }));
 
 vi.mock("next/headers", () => ({
@@ -25,6 +28,11 @@ vi.mock("@/i18n/requireLocale", () => ({
   requireLocale: async () => "de",
   resolveLocale: (locale: string) => (locale === "en" ? "en" : "de"),
 }));
+
+// Only CalendarEventsManager (rendered by /admin/termine) needs this — it's
+// a "use client" component that calls next/navigation's useRouter, which
+// has no App Router context in these direct Page({params}) renders.
+vi.mock("next/navigation", async () => (await import("../fixtures/navigation")).nextNavigationMock);
 
 const ORIGINAL_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET;
 
@@ -123,6 +131,60 @@ describe("/admin/bewerbungen (page)", () => {
 
     const link = screen.getByRole("link", { name: "Als CSV herunterladen" });
     expect(link).toHaveAttribute("href", "/api/admin/bewerbungen/csv?semester=HWS26");
+  });
+});
+
+const CALENDAR_EVENT = {
+  id: "22222222-2222-2222-2222-222222222222",
+  title: "Ideathon",
+  titleEn: null,
+  category: "innolab" as const,
+  startDate: "2026-09-24",
+  endDate: "2026-09-27",
+  startTime: null,
+  endTime: null,
+  location: null,
+  description: null,
+  descriptionEn: null,
+  tentative: false,
+  createdAt: new Date("2026-08-01T10:00:00Z"),
+  updatedAt: new Date("2026-08-01T10:00:00Z"),
+};
+
+describe("/admin/termine (page)", () => {
+  it("never reads calendar events from the database without a session cookie", async () => {
+    cookieGet.mockReturnValue(undefined);
+
+    const { default: Page } = await import("@/app/[locale]/admin/termine/page");
+    await Page({ params: params() });
+
+    expect(listCalendarEvents).not.toHaveBeenCalled();
+  });
+
+  it("renders the password prompt, not event data, without a session", async () => {
+    cookieGet.mockReturnValue(undefined);
+    listCalendarEvents.mockResolvedValue([CALENDAR_EVENT]);
+
+    const { default: Page } = await import("@/app/[locale]/admin/termine/page");
+    const tree = await Page({ params: params() });
+
+    expect(JSON.stringify(tree)).not.toContain("Ideathon");
+  });
+
+  it("reads and renders event data with a valid session", async () => {
+    cookieGet.mockReturnValue({ value: await validSessionCookie() });
+    listCalendarEvents.mockResolvedValue([CALENDAR_EVENT]);
+
+    const { default: Page } = await import("@/app/[locale]/admin/termine/page");
+    // Unlike /admin/bewerbungen, this page's content is a "use client"
+    // component (CalendarEventsManager) that calls next-intl's client
+    // useTranslations — it needs a real provider, which the app's own root
+    // layout supplies in production but this test bypasses by rendering
+    // the page directly.
+    renderWithIntl(await Page({ params: params() }));
+
+    expect(listCalendarEvents).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("Ideathon")).toBeInTheDocument();
   });
 });
 
