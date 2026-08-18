@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { isAuthenticatedRequest } from "@/lib/adminSession";
 import { listApplicationsBySemester } from "@/lib/db";
-import { csvDocument, csvFilenameSegment } from "@/lib/csv";
+import { csvDocument } from "@/lib/csv";
+import { filenameSegment } from "@/lib/filenameSegment";
 
 const CSV_COLUMNS = ["Name", "E-Mail", "Studiengang", "Eingangsdatum", "Mailstatus"];
 
@@ -49,7 +50,7 @@ export async function GET(request: NextRequest) {
     status: 200,
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="bewerbungen-${csvFilenameSegment(semester)}.csv"`,
+      "Content-Disposition": `attachment; filename="bewerbungen-${filenameSegment(semester)}.csv"`,
     },
   });
 }

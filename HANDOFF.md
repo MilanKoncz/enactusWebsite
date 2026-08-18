@@ -94,3 +94,18 @@ the run ends, not left behind as permanent documentation.
   alone and on a retry. That spec doesn't touch the homepage or anything
   this run has changed — matches the WebKit-under-load flakiness
   `playwright.config.ts`'s own comment already documents.
+- **A4: `csvFilenameSegment` renamed and moved.** Moved out of `lib/csv.ts`
+  into its own `lib/filenameSegment.ts` as `filenameSegment` once the ics
+  route needed the identical sanitisation for an event title — it was never
+  CSV-specific, only its first caller was. Updated the one existing
+  consumer (`api/admin/bewerbungen/csv/route.ts`) and its test.
+- **A4: a forced-download anchor click isn't reliably interceptable via
+  Playwright's `page.route()`** — tried mocking `/api/kalender/[id]/ics` in
+  the e2e spec and the real (unmigrated, DB-less) route answered instead in
+  both Chromium and WebKit, so the download's content can't be asserted
+  end-to-end without a real migrated database. The e2e test instead checks
+  the rendered link's `href` is wired to the right event's route; the
+  route's actual behaviour (folding, escaping, DTSTART/DTEND, 404/500,
+  headers) is covered by `tests/unit/lib/ics.test.ts` (30 cases) and
+  `tests/integration/calendarIcs.test.ts` (5 cases) against real
+  request/response objects.

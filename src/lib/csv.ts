@@ -29,11 +29,3 @@ export function csvRow(cells: string[]): string {
 export function csvDocument(columns: string[], rows: string[][]): string {
   return UTF8_BOM + csvRow(columns) + rows.map(csvRow).join("");
 }
-
-// Only ever interpolated into a Content-Disposition filename, so anything
-// outside this set is dropped rather than escaped — a semester label is
-// `HWS26`-shaped by definition (content/recruiting.ts's own regex), and a
-// filename is not the place to discover otherwise.
-export function csvFilenameSegment(value: string): string {
-  return value.replace(/[^A-Za-z0-9-]/g, "");
-}

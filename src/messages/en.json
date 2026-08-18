@@ -141,6 +141,7 @@
     "empty": "There are currently no events in the calendar.",
     "emptyFiltered": "No events match this selection.",
     "tentativeLabel": "Date not yet confirmed",
+    "addToCalendar": "Add to calendar",
     "highlight": {
       "eyebrow": "Next up",
       "today": "today",

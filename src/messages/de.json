@@ -141,6 +141,7 @@
     "empty": "Aktuell stehen keine Termine im Kalender.",
     "emptyFiltered": "Keine Termine für diese Auswahl.",
     "tentativeLabel": "Termin steht noch nicht fest",
+    "addToCalendar": "Zum Kalender hinzufügen",
     "highlight": {
       "eyebrow": "Nächster Termin",
       "today": "heute",

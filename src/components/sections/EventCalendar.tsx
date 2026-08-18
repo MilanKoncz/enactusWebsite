@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { ChevronUp, MapPin } from "lucide-react";
+import { CalendarPlus, ChevronUp, MapPin } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { buttonClasses } from "@/components/ui/Button";
 import { CategoryBadge, CATEGORY_LEFT_BORDER_CLASS } from "@/components/ui/CategoryBadge";
 import { cn } from "@/lib/cn";
 import { useNow } from "@/lib/useNow";
@@ -76,6 +77,24 @@ function TentativeNote({ label }: { label: string }) {
   return <p className="text-body-s opacity-60">{label}</p>;
 }
 
+// A real <a href download>, not Button's href branch — Button routes an
+// href through next-intl's localised Link (lib/navigation.ts), which would
+// try to prefix this API route with /en instead of leaving it alone (same
+// reasoning as PartnerContact.tsx's mailto link). buttonClasses gives it
+// Button's exact look without duplicating those classes by hand.
+function AddToCalendarLink({ eventId, label, size }: { eventId: string; label: string; size: "sm" | "md" }) {
+  return (
+    <a
+      href={`/api/kalender/${eventId}/ics`}
+      download
+      className={buttonClasses("secondary", size, "self-start")}
+    >
+      <CalendarPlus aria-hidden="true" className="size-4 shrink-0" />
+      {label}
+    </a>
+  );
+}
+
 /**
  * One row of the agenda list. Past events dim their title and meta text to
  * ink/60 on paper (this project's documented minimum for muted text) but
@@ -83,11 +102,12 @@ function TentativeNote({ label }: { label: string }) {
  * graphical label reads fine at full saturation even once the words around
  * it go quiet (docs/design-system.md's "Calendar category colors" section).
  */
-function EventRow({ event, past, locale, tentativeLabel }: {
+function EventRow({ event, past, locale, tentativeLabel, addToCalendarLabel }: {
   event: CalendarEvent;
   past: boolean;
   locale: string;
   tentativeLabel: string;
+  addToCalendarLabel: string;
 }) {
   return (
     <li
@@ -107,6 +127,9 @@ function EventRow({ event, past, locale, tentativeLabel }: {
         <EventMeta event={event} />
       </div>
       {event.tentative && <TentativeNote label={tentativeLabel} />}
+      {/* Adding a past event to a calendar app has no use — the button
+          only appears once a row is still ahead of "today". */}
+      {!past && <AddToCalendarLink eventId={event.id} label={addToCalendarLabel} size="sm" />}
     </li>
   );
 }
@@ -244,6 +267,7 @@ export function EventCalendar({ events, initialNowMs }: EventCalendarProps) {
                     )}
                     <EventMeta event={highlighted} />
                     {highlighted.tentative && <TentativeNote label={t("tentativeLabel")} />}
+                    <AddToCalendarLink eventId={highlighted.id} label={t("addToCalendar")} size="md" />
                   </Card>
                 )}
 
@@ -279,6 +303,7 @@ export function EventCalendar({ events, initialNowMs }: EventCalendarProps) {
                             past
                             locale={locale}
                             tentativeLabel={t("tentativeLabel")}
+                            addToCalendarLabel={t("addToCalendar")}
                           />
                         ))}
                       </ul>
@@ -298,6 +323,7 @@ export function EventCalendar({ events, initialNowMs }: EventCalendarProps) {
                           past={isPastEvent(event, initialNowMs)}
                           locale={locale}
                           tentativeLabel={t("tentativeLabel")}
+                          addToCalendarLabel={t("addToCalendar")}
                         />
                       ))}
                     </ul>

@@ -107,6 +107,23 @@ test.describe("homepage event calendar", () => {
     await expect(page.getByText("Mannheim", { exact: true })).toBeVisible();
   });
 
+  test("links 'Zum Kalender hinzufügen' at the highlighted event's own ics route", async ({ page }) => {
+    await mockCalendarEvents(page, ALL_EVENTS);
+    // The route's own behaviour (folding, escaping, DTSTART/DTEND,
+    // headers, the 404/500 cases) is covered end to end against real
+    // request/response objects by tests/unit/lib/ics.test.ts and
+    // tests/integration/calendarIcs.test.ts. A forced-download anchor click
+    // isn't reliably interceptable via page.route() in every engine (the
+    // request bypasses normal fetch/XHR interception on some download
+    // paths), so this only proves the rendered link's own wiring — that it
+    // exists, is reachable, and points at the correct event's route.
+    await page.goto("/");
+
+    const link = page.getByRole("link", { name: /Zum Kalender hinzufügen/ }).first();
+    await link.scrollIntoViewIfNeeded();
+    await expect(link).toHaveAttribute("href", `/api/kalender/${NEXT_EVENT.id}/ics`);
+  });
+
   test("narrows the agenda to a selected category via the filter chips", async ({ page }) => {
     await mockCalendarEvents(page, ALL_EVENTS);
     await page.goto("/");

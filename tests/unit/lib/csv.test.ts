@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { csvCell, csvDocument, csvFilenameSegment, csvRow, UTF8_BOM } from "@/lib/csv";
+import { csvCell, csvDocument, csvRow, UTF8_BOM } from "@/lib/csv";
 
 describe("csvCell", () => {
   it("leaves a plain value untouched", () => {
@@ -42,19 +42,5 @@ describe("csvDocument", () => {
 
   it("writes only the header row for no records", () => {
     expect(csvDocument(["Name"], [])).toBe(`${UTF8_BOM}Name\r\n`);
-  });
-});
-
-describe("csvFilenameSegment", () => {
-  it("keeps a normal semester label as-is", () => {
-    expect(csvFilenameSegment("HWS26")).toBe("HWS26");
-  });
-
-  it("strips quotes and separators that would break the Content-Disposition header", () => {
-    expect(csvFilenameSegment('HWS26"; rm -rf /')).toBe("HWS26rm-rf");
-  });
-
-  it("strips CR and LF so a header can never be split", () => {
-    expect(csvFilenameSegment("HWS26\r\nX-Injected: 1")).toBe("HWS26X-Injected1");
   });
 });
