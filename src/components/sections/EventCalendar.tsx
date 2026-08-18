@@ -2,15 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { CalendarPlus, ChevronUp, MapPin } from "lucide-react";
+import { ChevronUp } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { buttonClasses } from "@/components/ui/Button";
 import { CategoryBadge, CATEGORY_LEFT_BORDER_CLASS } from "@/components/ui/CategoryBadge";
+import { AddToCalendarLink, EventMeta, TentativeNote } from "@/components/ui/EventDetails";
 import { cn } from "@/lib/cn";
 import { useNow } from "@/lib/useNow";
+import { formatEventDate, formatMonthHeading } from "@/lib/calendarFormat";
 import {
   countdownFor,
   filterByCategories,
@@ -21,79 +22,6 @@ import {
   visibleCategories,
 } from "@/lib/calendarAgenda";
 import type { CalendarCategory, CalendarEvent } from "@/content/calendar";
-
-// Parses a plain "YYYY-MM-DD" as a UTC calendar date and always formats it
-// back with an explicit UTC timeZone — the round trip is then independent
-// of whichever timezone the server or the visitor's browser happens to run
-// in, so the server-rendered and first client-rendered text can never
-// disagree (the calendar_events columns have no time-of-day component to
-// begin with, see migrations/0006_calendar_events.sql).
-function parseDateOnly(dateStr: string): Date {
-  const [year, month, day] = dateStr.split("-").map(Number);
-  return new Date(Date.UTC(year, month - 1, day));
-}
-
-function formatEventDate(event: CalendarEvent, locale: string): string {
-  const formatter = new Intl.DateTimeFormat(locale, {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-  const start = formatter.format(parseDateOnly(event.startDate));
-  if (!event.endDate || event.endDate === event.startDate) return start;
-  return `${start} – ${formatter.format(parseDateOnly(event.endDate))}`;
-}
-
-function formatMonthHeading(monthKey: string, locale: string): string {
-  const [year, month] = monthKey.split("-").map(Number);
-  return new Intl.DateTimeFormat(locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(
-    new Date(Date.UTC(year, month - 1, 1)),
-  );
-}
-
-function formatEventTime(event: CalendarEvent): string | null {
-  if (!event.startTime) return null;
-  return event.endTime ? `${event.startTime}–${event.endTime}` : event.startTime;
-}
-
-function EventMeta({ event }: { event: CalendarEvent }) {
-  const time = formatEventTime(event);
-  if (!time && !event.location) return null;
-  return (
-    <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-body-s">
-      {time && <span className="font-mono tabular-nums">{time}</span>}
-      {event.location && (
-        <span className="inline-flex items-center gap-1">
-          <MapPin aria-hidden="true" className="size-3.5 shrink-0" />
-          {event.location}
-        </span>
-      )}
-    </p>
-  );
-}
-
-function TentativeNote({ label }: { label: string }) {
-  return <p className="text-body-s opacity-60">{label}</p>;
-}
-
-// A real <a href download>, not Button's href branch — Button routes an
-// href through next-intl's localised Link (lib/navigation.ts), which would
-// try to prefix this API route with /en instead of leaving it alone (same
-// reasoning as PartnerContact.tsx's mailto link). buttonClasses gives it
-// Button's exact look without duplicating those classes by hand.
-function AddToCalendarLink({ eventId, label, size }: { eventId: string; label: string; size: "sm" | "md" }) {
-  return (
-    <a
-      href={`/api/kalender/${eventId}/ics`}
-      download
-      className={buttonClasses("secondary", size, "self-start")}
-    >
-      <CalendarPlus aria-hidden="true" className="size-4 shrink-0" />
-      {label}
-    </a>
-  );
-}
 
 /**
  * One row of the agenda list. Past events dim their title and meta text to
