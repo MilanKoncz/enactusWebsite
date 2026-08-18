@@ -412,37 +412,38 @@
   },
   "EventsPage": {
     "eyebrow": "Events",
-    "title": "Enactus Mannheim ist Teil von Enactus Germany und dem weltweiten Enactus-Netzwerk."
+    "title": "Enactus Mannheim ist Teil von Enactus Germany und dem weltweiten Enactus-Netzwerk.",
+    "lead": "Neben unserer Arbeit in den Projekten und den Ressorts veranstalten wir ebenfalls Events zum Netzwerken, Lernen und Spaß haben."
   },
   "EventFormats": {
     "eyebrow": "Wie wir zusammenkommen",
     "title": "Vier Formate",
-    "tablistLabel": "Veranstaltungsformate",
-    "detailMissingHint": "Der Beschreibungstext liegt noch nicht vor.",
     "socials": {
       "title": "Socials",
-      "detail": "BESCHREIBUNG_FEHLT"
+      "detail": "Wir veranstalten wie viele Initiativen Socials wie Running Dinners und gemeinsame Barabende."
     },
     "workshops": {
       "title": "Workshops",
-      "detail": "BESCHREIBUNG_FEHLT"
+      "detail": "Außerdem planen wir Workshops, die unseren Projekten und Mitgliedern eine handfeste Hilfe sind. Daher sind diese meist auch nur für Vereinsmitglieder."
     },
     "teamweekend": {
       "title": "Teamwochenende",
-      "detail": "BESCHREIBUNG_FEHLT"
+      "detail": "Außerdem organisieren wir zu Beginn jedes Semesters ein Teamwochenende, um neue Mitglieder willkommen zu heißen."
     },
     "gala": {
-      "title": "Gala",
-      "detail": "BESCHREIBUNG_FEHLT"
+      "title": "Semesterabschluss",
+      "detail": "Abgeschlossen wird jedes Semester mit der Weihnachtsfeier oder dem Sommerfest als Hauptversammlung."
     }
   },
   "JourneysSection": {
     "eyebrow": "Journeys",
-    "title": "Unsere Reisen zu den Enactus-Wettbewerben"
+    "title": "Unsere Reisen zu den Enactus-Wettbewerben",
+    "lead": "Jedes Jahr gehen wir einmal auf eine Journey. Dort besuchen wir Venture-Capital-Firmen und Startups oder besuchen eine große Startup-Messe. Eindrucksvoll, motivierend und mit lustigen Erinnerungen."
   },
   "EventsNetwork": {
     "eyebrow": "Netzwerk",
     "title": "Teil eines großen Netzwerks",
+    "lead": "Hier hört es aber noch nicht auf! Wir sind Teil von Enactus Germany, die für alle deutschen Enactus Standorte große Events organisieren, die wir als Enactus Mannheim gemeinsam besuchen. Hier siehst du eine Auswahl von den wichtigsten Events im Jahr.",
     "studentsGermanyLabel": "Studierende deutschlandweit",
     "universitiesGermanyLabel": "Hochschulstandorte",
     "countriesGlobalLabel": "Länder weltweit",
@@ -450,6 +451,32 @@
     "atLeast": "über {value}",
     "teamsHeading": "Weitere Enactus-Teams",
     "teamLinkLabel": "Enactus {name} öffnet in neuem Tab"
+  },
+  "EgEvents": {
+    "nc": {
+      "abbreviation": "NC",
+      "title": "National Cup",
+      "description": "Der National Cup ist der Höhepunkt des Enactus-Jahres. Hier präsentiert jedes Enactus-Team sein stärkstes Projekt mit der Chance auf über 15.000 € Preisgeld. Die Stimmung ist atemberaubend herzlich und die Afterpartys legendär.",
+      "imageAlt": "Team feiert mit der Trophäe für den National Cup 2026 auf der Bühne"
+    },
+    "esa": {
+      "abbreviation": "ESA",
+      "title": "Enactus Startup Accelerator",
+      "description": "Der Enactus Startup Accelerator ist der Pitchcontest für junge Startprojekte. Hier präsentieren sich Projekte, die early-stage und innovativ sind, und kämpfen, genauso wie beim National Cup, um mehrere 1.000 € Preisgeld.",
+      "imageAlt": "Vortrag auf der Bühne beim Enactus Startup Accelerator, davor das Publikum im Saal"
+    },
+    "oew": {
+      "abbreviation": "OEW",
+      "title": "One Enactus Weekend",
+      "description": "Das One Enactus Weekend ist das Wochenende, an dem alle Enactees zum Feiern zusammenkommen. Danach weißt du, was die Enactus-Community bedeutet! Oft sind dabei sogar internationale Enactus-Teams vertreten.",
+      "imageAlt": "Luftaufnahme vieler Teilnehmender, die sich auf einer Wiese zu einer Formation aufgestellt haben"
+    },
+    "twe": {
+      "abbreviation": "TWE",
+      "title": "Trainingswochenende",
+      "description": "Das Trainingswochenende ist ein Wochenende voller Workshops für Enactees. Hier kann man in diversen Themen sein Wissen erweitern, um Herausforderungen im eigenen Projekt zu meistern und persönlich zu wachsen. Wie wäre es mit Leadership? Oder Projektfinanzierung?",
+      "imageAlt": "Gruppenfoto vor einem Enactus-Germany-Bus, mit hochgeworfenen bunten SDG-Boxen"
+    }
   },
   "PartnerPage": {
     "eyebrow": "Partner",

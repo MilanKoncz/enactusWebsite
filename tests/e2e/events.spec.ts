@@ -22,34 +22,52 @@ test.describe("/events", () => {
     }
   });
 
-  test("desktop: shows a tablist of four formats with one shared panel below", async ({
+  test("shows all four event formats with their title and detail text, no interaction needed", async ({
     page,
-    isMobile,
   }) => {
-    test.skip(isMobile, "desktop-only tablist layout, covered separately for touch below");
+    await page.goto("/events");
+    await expect(page.getByRole("heading", { name: "Socials" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Workshops" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Teamwochenende" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Semesterabschluss" })).toBeVisible();
+    await expect(
+      page.getByText("Wir veranstalten wie viele Initiativen Socials wie Running Dinners und gemeinsame Barabende."),
+    ).toBeVisible();
+  });
+
+  test("shows the four Enactus Germany events with their abbreviation, title, and description", async ({
+    page,
+  }) => {
+    await page.goto("/events");
+    for (const [abbreviation, title] of [
+      ["NC", "National Cup"],
+      ["ESA", "Enactus Startup Accelerator"],
+      ["OEW", "One Enactus Weekend"],
+      ["TWE", "Trainingswochenende"],
+    ]) {
+      await expect(page.getByText(abbreviation, { exact: true })).toBeVisible();
+      await expect(page.getByRole("heading", { name: title })).toBeVisible();
+    }
+  });
+
+  test("keeps the four Enactus Germany event cards the same height despite unequal text length", async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto("/events");
 
-    const socials = page.getByRole("tab", { name: "Socials" });
-    const workshops = page.getByRole("tab", { name: "Workshops" });
-    await expect(socials).toHaveAttribute("aria-selected", "true");
+    const heights = await page.evaluate(() => {
+      const headings = ["National Cup", "Enactus Startup Accelerator", "One Enactus Weekend", "Trainingswochenende"];
+      return headings.map((title) => {
+        const heading = Array.from(document.querySelectorAll("h3")).find((el) => el.textContent === title)!;
+        const card = heading.closest("li")!;
+        return card.getBoundingClientRect().height;
+      });
+    });
 
-    await workshops.click();
-    await expect(workshops).toHaveAttribute("aria-selected", "true");
-    await expect(socials).toHaveAttribute("aria-selected", "false");
-  });
-
-  test("touch: the four formats behave as an accordion", async ({ page, isMobile }) => {
-    test.skip(!isMobile, "accordion layout is the touch/narrow-width claim");
-    await page.goto("/events");
-
-    const socials = page.getByRole("button", { name: "Socials" });
-    const workshops = page.getByRole("button", { name: "Workshops" });
-    await expect(socials).toHaveAttribute("aria-expanded", "true");
-
-    await workshops.tap();
-    await expect(workshops).toHaveAttribute("aria-expanded", "true");
-    await expect(socials).toHaveAttribute("aria-expanded", "false");
+    for (const height of heights) {
+      expect(Math.round(height)).toBe(Math.round(heights[0]));
+    }
   });
 
   test("renders the Journeys history with all four confirmed trips", async ({ page }) => {

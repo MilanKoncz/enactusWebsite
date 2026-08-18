@@ -24,7 +24,7 @@ export function JourneysSection() {
   return (
     <Section className="relative isolate">
       <Container className="relative flex flex-col gap-10">
-        <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
+        <SectionHeading eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
         <ol className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {trips.map((trip) => (
             <li key={trip.key} className="border-l-2 border-gold py-1 pl-4">

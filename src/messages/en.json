@@ -412,37 +412,38 @@
   },
   "EventsPage": {
     "eyebrow": "Events",
-    "title": "Enactus Mannheim is part of Enactus Germany and the worldwide Enactus network."
+    "title": "Enactus Mannheim is part of Enactus Germany and the worldwide Enactus network.",
+    "lead": "Beyond our work in the projects and internal teams, we also run events for networking, learning, and having fun together."
   },
   "EventFormats": {
     "eyebrow": "How we come together",
     "title": "Four formats",
-    "tablistLabel": "Event formats",
-    "detailMissingHint": "The description hasn't been written yet.",
     "socials": {
       "title": "Socials",
-      "detail": "DESCRIPTION_MISSING"
+      "detail": "Like many student initiatives, we host socials such as running dinners and casual bar nights."
     },
     "workshops": {
       "title": "Workshops",
-      "detail": "DESCRIPTION_MISSING"
+      "detail": "We also run workshops that give our projects and members hands-on support. That's why they're mostly reserved for club members."
     },
     "teamweekend": {
       "title": "Team weekend",
-      "detail": "DESCRIPTION_MISSING"
+      "detail": "At the start of every semester, we organise a team weekend to welcome new members."
     },
     "gala": {
-      "title": "Gala",
-      "detail": "DESCRIPTION_MISSING"
+      "title": "End of semester",
+      "detail": "Every semester wraps up with the Christmas party or the summer festival, held as our general assembly."
     }
   },
   "JourneysSection": {
     "eyebrow": "Journeys",
-    "title": "Our trips to Enactus competitions"
+    "title": "Our trips to Enactus competitions",
+    "lead": "Once a year we head out on a journey, visiting venture capital firms and startups or attending a major startup fair. Impressive, motivating, and full of good memories."
   },
   "EventsNetwork": {
     "eyebrow": "Network",
     "title": "Part of a large network",
+    "lead": "But it doesn't stop there! We're part of Enactus Germany, which organises major events for every Enactus location in Germany, and we attend them together as Enactus Mannheim. Here's a selection of the most important events of the year.",
     "studentsGermanyLabel": "Students across Germany",
     "universitiesGermanyLabel": "University locations",
     "countriesGlobalLabel": "Countries worldwide",
@@ -450,6 +451,32 @@
     "atLeast": "over {value}",
     "teamsHeading": "More Enactus teams",
     "teamLinkLabel": "Enactus {name} opens in a new tab"
+  },
+  "EgEvents": {
+    "nc": {
+      "abbreviation": "NC",
+      "title": "National Cup",
+      "description": "The National Cup is the highlight of the Enactus year. Every Enactus team presents its strongest project here, with a chance to win over €15,000 in prize money. The mood is incredibly warm, and the afterparties are legendary.",
+      "imageAlt": "Team celebrating on stage with the National Cup 2026 trophy"
+    },
+    "esa": {
+      "abbreviation": "ESA",
+      "title": "Enactus Startup Accelerator",
+      "description": "The Enactus Startup Accelerator is the pitch contest for young, early-stage startup projects. Just like at the National Cup, these innovative projects compete for several thousand euros in prize money.",
+      "imageAlt": "A presentation on stage at the Enactus Startup Accelerator, with the audience seated in front"
+    },
+    "oew": {
+      "abbreviation": "OEW",
+      "title": "One Enactus Weekend",
+      "description": "The One Enactus Weekend is the weekend when all Enactees come together to celebrate. After that, you'll know what the Enactus community really means. International Enactus teams often join in too.",
+      "imageAlt": "Aerial view of many participants arranged into a formation on a large lawn"
+    },
+    "twe": {
+      "abbreviation": "TWE",
+      "title": "Training weekend",
+      "description": "The training weekend is a full weekend of workshops for Enactees. You can build your knowledge across a range of topics to tackle challenges in your own project and grow personally. How about leadership, or project financing?",
+      "imageAlt": "Group photo in front of an Enactus Germany van, with colourful SDG boxes tossed in the air"
+    }
   },
   "PartnerPage": {
     "eyebrow": "Partners",
