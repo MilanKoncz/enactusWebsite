@@ -181,13 +181,19 @@ export function HomeKpis() {
                     narrow cases. The spin-off tile's "5 Projekte" is wider
                     than every other tile's figure at exactly the width the
                     five-column row gets tightest (lg, before lg:text-display-3
-                    would apply) — heading-1 (2rem) is the one step down that
+                    would apply) — display-4 (2rem) is the one step down that
                     still clears the column there; every other breakpoint
-                    keeps the same size as the rest of the row. */}
+                    keeps the same size as the rest of the row. display-4, not
+                    heading-1: same 2rem size, but weight 400 like every other
+                    figure in this row — heading-1's weight 600 read as a
+                    different typeface next to the other four (getComputedStyle
+                    confirmed: 600 vs 400, both nominally "Instrument Serif",
+                    the browser synthesizing a bold Instrument Serif has no
+                    600 cut). */}
                 <p
                   className={cn(
                     "text-display-3 font-display sm:text-display-2 lg:text-display-3",
-                    isLast && "lg:text-heading-1",
+                    isLast && "lg:text-display-4",
                   )}
                 >
                   {kpi.verified ? (
@@ -218,7 +224,19 @@ export function HomeKpis() {
                     (Eyebrow: Geist Mono, uppercase, the same size and
                     tracking) rather than body copy — it reads as a footnote
                     to the label, not as a second sentence. */}
-                <Eyebrow className="min-h-[1lh]">
+                {/* whitespace-nowrap: this line reserves exactly one line's
+                    height (min-h-[1lh]) — an unforced wrap here overflows
+                    that reservation and reads as a stray paragraph break in
+                    the row. Below 375px "von über 1.000 Teams" (176.8px
+                    unwrapped, measured) no longer fits its ~152px column —
+                    letting it overflow instead of wrapping pushed the page
+                    itself into horizontal scroll (measured: 369px document
+                    against a 360px viewport), which the definition of done
+                    rules out, so it's truncated with an ellipsis here
+                    instead of shrinking the font further. Flagged to the
+                    board rather than resolved unilaterally — see
+                    ASSETS-TODO.md. */}
+                <Eyebrow className="min-h-[1lh] overflow-hidden text-ellipsis whitespace-nowrap">
                   {kpi.key === "worldRanking" ? t("worldRankingDetail") : null}
                 </Eyebrow>
               </div>

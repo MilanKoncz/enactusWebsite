@@ -50,6 +50,15 @@
   --text-display-3--letter-spacing: -0.01em;
   --text-display-3--font-weight: 400;
 
+  /* Same size as --text-heading-1, but weight 400 like the rest of the
+     display family — heading-1 carries weight 600, which forces Instrument
+     Serif into a synthesized bold. HomeKpis' narrowest tile ("5 Projekte")
+     needs the size, not the weight. */
+  --text-display-4: 2rem;
+  --text-display-4--line-height: 1.15;
+  --text-display-4--letter-spacing: -0.01em;
+  --text-display-4--font-weight: 400;
+
   --text-heading-1: 2rem;
   --text-heading-1--line-height: 1.2;
   --text-heading-1--letter-spacing: -0.01em;
