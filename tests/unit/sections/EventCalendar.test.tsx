@@ -84,12 +84,16 @@ describe("EventCalendar", () => {
 
     await user.click(chip);
     expect(chip).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByText("Ideathon")).toBeInTheDocument();
+    // getAllByText, not getByText — the month grid's own title-bearing bars
+    // (ab lg) render the same event titles the agenda list does, and both
+    // views exist in the DOM at once regardless of which the test's
+    // viewport-less jsdom environment would actually show.
+    expect(screen.getAllByText("Ideathon").length).toBeGreaterThan(0);
     expect(screen.queryByText("Kick-off")).not.toBeInTheDocument();
 
     await user.click(chip);
     expect(chip).toHaveAttribute("aria-pressed", "false");
-    expect(screen.getByText("Kick-off")).toBeInTheDocument();
+    expect(screen.getAllByText("Kick-off").length).toBeGreaterThan(0);
   });
 
   it("selecting every visible category is equivalent to selecting none — a union, not an intersection", async () => {
@@ -103,8 +107,8 @@ describe("EventCalendar", () => {
     await user.click(filterChips().getByRole("button", { name: /InnoLab/ }));
     await user.click(filterChips().getByRole("button", { name: /Bewerbung/ }));
 
-    expect(screen.getByText("Ideathon")).toBeInTheDocument();
-    expect(screen.getByText("Kick-off")).toBeInTheDocument();
+    expect(screen.getAllByText("Ideathon").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Kick-off").length).toBeGreaterThan(0);
   });
 
   it("has no accessibility violations", async () => {
