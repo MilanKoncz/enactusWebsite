@@ -1,3 +1,5 @@
+"use client";
+
 import { useFormatter, useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
@@ -6,6 +8,8 @@ import { LinkCard } from "@/components/ui/LinkCard";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { AnimatedFigure, useSeenOnce } from "@/components/motion/AnimatedFigure";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { networkStats, teamLinks } from "@/content/network";
 import { egEvents } from "@/content/egEvents";
 import { GermanyMap } from "@/components/sections/GermanyMap";
@@ -24,6 +28,8 @@ export function EventsNetwork() {
   const tEgEvents = useTranslations("EgEvents");
   const tPlaceholder = useTranslations("Placeholder");
   const format = useFormatter();
+  const reducedMotion = usePrefersReducedMotion();
+  const [statsRef, statsSeen] = useSeenOnce<HTMLDivElement>();
 
   return (
     <Section className="relative isolate">
@@ -62,21 +68,42 @@ export function EventsNetwork() {
             ))}
           </ul>
 
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+          {/* Counts up once scrolled into view, same shared mechanism as
+              HomeKpis' five KPI tiles (components/motion/AnimatedFigure.tsx)
+              — not a second implementation. Server-rendered and the no-JS/
+              reduced-motion fallback both stay the plain final value. */}
+          <div ref={statsRef} className="grid grid-cols-1 gap-8 sm:grid-cols-3">
             <div className="flex flex-col gap-2">
               <p className="text-display-2 font-display">
-                {t("approx", { value: format.number(networkStats.studentsGermany) })}
+                <AnimatedFigure
+                  target={networkStats.studentsGermany}
+                  start={statsSeen}
+                  reducedMotion={reducedMotion}
+                  format={(value) => t("approx", { value: format.number(value) })}
+                />
               </p>
               <Eyebrow>{t("studentsGermanyLabel")}</Eyebrow>
             </div>
             <div className="flex flex-col gap-2">
               <p className="text-display-2 font-display">
-                {t("atLeast", { value: format.number(networkStats.universitiesGermany) })}
+                <AnimatedFigure
+                  target={networkStats.universitiesGermany}
+                  start={statsSeen}
+                  reducedMotion={reducedMotion}
+                  format={(value) => t("atLeast", { value: format.number(value) })}
+                />
               </p>
               <Eyebrow>{t("universitiesGermanyLabel")}</Eyebrow>
             </div>
             <div className="flex flex-col gap-2">
-              <p className="text-display-2 font-display">{format.number(networkStats.countriesGlobal)}</p>
+              <p className="text-display-2 font-display">
+                <AnimatedFigure
+                  target={networkStats.countriesGlobal}
+                  start={statsSeen}
+                  reducedMotion={reducedMotion}
+                  format={(value) => format.number(value)}
+                />
+              </p>
               <Eyebrow>{t("countriesGlobalLabel")}</Eyebrow>
             </div>
           </div>
