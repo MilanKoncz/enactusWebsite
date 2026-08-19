@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import { useFormatter, useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
 import { Container } from "@/components/ui/Container";
@@ -5,9 +8,94 @@ import { Eyebrow } from "@/components/ui/Eyebrow";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { Section } from "@/components/ui/Section";
 import { ThreadSegment } from "@/components/motion/ThreadSegment";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { kpis, type KpiKey } from "@/content/kpis";
 
 type KpiFormat = "count" | "atLeastCount" | "atLeastCurrency" | "topRank" | "unitCount";
+
+const COUNT_DURATION_MS = 1200;
+
+function easeOutCubic(progress: number): number {
+  return 1 - Math.pow(1 - progress, 3);
+}
+
+// No IntersectionObserver-in-a-hook here — a single observer, owned by
+// HomeKpis itself, watches the whole row so all five figures start counting
+// on the same frame (docs/design-system.md: "one orchestrated moment beats
+// ten scattered effects"). `seen` only ever flips false→true: once this
+// section has been scrolled past, scrolling back up must not restart it.
+// Undefined IntersectionObserver (no browser support) degrades to "never
+// seen" — the figures stay at their server-rendered final value forever,
+// the same safe fallback a reduced-motion reader gets deliberately.
+function useSeenOnce<T extends HTMLElement>(): [React.RefObject<T | null>, boolean] {
+  const ref = useRef<T>(null);
+  const [seen, setSeen] = useState(false);
+
+  useEffect(() => {
+    if (seen || typeof IntersectionObserver === "undefined") return;
+    const node = ref.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setSeen(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.3 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [seen]);
+
+  return [ref, seen];
+}
+
+// Starts at `target` — the exact string the server rendered, and what a
+// no-JS or reduced-motion reader keeps forever — so there is never a
+// hydration mismatch and never a moment with no number at all. Counting
+// only ever begins once `start` flips true (HomeKpis's shared
+// IntersectionObserver): a plain requestAnimationFrame loop, timed against
+// a value read once when the loop starts, not a recurring external clock —
+// the useNow.ts bug this project already hit came from a clock read inside
+// useSyncExternalStore's getSnapshot, which this isn't.
+function AnimatedFigure({
+  target,
+  start,
+  reducedMotion,
+  format,
+}: {
+  target: number;
+  start: boolean;
+  reducedMotion: boolean;
+  format: (value: number) => string;
+}) {
+  const [display, setDisplay] = useState(target);
+
+  useEffect(() => {
+    if (!start || reducedMotion) return;
+    let frame: number;
+    const startTime = performance.now();
+    // No separate setDisplay(0) here — the first requestAnimationFrame
+    // callback below computes progress ≈ 0 on its own and sets the same
+    // value through the one code path every later frame also uses, rather
+    // than a synchronous setState call directly in the effect body
+    // (react-hooks/set-state-in-effect).
+    function tick(now: number) {
+      const progress = Math.min((now - startTime) / COUNT_DURATION_MS, 1);
+      if (progress < 1) {
+        setDisplay(Math.round(target * easeOutCubic(progress)));
+        frame = requestAnimationFrame(tick);
+      } else {
+        setDisplay(target);
+      }
+    }
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [start, reducedMotion, target]);
+
+  return <span className="tabular-nums">{format(display)}</span>;
+}
 
 // funding and projectIterations are lower bounds ("mehr als"), rendered with
 // a leading ">"; worldRanking is a rank, rendered with a leading "Top"; the
@@ -22,11 +110,13 @@ const KPI_FORMAT: Record<KpiKey, KpiFormat> = {
   spinoffs: "unitCount",
 };
 
-// Five static figures, deliberately not animated (docs/design-system.md:
-// "one orchestrated moment beats ten scattered effects" — that moment is
-// the hero, not this). Board-confirmed as of 2026-08-15/2026-08-16; the
-// `unverified` PlaceholderMark path stays in place (rather than being
-// deleted) for the next figure that ships ahead of board sign-off.
+// Five figures that count up from zero the first time this row scrolls into
+// view (useSeenOnce above), once, never again — board feedback, 2026-08-19,
+// on top of the otherwise-unanimated homepage (docs/design-system.md: "one
+// orchestrated moment beats ten scattered effects" still governs everywhere
+// else). Board-confirmed as of 2026-08-15/2026-08-16; the `unverified`
+// PlaceholderMark path stays in place (rather than being deleted) for the
+// next figure that ships ahead of board sign-off.
 //
 // Board feedback dropped both the "Kennzahlen" eyebrow/"Zahlen, die für
 // sich sprechen" headline pairing and the per-row "Stand: {date}" line —
@@ -36,6 +126,8 @@ export function HomeKpis() {
   const t = useTranslations("Kpis");
   const tPlaceholder = useTranslations("Placeholder");
   const format = useFormatter();
+  const reducedMotion = usePrefersReducedMotion();
+  const [rowRef, seen] = useSeenOnce<HTMLDivElement>();
 
   function formatValue(key: KpiKey, value: number): string {
     switch (KPI_FORMAT[key]) {
@@ -65,9 +157,11 @@ export function HomeKpis() {
             fixed min-height alone can't do that once a label wraps to two
             lines. Below lg there's only ever one tile per row, so equal
             height there falls out of the grid for free. */}
-        <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-5 lg:grid-rows-[auto_auto_auto] lg:gap-x-0 lg:gap-y-0">
+        <div
+          ref={rowRef}
+          className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-5 lg:grid-rows-[auto_auto_auto] lg:gap-x-0 lg:gap-y-0"
+        >
           {kpis.map((kpi, index) => {
-            const formatted = formatValue(kpi.key, kpi.value);
             const isLast = index === kpis.length - 1;
             return (
               <div
@@ -97,10 +191,20 @@ export function HomeKpis() {
                   )}
                 >
                   {kpi.verified ? (
-                    formatted
+                    <AnimatedFigure
+                      target={kpi.value}
+                      start={seen}
+                      reducedMotion={reducedMotion}
+                      format={(value) => formatValue(kpi.key, value)}
+                    />
                   ) : (
                     <PlaceholderMark variant="unverified" hint={tPlaceholder("unverifiedHint")}>
-                      {formatted}
+                      <AnimatedFigure
+                        target={kpi.value}
+                        start={seen}
+                        reducedMotion={reducedMotion}
+                        format={(value) => formatValue(kpi.key, value)}
+                      />
                     </PlaceholderMark>
                   )}
                 </p>
