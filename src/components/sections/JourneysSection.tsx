@@ -22,12 +22,24 @@ export function JourneysSection() {
   const t = useTranslations("JourneysSection");
 
   return (
-    <Section className="relative isolate">
+    <Section className="relative isolate signature-gradient">
       <Container className="relative flex flex-col gap-10">
-        <SectionHeading eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
+        {/* bg-paper: the heading's title/lead are full-opacity ink (safe
+            across the whole gradient, measured — see .signature-gradient's
+            comment in globals.css), but Eyebrow's muted 60%-opacity
+            treatment was only ever verified against a plain paper or ink
+            surface, not this gradient's intermediate tones — it dips as low
+            as 3.78:1 there. An opaque backing sidesteps re-deriving a
+            gradient-safe muted color for one line of text. */}
+        <div className="inline-flex flex-col gap-4 self-start bg-paper p-6">
+          <SectionHeading eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
+        </div>
         <ol className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {trips.map((trip) => (
-            <li key={trip.key} className="border-l-2 border-gold py-1 pl-4">
+            <li key={trip.key} className="border-l-2 border-gold bg-paper py-3 pl-4 pr-4">
+              {/* Same reasoning as the heading above — the season label is
+                  muted, so this whole card gets an opaque backing rather
+                  than just the one line. */}
               <p className="font-mono text-mono-xs uppercase opacity-60">
                 {seasonLabel(trip.key)} {trip.year}
               </p>

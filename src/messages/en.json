@@ -137,7 +137,7 @@
   "EventCalendar": {
     "eyebrow": "Calendar",
     "title": "What's coming up",
-    "lead": "The semester plan at a glance, from applications to the next competition.",
+    "lead": "The semester plan at a glance, from applications to the next pitch contest.",
     "filterLabel": "Filter by category",
     "earlierMonths": "Earlier events",
     "empty": "There are currently no events in the calendar.",

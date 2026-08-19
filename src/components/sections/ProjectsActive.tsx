@@ -136,9 +136,17 @@ export function ProjectsActive() {
   const [openSlug, setOpenSlug] = useState<string | null>(null);
 
   return (
-    <Section className="relative isolate">
+    <Section className="relative isolate signature-gradient">
       <Container className="relative flex flex-col gap-6">
-        <p className="font-mono text-mono-xs uppercase opacity-60">{t("heading")}</p>
+        {/* bg-paper: this label is muted (opacity-60), and that treatment
+            was only ever verified against a plain paper or ink surface —
+            see .signature-gradient's comment in globals.css for the
+            measured contrast that makes an opaque backing necessary here.
+            The cards below already sit on their own opaque bg-paper, so
+            they need no change. */}
+        <p className="inline-block self-start bg-paper px-3 py-1.5 font-mono text-mono-xs uppercase opacity-60">
+          {t("heading")}
+        </p>
         <ul className="flex flex-col gap-4">
           {activeProjects.map((project) => (
             <ProjectCard

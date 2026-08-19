@@ -92,6 +92,30 @@ describe("design tokens: color contrast", () => {
     expect(passesAA(contrastRatio("#ffeb3b", paper))).toBe(false);
   });
 
+  // .signature-gradient (globals.css) — the shared navy-to-gold background
+  // on /events' Journeys section and /projekte's active-projects section.
+  // Mirrors the two color-mix() percentages in globals.css exactly; if
+  // either changes, update both together, not just one.
+  describe(".signature-gradient stays betextable in ink end to end", () => {
+    const INK_MIX = 0.28;
+    const GOLD_MIX = 0.42;
+    const left = blendOverBackground(ink, INK_MIX, paper);
+    const right = blendOverBackground(gold, GOLD_MIX, paper);
+
+    it("holds AA at the darker (navy) end, the binding constraint", () => {
+      expect(passesAA(contrastRatio(ink, left))).toBe(true);
+    });
+
+    it("holds AA at the lighter (gold) end too", () => {
+      expect(passesAA(contrastRatio(ink, right))).toBe(true);
+    });
+
+    it("holds AA at the midpoint, sampled the same way the gradient itself interpolates", () => {
+      const mid = blendOverBackground(right, 0.5, left);
+      expect(passesAA(contrastRatio(ink, mid))).toBe(true);
+    });
+  });
+
   it("sand on paper fails AA — this combination must never ship", () => {
     expect(passesAA(contrastRatio(sand, paper))).toBe(false);
   });

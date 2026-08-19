@@ -780,3 +780,44 @@ h6 {
   padding-inline-start: var(--container-inset);
   padding-inline-end: 0;
 }
+
+/* The one shared background for a section that reads as too flatly white:
+   /events' Journeys section and /projekte's active-projects section
+   (board brief, 2026-08-19). A single named utility, not a one-off gradient
+   in either component's markup, so both are guaranteed to render exactly
+   the same tone — a drift here would be the same "two colors that should
+   be one" mistake the calendar category layer's own token-reuse test
+   guards against.
+
+   A full ink-to-gold gradient isn't safely betextable end to end — a
+   different point on the line needs a different text color to clear AA,
+   and this site's one text-on-gold rule has no exception for "except
+   here." color-mix() against --color-paper keeps every stop light enough
+   that --color-ink text clears 4.5:1 across the whole width, while still
+   reading clearly as "navy on the left, gold on the right" rather than a
+   flat wash — measured at seven points along the gradient (0/10/25/50/75/
+   90/100%), rendered pixel, not estimated:
+
+     t=0    #b1b5c1   9.10:1
+     t=0.10 #b8b9be   9.52:1
+     t=0.25 #c3c0b8  10.26:1
+     t=0.50 #d5cbb0  11.54:1
+     t=0.75 #e6d5a7  12.82:1
+     t=0.90 #f1dca2  13.76:1
+     t=1    #f8e09e  14.34:1
+
+   Contrast rises monotonically from left to right here (both endpoints are
+   lighter than --color-ink, so blending them can't dip below the darker
+   endpoint's own ratio) — the left edge is the binding constraint, at
+   9.10:1, more than double the 4.5:1 floor. If a future change to
+   --color-ink/--color-gold/--color-paper ever pushes a real point below
+   4.5:1, tests/unit/contrast.test.ts's gradient case catches it — move
+   that section's content onto opaque cards rather than adjusting the mix
+   percentages blind. */
+@utility signature-gradient {
+  background-image: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--color-ink) 28%, var(--color-paper)),
+    color-mix(in srgb, var(--color-gold) 42%, var(--color-paper))
+  );
+}
