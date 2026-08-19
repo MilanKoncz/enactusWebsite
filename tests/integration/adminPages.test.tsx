@@ -11,6 +11,7 @@ import { renderWithIntl } from "../fixtures/intl";
  */
 const listApplications = vi.fn();
 const listCalendarEvents = vi.fn();
+const listJobPostings = vi.fn();
 const listFailedMails = vi.fn();
 const listCronRuns = vi.fn();
 const listRecruitingWindows = vi.fn();
@@ -20,6 +21,7 @@ const cookieGet = vi.fn();
 vi.mock("@/lib/db", () => ({
   listApplications: (...args: unknown[]) => listApplications(...args),
   listCalendarEvents: (...args: unknown[]) => listCalendarEvents(...args),
+  listJobPostings: (...args: unknown[]) => listJobPostings(...args),
   listFailedMails: (...args: unknown[]) => listFailedMails(...args),
   listCronRuns: (...args: unknown[]) => listCronRuns(...args),
   listRecruitingWindows: (...args: unknown[]) => listRecruitingWindows(...args),
@@ -65,6 +67,7 @@ beforeEach(() => {
   // tests that actually assert on these values override them.
   listApplications.mockResolvedValue([]);
   listCalendarEvents.mockResolvedValue([]);
+  listJobPostings.mockResolvedValue([]);
   listFailedMails.mockResolvedValue([]);
   listCronRuns.mockResolvedValue([]);
   listRecruitingWindows.mockResolvedValue([]);
@@ -201,6 +204,53 @@ describe("/admin/termine (page)", () => {
 
     expect(listCalendarEvents).toHaveBeenCalledTimes(1);
     expect(screen.getByText("Ideathon")).toBeInTheDocument();
+  });
+});
+
+const JOB_POSTING = {
+  id: "33333333-3333-3333-3333-333333333333",
+  company: "SZA",
+  title: "Werkstudent Consulting",
+  employmentType: "werkstudent" as const,
+  location: "Mannheim",
+  remote: "hybrid" as const,
+  description: null,
+  applyUrl: "https://example.com/jobs/1",
+  expiresAt: "2099-01-01",
+  partnerSlug: null,
+  createdAt: new Date("2026-08-01T10:00:00Z"),
+  updatedAt: new Date("2026-08-01T10:00:00Z"),
+};
+
+describe("/admin/jobs (page)", () => {
+  it("never reads job postings from the database without a session cookie", async () => {
+    cookieGet.mockReturnValue(undefined);
+
+    const { default: Page } = await import("@/app/[locale]/admin/jobs/page");
+    await Page({ params: params() });
+
+    expect(listJobPostings).not.toHaveBeenCalled();
+  });
+
+  it("renders the password prompt, not posting data, without a session", async () => {
+    cookieGet.mockReturnValue(undefined);
+    listJobPostings.mockResolvedValue([JOB_POSTING]);
+
+    const { default: Page } = await import("@/app/[locale]/admin/jobs/page");
+    const tree = await Page({ params: params() });
+
+    expect(JSON.stringify(tree)).not.toContain("Werkstudent Consulting");
+  });
+
+  it("reads and renders posting data with a valid session", async () => {
+    cookieGet.mockReturnValue({ value: await validSessionCookie() });
+    listJobPostings.mockResolvedValue([JOB_POSTING]);
+
+    const { default: Page } = await import("@/app/[locale]/admin/jobs/page");
+    renderWithIntl(await Page({ params: params() }));
+
+    expect(listJobPostings).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("Werkstudent Consulting")).toBeInTheDocument();
   });
 });
 

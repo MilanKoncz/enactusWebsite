@@ -42,6 +42,12 @@ const retentionSchema = z.object({
   applications: retentionPeriodSchema.extend({ months: z.number().int().positive() }),
   contactMessages: retentionPeriodSchema.extend({ months: z.number().int().positive() }),
   reminderSignupsUnconfirmed: retentionPeriodSchema.extend({ days: z.number().int().positive() }),
+  // Anchored to each row's own expires_at, not created_at like every period
+  // above — a job posting is meant to stay findable at /admin/jobs for a
+  // while after it lapses (the board might still want to see who applied,
+  // or re-list it), just not forever. This period came directly from the
+  // board's own instruction, not a guess awaiting sign-off.
+  jobPostings: retentionPeriodSchema.extend({ months: z.number().int().positive() }),
   rateLimitHits: retentionPeriodSchema.extend({ days: z.number().int().positive() }),
 });
 export type Retention = z.infer<typeof retentionSchema>;
@@ -53,6 +59,7 @@ export const retention: Retention = retentionSchema.parse({
   // until the subscriber unsubscribes (Art. 6(1)(a) GDPR consent lasts
   // until withdrawn), so only the unconfirmed case needs a number here.
   reminderSignupsUnconfirmed: { days: 30, confirmedByBoard: false },
+  jobPostings: { months: 12, confirmedByBoard: true },
   // Not a privacy period, a housekeeping one — always been 1 day, moved
   // here from a hardcoded value in the cleanup route.
   rateLimitHits: { days: 1, confirmedByBoard: true },

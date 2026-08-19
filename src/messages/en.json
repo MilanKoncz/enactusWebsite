@@ -13,6 +13,7 @@
     "partner": "Partners",
     "kontakt": "Contact",
     "mitmachen": "Get involved",
+    "jobs": "Jobs",
     "impressum": "Legal notice",
     "datenschutz": "Privacy policy"
   },
@@ -176,6 +177,29 @@
     "socials": "Socials",
     "workshops": "Workshops",
     "bewerbung": "Applications"
+  },
+  "JobEmploymentTypes": {
+    "praktikum": "Internship",
+    "werkstudent": "Working student",
+    "abschlussarbeit": "Thesis",
+    "einstieg": "Entry-level"
+  },
+  "JobRemoteOptions": {
+    "vor_ort": "On-site",
+    "hybrid": "Hybrid",
+    "remote": "Remote"
+  },
+  "JobsPage": {
+    "eyebrow": "Jobs",
+    "title": "Open positions at our partners",
+    "lead": "Internships, working-student roles, and entry-level positions our partner companies have listed with us directly. Applications go straight to the company, not to us.",
+    "filterLabel": "Filter by position type",
+    "empty": "No positions are listed right now.",
+    "emptyHint": "Partner companies who'd like to list a position can get in touch with us.",
+    "emptyCta": "Get in touch",
+    "emptyFiltered": "No positions match this filter.",
+    "applyCta": "View job posting",
+    "applyCtaLabel": "Open {title} at {company} in a new tab"
   },
   "AlumniVoices": {
     "eyebrow": "Where it leads",
@@ -1093,6 +1117,7 @@
       "failedMails": "Failed mails",
       "recruitingWindows": "Application windows",
       "calendarEvents": "Calendar events",
+      "jobPostings": "Jobs",
       "reminders": "Reminder list",
       "contactMessages": "Contact messages",
       "deletionRequests": "Deletion requests",
@@ -1122,6 +1147,7 @@
         "failedMails": "Records whose mail delivery failed, with the error and a resend.",
         "recruitingWindows": "Create, edit, and delete application windows.",
         "calendarEvents": "Create, edit, and delete calendar events.",
+        "jobPostings": "Create, edit, and delete our partners' job postings.",
         "reminders": "Who signed up for the reminder, confirmed and unconfirmed.",
         "contactMessages": "Incoming contact messages with their delivery status.",
         "deletionRequests": "Find and delete personal data for an address (GDPR Art. 15 and 17).",
@@ -1246,6 +1272,46 @@
         "action": "Action"
       }
     },
+    "jobPostings": {
+      "title": "Jobs",
+      "lead": "Our partners' open positions, as shown on /jobs. Changes take effect immediately.",
+      "empty": "No position on record.",
+      "createHeading": "Create a position",
+      "editHeading": "Edit position",
+      "companyLabel": "Company",
+      "titleLabel": "Title",
+      "employmentTypeLabel": "Position type",
+      "locationLabel": "Location",
+      "remoteLabel": "On-site / Hybrid / Remote",
+      "descriptionLabel": "Short description",
+      "applyUrlLabel": "Application link",
+      "applyUrlHint": "Absolute https URL to the listing on the company's site.",
+      "expiresAtLabel": "Expires on",
+      "partnerLabel": "Partner",
+      "partnerNone": "No partner assigned",
+      "create": "Create",
+      "saveChanges": "Save changes",
+      "cancelEdit": "Cancel",
+      "edit": "Edit",
+      "delete": "Delete",
+      "confirmDelete": "Really delete the position \"{title}\" at {company}?",
+      "errorGeneric": "That didn't work. Please try again.",
+      "errorCompanyRequired": "Please give a company.",
+      "errorTitleRequired": "Please give a title.",
+      "errorApplyUrlInvalid": "Please give a valid https URL.",
+      "errorExpiresAtRequired": "Please give an expiry date.",
+      "errorExpiresAtPast": "The expiry date must not be in the past when creating a position.",
+      "expiredBadge": "Expired",
+      "activeBadge": "Active",
+      "columns": {
+        "company": "Company",
+        "title": "Title",
+        "type": "Type",
+        "expiresAt": "Expires",
+        "status": "Status",
+        "action": "Action"
+      }
+    },
     "reminders": {
       "title": "Reminder list",
       "lead": "Who wants to be notified when applications open. Only confirmed addresses may ever be mailed.",
@@ -1329,6 +1395,7 @@
         "reminderSignups": "Reminder list",
         "recruitingWindows": "Application windows",
         "calendarEvents": "Calendar events",
+        "jobPostings": "Jobs",
         "rateLimitHits": "Rate-limit counters",
         "cronRuns": "Cron runs"
       }

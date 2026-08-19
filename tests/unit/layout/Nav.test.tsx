@@ -44,4 +44,19 @@ describe("Nav", () => {
     const { container } = renderWithIntl(<Nav />);
     expect(await axe(container)).toHaveNoViolations();
   });
+
+  it("omits 'Jobs' by default (showJobs unset)", () => {
+    mockPathname.mockReturnValue("/");
+    renderWithIntl(<Nav />);
+    expect(screen.queryByRole("link", { name: "Jobs" })).not.toBeInTheDocument();
+  });
+
+  it("shows 'Jobs', right after Termine, when showJobs is true", () => {
+    mockPathname.mockReturnValue("/");
+    renderWithIntl(<Nav showJobs />);
+    const links = screen.getAllByRole("link").map((link) => link.textContent);
+    const termineIndex = links.indexOf("Termine");
+    expect(links[termineIndex + 1]).toBe("Jobs");
+    expect(screen.getByRole("link", { name: "Jobs" })).toHaveAttribute("href", "/jobs");
+  });
 });

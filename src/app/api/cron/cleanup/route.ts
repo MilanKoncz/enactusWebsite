@@ -4,6 +4,7 @@ import type { NextRequest } from "next/server";
 import {
   deleteExpiredApplications,
   deleteExpiredContactMessages,
+  deleteExpiredJobPostings,
   deleteExpiredReminderSignups,
   finishCronRun,
   pruneRateLimitHits,
@@ -12,6 +13,7 @@ import {
 import {
   applicationRetentionCutoff,
   contactMessageRetentionCutoff,
+  jobPostingRetentionCutoff,
   reminderSignupRetentionCutoff,
   rateLimitHitRetentionCutoff,
 } from "@/lib/retentionCutoff";
@@ -59,22 +61,36 @@ export async function GET(request: NextRequest) {
     return null;
   });
 
-  const [applications, contactMessages, reminderSignups, rateLimitHits] = await Promise.allSettled([
+  const [applications, contactMessages, reminderSignups, jobPostings, rateLimitHits] = await Promise.allSettled([
     deleteExpiredApplications(applicationRetentionCutoff(now)),
     deleteExpiredContactMessages(contactMessageRetentionCutoff(now)),
     deleteExpiredReminderSignups(reminderSignupRetentionCutoff(now)),
+    deleteExpiredJobPostings(jobPostingRetentionCutoff(now)),
     pruneRateLimitHits(rateLimitHitRetentionCutoff(now)),
   ]);
 
+  // jobPostings isn't part of the counts object below: cron_runs
+  // (migrations/0005_cron_runs.sql) has no deleted_job_postings column, and
+  // job_postings is purely additive (the brief: "bestehende Tabellen
+  // bleiben unverändert") — so this deletion runs and is reported in the
+  // response body, but doesn't get a persisted per-run count the way the
+  // other four do.
   const summary = {
     applications: applications.status === "fulfilled" ? applications.value : null,
     contactMessages: contactMessages.status === "fulfilled" ? contactMessages.value : null,
     reminderSignups: reminderSignups.status === "fulfilled" ? reminderSignups.value : null,
     rateLimitHits: rateLimitHits.status === "fulfilled" ? rateLimitHits.value : null,
   };
+  const jobPostingsDeleted = jobPostings.status === "fulfilled" ? jobPostings.value : null;
 
   const failures: string[] = [];
-  for (const [name, result] of Object.entries({ applications, contactMessages, reminderSignups, rateLimitHits })) {
+  for (const [name, result] of Object.entries({
+    applications,
+    contactMessages,
+    reminderSignups,
+    jobPostings,
+    rateLimitHits,
+  })) {
     if (result.status === "rejected") {
       console.error(`Cleanup step "${name}" failed`, result.reason);
       const reason = result.reason instanceof Error ? result.reason.message : String(result.reason);
@@ -90,5 +106,5 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  return NextResponse.json({ ok: true, deleted: summary });
+  return NextResponse.json({ ok: true, deleted: { ...summary, jobPostings: jobPostingsDeleted } });
 }

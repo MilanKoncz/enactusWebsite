@@ -9,6 +9,7 @@ import { Section } from "@/components/ui/Section";
 import { Logo } from "@/components/layout/Logo";
 import {
   footerColumns,
+  jobsNavItem,
   networkLinks,
   socialLinks,
   routes,
@@ -54,11 +55,20 @@ function ExternalLinkItem({
   );
 }
 
-export function Footer() {
+export type FooterProps = {
+  /** See Header.tsx's identical prop — fetched once by the site layout and
+      threaded down, since useTranslations below can't be called from an
+      async component (react-hooks/rules-of-hooks). */
+  hasJobs?: boolean;
+};
+
+export function Footer({ hasJobs = false }: FooterProps) {
   const t = useTranslations("Footer");
   const tRoutes = useTranslations("Routes");
   const tSite = useTranslations("Site");
   const tPlaceholder = useTranslations("Placeholder");
+
+  const associationLinks = hasJobs ? [...footerColumns.association, jobsNavItem] : footerColumns.association;
 
   return (
     <footer className="mt-auto">
@@ -91,7 +101,7 @@ export function Footer() {
                   {t("columns.association")}
                 </h2>
                 <ul className="flex flex-col gap-2">
-                  {footerColumns.association.map((item) => (
+                  {associationLinks.map((item) => (
                     <li key={item.key}>
                       <Link href={item.href} className="link-underline">
                         {tRoutes(item.key as RouteKey)}

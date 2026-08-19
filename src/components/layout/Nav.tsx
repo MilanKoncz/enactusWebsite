@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { mainNav } from "@/content/navigation";
+import { mainNav, jobsNavItem } from "@/content/navigation";
 import { Link, usePathname } from "@/lib/navigation";
 import { cn } from "@/lib/cn";
 
@@ -9,12 +9,23 @@ export type NavProps = {
   variant?: "desktop" | "mobile";
   onNavigate?: () => void;
   className?: string;
+  /** Whether at least one non-expired job posting exists — see
+      content/navigation.ts's jobsNavItem comment. Threaded down from the
+      site layout's server-fetched count, not read here. */
+  showJobs?: boolean;
 };
 
-export function Nav({ variant = "desktop", onNavigate, className }: NavProps) {
+export function Nav({ variant = "desktop", onNavigate, className, showJobs = false }: NavProps) {
   const t = useTranslations("Routes");
   const tHeader = useTranslations("Header");
   const pathname = usePathname();
+
+  // Spliced in after "termine" — see jobsNavItem's own comment for why that
+  // slot.
+  const termineIndex = mainNav.findIndex((item) => item.key === "termine");
+  const items = showJobs
+    ? [...mainNav.slice(0, termineIndex + 1), jobsNavItem, ...mainNav.slice(termineIndex + 1)]
+    : mainNav;
 
   return (
     <nav
@@ -24,7 +35,7 @@ export function Nav({ variant = "desktop", onNavigate, className }: NavProps) {
         className,
       )}
     >
-      {mainNav.map((item) => {
+      {items.map((item) => {
         const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
         return (
           <Link

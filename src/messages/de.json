@@ -13,6 +13,7 @@
     "partner": "Partner",
     "kontakt": "Kontakt",
     "mitmachen": "Mitmachen",
+    "jobs": "Jobs",
     "impressum": "Impressum",
     "datenschutz": "Datenschutz"
   },
@@ -176,6 +177,29 @@
     "socials": "Socials",
     "workshops": "Workshops",
     "bewerbung": "Bewerbung"
+  },
+  "JobEmploymentTypes": {
+    "praktikum": "Praktikum",
+    "werkstudent": "Werkstudent:in",
+    "abschlussarbeit": "Abschlussarbeit",
+    "einstieg": "Berufseinstieg"
+  },
+  "JobRemoteOptions": {
+    "vor_ort": "Vor Ort",
+    "hybrid": "Hybrid",
+    "remote": "Remote"
+  },
+  "JobsPage": {
+    "eyebrow": "Jobs",
+    "title": "Offene Stellen bei unseren Partnern",
+    "lead": "Praktika, Werkstudierendenstellen und Berufseinstiege, die uns Partnerunternehmen direkt gemeldet haben. Bewerbungen laufen ausschließlich über das jeweilige Unternehmen.",
+    "filterLabel": "Nach Art der Stelle filtern",
+    "empty": "Aktuell sind keine Stellen ausgeschrieben.",
+    "emptyHint": "Partnerunternehmen, die eine Stelle ausschreiben möchten, können sich bei uns melden.",
+    "emptyCta": "Kontakt aufnehmen",
+    "emptyFiltered": "Keine Stellen für diese Auswahl.",
+    "applyCta": "Zur Stellenanzeige",
+    "applyCtaLabel": "{title} bei {company} in neuem Tab öffnen"
   },
   "AlumniVoices": {
     "eyebrow": "Wohin es führt",
@@ -1093,6 +1117,7 @@
       "failedMails": "Fehlgeschlagene Mails",
       "recruitingWindows": "Bewerbungsfenster",
       "calendarEvents": "Termine",
+      "jobPostings": "Jobs",
       "reminders": "Erinnerungsliste",
       "contactMessages": "Kontaktanfragen",
       "deletionRequests": "Löschanfragen",
@@ -1122,6 +1147,7 @@
         "failedMails": "Datensätze, deren Mailversand gescheitert ist, mit Fehlertext und erneutem Versand.",
         "recruitingWindows": "Bewerbungsfenster anlegen, bearbeiten und löschen.",
         "calendarEvents": "Termine anlegen, bearbeiten und löschen.",
+        "jobPostings": "Offene Stellen unserer Partner anlegen, bearbeiten und löschen.",
         "reminders": "Wer sich für die Erinnerung eingetragen hat, bestätigt und unbestätigt.",
         "contactMessages": "Eingegangene Kontaktanfragen mit Versandstatus.",
         "deletionRequests": "Personenbezogene Daten zu einer Adresse suchen und löschen (Art. 15 und 17 DSGVO).",
@@ -1246,6 +1272,46 @@
         "action": "Aktion"
       }
     },
+    "jobPostings": {
+      "title": "Jobs",
+      "lead": "Offene Stellen unserer Partner, wie sie auf /jobs erscheinen. Änderungen wirken sofort.",
+      "empty": "Keine Stelle eingetragen.",
+      "createHeading": "Stelle anlegen",
+      "editHeading": "Stelle bearbeiten",
+      "companyLabel": "Unternehmen",
+      "titleLabel": "Titel",
+      "employmentTypeLabel": "Art der Stelle",
+      "locationLabel": "Ort",
+      "remoteLabel": "Vor Ort / Hybrid / Remote",
+      "descriptionLabel": "Kurzbeschreibung",
+      "applyUrlLabel": "Bewerbungslink",
+      "applyUrlHint": "Absolute https-URL zur Anzeige beim Unternehmen.",
+      "expiresAtLabel": "Läuft ab am",
+      "partnerLabel": "Partner",
+      "partnerNone": "Kein Partner zugeordnet",
+      "create": "Anlegen",
+      "saveChanges": "Änderungen speichern",
+      "cancelEdit": "Abbrechen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "confirmDelete": "Stelle „{title}“ bei {company} wirklich löschen?",
+      "errorGeneric": "Das hat nicht geklappt. Bitte versuch es noch einmal.",
+      "errorCompanyRequired": "Bitte gib das Unternehmen an.",
+      "errorTitleRequired": "Bitte gib einen Titel an.",
+      "errorApplyUrlInvalid": "Bitte gib eine gültige https-URL an.",
+      "errorExpiresAtRequired": "Bitte gib ein Ablaufdatum an.",
+      "errorExpiresAtPast": "Das Ablaufdatum darf beim Anlegen nicht in der Vergangenheit liegen.",
+      "expiredBadge": "Abgelaufen",
+      "activeBadge": "Aktiv",
+      "columns": {
+        "company": "Unternehmen",
+        "title": "Titel",
+        "type": "Art",
+        "expiresAt": "Läuft ab",
+        "status": "Status",
+        "action": "Aktion"
+      }
+    },
     "reminders": {
       "title": "Erinnerungsliste",
       "lead": "Wer benachrichtigt werden möchte, sobald die Bewerbung öffnet. Nur bestätigte Adressen dürfen angeschrieben werden.",
@@ -1329,6 +1395,7 @@
         "reminderSignups": "Erinnerungsliste",
         "recruitingWindows": "Bewerbungsfenster",
         "calendarEvents": "Termine",
+        "jobPostings": "Jobs",
         "rateLimitHits": "Rate-Limit-Zähler",
         "cronRuns": "Cron-Läufe"
       }

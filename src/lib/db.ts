@@ -522,6 +522,143 @@ export async function deleteCalendarEvent(id: string): Promise<boolean> {
   return rows.length > 0;
 }
 
+export type EmploymentType = "praktikum" | "werkstudent" | "abschlussarbeit" | "einstieg";
+export type RemoteOption = "vor_ort" | "hybrid" | "remote";
+
+export type JobPostingRow = {
+  id: string;
+  company: string;
+  title: string;
+  employmentType: EmploymentType;
+  location: string | null;
+  remote: RemoteOption;
+  description: string | null;
+  applyUrl: string;
+  expiresAt: string;
+  partnerSlug: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type JobPostingInput = {
+  company: string;
+  title: string;
+  employmentType: EmploymentType;
+  location?: string;
+  remote: RemoteOption;
+  description?: string;
+  applyUrl: string;
+  expiresAt: string;
+  partnerSlug?: string;
+};
+
+// expires_at cast to text, not left as the driver's own Date parsing — same
+// reasoning as CALENDAR_EVENT_COLUMNS above: a plain `date` column has no
+// timezone, and letting the driver round-trip through a JS Date risks
+// silently shifting the value by the server process's own offset.
+const JOB_POSTING_COLUMNS = `
+  id, company, title, employment_type, location, remote, description,
+  apply_url, expires_at::text as expires_at, partner_slug, created_at, updated_at
+`;
+
+function toJobPostingRow(row: Record<string, unknown>): JobPostingRow {
+  return {
+    id: row.id as string,
+    company: row.company as string,
+    title: row.title as string,
+    employmentType: row.employment_type as EmploymentType,
+    location: (row.location as string | null) ?? null,
+    remote: row.remote as RemoteOption,
+    description: (row.description as string | null) ?? null,
+    applyUrl: row.apply_url as string,
+    expiresAt: row.expires_at as string,
+    partnerSlug: (row.partner_slug as string | null) ?? null,
+    createdAt: row.created_at as Date,
+    updatedAt: row.updated_at as Date,
+  };
+}
+
+// Powers /admin/jobs — every posting, expired ones included, so the board
+// can still find and edit or delete one after it's lapsed.
+export async function listJobPostings(): Promise<JobPostingRow[]> {
+  const rows = await sql().query(
+    `select ${JOB_POSTING_COLUMNS} from job_postings order by created_at desc`,
+  );
+  return (rows as Record<string, unknown>[]).map(toJobPostingRow);
+}
+
+// Powers /jobs and /api/job-postings — the server-side filter the brief asks
+// for: an expired posting is excluded by this query, not merely hidden in
+// the UI. current_date is Postgres's own clock, the same authority every
+// other "is anything still ahead" question in this file already defers to.
+export async function listActiveJobPostings(): Promise<JobPostingRow[]> {
+  const rows = await sql().query(
+    `select ${JOB_POSTING_COLUMNS} from job_postings where expires_at >= current_date order by created_at desc`,
+  );
+  return (rows as Record<string, unknown>[]).map(toJobPostingRow);
+}
+
+export async function findJobPostingById(id: string): Promise<JobPostingRow | null> {
+  const rows = await sql().query(`select ${JOB_POSTING_COLUMNS} from job_postings where id = $1`, [id]);
+  return rows.length > 0 ? toJobPostingRow(rows[0] as Record<string, unknown>) : null;
+}
+
+export async function insertJobPosting(input: JobPostingInput): Promise<JobPostingRow> {
+  const rows = await sql()`
+    insert into job_postings (
+      company, title, employment_type, location, remote, description,
+      apply_url, expires_at, partner_slug
+    ) values (
+      ${input.company}, ${input.title}, ${input.employmentType}, ${input.location ?? null},
+      ${input.remote}, ${input.description ?? null}, ${input.applyUrl}, ${input.expiresAt},
+      ${input.partnerSlug ?? null}
+    )
+    returning id
+  `;
+  const created = await findJobPostingById((rows[0] as Record<string, unknown>).id as string);
+  if (!created) throw new Error("Inserted job posting could not be re-read");
+  return created;
+}
+
+export async function updateJobPosting(id: string, input: JobPostingInput): Promise<JobPostingRow | null> {
+  const rows = await sql()`
+    update job_postings
+    set
+      company = ${input.company},
+      title = ${input.title},
+      employment_type = ${input.employmentType},
+      location = ${input.location ?? null},
+      remote = ${input.remote},
+      description = ${input.description ?? null},
+      apply_url = ${input.applyUrl},
+      expires_at = ${input.expiresAt},
+      partner_slug = ${input.partnerSlug ?? null},
+      updated_at = now()
+    where id = ${id}
+    returning id
+  `;
+  if (rows.length === 0) return null;
+  return findJobPostingById(id);
+}
+
+export async function deleteJobPosting(id: string): Promise<boolean> {
+  const rows = await sql()`
+    delete from job_postings where id = ${id} returning id
+  `;
+  return rows.length > 0;
+}
+
+// The retention rule is anchored to each row's own expires_at, not its
+// created_at (content/retention.ts) — unlike every other deleteExpired*
+// function in this file, so `cutoff` here is compared against expires_at.
+export async function deleteExpiredJobPostings(cutoff: Date): Promise<number> {
+  const cutoffDate = cutoff.toISOString().slice(0, 10);
+  const rows = await sql()`
+    delete from job_postings where expires_at <= ${cutoffDate} returning id
+  `;
+  return rows.length;
+}
+
 export type ReminderSignupResult = {
   id: string;
   confirmed: boolean;
@@ -957,6 +1094,7 @@ export type TableCounts = {
   reminderSignups: number;
   recruitingWindows: number;
   calendarEvents: number;
+  jobPostings: number;
   rateLimitHits: number;
   cronRuns: number;
 };
@@ -969,6 +1107,7 @@ export async function countRowsPerTable(): Promise<TableCounts> {
       (select count(*)::int from reminder_signups) as reminder_signups,
       (select count(*)::int from recruiting_windows) as recruiting_windows,
       (select count(*)::int from calendar_events) as calendar_events,
+      (select count(*)::int from job_postings) as job_postings,
       (select count(*)::int from rate_limit_hits) as rate_limit_hits,
       (select count(*)::int from cron_runs) as cron_runs
   `;
@@ -979,6 +1118,7 @@ export async function countRowsPerTable(): Promise<TableCounts> {
     reminderSignups: row.reminder_signups as number,
     recruitingWindows: row.recruiting_windows as number,
     calendarEvents: row.calendar_events as number,
+    jobPostings: row.job_postings as number,
     rateLimitHits: row.rate_limit_hits as number,
     cronRuns: row.cron_runs as number,
   };

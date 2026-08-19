@@ -15,6 +15,7 @@ const routeKeySchema = z.enum([
   "partner",
   "kontakt",
   "mitmachen",
+  "jobs",
   "impressum",
   "datenschutz",
 ]);
@@ -37,6 +38,7 @@ const ROUTE_HREFS = {
   partner: "/partner",
   kontakt: "/kontakt",
   mitmachen: "/mitmachen",
+  jobs: "/jobs",
   impressum: "/impressum",
   datenschutz: "/datenschutz",
 } as const satisfies Record<RouteKey, string>;
@@ -65,6 +67,15 @@ export const mainNav: NavItem[] = [
   navItem("partner"),
   navItem("kontakt"),
 ];
+
+// Not part of mainNav above: "Jobs" only appears in the header/footer once
+// at least one non-expired posting exists (Nav.tsx/Footer.tsx read this
+// conditionally, gated on a server-fetched job count) — the /jobs route
+// itself stays reachable and in the sitemap regardless (routes.jobs above).
+// Sits right after "Termine": both are board-maintained, date-driven lists,
+// and Jobs is the more actionable of the two for the visitor this nav item
+// exists for.
+export const jobsNavItem: NavItem = navItem("jobs");
 
 // No dedicated /team route: the Vorstand only appears on the homepage board
 // grid (see docs/engineering.md's old-URL redirect map — the old site's

@@ -38,6 +38,13 @@ export function rateLimitHitRetentionCutoff(now: Date): Date {
   return addDays(now, -retention.rateLimitHits.days);
 }
 
+// Compared against each row's own expires_at (lib/db.ts's
+// deleteExpiredJobPostings), not created_at like every cutoff above —
+// content/retention.ts's own comment on why.
+export function jobPostingRetentionCutoff(now: Date): Date {
+  return addMonths(now, -retention.jobPostings.months);
+}
+
 function addMonths(date: Date, months: number): Date {
   const result = new Date(date.getTime());
   result.setUTCMonth(result.getUTCMonth() + months);

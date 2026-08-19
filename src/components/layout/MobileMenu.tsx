@@ -13,6 +13,8 @@ import { cn } from "@/lib/cn";
 
 export type MobileMenuProps = {
   className?: string;
+  /** See Header.tsx's identical prop — threaded straight through to Nav. */
+  hasJobs?: boolean;
 };
 
 // bg-current, not bg-ink: this button renders in the header (ink or paper
@@ -28,7 +30,7 @@ const MENU_BUTTON_CLASSES =
 // return to the trigger for free (Content forces trapFocus, can't be
 // disabled) — nothing here is hand-rolled. No Overlay: the panel is opaque
 // and fullscreen, an overlay would be a decoration with nothing to do.
-export function MobileMenu({ className }: MobileMenuProps) {
+export function MobileMenu({ className, hasJobs = false }: MobileMenuProps) {
   const [open, setOpen] = useState(false);
   const t = useTranslations("Header");
   const close = () => setOpen(false);
@@ -75,7 +77,7 @@ export function MobileMenu({ className }: MobileMenuProps) {
               </button>
             </Dialog.Close>
           </div>
-          <Nav variant="mobile" onNavigate={close} />
+          <Nav variant="mobile" onNavigate={close} showJobs={hasJobs} />
           <LocaleSwitch />
           <Button href="/mitmachen" onClick={close}>
             {t("cta")}

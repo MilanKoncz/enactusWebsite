@@ -28,7 +28,15 @@ import { cn } from "@/lib/cn";
 // behaves exactly as before. data-surface="ink" while overlaid reuses the
 // existing focus-ring mechanism (globals.css), so the ring goes gold over
 // the dark hero without a separate code path.
-export function Header() {
+export type HeaderProps = {
+  /** Whether "Jobs" should appear in the nav — see Nav.tsx's own prop
+      comment. Fetched once, server-side, by the site layout that renders
+      this component, and threaded down rather than fetched here: Header is
+      a client component and can't await the database itself. */
+  hasJobs?: boolean;
+};
+
+export function Header({ hasJobs = false }: HeaderProps) {
   const t = useTranslations("Header");
   const [compact, setCompact] = useState(false);
   const { overlaid } = useHeaderSurface();
@@ -63,13 +71,13 @@ export function Header() {
             className="transition-opacity duration-(--duration-fast) ease-signature hover:opacity-80 focus-visible:opacity-80">
             <Logo variant="full" surface={overlaid ? "ink" : "paper"} />
           </Link>
-          <Nav variant="desktop" className="hidden lg:flex" />
+          <Nav variant="desktop" showJobs={hasJobs} className="hidden lg:flex" />
           <div className="flex items-center gap-4">
             <LocaleSwitch className="hidden lg:flex" />
             <Button href="/mitmachen" size="sm" className="hidden lg:inline-flex">
               {t("cta")}
             </Button>
-            <MobileMenu />
+            <MobileMenu hasJobs={hasJobs} />
           </div>
         </Container>
       </header>

@@ -64,4 +64,14 @@ describe("Footer", () => {
     const { container } = renderWithIntl(<Footer />);
     expect(await axe(container)).toHaveNoViolations();
   });
+
+  it("omits the 'Jobs' link by default (hasJobs unset)", () => {
+    renderWithIntl(<Footer />);
+    expect(screen.queryByRole("link", { name: "Jobs" })).not.toBeInTheDocument();
+  });
+
+  it("adds a 'Jobs' link to the association column when hasJobs is true", () => {
+    renderWithIntl(<Footer hasJobs />);
+    expect(screen.getByRole("link", { name: "Jobs" })).toHaveAttribute("href", "/jobs");
+  });
 });

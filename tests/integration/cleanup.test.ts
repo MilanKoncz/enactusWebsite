@@ -5,6 +5,7 @@ import { NextRequest } from "next/server";
 const deleteExpiredApplications = vi.fn();
 const deleteExpiredContactMessages = vi.fn();
 const deleteExpiredReminderSignups = vi.fn();
+const deleteExpiredJobPostings = vi.fn();
 const pruneRateLimitHits = vi.fn();
 const startCronRun = vi.fn();
 const finishCronRun = vi.fn();
@@ -13,6 +14,7 @@ vi.mock("@/lib/db", () => ({
   deleteExpiredApplications: (...args: unknown[]) => deleteExpiredApplications(...args),
   deleteExpiredContactMessages: (...args: unknown[]) => deleteExpiredContactMessages(...args),
   deleteExpiredReminderSignups: (...args: unknown[]) => deleteExpiredReminderSignups(...args),
+  deleteExpiredJobPostings: (...args: unknown[]) => deleteExpiredJobPostings(...args),
   pruneRateLimitHits: (...args: unknown[]) => pruneRateLimitHits(...args),
   startCronRun: (...args: unknown[]) => startCronRun(...args),
   finishCronRun: (...args: unknown[]) => finishCronRun(...args),
@@ -78,6 +80,7 @@ describe("GET /api/cron/cleanup", () => {
     deleteExpiredApplications.mockResolvedValue(2);
     deleteExpiredContactMessages.mockResolvedValue(1);
     deleteExpiredReminderSignups.mockResolvedValue(3);
+    deleteExpiredJobPostings.mockResolvedValue(4);
     pruneRateLimitHits.mockResolvedValue(10);
 
     const { GET } = await import("@/app/api/cron/cleanup/route");
@@ -86,7 +89,7 @@ describe("GET /api/cron/cleanup", () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({
       ok: true,
-      deleted: { applications: 2, contactMessages: 1, reminderSignups: 3, rateLimitHits: 10 },
+      deleted: { applications: 2, contactMessages: 1, reminderSignups: 3, jobPostings: 4, rateLimitHits: 10 },
     });
   });
 

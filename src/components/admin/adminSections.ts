@@ -1,6 +1,7 @@
 import {
   Activity,
   BellRing,
+  Briefcase,
   CalendarDays,
   CalendarRange,
   FileText,
@@ -44,6 +45,7 @@ export const ADMIN_SECTIONS = [
   { href: "/admin/kontakt", messageKey: "contactMessages", icon: MessageSquare, group: "communication" },
   { href: "/admin/mails", messageKey: "failedMails", icon: MailWarning, group: "communication" },
   { href: "/admin/termine", messageKey: "calendarEvents", icon: CalendarDays, group: "content" },
+  { href: "/admin/jobs", messageKey: "jobPostings", icon: Briefcase, group: "content" },
   { href: "/admin/loeschanfragen", messageKey: "deletionRequests", icon: Trash2, group: "system" },
   { href: "/admin/system", messageKey: "system", icon: Activity, group: "system" },
 ] as const satisfies ReadonlyArray<{
