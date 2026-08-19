@@ -20,6 +20,15 @@ import { PILLAR_IMAGE_FIT, PILLAR_OVERLAY_OPACITY } from "@/components/sections/
  * would never have noticed the calendar layer diverging from
  * design-tokens.ts at all.
  */
+function hexToRgb(hex: string): [number, number, number] {
+  const normalized = hex.replace("#", "");
+  return [
+    parseInt(normalized.slice(0, 2), 16),
+    parseInt(normalized.slice(2, 4), 16),
+    parseInt(normalized.slice(4, 6), 16),
+  ];
+}
+
 function readCssColorTokens(): { tokens: Record<string, string>; calendarTokens: Record<string, string> } {
   const css = readFileSync(resolve(process.cwd(), "src/app/globals.css"), "utf-8");
   const tokens: Record<string, string> = {};
@@ -94,25 +103,33 @@ describe("design tokens: color contrast", () => {
 
   // .signature-gradient (globals.css) — the shared navy-to-gold background
   // on /events' Journeys section and /projekte's active-projects section.
-  // Mirrors the two color-mix() percentages in globals.css exactly; if
-  // either changes, update both together, not just one.
-  describe(".signature-gradient stays betextable in ink end to end", () => {
-    const INK_MIX = 0.28;
-    const GOLD_MIX = 0.42;
-    const left = blendOverBackground(ink, INK_MIX, paper);
-    const right = blendOverBackground(gold, GOLD_MIX, paper);
+  // Redone 2026-08-19 as a plain two-stop gradient, real tokens at both
+  // ends, no color-mix() — see the utility's own comment for why the
+  // AA-everywhere constraint that used to force both stops toward paper no
+  // longer applies (both consumers put text on opaque cards, never
+  // directly on this background). This is a drift guard, not an AA check:
+  // it fails if a future edit quietly reintroduces a color-mix() and washes
+  // the endpoints out toward paper again, the exact regression this
+  // replaced.
+  describe(".signature-gradient runs the real tokens at both ends, unmixed", () => {
+    const css = readFileSync(resolve(process.cwd(), "src/app/globals.css"), "utf-8");
+    const declaration = css.match(/@utility signature-gradient \{[\s\S]*?\}/)?.[0] ?? "";
 
-    it("holds AA at the darker (navy) end, the binding constraint", () => {
-      expect(passesAA(contrastRatio(ink, left))).toBe(true);
+    it("starts at --color-ink and ends at --color-gold, with no color-mix()", () => {
+      expect(declaration).toContain("linear-gradient(to right, var(--color-ink), var(--color-gold))");
+      expect(declaration).not.toContain("color-mix");
     });
 
-    it("holds AA at the lighter (gold) end too", () => {
-      expect(passesAA(contrastRatio(ink, right))).toBe(true);
+    it("the left (navy) end reads unambiguously blue: blue channel dominates red and green", () => {
+      const [r, g, b] = hexToRgb(ink);
+      expect(b).toBeGreaterThan(r);
+      expect(b).toBeGreaterThan(g);
     });
 
-    it("holds AA at the midpoint, sampled the same way the gradient itself interpolates", () => {
-      const mid = blendOverBackground(right, 0.5, left);
-      expect(passesAA(contrastRatio(ink, mid))).toBe(true);
+    it("the right (gold) end reads unambiguously warm/gold: red and green dominate blue", () => {
+      const [r, g, b] = hexToRgb(gold);
+      expect(r).toBeGreaterThan(b);
+      expect(g).toBeGreaterThan(b);
     });
   });
 
