@@ -111,6 +111,11 @@ test.describe("/prozess", () => {
     const before = await documentY(second);
     await first.click();
     await expect(first).toHaveAttribute("aria-expanded", "true");
+    // aria-expanded flips immediately, but the panel's height itself
+    // reaches its open state over --duration-calm (globals.css's
+    // grid-template-rows transition) — measuring before that settles
+    // caught this test mid-transition often enough to read as flaky.
+    await page.waitForTimeout(500);
     const after = await documentY(second);
     expect(after).toBeGreaterThan(before);
   });
