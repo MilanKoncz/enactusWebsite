@@ -444,17 +444,21 @@ body {
   /* Alumni employer logos, now the Alumni section's own background texture
      (AlumniVoices.tsx's AlumniLogoField, board brief 2026-08-19) rather than
      a labelled grid of their own — decorative, aria-hidden as a whole, so
-     there's nothing here for a keyboard user to focus. A flat, even opacity
-     is the base state every visitor gets, including touch and reduced
-     motion ("Logos stehen gleichmäßig da") — this rule is never guarded by
-     a media query. Only a fine pointer with hover support and no
-     reduced-motion preference additionally gets the dock-style proximity
-     scale below, driven by ProximityGroup's --proximity (0-1) custom
-     property. transform and opacity only (motion rule 5): the cell itself
-     never resizes, so a mouse sweep across 50+ logos never reflows the
-     grid, only repaints. */
+     there's nothing here for a keyboard user to focus. Full, even opacity is
+     the base state every visitor gets, including touch and reduced motion
+     ("Logos stehen gleichmäßig da in voller Deckkraft", board brief
+     2026-08-20 superseding the flat-0.4 base this used to carry
+     unconditionally) — this rule is never guarded by a media query. Only a
+     fine pointer with hover support and no reduced-motion preference dims
+     the resting state and adds the dock-style proximity scale below, driven
+     by ProximityGroup's --proximity (0-1) custom property: that combination
+     is the one case where an unfocused logo can be brought back to full
+     strength by moving the pointer near it, so dimming it first is a real
+     "not yet focused" state rather than a dead end. transform and opacity
+     only (motion rule 5): the cell itself never resizes, so a mouse sweep
+     across 50+ logos never reflows the grid, only repaints. */
   .alumni-logo-cell {
-    opacity: 0.4;
+    opacity: 1;
   }
 
   @media (hover: hover) and (pointer: fine) {

@@ -42,7 +42,7 @@ const logoFieldItems = Array.from({ length: LOGO_FIELD_REPEATS }, (_, repeat) =>
 function AlumniLogoField() {
   return (
     <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
-      <ProximityGroup className="grid h-full w-full auto-rows-[7rem] grid-cols-[repeat(auto-fill,minmax(7rem,1fr))] content-start gap-4 p-4">
+      <ProximityGroup className="grid h-full w-full auto-rows-[7rem] grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] content-start gap-4 p-4 sm:grid-cols-[repeat(auto-fill,minmax(7rem,1fr))]">
         {logoFieldItems.map((employer) => (
           <div key={employer.key} className="alumni-logo-cell flex items-center justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element -- decorative,
@@ -68,11 +68,20 @@ function AlumniLogoField() {
 // this the logo wallpaper read as a cramped sliver rather than the section
 // this content deserves — the same reasoning the old combined section got
 // its height from the quote track that used to sit here too.
+//
+// 34rem below `md`, taller than the 32rem from `md` up, even though the
+// section holds less real content on mobile: the heading wraps to three
+// lines there (it fits on two from `md`), and its own opaque bg-paper card
+// sits in front of the field's first couple of rows either way — at 26rem
+// (the value this used to carry) that card's card alone covered most of the
+// section's height, leaving one half-height row of logos stranded between
+// the card and the bottom fade. 34rem leaves genuine room for a full band
+// of logos below the card before the fade takes over.
 export function AlumniEmployers() {
   const t = useTranslations("AlumniEmployers");
 
   return (
-    <Section className="relative isolate min-h-[26rem] overflow-hidden md:min-h-[32rem]">
+    <Section className="relative isolate min-h-[34rem] overflow-hidden md:min-h-[32rem]">
       <AlumniLogoField />
       {/* z-0, not ThreadSegment's own default -z-10: that default assumes it
           sits directly on the section's own background, but here
