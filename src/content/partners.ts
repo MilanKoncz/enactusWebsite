@@ -138,7 +138,11 @@ export const partners: Partner[] = [
     logo: "/brand/partners/phoenix-group.png",
     tier: null,
   }),
-  partner({ slug: "pg", name: "P&G", logo: "/brand/partners/pg.webp", tier: null }),
+  // The handover file (`pg.webp`) had its transparency baked in as a visible
+  // checkerboard — true alpha wasn't recoverable from the flattened source,
+  // so `pg.png` is the same artwork matted onto `--color-paper`, the
+  // PartnerMarquee section background it actually renders on.
+  partner({ slug: "pg", name: "P&G", logo: "/brand/partners/pg.png", tier: null }),
 ];
 
 export { partnerSchema };
