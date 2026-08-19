@@ -11,9 +11,52 @@ import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ThreadSegment } from "@/components/motion/ThreadSegment";
+import { ProximityGroup } from "@/components/motion/ProximityGroup";
 import { alumni } from "@/content/alumni";
+import { alumniEmployers } from "@/content/alumniEmployers";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { cn } from "@/lib/cn";
+
+// Where our alumni work today, run full-bleed as this section's own
+// wallpaper instead of a labelled grid of its own (board brief, 2026-08-19)
+// — see content/alumniEmployers.ts. 54 real logos rarely divide evenly into
+// a grid at every viewport width, and a ragged last row would read as
+// broken, so the source list repeats until the grid comfortably overflows
+// the section at any realistic width/height, then the container clips
+// whatever doesn't fit — cheaper and more robust than measuring the
+// section's real height in JS to compute an exact count.
+const LOGO_FIELD_REPEATS = 3;
+const logoFieldItems = Array.from({ length: LOGO_FIELD_REPEATS }, (_, repeat) =>
+  alumniEmployers.map((employer) => ({ ...employer, key: `${employer.slug}-${repeat}` })),
+).flat();
+
+// ProximityGroup (already driving the board portraits' lift) writes
+// --proximity (0-1) onto each of its direct children from a single
+// rAF-throttled pointermove listener, gated off entirely on touch and
+// prefers-reduced-motion — reused as-is rather than a second hook, since it
+// already is "one event on the container, throttled, cleaned up on
+// unmount" (docs/design-system.md's motion rules). `.alumni-logo-cell` in
+// globals.css maps that value to a transform/opacity-only scale — the cell
+// itself never resizes, so neighbors never reflow, only the logo's own
+// paint grows past its cell's edges into the gap around it.
+function AlumniLogoField() {
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+      <ProximityGroup className="grid h-full w-full auto-rows-[7rem] grid-cols-[repeat(auto-fill,minmax(7rem,1fr))] content-start gap-4 p-4">
+        {logoFieldItems.map((employer) => (
+          <div key={employer.key} className="alumni-logo-cell flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element -- decorative,
+                repeated background texture: next/image's optimization
+                pipeline (blur placeholder, srcset) is pure overhead here,
+                the source files are already small, and the browser caches
+                every repeat of the same URL as one fetch. */}
+            <img src={employer.logo} alt="" className="h-8 w-full object-contain sm:h-10" />
+          </div>
+        ))}
+      </ProximityGroup>
+    </div>
+  );
+}
 
 // Same lift/scale as Button (docs/design-system.md's Interaction section),
 // dropped onto a bare icon button: a hover/focus tint plus the identical
@@ -84,9 +127,12 @@ export function AlumniVoices() {
 
   return (
     <Section className="relative isolate">
+      <AlumniLogoField />
       <ThreadSegment stop="alumni" />
       <Container className="relative flex flex-col gap-10">
-        <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
+        <div className="inline-flex flex-col gap-10 self-start bg-paper p-6 md:p-8">
+          <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
+        </div>
       </Container>
       <div role="region" aria-label={t("regionLabel")} className="relative mt-16 flex flex-col gap-10">
         <div
@@ -111,7 +157,7 @@ export function AlumniVoices() {
               }}
               className="grid w-full shrink-0 snap-center grid-cols-1 items-center gap-10 md:grid-cols-12"
             >
-              <div className="flex flex-col gap-6 px-4 sm:px-6 md:col-span-6 md:bleed-end">
+              <div className="flex flex-col gap-6 bg-paper px-4 py-8 sm:px-6 md:col-span-6 md:bleed-end">
                 <p className="text-display-3 font-display md:text-display-2">„{alumnus.quote}“</p>
                 <div className="flex flex-col gap-1">
                   <p className="text-body-m font-medium">
@@ -138,34 +184,46 @@ export function AlumniVoices() {
                     </ImageLightbox>
                   </div>
                 ) : (
-                  <Placeholder kind="Foto" label={alumnus.name} ratio="3 / 4" className="w-full" />
+                  // bg-paper: Placeholder's own bg-gold/5 is translucent by
+                  // design (fine on the plain paper background it sits on
+                  // everywhere else on the site) — here it would let the
+                  // logo field bleed through behind it, so this one spot
+                  // gets an opaque backing underneath it too.
+                  <Placeholder
+                    kind="Foto"
+                    label={alumnus.name}
+                    ratio="3 / 4"
+                    className="w-full bg-paper"
+                  />
                 )}
               </div>
             </div>
           ))}
         </div>
-        <Container className="relative flex items-center justify-center gap-6">
-          <button
-            type="button"
-            onClick={() => scrollToIndex(Math.max(current - 1, 0))}
-            disabled={current === 0}
-            aria-label={t("prev")}
-            className={NAV_BUTTON_CLASSES}
-          >
-            <ChevronLeft aria-hidden="true" className="size-5" />
-          </button>
-          <p className="text-mono-s font-mono uppercase opacity-60">
-            {t("position", { current: current + 1, total: alumni.length })}
-          </p>
-          <button
-            type="button"
-            onClick={() => scrollToIndex(Math.min(current + 1, alumni.length - 1))}
-            disabled={current === alumni.length - 1}
-            aria-label={t("next")}
-            className={NAV_BUTTON_CLASSES}
-          >
-            <ChevronRight aria-hidden="true" className="size-5" />
-          </button>
+        <Container className="relative flex items-center justify-center">
+          <div className="flex items-center gap-6 bg-paper px-6 py-3">
+            <button
+              type="button"
+              onClick={() => scrollToIndex(Math.max(current - 1, 0))}
+              disabled={current === 0}
+              aria-label={t("prev")}
+              className={NAV_BUTTON_CLASSES}
+            >
+              <ChevronLeft aria-hidden="true" className="size-5" />
+            </button>
+            <p className="text-mono-s font-mono uppercase opacity-60">
+              {t("position", { current: current + 1, total: alumni.length })}
+            </p>
+            <button
+              type="button"
+              onClick={() => scrollToIndex(Math.min(current + 1, alumni.length - 1))}
+              disabled={current === alumni.length - 1}
+              aria-label={t("next")}
+              className={NAV_BUTTON_CLASSES}
+            >
+              <ChevronRight aria-hidden="true" className="size-5" />
+            </button>
+          </div>
         </Container>
       </div>
     </Section>

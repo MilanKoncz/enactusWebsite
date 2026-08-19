@@ -1,10 +1,12 @@
 import { z } from "zod";
 
 /**
- * Companies our alumni work at today — a factual "where they ended up" grid
- * shown below the alumni statements (AlumniVoices.tsx), not a partnership
- * claim: no logo here links to the company's own site, and none is tied to
- * a named person (see docs/content-guide.md and the board brief, 2026-08-19).
+ * Companies our alumni work at today — a factual "where they ended up" set,
+ * rendered as the Alumni section's own background texture
+ * (AlumniVoices.tsx's AlumniLogoField), not a labelled grid of their own as
+ * of 2026-08-19. Still not a partnership claim: no logo here links to the
+ * company's own site, and none is tied to a named person (see
+ * docs/content-guide.md and the board brief, 2026-08-19).
  *
  * Source: a board media handover of 56 black-and-white logos
  * (`AlumniLogos/`, root of the repo), every file named identically and

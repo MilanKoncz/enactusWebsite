@@ -23,7 +23,6 @@ describe("threadRoute", () => {
       "benefits",
       "gate-alumni",
       "alumni",
-      "alumniEmployers",
       "gate-board",
       "board",
       "cta",

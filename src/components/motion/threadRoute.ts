@@ -6,7 +6,6 @@ export type ThreadStop =
   | "benefits"
   | "gate-alumni"
   | "alumni"
-  | "alumniEmployers"
   | "gate-board"
   | "board"
   | "cta";
@@ -122,15 +121,6 @@ const ROUTES: Record<ThreadStop, Record<ThreadWidth, Waypoints>> = {
     wide: { from: 50, bow: 20, to: 50 },
     narrow: narrowAt(6),
   },
-  // A quieter continuation of alumni's own leftward swing, not a fresh
-  // excursion of its own (added 2026-08-19 for the alumni-employers logo
-  // grid) — the swing has already returned most of the way to centre by the
-  // time this section starts, so it settles the rest of the way here rather
-  // than curving again just before the gate straightens it out completely.
-  alumniEmployers: {
-    wide: { from: 50, bow: 44, to: 50 },
-    narrow: narrowAt(5),
-  },
   "gate-board": {
     wide: { from: 50, bow: 50, to: 50 },
     narrow: narrowAt(MOBILE_AXIS),
@@ -156,7 +146,6 @@ export const HOME_STOPS: ThreadStop[] = [
   "benefits",
   "gate-alumni",
   "alumni",
-  "alumniEmployers",
   "gate-board",
   "board",
   "cta",

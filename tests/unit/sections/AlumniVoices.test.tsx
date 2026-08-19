@@ -7,6 +7,7 @@ import { mockIntersectionObserver } from "../../fixtures/observers";
 import { mockMatchMedia } from "../../fixtures/matchMedia";
 import { AlumniVoices } from "@/components/sections/AlumniVoices";
 import { alumni } from "@/content/alumni";
+import { alumniEmployers } from "@/content/alumniEmployers";
 
 beforeEach(() => {
   // jsdom doesn't implement scroll containers actually scrolling.
@@ -57,5 +58,16 @@ describe("AlumniVoices", () => {
   it("has no accessibility violations", async () => {
     const { container } = renderWithIntl(<AlumniVoices />);
     expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it("renders the alumni-employer logos as a decorative, hidden background field", () => {
+    const { container } = renderWithIntl(<AlumniVoices />);
+    const field = container.querySelector('[aria-hidden="true"]');
+    expect(field).toBeInTheDocument();
+    const images = field!.querySelectorAll("img");
+    expect(images.length).toBeGreaterThanOrEqual(alumniEmployers.length);
+    for (const img of images) {
+      expect(img).toHaveAttribute("alt", "");
+    }
   });
 });

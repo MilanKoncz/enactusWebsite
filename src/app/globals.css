@@ -430,28 +430,32 @@ h6 {
     }
   }
 
-  /* Alumni employer logos (AlumniEmployers.tsx) — a plain factual grid, not
-     an interactive control, so there's nothing here for a keyboard user to
-     focus. Full opacity is the safe default — a touch device (board brief:
-     "auf Mobile dauerhaft in voller Deckkraft") and reduced motion both keep
-     it permanently. Only a pointer with real hover support dims logos at
-     rest and restores them on hover, the same three-guard shape
-     `.hover-grow` above uses. */
-  .alumni-logo {
-    opacity: 1;
-    transition:
-      opacity var(--duration-fast) var(--ease-signature),
-      transform var(--duration-fast) var(--ease-signature);
+  /* Alumni employer logos, now the Alumni section's own background texture
+     (AlumniVoices.tsx's AlumniLogoField, board brief 2026-08-19) rather than
+     a labelled grid of their own — decorative, aria-hidden as a whole, so
+     there's nothing here for a keyboard user to focus. A flat, even opacity
+     is the base state every visitor gets, including touch and reduced
+     motion ("Logos stehen gleichmäßig da") — this rule is never guarded by
+     a media query. Only a fine pointer with hover support and no
+     reduced-motion preference additionally gets the dock-style proximity
+     scale below, driven by ProximityGroup's --proximity (0-1) custom
+     property. transform and opacity only (motion rule 5): the cell itself
+     never resizes, so a mouse sweep across 50+ logos never reflows the
+     grid, only repaints. */
+  .alumni-logo-cell {
+    opacity: 0.4;
   }
 
-  @media (hover: hover) and (min-width: 768px) and (prefers-reduced-motion: no-preference) {
-    .alumni-logo {
-      opacity: 0.6;
-    }
-
-    .alumni-logo:hover {
-      opacity: 1;
-      transform: scale(1.05);
+  @media (hover: hover) and (pointer: fine) {
+    @media (prefers-reduced-motion: no-preference) {
+      .alumni-logo-cell {
+        --proximity: 0;
+        opacity: calc(0.4 + var(--proximity) * 0.6);
+        transform: scale(calc(1 + var(--proximity) * 0.8));
+        transition:
+          opacity 150ms ease-out,
+          transform 150ms ease-out;
+      }
     }
   }
 
