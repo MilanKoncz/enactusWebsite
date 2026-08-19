@@ -214,7 +214,22 @@ export function HomeKpis() {
                     </PlaceholderMark>
                   )}
                 </p>
-                <Eyebrow>{t(`labels.${kpi.key}`)}</Eyebrow>
+                {/* lg:self-center: the subgrid's label row is sized to the
+                    tallest label across all five tiles (several wrap to two
+                    lines at this column width), so a one-line label like
+                    "Weltweit" would otherwise sit flush at the top of that
+                    taller row by default (grid's align-items: stretch keeps
+                    the box tall, but block content still renders from its
+                    top) — leaving no visible slack above it but a wide one
+                    below, before the detail line starts. Centering the label
+                    within its row splits that same slack evenly above and
+                    below, so the gap down to the detail line reads the same
+                    as the gap up from the value, measured: both 8px of
+                    box-model gap plus ~9px of even leading either side.
+                    Below lg every tile sizes its own rows independently (no
+                    shared subgrid track), so there's no slack to correct
+                    there. */}
+                <Eyebrow className="lg:self-center">{t(`labels.${kpi.key}`)}</Eyebrow>
                 {/* Reserved for a per-figure detail (e.g. which years the
                     championships were won) once one exists — empty rather
                     than invented, kept at one line's height so adding it
@@ -228,16 +243,23 @@ export function HomeKpis() {
                     height (min-h-[1lh]) — an unforced wrap here overflows
                     that reservation and reads as a stray paragraph break in
                     the row. Below 375px "von über 1.000 Teams" (176.8px
-                    unwrapped, measured) no longer fits its ~152px column —
-                    letting it overflow instead of wrapping pushed the page
-                    itself into horizontal scroll (measured: 369px document
-                    against a 360px viewport), which the definition of done
-                    rules out, so it's truncated with an ellipsis here
-                    instead of shrinking the font further. Flagged to the
-                    board rather than resolved unilaterally — see
-                    ASSETS-TODO.md. */}
-                <Eyebrow className="min-h-[1lh] overflow-hidden text-ellipsis whitespace-nowrap">
-                  {kpi.key === "worldRanking" ? t("worldRankingDetail") : null}
+                    unwrapped, measured) no longer fits its ~152px column;
+                    letting it overflow pushed the page itself into
+                    horizontal scroll (measured: 369px document against a
+                    360px viewport), which the definition of done rules out.
+                    An ellipsis truncation used to sit here instead, but a
+                    cut-off figure ("von über 1.000 T…") is worse than a
+                    shorter complete one — board feedback, 2026-08-19 — so
+                    below 375px this swaps to "worldRankingDetailShort", a
+                    dedicated short translation, not a shrunk font or a
+                    JS-measured breakpoint. */}
+                <Eyebrow className="min-h-[1lh] whitespace-nowrap">
+                  {kpi.key === "worldRanking" ? (
+                    <>
+                      <span className="min-[375px]:hidden">{t("worldRankingDetailShort")}</span>
+                      <span className="hidden min-[375px]:inline">{t("worldRankingDetail")}</span>
+                    </>
+                  ) : null}
                 </Eyebrow>
               </div>
             );

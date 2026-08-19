@@ -88,7 +88,8 @@
     },
     "topRankFormat": "Top {value}",
     "spinoffsFormat": "{value} projects",
-    "worldRankingDetail": "out of 1,000+ teams"
+    "worldRankingDetail": "out of 1,000+ teams",
+    "worldRankingDetailShort": "of 1,000+ teams"
   },
   "Pillars": {
     "eyebrow": "Why Enactus",

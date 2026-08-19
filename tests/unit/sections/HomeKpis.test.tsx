@@ -46,6 +46,17 @@ describe("HomeKpis", () => {
     expect(screen.getByText("von über 1.000 Teams")).toBeInTheDocument();
   });
 
+  it("renders a dedicated short field-size detail for narrow screens, complete rather than truncated", () => {
+    mockMatchMedia(false);
+    renderWithIntl(<HomeKpis />);
+    // Both strings render at once — a min-[375px]: CSS variant picks which
+    // one is visible, not JavaScript — so this only asserts the short
+    // string is a real, complete translation (not an ellipsis truncation
+    // of the long one).
+    expect(screen.getByText("von 1.000+ Teams")).toBeInTheDocument();
+    expect(screen.queryByText(/…/)).not.toBeInTheDocument();
+  });
+
   it("renders funding and project iterations as lower bounds", () => {
     mockMatchMedia(false);
     renderWithIntl(<HomeKpis />);
