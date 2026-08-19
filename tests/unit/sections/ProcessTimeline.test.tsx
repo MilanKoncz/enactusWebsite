@@ -1,9 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { act, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "jest-axe";
 import { renderWithIntl } from "../../fixtures/intl";
-import { mockIntersectionObserver } from "../../fixtures/observers";
 import { mockMatchMedia } from "../../fixtures/matchMedia";
 import { GateMarker } from "@/components/ui/GateMarker";
 import { ProcessTimeline } from "@/components/sections/ProcessTimeline";
@@ -28,13 +27,10 @@ afterEach(() => {
 });
 
 // The common case: motion is allowed, so ProcessTimeline is "enhanced"
-// (closed-by-default, scroll-revealed) and its IntersectionObserver effect
-// runs — both need a stub the way HomeHero's tests stub the same pair.
+// (closed-by-default, opens only on click or keyboard activation).
 function renderEnhanced() {
   mockMatchMedia(false);
-  const io = mockIntersectionObserver();
-  const view = renderWithIntl(<ProcessTimeline />);
-  return { io, ...view };
+  return renderWithIntl(<ProcessTimeline />);
 }
 
 describe("ProcessTimeline", () => {
@@ -68,7 +64,7 @@ describe("ProcessTimeline", () => {
     expect(screen.queryByText("PRÜFPUNKT_1")).toBeNull();
   });
 
-  it("renders GateMarker for exactly the three confirmed gates, a calm dot for the other five", () => {
+  it("renders GateMarker for exactly the three confirmed gates, a calm bar for the other five", () => {
     renderEnhanced();
     const calls = vi.mocked(GateMarker).mock.calls;
     const labels = new Set(calls.map(([props]) => props.label));
@@ -98,7 +94,7 @@ describe("ProcessTimeline", () => {
     expect(button).toHaveAttribute("aria-expanded", "true");
   });
 
-  it("lets a manually opened station close again, as long as it hasn't been auto-revealed by scroll", async () => {
+  it("lets a manually opened station close again", async () => {
     const user = userEvent.setup();
     renderEnhanced();
 
@@ -110,20 +106,11 @@ describe("ProcessTimeline", () => {
     expect(button).toHaveAttribute("aria-expanded", "false");
   });
 
-  it("latches a station open once it scrolls into view, and keeps it open even after a manual close attempt", async () => {
-    const { io } = renderEnhanced();
-    const user = userEvent.setup();
-
-    const button = screen.getByRole("button", { name: /mvp-phase/i });
-    expect(button).toHaveAttribute("aria-expanded", "false");
-
-    act(() => {
-      io.intersect(true);
-    });
-    expect(button).toHaveAttribute("aria-expanded", "true");
-
-    await user.click(button);
-    expect(button).toHaveAttribute("aria-expanded", "true");
+  it("never opens a station on its own — every station stays closed until a reader acts", () => {
+    renderEnhanced();
+    for (const button of screen.getAllByRole("button")) {
+      expect(button).toHaveAttribute("aria-expanded", "false");
+    }
   });
 
   it("has no accessibility violations", async () => {

@@ -220,7 +220,7 @@
   },
   "Process": {
     "eyebrow": "The process",
-    "title": "From idea to company",
+    "title": "From idea to spin-off",
     "intro": "Eight stations take a project from its first pitch to spinning off as an independent company.",
     "timeline": {
       "regionLabel": "Process steps",
@@ -272,7 +272,7 @@
     "guide": {
       "eyebrow": "For reference",
       "title": "Project Guide",
-      "lead": "The full process as a PDF, to read at your own pace.",
+      "lead": "The full process as a PDF, to read at your own pace, with everything explained in more detail.",
       "cta": "Download the Project Guide",
       "fileInfo": "PDF · {size}",
       "unavailableHint": "The Project Guide isn't available yet."
@@ -280,7 +280,7 @@
     "cta": {
       "eyebrow": "Get involved",
       "title": "Ready for the first station?",
-      "lead": "Apply and start with your own idea at Kick-off.",
+      "lead": "Apply and start with your own idea in the InnoLab.",
       "primaryCta": "Apply now"
     }
   },

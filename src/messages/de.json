@@ -220,7 +220,7 @@
   },
   "Process": {
     "eyebrow": "Der Prozess",
-    "title": "Von der Idee zum Unternehmen",
+    "title": "Von der Idee zur Ausgründung",
     "intro": "Acht Stationen führen ein Projekt vom ersten Pitch bis zur Ausgründung als eigenständiges Unternehmen.",
     "timeline": {
       "regionLabel": "Prozessschritte",
@@ -272,7 +272,7 @@
     "guide": {
       "eyebrow": "Zum Nachlesen",
       "title": "Project Guide",
-      "lead": "Der komplette Prozess als PDF zum Nachlesen.",
+      "lead": "Der komplette Prozess als PDF zum Nachlesen. Hier ist alles genauer erklärt.",
       "cta": "Project Guide herunterladen",
       "fileInfo": "PDF · {size}",
       "unavailableHint": "Der Project Guide ist noch nicht verfügbar."
@@ -280,7 +280,7 @@
     "cta": {
       "eyebrow": "Mitmachen",
       "title": "Bereit für die erste Station?",
-      "lead": "Bewirb dich und starte mit deiner eigenen Idee beim Kick-off.",
+      "lead": "Bewirb dich und starte mit deiner eigenen Idee im InnoLab.",
       "primaryCta": "Jetzt bewerben"
     }
   },

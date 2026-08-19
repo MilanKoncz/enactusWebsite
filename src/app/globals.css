@@ -540,13 +540,12 @@ h6 {
      user-triggered toggle on one element (the same risk class as the FAQ
      accordion's real height animation above): it never runs continuously or
      scroll-linked the way `.pillar-detail` does, so it was never a
-     candidate for `animation-timeline: view()` the way that one is — the
-     actual "open on scroll" behaviour here is a plain IntersectionObserver
-     latch in ProcessTimeline.tsx, not a CSS scroll-timeline.
+     candidate for `animation-timeline: view()` the way that one is — a
+     station only opens on click or keyboard activation, never on scroll
+     (board feedback, 2026-08-19).
 
      `[data-open]` is the one mechanism that decides "open": React sets it
-     once a station's IntersectionObserver latch fires (permanently, never
-     cleared) or a reader manually toggles it. Because `isOpen` in
+     once a reader toggles a station. Because `isOpen` in
      ProcessTimeline.tsx defaults to true until the client actually confirms
      it should be closed-by-default, the server-rendered markup already
      carries `data-open` on first paint — a no-JS reader's HTML is already

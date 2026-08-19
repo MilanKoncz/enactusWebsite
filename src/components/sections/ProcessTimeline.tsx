@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useId, useSyncExternalStore } from "react";
+import { useCallback, useState, useId, useSyncExternalStore } from "react";
 import {
   ChevronDown,
   Cog,
@@ -58,14 +58,38 @@ function useHasMounted(): boolean {
   );
 }
 
+// A gate is a Zeitpunkt — GateMarker's own rule is bound to a single text
+// row's height (min-h-8, ~32px) and stays untouched here, still the site's
+// one gate motif (docs/design-system.md). A phase has duration, so it gets
+// its own, deliberately different mark: a muted bar roughly 2.5x that
+// height (h-20, 80px) rather than a literal swap of the two shapes — gold
+// stays reserved for gates, so the phase bar reads as "a stretch of the
+// line" without competing with the signature motif. Both are legible by
+// shape alone, not only by color.
 function Marker({ step, title }: { step: Step; title: string }) {
   if (step.kind === "milestone") {
     return <GateMarker label={title} variant="milestone" />;
   }
   return (
     <span className="flex items-center gap-3">
-      <span aria-hidden="true" className="size-2 shrink-0 rounded-full bg-ink/40" />
+      <span aria-hidden="true" className="h-20 w-[2px] shrink-0 bg-ink/40" />
       <span className="whitespace-nowrap font-mono text-mono-s uppercase">{title}</span>
+    </span>
+  );
+}
+
+// Numeral and marker used to stack in a column for a plain (no-checklist)
+// station but sit side by side for a button-wrapped one — an accident of
+// two different wrapper elements, not a deliberate difference. Sharing one
+// row layout keeps every station's marker the same distance from the
+// timeline spine regardless of whether it renders as a button.
+function StationHead({ step, title }: { step: Step; title: string }) {
+  return (
+    <span className="flex items-center gap-2">
+      <span className="font-mono text-mono-xs uppercase opacity-60">
+        {String(step.order).padStart(2, "0")}
+      </span>
+      <Marker step={step} title={title} />
     </span>
   );
 }
@@ -94,26 +118,17 @@ type StationProps = {
   step: Step;
   enhanced: boolean;
   manuallyOpen: boolean;
-  seen: boolean;
   onToggle: (key: string) => void;
-  registerNode: (key: string, node: HTMLDivElement | null) => void;
 };
 
-// A station with a checklist opens on its own once it reaches the viewport
-// and then stays open for the rest of the visit — `seen` is a one-way
-// latch, never cleared, so scrolling back up past a station never
-// re-collapses it. `manuallyOpen` is the independent keyboard/screen-reader
-// path to the same state, so neither depends on the reader's scroll
-// position. `enhanced` is false before the component has mounted or under
-// prefers-reduced-motion — in both cases the station renders permanently
-// open (see the isOpen computation below), which is also exactly what the
-// server-rendered markup already looks like before any client JS runs.
-//
-// The intersection watching itself lives one level up, in ProcessTimeline —
-// a single shared IntersectionObserver watching every station's node,
-// rather than one instance per station. `registerNode` is only how a
-// station hands its DOM node to that shared observer.
-function Station({ step, enhanced, manuallyOpen, seen, onToggle, registerNode }: StationProps) {
+// A station with a checklist opens and closes only on click or keyboard
+// activation — no scroll-driven auto-reveal, board feedback 2026-08-19 (it
+// read as the page acting on its own). `enhanced` is false before the
+// client has mounted or under prefers-reduced-motion — in both cases the
+// station renders permanently open (see isOpen below), which is also
+// exactly what the server-rendered markup already looks like before any
+// client JS runs, so a no-JS reader never loses access to the content.
+function Station({ step, enhanced, manuallyOpen, onToggle }: StationProps) {
   const t = useTranslations("Process");
   const panelId = useId();
   const Icon = ICONS[step.icon];
@@ -123,16 +138,7 @@ function Station({ step, enhanced, manuallyOpen, seen, onToggle, registerNode }:
     ? (t.raw(`steps.${step.key}.checklist` as ChecklistCopyKey) as string[])
     : null;
   const kindLabel = step.kind === "milestone" ? t("timeline.milestoneLabel") : t("timeline.phaseLabel");
-  const isOpen = !enhanced || manuallyOpen || seen;
-
-  const head = (
-    <>
-      <span className="font-mono text-mono-xs uppercase opacity-60">
-        {String(step.order).padStart(2, "0")}
-      </span>
-      <Marker step={step} title={title} />
-    </>
-  );
+  const isOpen = !enhanced || manuallyOpen;
 
   const description = (
     <span className="flex items-start gap-2 pl-9 text-body-s opacity-80">
@@ -143,33 +149,27 @@ function Station({ step, enhanced, manuallyOpen, seen, onToggle, registerNode }:
 
   if (!checklist) {
     // Nothing to disclose — kickOff and ideation render as a plain block,
-    // no button and no chevron, so they never read as a broken control now
-    // that every other station opens on its own (board feedback, 2026-08-19).
+    // no button and no chevron, so they never read as a broken control.
     return (
       <div className="relative flex flex-col items-start gap-2">
-        {head}
+        <StationHead step={step} title={title} />
         {description}
       </div>
     );
   }
 
   return (
-    <div
-      ref={(node) => registerNode(step.key, node)}
-      data-open={isOpen ? "" : undefined}
-      data-station-key={step.key}
-      className="relative flex flex-col items-start gap-2"
-    >
+    <div data-open={isOpen ? "" : undefined} className="relative flex flex-col items-start gap-2">
       <button
         type="button"
         aria-expanded={isOpen}
         aria-controls={panelId}
         onClick={() => onToggle(step.key)}
-        className="flex w-full items-center gap-2 rounded-md p-2 text-left transition-[background-color,transform] duration-[var(--duration-fast)] ease-signature hover:-translate-y-px hover:bg-ink/5 focus-visible:-translate-y-px focus-visible:bg-ink/5"
+        className="flex w-full items-center gap-2 rounded-md py-2 pr-2 text-left transition-[background-color,transform] duration-[var(--duration-fast)] ease-signature hover:-translate-y-px hover:bg-ink/5 focus-visible:-translate-y-px focus-visible:bg-ink/5"
       >
         <span className="sr-only">{`${kindLabel}: ${title}`}</span>
         <span aria-hidden="true" className="flex flex-1 items-center gap-2">
-          {head}
+          <StationHead step={step} title={title} />
         </span>
         <ChevronDown aria-hidden="true" className={cn(CHEVRON_CLASSES, isOpen && "rotate-180")} />
       </button>
@@ -195,22 +195,26 @@ function Station({ step, enhanced, manuallyOpen, seen, onToggle, registerNode }:
 // horizontal arrangement didn't read well, so vertical is now the only
 // layout, matching the mobile treatment this component always had.
 //
+// The spine is `absolute` with `top-0 bottom-0` against this relatively
+// positioned group, not a measured height — it already tracks the group's
+// rendered height through ordinary layout, so a station opening (pushing
+// later stations down through the station-panel grid trick) or closing
+// changes the group's height and the spine's bottom edge moves with it for
+// free, no JS involved.
+//
 // A station with a checklist takes real layout space once open — a click
-// or the scroll-latch below expands the checklist in normal flow, pushing
-// later stations down, rather than floating it over them. The previous
-// "never moves a neighbor" floating-panel technique assumed at most one
-// station was ever open at a time (a strict accordion); this component no
-// longer enforces that — stations accumulate open as the reader scrolls
-// down and stay open — so several panels can be open at once, and a
-// floating panel from an earlier station would then overlap a later one's
-// own content instead of just sitting quietly below it.
+// expands the checklist in normal flow, pushing later stations down,
+// rather than floating it over them. The previous "never moves a neighbor"
+// floating-panel technique assumed at most one station was ever open at a
+// time (a strict accordion); this component no longer enforces that — a
+// reader can open several at once — so a floating panel from an earlier
+// station would then overlap a later one's own content instead of just
+// sitting quietly below it.
 export function ProcessTimeline() {
   const t = useTranslations("Process");
   const prefersReducedMotion = usePrefersReducedMotion();
   const hasMounted = useHasMounted();
   const [manuallyOpenKeys, setManuallyOpenKeys] = useState<ReadonlySet<string>>(() => new Set());
-  const [seenKeys, setSeenKeys] = useState<ReadonlySet<string>>(() => new Set());
-  const nodesRef = useRef<Map<string, HTMLDivElement>>(new Map());
 
   const toggle = useCallback((key: string) => {
     setManuallyOpenKeys((current) => {
@@ -224,61 +228,12 @@ export function ProcessTimeline() {
     });
   }, []);
 
-  const registerNode = useCallback((key: string, node: HTMLDivElement | null) => {
-    if (node) {
-      nodesRef.current.set(key, node);
-    } else {
-      nodesRef.current.delete(key);
-    }
-  }, []);
-
-  // Enhanced (closed-by-default, scroll-revealed) only once the client has
-  // mounted and confirmed motion is allowed — every other case, including
-  // the render before that's confirmed, falls back to permanently open,
-  // which is exactly what a no-JS reader's server-rendered markup already
-  // looks like, since that fallback needs no script to take effect.
+  // Enhanced (closed-by-default) only once the client has mounted and
+  // confirmed motion is allowed — every other case, including the render
+  // before that's confirmed, falls back to permanently open, which is
+  // exactly what a no-JS reader's server-rendered markup already looks
+  // like, since that fallback needs no script to take effect.
   const enhanced = hasMounted && !prefersReducedMotion;
-
-  // One shared observer for every station with a checklist, not one per
-  // station — every ref is already attached by the time this effect runs
-  // (refs commit before effects), and the station list never changes, so
-  // there's nothing to re-observe later. A station is dropped from
-  // observation the moment it's first seen — `seenKeys` never clears it
-  // again, so watching it further would only cost cycles for no purpose.
-  useEffect(() => {
-    if (!enhanced) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const newlySeen = entries
-          .filter((entry) => entry.isIntersecting)
-          .map((entry) => (entry.target as HTMLElement).dataset.stationKey)
-          .filter((key): key is string => Boolean(key));
-        if (newlySeen.length === 0) return;
-        setSeenKeys((current) => {
-          const next = new Set(current);
-          let changed = false;
-          for (const key of newlySeen) {
-            if (!next.has(key)) {
-              next.add(key);
-              changed = true;
-            }
-          }
-          return changed ? next : current;
-        });
-        for (const entry of entries) {
-          if (entry.isIntersecting) observer.unobserve(entry.target);
-        }
-      },
-      // A station latches open once 40% of its own height has scrolled
-      // into the viewport — generous enough that a "scroll into view" that
-      // stops at the nearest edge (a station never re-centers itself)
-      // still crosses it, rather than a rootMargin band a station could
-      // land outside of entirely depending on where it stops.
-      { threshold: 0.4 },
-    );
-    for (const node of nodesRef.current.values()) observer.observe(node);
-    return () => observer.disconnect();
-  }, [enhanced]);
 
   return (
     <Section className="relative isolate">
@@ -286,7 +241,7 @@ export function ProcessTimeline() {
         <div
           role="group"
           aria-label={t("timeline.regionLabel")}
-          className="relative isolate flex flex-col gap-10 py-20 md:py-24"
+          className="relative isolate flex flex-col gap-10 py-8 md:py-10"
         >
           <span
             aria-hidden="true"
@@ -298,9 +253,7 @@ export function ProcessTimeline() {
               step={step}
               enhanced={enhanced}
               manuallyOpen={manuallyOpenKeys.has(step.key)}
-              seen={seenKeys.has(step.key)}
               onToggle={toggle}
-              registerNode={registerNode}
             />
           ))}
         </div>

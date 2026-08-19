@@ -45,13 +45,7 @@ test.describe("/prozess", () => {
     }
   });
 
-  test("a station's checklist opens on its own once scrolled into view, and stays open after scrolling away again", async ({
-    page,
-  }) => {
-    // Short enough that Inno-Gating is reliably below the fold on load
-    // regardless of the engine's exact text-layout metrics — at a taller
-    // viewport it landed on-screen (and so already latched open) on one
-    // engine but not the other.
+  test("a station's checklist never opens on its own from scrolling", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 500 });
     await page.goto("/prozess");
 
@@ -59,13 +53,12 @@ test.describe("/prozess", () => {
     await expect(button).toHaveAttribute("aria-expanded", "false");
 
     await button.scrollIntoViewIfNeeded();
-    // The IntersectionObserver latch fires asynchronously off the browser's
-    // own rendering pipeline, not a React state update polling can race —
-    // toHaveAttribute already retries until this resolves or times out.
-    await expect(button).toHaveAttribute("aria-expanded", "true");
+    await page.waitForTimeout(300);
+    await expect(button).toHaveAttribute("aria-expanded", "false");
 
-    await page.evaluate(() => window.scrollTo(0, 0));
-    await expect(button).toHaveAttribute("aria-expanded", "true");
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(300);
+    await expect(button).toHaveAttribute("aria-expanded", "false");
   });
 
   test("a station also opens on click or keyboard activation, independent of scroll position", async ({
@@ -88,9 +81,6 @@ test.describe("/prozess", () => {
   test("opening a station's checklist pushes a later station down, since panels now take real layout space", async ({
     page,
   }) => {
-    // A short viewport so the auto-scroll-open latch (threshold 0.4) never
-    // fires for either station on initial paint — otherwise "before" would
-    // already capture the panel open and the click below would be a no-op.
     await page.setViewportSize({ width: 1280, height: 400 });
     await page.goto("/prozess");
     const first = page.getByRole("button", { name: /inno-gating/i });
