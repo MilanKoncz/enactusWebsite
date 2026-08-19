@@ -299,7 +299,10 @@ test.describe("/termine event calendar", () => {
       await chip.click();
       await expect(chip).toHaveAttribute("aria-pressed", "true");
 
-      await expect(page.getByText("Kick-off")).toBeVisible();
+      // .filter({ visible: true }), not a bare getByText — the month grid's
+      // own title-bearing bars (ab lg) carry the same event titles now, and
+      // the whole grid stays in the DOM even here, just CSS-hidden below md.
+      await expect(page.getByText("Kick-off").filter({ visible: true })).toBeVisible();
       await expect(page.getByRole("button", { name: /Ideathon/ })).not.toBeVisible();
     });
 

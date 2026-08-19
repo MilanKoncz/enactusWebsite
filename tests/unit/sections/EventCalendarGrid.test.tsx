@@ -51,7 +51,9 @@ describe("EventCalendarGrid", () => {
 
     await user.click(cell(/^16\. September 2026/));
     expect(screen.getByRole("heading", { name: "Termine am 16. September 2026" })).toBeInTheDocument();
-    expect(screen.getByText("Ideathon")).toBeInTheDocument();
+    // "Ideathon" now also appears in the grid's own title-bearing bar
+    // (ab lg) — getAllByText, not getByText, since both are legitimate.
+    expect(screen.getAllByText("Ideathon").length).toBeGreaterThan(0);
   });
 
   it("opens the day list on Enter, from the roving-focused cell", async () => {
@@ -68,7 +70,9 @@ describe("EventCalendarGrid", () => {
 
     await user.keyboard("{Enter}");
     expect(screen.getByRole("heading", { name: "Termine am 16. September 2026" })).toBeInTheDocument();
-    expect(screen.getByText("Ideathon")).toBeInTheDocument();
+    // "Ideathon" now also appears in the grid's own title-bearing bar
+    // (ab lg) — getAllByText, not getByText, since both are legitimate.
+    expect(screen.getAllByText("Ideathon").length).toBeGreaterThan(0);
   });
 
   it("shows a quiet empty state for a selected day with no events", async () => {
@@ -113,6 +117,29 @@ describe("EventCalendarGrid", () => {
     const { container } = renderWithIntl(<EventCalendarGrid events={events} initialNowMs={NOW} />);
     expect(container.querySelectorAll(".bg-cal-innolab")).toHaveLength(1);
     expect(container.querySelectorAll(".bg-cal-projekte")).toHaveLength(1);
+  });
+
+  it("shows the event's title in the cell, as visible text, a tooltip, and part of the cell's accessible name", () => {
+    const events = [event({ startDate: "2026-09-16", title: "Ideathon", category: "innolab" })];
+    renderWithIntl(<EventCalendarGrid events={events} initialNowMs={NOW} />);
+    const title = screen.getByText("Ideathon").closest("[title]");
+    expect(title).toHaveAttribute("title", "Ideathon");
+    expect(cell(/^16\. September 2026/)).toHaveAccessibleName(/Ideathon/);
+  });
+
+  it("puts a category-colored left border on a single-day event's title, not a filled background", () => {
+    const events = [event({ startDate: "2026-09-16", title: "Ideathon", category: "innolab" })];
+    const { container } = renderWithIntl(<EventCalendarGrid events={events} initialNowMs={NOW} />);
+    const titled = screen.getByText("Ideathon").closest("[title]");
+    expect(titled).toHaveClass("border-l-cal-innolab");
+    expect(container.querySelectorAll(".bg-cal-innolab")).toHaveLength(1);
+  });
+
+  it("repeats a multi-day event's title at the first visible day of every week it spans", () => {
+    const events = [event({ startDate: "2026-09-16", endDate: "2026-09-24", title: "Journey" })];
+    renderWithIntl(<EventCalendarGrid events={events} initialNowMs={NOW} />);
+    // 16.–24. crosses a Monday (the 21st) — one title per week row.
+    expect(screen.getAllByText("Journey")).toHaveLength(2);
   });
 
   it("moves the roving tabindex with the arrow keys, one day at a time", async () => {

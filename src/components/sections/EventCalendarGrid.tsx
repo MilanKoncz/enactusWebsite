@@ -4,7 +4,11 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { CATEGORY_BAR_CLASS, CATEGORY_BAR_TENTATIVE_CLASS } from "@/components/ui/CategoryBadge";
+import {
+  CATEGORY_BAR_CLASS,
+  CATEGORY_BAR_TENTATIVE_CLASS,
+  CATEGORY_LEFT_BORDER_CLASS,
+} from "@/components/ui/CategoryBadge";
 import { EventRow } from "@/components/ui/EventDetails";
 import { cn } from "@/lib/cn";
 import { formatDayLong, formatMonthHeading } from "@/lib/calendarFormat";
@@ -293,15 +297,26 @@ export function EventCalendarGrid({ events, initialNowMs }: EventCalendarGridPro
                 const isCurrentMonth = monthKeyOf(date) === viewMonth;
                 const isToday = date === today;
                 const isSelected = date === selectedDate;
-                const dayCount = eventsOnDay(events, date).length;
+                const dayEventsForCell = eventsOnDay(events, date);
+                const dayCount = dayEventsForCell.length;
                 const dayNumber = Number(date.slice(8, 10));
                 // aria-label always wins over an element's own content for
-                // the accessible name, so the today-marker has to be part
-                // of this string directly — a child sr-only span would be
-                // silently ignored once the div already has an aria-label.
-                const cellLabel = isToday
-                  ? `${t("grid.cellLabel", { date: formatDayLong(date, locale), count: dayCount })}, ${t("grid.todayMarker")}`
-                  : t("grid.cellLabel", { date: formatDayLong(date, locale), count: dayCount });
+                // the accessible name, so the today-marker (and, below, the
+                // event titles) have to be part of this one string directly
+                // — a child sr-only span would be silently ignored once the
+                // div already has an aria-label. The bars overlay drawn
+                // below stays aria-hidden (a `role="row"` may only contain
+                // gridcell/columnheader children — a floating, independently
+                // labelled bar there fails aria-required-children), so this
+                // cell's own label is the only place a screen reader gets
+                // each day's event titles, not just their count.
+                let cellLabel = t("grid.cellLabel", { date: formatDayLong(date, locale), count: dayCount });
+                if (dayCount > 0) {
+                  cellLabel += `. ${dayEventsForCell.map((event) => event.title).join(", ")}`;
+                }
+                if (isToday) {
+                  cellLabel += `, ${t("grid.todayMarker")}`;
+                }
 
                 return (
                   <div
@@ -316,7 +331,12 @@ export function EventCalendarGrid({ events, initialNowMs }: EventCalendarGridPro
                     aria-label={cellLabel}
                     onClick={() => isCurrentMonth && handleCellActivate(date)}
                     className={cn(
-                      "flex min-h-16 flex-col items-center gap-1 rounded-sm py-1 font-mono text-mono-s tabular-nums transition-colors duration-[var(--duration-fast)] ease-signature",
+                      // Ab lg the bars overlay grows real title text into
+                      // it (absolutely positioned, so it never contributes
+                      // to this flex box's own height) — min-h grows to
+                      // match so that content never bleeds into the row
+                      // below instead of just being taller within this one.
+                      "flex min-h-16 flex-col items-center gap-1 rounded-sm py-1 font-mono text-mono-s tabular-nums transition-colors duration-[var(--duration-fast)] ease-signature lg:min-h-36",
                       isCurrentMonth ? "cursor-pointer" : "pointer-events-none opacity-30",
                       isSelected ? "bg-ink text-paper" : isCurrentMonth && "hover:bg-ink/5",
                     )}
@@ -338,22 +358,63 @@ export function EventCalendarGrid({ events, initialNowMs }: EventCalendarGridPro
               <div
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-x-0 top-6 grid grid-cols-7 gap-x-1 gap-y-0.5 px-0"
-                style={{ gridAutoRows: "0.375rem" }}
+                style={{ gridAutoRows: "1.25rem" }}
               >
-                {bars.map((bar) => (
-                  <span
-                    key={bar.event.id}
-                    style={{ gridColumn: `${bar.column + 1} / span ${bar.span}`, gridRow: bar.lane + 1 }}
-                    className={cn(
-                      "h-1.5",
-                      bar.continuesBefore ? "rounded-l-none" : "rounded-l-full",
-                      bar.continuesAfter ? "rounded-r-none" : "rounded-r-full",
-                      bar.event.tentative
-                        ? CATEGORY_BAR_TENTATIVE_CLASS[bar.event.category]
-                        : CATEGORY_BAR_CLASS[bar.event.category],
-                    )}
-                  />
-                ))}
+                {bars.map((bar) => {
+                  // Every WeekBar is already clipped to this one week row, so
+                  // `bar.column` is that segment's own first visible day —
+                  // for a multi-week event that's a fresh title each week it
+                  // continues into, not just once at the event's real start.
+                  const clickDate = week[bar.column];
+                  return (
+                    <span key={bar.event.id} className="contents">
+                      {/* md through the point titles get room to breathe
+                          (lg) — the plain colored bar this grid always had,
+                          no title text: at that width there's only room for
+                          two or three characters before the ellipsis, which
+                          reads worse than no text at all. */}
+                      <span
+                        aria-hidden="true"
+                        style={{ gridColumn: `${bar.column + 1} / span ${bar.span}`, gridRow: bar.lane + 1 }}
+                        className={cn(
+                          "self-center h-1.5 lg:hidden",
+                          bar.continuesBefore ? "rounded-l-none" : "rounded-l-full",
+                          bar.continuesAfter ? "rounded-r-none" : "rounded-r-full",
+                          bar.event.tentative
+                            ? CATEGORY_BAR_TENTATIVE_CLASS[bar.event.category]
+                            : CATEGORY_BAR_CLASS[bar.event.category],
+                        )}
+                      />
+                      {/* Ab lg: the title itself, on a neutral surface — a
+                          category color as a left border (the same accent
+                          CATEGORY_LEFT_BORDER_CLASS already uses for the
+                          agenda's next-event card), not as a fill, so ink
+                          text never has to clear contrast against seven
+                          different saturated backgrounds. `title` is the
+                          mouse tooltip for a name truncated by CSS, not the
+                          DOM — the full text is already the cell's own
+                          aria-label above (this whole overlay stays
+                          aria-hidden, a `role="row"` may only contain
+                          gridcell children). pointer-events are re-enabled
+                          on just this element (the shared overlay above
+                          stays pass-through) so the tooltip actually fires
+                          on hover, and clicking it activates the same day
+                          the cell underneath does, not a dead click target. */}
+                      <span
+                        title={bar.event.title}
+                        onClick={() => handleCellActivate(clickDate)}
+                        style={{ gridColumn: `${bar.column + 1} / span ${bar.span}`, gridRow: bar.lane + 1 }}
+                        className={cn(
+                          "hidden h-full min-w-0 cursor-pointer items-center overflow-hidden rounded-sm border-l-2 bg-ink/5 px-1.5 pointer-events-auto lg:flex",
+                          bar.event.tentative ? "border-dashed" : "border-solid",
+                          CATEGORY_LEFT_BORDER_CLASS[bar.event.category],
+                        )}
+                      >
+                        <span className="truncate font-mono text-mono-xs text-ink">{bar.event.title}</span>
+                      </span>
+                    </span>
+                  );
+                })}
                 {week
                   .map((date, index) => ({ date, index, count: overflowByDate[date] }))
                   .filter((cell) => cell.count)
