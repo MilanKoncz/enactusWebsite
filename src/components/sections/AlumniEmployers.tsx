@@ -74,7 +74,19 @@ export function AlumniEmployers() {
   return (
     <Section className="relative isolate min-h-[26rem] overflow-hidden md:min-h-[32rem]">
       <AlumniLogoField />
-      <ThreadSegment stop="alumni-employers" />
+      {/* z-0, not ThreadSegment's own default -z-10: that default assumes it
+          sits directly on the section's own background, but here
+          AlumniLogoField is itself a full-bleed, z-index:auto layer between
+          the two — at -z-10 the thread painted behind it, and specifically
+          behind AlumniLogoField's own bottom fade-to-paper gradient, which
+          reads as opaque paper right where the thread's path curves back
+          toward center. z-0 (same stacking level, later in the DOM) puts the
+          thread in front of the whole logo field instead, matching every
+          other stop's rule that it's visible above its section's background
+          and below the section's real (Container) content — Container still
+          comes after this in the DOM, at the same level, so it keeps
+          painting on top. */}
+      <ThreadSegment stop="alumni-employers" className="z-0" />
       <Container className="relative flex flex-col gap-10">
         <div className="inline-flex flex-col gap-4 self-start bg-paper p-6 md:p-8">
           <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
