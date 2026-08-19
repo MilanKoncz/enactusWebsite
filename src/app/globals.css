@@ -419,6 +419,31 @@ h6 {
     }
   }
 
+  /* Alumni employer logos (AlumniEmployers.tsx) — a plain factual grid, not
+     an interactive control, so there's nothing here for a keyboard user to
+     focus. Full opacity is the safe default — a touch device (board brief:
+     "auf Mobile dauerhaft in voller Deckkraft") and reduced motion both keep
+     it permanently. Only a pointer with real hover support dims logos at
+     rest and restores them on hover, the same three-guard shape
+     `.hover-grow` above uses. */
+  .alumni-logo {
+    opacity: 1;
+    transition:
+      opacity var(--duration-fast) var(--ease-signature),
+      transform var(--duration-fast) var(--ease-signature);
+  }
+
+  @media (hover: hover) and (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+    .alumni-logo {
+      opacity: 0.6;
+    }
+
+    .alumni-logo:hover {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+  }
+
   /* Pillars ("Was uns einzigartig macht") supporting text — title stays
      visible at rest; the lead sentence and detail line are what this class
      hides. A deliberate, board-confirmed reversal of the "always visible"

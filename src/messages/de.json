@@ -184,6 +184,10 @@
     "next": "Nächstes Statement",
     "position": "{current} von {total}"
   },
+  "AlumniEmployers": {
+    "eyebrow": "Alumni-Netzwerk",
+    "title": "Wo unsere Alumni heute arbeiten"
+  },
   "BoardGrid": {
     "eyebrow": "Der Vorstand",
     "title": "Wer den Verein führt",

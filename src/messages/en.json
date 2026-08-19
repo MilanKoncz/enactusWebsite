@@ -184,6 +184,10 @@
     "next": "Next statement",
     "position": "{current} of {total}"
   },
+  "AlumniEmployers": {
+    "eyebrow": "Alumni network",
+    "title": "Where our alumni work today"
+  },
   "BoardGrid": {
     "eyebrow": "The board",
     "title": "Who runs the association",

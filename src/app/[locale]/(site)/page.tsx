@@ -7,6 +7,7 @@ import { HomeKpis } from "@/components/sections/HomeKpis";
 import { Pillars } from "@/components/sections/Pillars";
 import { Benefits } from "@/components/sections/Benefits";
 import { AlumniVoices } from "@/components/sections/AlumniVoices";
+import { AlumniEmployers } from "@/components/sections/AlumniEmployers";
 import { BoardGrid } from "@/components/sections/BoardGrid";
 import { ClosingCta } from "@/components/sections/ClosingCta";
 import { GateDivider } from "@/components/sections/GateDivider";
@@ -53,6 +54,7 @@ export default async function HomePage({ params }: PageProps) {
       <Benefits />
       <GateDivider label={t("dividers.alumni")} stop="gate-alumni" />
       <AlumniVoices />
+      <AlumniEmployers />
       <GateDivider label={t("dividers.board")} stop="gate-board" />
       <BoardGrid />
       <ClosingCta />
