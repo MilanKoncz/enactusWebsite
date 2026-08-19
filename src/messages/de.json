@@ -440,20 +440,20 @@
     }
   },
   "JourneysSection": {
-    "eyebrow": "Journeys",
-    "title": "Unsere Reisen zu den Enactus-Wettbewerben",
+    "eyebrow": "Unser größtes Social im Jahr",
+    "title": "Journeys",
     "lead": "Jedes Jahr gehen wir einmal auf eine Journey. Dort besuchen wir Venture-Capital-Firmen und Startups oder besuchen eine große Startup-Messe. Eindrucksvoll, motivierend und mit lustigen Erinnerungen."
   },
   "EventsNetwork": {
-    "eyebrow": "Netzwerk",
-    "title": "Teil eines großen Netzwerks",
+    "eyebrow": "Teil eines großen Netzwerks",
+    "title": "Die Events mit Enactus Germany",
     "lead": "Hier hört es aber noch nicht auf! Wir sind Teil von Enactus Germany, die für alle deutschen Enactus Standorte große Events organisieren, die wir als Enactus Mannheim gemeinsam besuchen. Hier siehst du eine Auswahl von den wichtigsten Events im Jahr.",
     "studentsGermanyLabel": "Studierende deutschlandweit",
     "universitiesGermanyLabel": "Hochschulstandorte",
     "countriesGlobalLabel": "Länder weltweit",
     "approx": "rund {value}",
     "atLeast": "über {value}",
-    "teamsHeading": "Weitere Enactus-Teams",
+    "teamsHeading": "Weitere starke Enactus-Teams",
     "teamLinkLabel": "Enactus {name} öffnet in neuem Tab"
   },
   "EgEvents": {

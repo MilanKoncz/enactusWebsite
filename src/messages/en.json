@@ -440,20 +440,20 @@
     }
   },
   "JourneysSection": {
-    "eyebrow": "Journeys",
-    "title": "Our trips to Enactus competitions",
+    "eyebrow": "Our biggest social trip of the year",
+    "title": "Journeys",
     "lead": "Once a year we head out on a journey, visiting venture capital firms and startups or attending a major startup fair. Impressive, motivating, and full of good memories."
   },
   "EventsNetwork": {
-    "eyebrow": "Network",
-    "title": "Part of a large network",
+    "eyebrow": "Part of a large network",
+    "title": "Events with Enactus Germany",
     "lead": "But it doesn't stop there! We're part of Enactus Germany, which organises major events for every Enactus location in Germany, and we attend them together as Enactus Mannheim. Here's a selection of the most important events of the year.",
     "studentsGermanyLabel": "Students across Germany",
     "universitiesGermanyLabel": "University locations",
     "countriesGlobalLabel": "Countries worldwide",
     "approx": "around {value}",
     "atLeast": "over {value}",
-    "teamsHeading": "More Enactus teams",
+    "teamsHeading": "More strong Enactus teams",
     "teamLinkLabel": "Enactus {name} opens in a new tab"
   },
   "EgEvents": {
