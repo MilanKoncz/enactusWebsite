@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import { toolKeySchema, toolSchema, tools } from "@/content/tools";
 
 describe("content/tools", () => {
-  it("lists the four tools in order", () => {
-    expect(tools.map((t) => t.key)).toEqual(["notion", "canva", "claude", "googleWorkspace"]);
-    expect(tools.map((t) => t.order)).toEqual([1, 2, 3, 4]);
+  it("lists the five tools in order", () => {
+    expect(tools.map((t) => t.key)).toEqual(["notion", "canva", "claude", "googleWorkspace", "openai"]);
+    expect(tools.map((t) => t.order)).toEqual([1, 2, 3, 4, 5]);
   });
 
   it("has a real logo path for every tool", () => {

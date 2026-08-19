@@ -59,12 +59,12 @@ describe("Benefits", () => {
     expect(card).toBeInTheDocument();
   });
 
-  it("shows a static 2×2 grid of the tool logos below md, hidden at md and up", () => {
+  it("shows a static two-column grid of the tool logos below md, hidden at md and up", () => {
     const { container } = renderWithIntl(<Benefits />);
     const grid = container.querySelector(".grid.grid-cols-2.md\\:hidden");
     expect(grid).toBeInTheDocument();
     expect(grid).toHaveAttribute("aria-hidden", "true");
-    expect(grid!.querySelectorAll("img")).toHaveLength(4);
+    expect(grid!.querySelectorAll("img")).toHaveLength(5);
   });
 
   it("keeps the animated arc hidden below md and visible from md up", () => {

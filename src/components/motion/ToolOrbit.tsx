@@ -1,42 +1,39 @@
 import Image from "next/image";
 import { tools } from "@/content/tools";
 
-// All in pixels. RADIUS is the drawn semicircle; the logos rest on its
-// outside, each one's inner edge just clear of the line, so the arc stays
-// unbroken underneath them instead of being chopped into segments by four
-// opaque discs.
+// All in pixels. RADIUS is the orbit path the logos travel — invisible, never
+// drawn (board feedback, 2026-08-19: "just the logos, no visible ring").
+// LOGO_RADIUS sits the logos directly on that path rather than clear of a
+// drawn line, since there's no line to clear anymore.
 //
-// The logo box is a landscape rectangle rather than a square because two of
-// the four marks are wordmarks: a square box fits a wordmark by its width
-// and leaves it a sliver tall, while a near-square mark fills the box
-// entirely, so the same box makes the four read at wildly different sizes.
-// A wide box gives the wordmarks their width and still lets the marks use
-// the full height. The source files were trimmed of their transparent
+// The logo box is a landscape rectangle rather than a square because most of
+// the five marks are wordmarks: a square box fits a wordmark by its width and
+// leaves it a sliver tall, while a near-square mark (openai, claude) fills the
+// box entirely, so the same box makes the five read at wildly different
+// sizes. A wide box gives the wordmarks their width and still lets the marks
+// use the full height. The source files were trimmed of their transparent
 // margins for the same reason — Notion's mark occupied a third of its own
 // canvas, so `object-contain` was scaling mostly empty space.
 const LOGO_WIDTH = 96;
 const LOGO_HEIGHT = 56;
 const RADIUS = 106;
-const CLEARANCE = 4;
-const LOGO_RADIUS = RADIUS + LOGO_HEIGHT / 2 + CLEARANCE;
-const WIDTH = LOGO_RADIUS * 2 + LOGO_WIDTH;
-const HEIGHT = LOGO_RADIUS + LOGO_HEIGHT / 2;
-const CENTRE_X = WIDTH / 2;
-const CENTRE_Y = HEIGHT;
+const LOGO_RADIUS = RADIUS;
 
-// The outermost logos stop short of the arc's flat ends, so the arc reads as
-// a shape in its own right rather than as four logos with a line between
-// them: 0deg points straight right, 180deg straight left.
-const ARC_START_DEG = 160;
-const ARC_END_DEG = 20;
+// A logo stays landscape-oriented at every point on the circle (see the
+// upright-logo comment below), so the bounding box needs the full logo width
+// clear on the left/right extremes and the full logo height clear on the
+// top/bottom extremes — not just at one side, since every logo visits every
+// point on the circle as it orbits.
+const WIDTH = LOGO_RADIUS * 2 + LOGO_WIDTH;
+const HEIGHT = LOGO_RADIUS * 2 + LOGO_HEIGHT;
+const CENTRE_X = WIDTH / 2;
+const CENTRE_Y = HEIGHT / 2;
 
 function angleFor(index: number, count: number): number {
-  if (count <= 1) return (ARC_START_DEG + ARC_END_DEG) / 2;
-  return ARC_START_DEG + ((ARC_END_DEG - ARC_START_DEG) * index) / (count - 1);
+  return (360 * index) / count;
 }
 
-// Negative sin because the semicircle is drawn over the top of the centre
-// point and screen y grows downward.
+// Negative sin because screen y grows downward.
 function positionFor(index: number, count: number): { x: number; y: number } {
   const radians = (angleFor(index, count) * Math.PI) / 180;
   return {
@@ -45,75 +42,38 @@ function positionFor(index: number, count: number): { x: number; y: number } {
   };
 }
 
-const ARC_PATH = `M ${CENTRE_X - RADIUS},${CENTRE_Y} A ${RADIUS},${RADIUS} 0 0 1 ${CENTRE_X + RADIUS},${CENTRE_Y}`;
-
-// The dome above is drawn and positioned exactly as if it still sat flat on
-// its own bottom-centre hub (CENTRE_X, CENTRE_Y) — every position above this
-// point is unchanged from that flat layout. The whole stage is then turned
-// into an open arc facing sideways by a -90deg rotation (CSS: negative is
-// counterclockwise, "to the left") around that same hub, baked straight into
-// the orbit-sway keyframes (globals.css) rather than a separate static
-// transform: an animation targeting `transform` replaces the property
-// outright each frame, so it can't be layered on top of an unrelated static
-// rotate() on the same element the way two independent CSS properties could
-// stack. orbit-counter-sway is shifted by the exact opposite baseline
-// (+90deg) for the same reason it already existed — cancelling the stage's
-// rotation exactly, so every logo stays upright through the turn instead of
-// swinging with it.
+// Purely decorative (aria-hidden — content/tools.ts). Continuous, very slow
+// orbit — animate-orbit-spin's duration lives as --orbit-duration in
+// globals.css, a named constant rather than a bare number in the shorthand,
+// same reasoning as --marquee-duration next to it.
 //
-// Rotating a WIDTH×HEIGHT box by exactly 90 degrees always swaps its
-// bounding box to HEIGHT×WIDTH, whatever the hub's own position inside it —
-// so the outer, unanimated wrapper below reserves HEIGHT×WIDTH of layout
-// space (tall, not wide), and the inner stage is offset by
-// (HEIGHT - CENTRE_X, WIDTH / 2 - CENTRE_Y) so the hub lands exactly where
-// the rotated dome needs it: the vertical centre of the new box's right
-// edge, with the arc opening out to the left of it.
-const STAGE_LEFT = HEIGHT - CENTRE_X;
-const STAGE_TOP = WIDTH / 2 - CENTRE_Y;
-
-// Purely decorative (aria-hidden — content/tools.ts) — a CSS-only sway, no
-// JavaScript, transform only (docs/design-system.md motion rule 5). A gold
-// 2px arc, the same weight as the gate marker's rule and the golden thread,
-// with the four logos resting on its outside like objects on a curved shelf.
-// The whole stage then gently rocks a few degrees around the arc's own
-// centre (globals.css's orbit-sway).
-//
-// Every logo is positioned by translation alone, never by rotating an arm it
-// hangs off: an arm rotated to the far end of the arc took its logo with it,
-// which is why Claude used to sit upside down and Canva at a slant. The only
-// rotation left on a logo is orbit-counter-sway, which cancels the stage's
-// sway (and now its baseline turn) exactly, so it stays upright the whole
-// way through.
+// Every logo is positioned by translation alone (positionFor above), never by
+// rotating an arm it hangs off: an arm rotated to the far end of the old
+// semicircle took its logo with it, which is why Claude used to sit upside
+// down and Canva at a slant. The whole stage instead rotates as one rigid
+// body around the circle's own centre (animate-orbit-spin), carrying every
+// logo's translated position around with it, while each logo individually
+// counter-rotates by the exact same keyframes played in reverse
+// (animate-orbit-counter-spin) — the established mechanism this component
+// already used for its old sway, generalised from a small back-and-forth
+// rock to a full one-directional loop. Two simple 0deg/360deg keyframes, same
+// duration, same linear timing, always sum to zero at every instant, so a
+// logo's own artwork stays upright through the whole orbit instead of
+// sweeping around with the stage.
 //
 // Under prefers-reduced-motion, globals.css's blanket override collapses
 // both animations to a single near-instant iteration ending at their final
-// keyframe (-82deg stage sway, 82deg counter-sway) — the two still cancel
-// out exactly, so every logo lands upright, just uniformly offset by a
-// harmless fixed few degrees, evenly spaced exactly as before rather than
-// bunched up or reset to a stray mid-animation frame.
+// keyframe — rotate(360deg) and rotate(-360deg), both visually identical to
+// rotate(0deg) — so the assembly lands exactly on its unrotated resting
+// state: the circle motionless, every logo exactly where positionFor placed
+// it, evenly spaced and upright.
 export function ToolOrbit() {
   return (
-    <div aria-hidden="true" className="relative" style={{ width: HEIGHT, height: WIDTH }}>
+    <div aria-hidden="true" className="relative" style={{ width: WIDTH, height: HEIGHT }}>
       <div
-        className="absolute animate-orbit-sway"
-        style={{
-          left: STAGE_LEFT,
-          top: STAGE_TOP,
-          width: WIDTH,
-          height: HEIGHT,
-          transformOrigin: `${CENTRE_X}px ${CENTRE_Y}px`,
-        }}
+        className="absolute inset-0 animate-orbit-spin"
+        style={{ transformOrigin: `${CENTRE_X}px ${CENTRE_Y}px` }}
       >
-        <svg
-          viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-          width={WIDTH}
-          height={HEIGHT}
-          fill="none"
-          className="absolute inset-0"
-        >
-          <path d={ARC_PATH} stroke="var(--color-gold)" strokeWidth={2} strokeLinecap="round" />
-        </svg>
-
         {tools.map((toolItem, index) => {
           const { x, y } = positionFor(index, tools.length);
           return (
@@ -123,7 +83,7 @@ export function ToolOrbit() {
               style={{ left: x, top: y }}
             >
               <div
-                className="relative animate-orbit-counter-sway"
+                className="relative animate-orbit-counter-spin"
                 style={{ width: LOGO_WIDTH, height: LOGO_HEIGHT }}
               >
                 <Image

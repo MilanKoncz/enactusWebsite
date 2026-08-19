@@ -145,14 +145,17 @@
      "caret hidden" rather than "caret stuck visibly mid-blink". */
   --animate-caret-blink: caret-blink 1s steps(1) infinite;
 
-  /* Benefits' tool halfcircle (ToolOrbit) — a slow, small rigid sway of the
-     whole arc, never a full spin (docs/design-system.md motion rule 5:
-     transform only). The counter-sway keyframe is this one played with
-     inverted values, so each logo cancels the stage's rotation exactly and
-     stays upright through the motion. It cancels the sway and nothing else:
-     a logo's position on the arc is a translation, never a rotated arm. */
-  --animate-orbit-sway: orbit-sway 6s ease-in-out infinite alternate;
-  --animate-orbit-counter-sway: orbit-counter-sway 6s ease-in-out infinite alternate;
+  /* Benefits' tool circle (ToolOrbit) — a slow, continuous rigid rotation of
+     the whole (invisible) circle, transform only (docs/design-system.md
+     motion rule 5). --orbit-duration is a named constant rather than a bare
+     number in the shorthand, same reasoning as --marquee-duration above.
+     The counter-spin keyframe is this one played with inverted values, so
+     each logo cancels the stage's rotation exactly and stays upright through
+     the motion. It cancels the spin and nothing else: a logo's position on
+     the circle is a translation, never a rotated arm. */
+  --orbit-duration: 90s;
+  --animate-orbit-spin: orbit-spin var(--orbit-duration) linear infinite;
+  --animate-orbit-counter-spin: orbit-counter-spin var(--orbit-duration) linear infinite;
 
   /* Interaction — docs/design-system.md. Registered under @theme (unlike
      --duration-fast/--duration-calm below) because --ease-* is a real
@@ -286,27 +289,26 @@ h6 {
   }
 }
 
-/* -90deg/+90deg is the tool arc's own baseline turn (ToolOrbit.tsx: an open
-   arc facing sideways, not a static rotate() layered on top of this same
-   animated property), with the same ±8deg sway as before on top of that
-   baseline. Shifting both keyframes by the same 90deg in opposite
-   directions keeps them summing to exactly zero at every point in the
-   cycle, same as before the arc was turned — see ToolOrbit.tsx. */
-@keyframes orbit-sway {
+/* A full, continuous loop rather than the old back-and-forth sway — see
+   ToolOrbit.tsx. orbit-spin and orbit-counter-spin are exact opposites at
+   every instant (same duration, same linear timing, 0deg/360deg vs.
+   0deg/-360deg), so a logo counter-spinning cancels the stage's rotation
+   exactly and never appears to turn. */
+@keyframes orbit-spin {
   from {
-    transform: rotate(-98deg);
+    transform: rotate(0deg);
   }
   to {
-    transform: rotate(-82deg);
+    transform: rotate(360deg);
   }
 }
 
-@keyframes orbit-counter-sway {
+@keyframes orbit-counter-spin {
   from {
-    transform: rotate(98deg);
+    transform: rotate(0deg);
   }
   to {
-    transform: rotate(82deg);
+    transform: rotate(-360deg);
   }
 }
 

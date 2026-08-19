@@ -18,12 +18,12 @@ import { tools } from "@/content/tools";
 // interactive is only noise in the tab order now that the text is always
 // there.
 //
-// The animated arc (ToolOrbit) is kept from `md` up — a real tablet, not
-// just "not a phone" — and replaced below that by a static 2×2 grid of the
-// same four logos: a decorative flourish is worth animating once there's
-// room for it beside the cards, but on a phone it's worth keeping only as
-// plain, unanimated information (board brief: "either drop it or reduce it
-// to a static row on mobile").
+// The animated circle (ToolOrbit) is kept from `md` up — a real tablet, not
+// just "not a phone" — and replaced below that by a static two-column grid
+// of the same five logos: a decorative flourish is worth animating once
+// there's room for it beside the cards, but on a phone it's worth keeping
+// only as plain, unanimated information (board brief: "either drop it or
+// reduce it to a static row on mobile").
 export function Benefits() {
   const t = useTranslations("Benefits");
 
