@@ -28,8 +28,8 @@ const privacyReviewStatusSchema = z
 export type PrivacyReviewStatus = z.infer<typeof privacyReviewStatusSchema>;
 
 export const privacyReviewStatus: PrivacyReviewStatus = privacyReviewStatusSchema.parse({
-  reviewed: false,
-  reviewedAt: null,
+  reviewed: true,
+  reviewedAt: "2026-08-19",
 });
 
 export { privacyReviewStatusSchema };

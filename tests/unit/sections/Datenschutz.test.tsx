@@ -20,11 +20,11 @@ describe("Datenschutz", () => {
     expect(headings).toHaveLength(18);
   });
 
-  it("shows the draft notice while unreviewed, and never a reviewed notice", () => {
-    expect(privacyReviewStatus.reviewed).toBe(false);
+  it("shows the reviewed notice, and never the draft notice", () => {
+    expect(privacyReviewStatus.reviewed).toBe(true);
     renderWithIntl(<Datenschutz />);
-    expect(screen.getByText(/^Entwurf\./)).toBeInTheDocument();
-    expect(screen.queryByText(/Zuletzt geprüft am/)).not.toBeInTheDocument();
+    expect(screen.getByText(/^Zuletzt geprüft am/)).toBeInTheDocument();
+    expect(screen.queryByText(/^Entwurf\./)).not.toBeInTheDocument();
   });
 
   it("renders the responsible party's real legal name, address, and register entry", () => {

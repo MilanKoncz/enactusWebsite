@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { privacyReviewStatus, privacyReviewStatusSchema } from "@/content/privacy";
 
 describe("content/privacy", () => {
-  it("starts unreviewed, with no review date", () => {
-    expect(privacyReviewStatus).toEqual({ reviewed: false, reviewedAt: null });
+  it("is reviewed, with a review date", () => {
+    expect(privacyReviewStatus).toEqual({ reviewed: true, reviewedAt: "2026-08-19" });
   });
 
   it("validates the exported status", () => {
