@@ -611,8 +611,19 @@ h6 {
     left: 0;
     bottom: -0.15em;
     width: 100%;
-    height: 0;
-    border-top: 1px dotted var(--color-gold);
+    height: 1px;
+    /* Resting state: a solid, quiet rule in the text's own color rather
+       than gold — a dotted gold underline under every prose link read as
+       visual noise across a page of running text. ink/40 keeps it present
+       without competing with the text it sits under. */
+    background: var(--color-ink);
+    opacity: 0.4;
+    transition: opacity var(--duration-fast) var(--ease-grow);
+  }
+
+  .link-underline:hover::before,
+  .link-underline:focus-visible::before {
+    opacity: 0;
   }
 
   .link-underline::after {
@@ -621,12 +632,17 @@ h6 {
     left: 0;
     bottom: -0.15em;
     width: 100%;
-    height: 1px;
+    /* 2px, a shade bolder than the 1px resting rule above — "hover/focus
+       gets a little intent" (docs/design-system.md's --ease-signature
+       rationale), applied here as weight since this is a scaleX sweep, not
+       a lift. */
+    height: 2px;
     /* The signature gold accent, not currentColor: a growing underline is a
        decorative accent line, not running text, so the "gold is never a
        text color on paper" rule (docs/design-system.md) doesn't apply to
        it — it was black before only because it inherited the surrounding
-       prose color by default. */
+       prose color by default. Text itself stays ink at all times; only this
+       accent rule turns gold, on hover/focus only. */
     background: var(--color-gold);
     transform: scaleX(0);
     transform-origin: left;
