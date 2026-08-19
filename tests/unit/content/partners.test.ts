@@ -1,14 +1,18 @@
 import { describe, expect, it } from "vitest";
 import { partners, partnerSchema } from "@/content/partners";
 
-const MARQUEE_ONLY_SLUGS = ["htgf", "allianz-global-investors", "basf", "phoenix-group", "pg"];
+// htgf gained a tier (Knowledge, 2026-08-19) but its url is still
+// unconfirmed — it's no longer marquee-only, so it moved out of this list,
+// but it still needs its own exception below wherever the other four
+// marquee-only additions are excluded for having no url yet.
+const MARQUEE_ONLY_SLUGS = ["allianz-global-investors", "basf", "phoenix-group", "pg"];
 
 describe("content/partners", () => {
-  it("has the twelve confirmed partners plus five homepage-marquee-only additions", () => {
+  it("has the twelve confirmed partners plus five additions still missing at least a tier or url", () => {
     expect(partners).toHaveLength(17);
   });
 
-  it("keeps the five marquee-only additions tier-less, so they never appear on the tiered /partner grid", () => {
+  it("keeps the four still-tier-less additions out of the tiered /partner grid entirely", () => {
     for (const slug of MARQUEE_ONLY_SLUGS) {
       const p = partners.find((partner) => partner.slug === slug);
       expect(p?.tier).toBeNull();
@@ -26,6 +30,7 @@ describe("content/partners", () => {
       "shub-mannheim",
       "mafinex",
       "mcei",
+      "htgf",
     ]);
     expect(byTier.Flagship?.map((p) => p.slug)).toEqual(["procredit-bank", "eon-inhouse-consulting"]);
     expect(byTier.Sponsoring?.map((p) => p.slug)).toEqual([
@@ -41,11 +46,12 @@ describe("content/partners", () => {
     }
   });
 
-  it("has a confirmed url for every tiered partner except MCEI", () => {
+  it("has a confirmed url for every tiered partner except MCEI and HTGF", () => {
     const bySlug = Object.fromEntries(partners.map((p) => [p.slug, p.url]));
     expect(bySlug.mcei).toBeNull();
+    expect(bySlug.htgf).toBeNull();
     for (const p of partners) {
-      if (p.slug === "mcei" || MARQUEE_ONLY_SLUGS.includes(p.slug)) continue;
+      if (p.slug === "mcei" || p.slug === "htgf" || MARQUEE_ONLY_SLUGS.includes(p.slug)) continue;
       expect(p.url).toMatch(/^https:\/\//);
     }
   });

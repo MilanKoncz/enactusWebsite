@@ -20,11 +20,18 @@ import { z } from "zod";
  * Five more (`htgf`, `allianz-global-investors`, `basf`, `phoenix-group`,
  * `pg`) were added 2026-08-16 for the homepage logo band only, from the
  * board's own logo handover (`neue medien/Logo Firmen/`) — real logos, but
- * `tier`/`url` stay `null` until the board assigns a partnership tier and
- * the sites are fetched and confirmed the same way the twelve above were
+ * `tier`/`url` stayed `null` until the board assigned a partnership tier and
+ * the site was fetched and confirmed the same way the twelve above were
  * (see ASSETS-TODO.md). A `null` tier simply never matches PartnerTiers.tsx's
- * fixed `TIER_ORDER`, so these five appear in the homepage band without
- * also showing up (unconfirmed) on /partner's tiered grid.
+ * fixed `TIER_ORDER`, so an entry still at `null` appears in the homepage
+ * band without also showing up (unconfirmed) on /partner's tiered grid.
+ *
+ * `htgf` was the first of the five to get a tier: confirmed as a Knowledge
+ * Partner 2026-08-19, moved up into the Knowledge group below (array order
+ * doesn't affect rendering — PartnerTiers.tsx filters by `tier`, not
+ * position — but it groups this file the same way the page groups the
+ * page). Its `url` is still unconfirmed, so it stays `null` rather than a
+ * guess (see ASSETS-TODO.md); the remaining four keep `tier: null` too.
  */
 
 const partnerSchema = z.object({
@@ -86,6 +93,9 @@ export const partners: Partner[] = [
   }),
   // No verifiable url — see the file comment and ASSETS-TODO.md.
   partner({ slug: "mcei", name: "MCEI", logo: "/brand/partners/mcei.png", tier: "Knowledge" }),
+  // Knowledge Partner since 2026-08-19 (board confirmation) — see the file
+  // comment and ASSETS-TODO.md for the still-unconfirmed url.
+  partner({ slug: "htgf", name: "HTGF", logo: "/brand/partners/htgf.png", tier: "Knowledge" }),
   // Flagship
   partner({
     slug: "procredit-bank",
@@ -124,7 +134,6 @@ export const partners: Partner[] = [
     url: "https://www.absolventum.de/",
   }),
   // Homepage logo band only — see the file comment above.
-  partner({ slug: "htgf", name: "HTGF", logo: "/brand/partners/htgf.png", tier: null }),
   partner({
     slug: "allianz-global-investors",
     name: "Allianz Global Investors",
