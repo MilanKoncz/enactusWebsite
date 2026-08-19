@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { ImageLightbox } from "@/components/ui/ImageLightbox";
+import { ImageWithPlaceholder } from "@/components/ui/ImageWithPlaceholder";
 import { Placeholder } from "@/components/ui/Placeholder";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { Section } from "@/components/ui/Section";
@@ -130,7 +130,7 @@ export function AlumniVoices() {
                 {alumnus.photo ? (
                   <div className="relative aspect-3/4 w-full overflow-hidden">
                     <ImageLightbox src={alumnus.photo} alt={alumnus.name} triggerClassName="absolute inset-0">
-                      <Image
+                      <ImageWithPlaceholder
                         src={alumnus.photo}
                         alt={alumnus.name}
                         fill

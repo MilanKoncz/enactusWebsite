@@ -1,7 +1,7 @@
-import Image from "next/image";
 import { useFormatter, useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { ImageWithPlaceholder } from "@/components/ui/ImageWithPlaceholder";
 import { LinkCard } from "@/components/ui/LinkCard";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { Section } from "@/components/ui/Section";
@@ -41,7 +41,7 @@ export function EventsNetwork() {
                 className="flex h-full flex-col overflow-hidden rounded-md border border-ink/10 bg-paper"
               >
                 <div className="relative aspect-3/4 overflow-hidden">
-                  <Image
+                  <ImageWithPlaceholder
                     src={event.image}
                     alt={tEgEvents(`${event.key}.imageAlt` as EgEventCopyKey)}
                     fill

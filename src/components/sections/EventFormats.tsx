@@ -1,6 +1,6 @@
-import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
+import { ImageWithPlaceholder } from "@/components/ui/ImageWithPlaceholder";
 import { Placeholder } from "@/components/ui/Placeholder";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -33,7 +33,13 @@ function FormatMedia({ format, title, alt }: { format: EventFormat; title: strin
   }
   return (
     <div className="relative aspect-3/4 overflow-hidden">
-      <Image src={format.image} alt={alt} fill sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" className="object-cover" />
+      <ImageWithPlaceholder
+        src={format.image}
+        alt={alt}
+        fill
+        sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+        className="object-cover"
+      />
     </div>
   );
 }

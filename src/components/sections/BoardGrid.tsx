@@ -2,13 +2,13 @@ import { FaLinkedin } from "react-icons/fa";
 import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { ImageLightbox } from "@/components/ui/ImageLightbox";
+import { ImageWithPlaceholder } from "@/components/ui/ImageWithPlaceholder";
 import { Placeholder } from "@/components/ui/Placeholder";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ProximityGroup } from "@/components/motion/ProximityGroup";
 import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { board } from "@/content/board";
-import Image from "next/image";
 // react-icons' bundled Font Awesome brand icon, not Simple Icons: Simple
 // Icons dropped LinkedIn's mark after a takedown request (see Footer.tsx's
 // identical use of FaLinkedin for the same reason).
@@ -65,10 +65,11 @@ export function BoardGrid() {
               <div data-portrait className="relative overflow-hidden rounded-md aspect-3/4 w-full">
                 {member.photo ? (
                   <ImageLightbox src={member.photo} alt={member.name} triggerClassName="absolute inset-0">
-                    <Image
+                    <ImageWithPlaceholder
                       src={member.photo}
                       alt={member.name}
                       fill
+                      sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 50vw"
                       className={PORTRAIT_ZOOM_CLASSES}
                     />
                   </ImageLightbox>

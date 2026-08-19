@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
 import { ImageLightbox } from "@/components/ui/ImageLightbox";
+import { ImageWithPlaceholder } from "@/components/ui/ImageWithPlaceholder";
 import { LinkCard } from "@/components/ui/LinkCard";
 import { Placeholder } from "@/components/ui/Placeholder";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
@@ -45,7 +46,7 @@ function ProjectLeadCard({ lead, unverifiedEmailHint }: { lead: ProjectLead; unv
       <div className="relative w-16 shrink-0 overflow-hidden rounded-md aspect-3/4">
         {lead.photo ? (
           <ImageLightbox src={lead.photo} alt={lead.name} triggerClassName="absolute inset-0">
-            <Image src={lead.photo} alt={lead.name} fill sizes="64px" className="object-cover" />
+            <ImageWithPlaceholder src={lead.photo} alt={lead.name} fill sizes="64px" className="object-cover" />
           </ImageLightbox>
         ) : (
           <Placeholder kind="Foto" label={lead.name} ratio="3 / 4" className="size-full p-2" />
@@ -168,7 +169,7 @@ export function ProjectDetailContent({ project, labels, className }: ProjectDeta
             return image ? (
               <div key={image} className="relative overflow-hidden rounded-md aspect-4/3">
                 <ImageLightbox src={image} alt={project.name} triggerClassName="absolute inset-0">
-                  <Image
+                  <ImageWithPlaceholder
                     src={image}
                     alt={project.name}
                     fill

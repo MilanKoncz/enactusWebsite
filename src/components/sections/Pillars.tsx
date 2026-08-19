@@ -1,8 +1,8 @@
-import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { GateMarker } from "@/components/ui/GateMarker";
 import { DetailText } from "@/components/ui/DetailText";
+import { ImageWithPlaceholder } from "@/components/ui/ImageWithPlaceholder";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/motion/Reveal";
@@ -88,10 +88,11 @@ export function Pillars() {
             >
               {pillar.image && (
                 <>
-                  <Image
+                  <ImageWithPlaceholder
                     src={pillar.image}
                     alt=""
                     fill
+                    sizes="(min-width: 768px) 33vw, 100vw"
                     className={PILLAR_IMAGE_FIT[pillar.key] === "contain" ? "object-contain" : "object-cover"}
                   />
                   <div aria-hidden="true" className={`absolute inset-0 ${PILLAR_OVERLAY_OPACITY_CLASS}`} />
