@@ -17,13 +17,21 @@ describe("EventsNetwork", () => {
     expect(screen.getByText("34")).toBeInTheDocument();
   });
 
-  it("links every sibling team to its confirmed URL in a new tab", () => {
+  // Two links per team now, not one: the text LinkCard and the map's
+  // overlay link (GermanyMap.tsx) — both real, both pointing at the same
+  // URL, since the map is a supplement to the text links, not a
+  // replacement (docs/content-guide.md-style redundancy for pointer-free
+  // navigation).
+  it("links every sibling team to its confirmed URL in a new tab, from both the text list and the map", () => {
     renderWithIntl(<EventsNetwork />);
     for (const team of teamLinks) {
-      const link = screen.getByRole("link", { name: new RegExp(team.name) });
-      expect(link).toHaveAttribute("href", team.url!);
-      expect(link).toHaveAttribute("target", "_blank");
-      expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
+      const links = screen.getAllByRole("link", { name: new RegExp(team.name) });
+      expect(links).toHaveLength(2);
+      for (const link of links) {
+        expect(link).toHaveAttribute("href", team.url!);
+        expect(link).toHaveAttribute("target", "_blank");
+        expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
+      }
     }
   });
 

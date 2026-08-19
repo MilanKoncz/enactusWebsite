@@ -77,10 +77,25 @@ test.describe("/events", () => {
     await expect(page.getByText("HWS 2024")).toBeVisible();
   });
 
-  test("links every sibling team to a real, external URL", async ({ page }) => {
+  // Two links now, not one: the text LinkCard and the Germany map's overlay
+  // link (GermanyMap.tsx) — the map is a supplement, not a replacement, so
+  // both keep working.
+  test("links every sibling team to a real, external URL, from both the text list and the map", async ({
+    page,
+  }) => {
     await page.goto("/events");
-    const link = page.getByRole("link", { name: /München/ });
-    await expect(link).toHaveAttribute("href", "https://enactus-muenchen.de/");
-    await expect(link).toHaveAttribute("target", "_blank");
+    const links = page.getByRole("link", { name: /München/ });
+    await expect(links).toHaveCount(2);
+    for (const link of await links.all()) {
+      await expect(link).toHaveAttribute("href", "https://enactus-muenchen.de/");
+      await expect(link).toHaveAttribute("target", "_blank");
+    }
+  });
+
+  test("shows a Germany map with a describing label, below the team links", async ({ page }) => {
+    await page.goto("/events");
+    const map = page.getByRole("img", { name: /Karte der Enactus-Standorte in Deutschland/ });
+    await expect(map).toBeVisible();
+    await expect(map.getByText("Mannheim")).toBeVisible();
   });
 });

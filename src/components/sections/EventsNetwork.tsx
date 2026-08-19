@@ -8,6 +8,7 @@ import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { networkStats, teamLinks } from "@/content/network";
 import { egEvents } from "@/content/egEvents";
+import { GermanyMap } from "@/components/sections/GermanyMap";
 
 // egEvent.key is a validated string, not a literal union — same cast
 // pattern as ProjectDetailContent.tsx's ProjectCopyKey.
@@ -100,6 +101,10 @@ export function EventsNetwork() {
               </li>
             ))}
           </ul>
+
+          {/* Below the text links, as a supplement — not a replacement, so
+              pointer-free navigation never loses the sibling teams. */}
+          <GermanyMap />
         </div>
       </Container>
     </Section>

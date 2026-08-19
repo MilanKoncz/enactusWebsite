@@ -40,6 +40,18 @@ export const networkStats: NetworkStats = networkStatsSchema.parse({
  * URL below was fetched and confirmed live on 2026-08-15, each page
  * self-identifying as that city's Enactus chapter — not guessed from a
  * domain-naming pattern. None needed a placeholder.
+ *
+ * These same five, plus Mannheim itself, are the six locations plotted on
+ * the Germany map at the end of /events (GermanyMap.tsx). Checked
+ * 2026-08-19 whether enactus.de publishes a fuller, official roster of
+ * German team locations to plot instead: enactus.de/network references a
+ * "list of all Enactus teams in Germany" heading, but the roster itself
+ * renders as content this project's fetch tooling couldn't read (likely
+ * client-rendered or embedded, not present in the fetched markup) — not
+ * confirmed empty, just not retrievable, so nothing beyond these six was
+ * added rather than guessing at what that list contains. The map's pixel
+ * coordinates for each city live in GermanyMap.tsx itself, not here —
+ * presentation detail, not a board-maintained fact.
  */
 const teamKeySchema = z.enum(["muenchen", "muenster", "hamburg", "koeln", "karlsruhe"]);
 export type TeamKey = z.infer<typeof teamKeySchema>;

@@ -454,7 +454,9 @@
     "approx": "around {value}",
     "atLeast": "over {value}",
     "teamsHeading": "More strong Enactus teams",
-    "teamLinkLabel": "Enactus {name} opens in a new tab"
+    "teamLinkLabel": "Enactus {name} opens in a new tab",
+    "mapTitle": "Map of Enactus team locations in Germany: Mannheim, plus the partner teams in Munich, Münster, Hamburg, Cologne, and Karlsruhe",
+    "mapMannheimLabel": "Mannheim"
   },
   "EgEvents": {
     "nc": {
