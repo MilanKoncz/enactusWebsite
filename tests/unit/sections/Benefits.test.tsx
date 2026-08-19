@@ -59,18 +59,20 @@ describe("Benefits", () => {
     expect(card).toBeInTheDocument();
   });
 
-  it("shows a static two-column grid of the tool logos below md, hidden at md and up", () => {
+  it("shows a smaller orbit of the tool logos below md, hidden at md and up", () => {
     const { container } = renderWithIntl(<Benefits />);
-    const grid = container.querySelector(".grid.grid-cols-2.md\\:hidden");
-    expect(grid).toBeInTheDocument();
-    expect(grid).toHaveAttribute("aria-hidden", "true");
-    expect(grid!.querySelectorAll("img")).toHaveLength(5);
+    const mobileWrapper = container.querySelector(".md\\:hidden");
+    expect(mobileWrapper).toBeInTheDocument();
+    const orbit = mobileWrapper!.querySelector('[aria-hidden="true"]');
+    expect(orbit).toBeInTheDocument();
+    expect(orbit!.querySelectorAll("img")).toHaveLength(5);
   });
 
-  it("keeps the animated arc hidden below md and visible from md up", () => {
+  it("keeps the full-size orbit hidden below md and visible from md up", () => {
     const { container } = renderWithIntl(<Benefits />);
     const orbitWrapper = container.querySelector(".hidden.shrink-0.md\\:block");
     expect(orbitWrapper).toBeInTheDocument();
+    expect(orbitWrapper!.querySelectorAll("img")).toHaveLength(5);
   });
 
   it("has no accessibility violations", async () => {

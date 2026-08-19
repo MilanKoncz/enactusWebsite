@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Card } from "@/components/ui/Card";
 import { Container } from "@/components/ui/Container";
@@ -8,7 +7,6 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ThreadSegment } from "@/components/motion/ThreadSegment";
 import { ToolOrbit } from "@/components/motion/ToolOrbit";
 import { benefits } from "@/content/benefits";
-import { tools } from "@/content/tools";
 
 // Same always-visible detail text as Pillars (DetailText), denser grid, no
 // gate marker — that motif belongs to the pillars, one signature element,
@@ -18,12 +16,12 @@ import { tools } from "@/content/tools";
 // interactive is only noise in the tab order now that the text is always
 // there.
 //
-// The animated circle (ToolOrbit) is kept from `md` up — a real tablet, not
-// just "not a phone" — and replaced below that by a static two-column grid
-// of the same five logos: a decorative flourish is worth animating once
-// there's room for it beside the cards, but on a phone it's worth keeping
-// only as plain, unanimated information (board brief: "either drop it or
-// reduce it to a static row on mobile").
+// The animated circle (ToolOrbit) now orbits at every width (board brief,
+// 2026-08-20, reversing the earlier "static grid below md" call) — a
+// smaller `scale` below `md`, not a second static layout: same rotational
+// speed (the CSS animation is time-based, not distance-based), logos stay
+// upright either way, only the circle's own footprint shrinks to fit a
+// phone-width column.
 export function Benefits() {
   const t = useTranslations("Benefits");
 
@@ -32,12 +30,8 @@ export function Benefits() {
       <ThreadSegment stop="benefits" />
       <Container className="relative flex flex-col gap-12">
         <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
-        <div className="grid grid-cols-2 gap-6 md:hidden" aria-hidden="true">
-          {tools.map((toolItem) => (
-            <div key={toolItem.key} className="relative h-14 w-full">
-              <Image src={toolItem.logo} alt="" fill sizes="160px" className="object-contain" />
-            </div>
-          ))}
+        <div className="flex justify-center md:hidden">
+          <ToolOrbit scale={0.6} />
         </div>
         {/* The orbit is a sibling of the grid, not of the whole column: it
             centres against the cards themselves, so it reads as belonging to
