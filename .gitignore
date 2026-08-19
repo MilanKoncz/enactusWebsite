@@ -50,3 +50,7 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# working notes, not project files
+/HANDOFF.md
+/REVIEW.md
