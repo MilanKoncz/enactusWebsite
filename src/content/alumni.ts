@@ -34,4 +34,16 @@ function placeholderAlumnus(index: number): Alumnus {
 
 export const alumni: Alumnus[] = [1, 2, 3].map(placeholderAlumnus);
 
+/**
+ * Whether AlumniVoices.tsx (the quote/portrait track) renders at all — a
+ * single switch, not a per-entry one, since all three current entries are
+ * the same ALUMNUS_N/POSITION_N/STATEMENT_N placeholder shape (see
+ * placeholderAlumnus above) and none of them is real enough to publish
+ * alone. `false` until real quotes replace the placeholders (ASSETS-TODO.md
+ * tracks this); flip to `true` once `alumni` above holds real entries — the
+ * component and its section are otherwise untouched, so nothing else needs
+ * to change to bring it back.
+ */
+export const ALUMNI_STATEMENTS_ENABLED = false;
+
 export { alumnusSchema };

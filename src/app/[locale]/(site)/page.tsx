@@ -6,10 +6,12 @@ import { PartnerMarquee } from "@/components/sections/PartnerMarquee";
 import { HomeKpis } from "@/components/sections/HomeKpis";
 import { Pillars } from "@/components/sections/Pillars";
 import { Benefits } from "@/components/sections/Benefits";
+import { AlumniEmployers } from "@/components/sections/AlumniEmployers";
 import { AlumniVoices } from "@/components/sections/AlumniVoices";
 import { BoardGrid } from "@/components/sections/BoardGrid";
 import { ClosingCta } from "@/components/sections/ClosingCta";
 import { GateDivider } from "@/components/sections/GateDivider";
+import { ALUMNI_STATEMENTS_ENABLED } from "@/content/alumni";
 
 type PageProps = {
   params: Promise<{ locale: string }>;
@@ -52,7 +54,14 @@ export default async function HomePage({ params }: PageProps) {
       <Pillars />
       <Benefits />
       <GateDivider label={t("dividers.alumni")} stop="gate-alumni" />
-      <AlumniVoices />
+      <AlumniEmployers />
+      {/* Not rendered until content/alumni.ts's ALUMNI_STATEMENTS_ENABLED
+          flips true — the placeholder quotes it would otherwise show must
+          never go live (ASSETS-TODO.md). threadRoute.ts's alumni-employers
+          and alumni-voices stops both start and end at the shared midpoint
+          (50), so the golden thread's seam holds whether this renders or
+          not. */}
+      {ALUMNI_STATEMENTS_ENABLED && <AlumniVoices />}
       <GateDivider label={t("dividers.board")} stop="gate-board" />
       <BoardGrid />
       <ClosingCta />

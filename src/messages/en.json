@@ -201,6 +201,10 @@
     "applyCta": "View job posting",
     "applyCtaLabel": "Open {title} at {company} in a new tab"
   },
+  "AlumniEmployers": {
+    "eyebrow": "Alumni",
+    "title": "Where our alumni work today"
+  },
   "AlumniVoices": {
     "eyebrow": "Where it leads",
     "title": "What becomes of our members",

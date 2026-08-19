@@ -106,11 +106,35 @@ export function ProximityGroup({ children, className }: ProximityGroupProps) {
     const resizeObserver = new ResizeObserver(measure);
     resizeObserver.observe(container);
 
+    // getBoundingClientRect() is viewport-relative, not document-relative —
+    // it only reflects the container's position at the moment it's called.
+    // ResizeObserver alone leaves it stale the instant the page scrolls
+    // after mount, which for a section that starts below the fold (true of
+    // every ProximityGroup on this site) is effectively always: the cached
+    // rect from mount time no longer lines up with a pointermove event's
+    // own (also viewport-relative) coordinates, so every proximity
+    // calculation compares against the wrong position and silently stays at
+    // 0. rAF-throttled the same way applyProximity already is — a bare
+    // `scroll` listener can fire many times faster than the frame rate, and
+    // re-measuring every direct child on each one would be real layout
+    // thrashing during a fast scroll gesture.
+    let scrollFrame: number | null = null;
+    function handleScroll() {
+      if (scrollFrame !== null) return;
+      scrollFrame = requestAnimationFrame(() => {
+        scrollFrame = null;
+        measure();
+      });
+    }
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
     container.addEventListener("pointermove", handlePointerMove);
     container.addEventListener("pointerleave", handlePointerLeave);
 
     return () => {
       resizeObserver.disconnect();
+      window.removeEventListener("scroll", handleScroll);
+      if (scrollFrame !== null) cancelAnimationFrame(scrollFrame);
       container.removeEventListener("pointermove", handlePointerMove);
       container.removeEventListener("pointerleave", handlePointerLeave);
       if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);

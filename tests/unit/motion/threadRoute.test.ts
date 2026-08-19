@@ -22,11 +22,29 @@ describe("threadRoute", () => {
       "pillars",
       "benefits",
       "gate-alumni",
-      "alumni",
+      "alumni-employers",
+      "alumni-voices",
       "gate-board",
       "board",
       "cta",
     ]);
+  });
+
+  // alumni-employers (AlumniEmployers.tsx) always renders; alumni-voices
+  // (AlumniVoices.tsx) currently doesn't (content/alumni.ts's
+  // ALUMNI_STATEMENTS_ENABLED is false) — the seam has to hold in both
+  // configurations, which is exactly what both halves starting and ending at
+  // the shared midpoint (50) guarantees, independent of the array position
+  // check above.
+  it("keeps alumni-employers and alumni-voices individually collapsible at the shared midpoint (50)", () => {
+    for (const width of WIDTHS) {
+      for (const stop of ["alumni-employers", "alumni-voices"] as const) {
+        const { from, to } = waypointsFor(stop, width);
+        const axis = width === "wide" ? 50 : 8;
+        expect(from).toBe(axis);
+        expect(to).toBe(axis);
+      }
+    }
   });
 
   it("keeps the three gate-divider stops perfectly vertical at the desktop centre (50)", () => {

@@ -5,7 +5,8 @@ export type ThreadStop =
   | "pillars"
   | "benefits"
   | "gate-alumni"
-  | "alumni"
+  | "alumni-employers"
+  | "alumni-voices"
   | "gate-board"
   | "board"
   | "cta";
@@ -46,7 +47,8 @@ type Waypoints = {
  * into, so the thread reads as one continuous line finding its way rather
  * than a rule that always leans the same direction: partners enters from the
  * left; kpis/pillars/benefits (the one excursion between gate-kpis and
- * gate-alumni) swings right; alumni swings back left; board/cta (the final
+ * gate-alumni) swings right; alumni-employers/alumni-voices (the excursion
+ * between gate-alumni and gate-board) swings back left; board/cta (the final
  * excursion, page ends before another gate closes it) swings right again.
  *
  * `narrow` (below `md`) is a deliberately different shape, not a scaled-down
@@ -117,8 +119,22 @@ const ROUTES: Record<ThreadStop, Record<ThreadWidth, Waypoints>> = {
     wide: { from: 50, bow: 50, to: 50 },
     narrow: narrowAt(MOBILE_AXIS),
   },
-  alumni: {
+  // Split from the original single `alumni` stop (2026-08-19) when the logo
+  // field became its own section, independent of the quote/portrait track
+  // (AlumniVoices.tsx, currently not rendered at all — see
+  // content/alumni.ts's ALUMNI_STATEMENTS_ENABLED). Both halves start and
+  // end at 50, the same round trip the original single stop made — so the
+  // seam holds together whether `alumni-voices` actually renders between
+  // them or not: gate-alumni(50) -> alumni-employers(50->20->50) ->
+  // [alumni-voices(50->35->50), only when the flag is on] -> gate-board(50).
+  // Never give either half an asymmetric from/to (matching a fixed midpoint
+  // some other stop expects) — that's what makes the pair collapsible.
+  "alumni-employers": {
     wide: { from: 50, bow: 20, to: 50 },
+    narrow: narrowAt(6),
+  },
+  "alumni-voices": {
+    wide: { from: 50, bow: 35, to: 50 },
     narrow: narrowAt(6),
   },
   "gate-board": {
@@ -145,7 +161,8 @@ export const HOME_STOPS: ThreadStop[] = [
   "pillars",
   "benefits",
   "gate-alumni",
-  "alumni",
+  "alumni-employers",
+  "alumni-voices",
   "gate-board",
   "board",
   "cta",
