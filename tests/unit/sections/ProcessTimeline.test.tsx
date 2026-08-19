@@ -1,8 +1,10 @@
-import { describe, expect, it, vi } from "vitest";
-import { fireEvent, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { act, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "jest-axe";
 import { renderWithIntl } from "../../fixtures/intl";
+import { mockIntersectionObserver } from "../../fixtures/observers";
+import { mockMatchMedia } from "../../fixtures/matchMedia";
 import { GateMarker } from "@/components/ui/GateMarker";
 import { ProcessTimeline } from "@/components/sections/ProcessTimeline";
 import { steps } from "@/content/process";
@@ -19,22 +21,39 @@ vi.mock("@/components/ui/GateMarker", async () => {
   return { GateMarker: vi.fn(actual.GateMarker) };
 });
 
+const CHECKLIST_STEP_COUNT = steps.filter((step) => step.hasChecklist).length;
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
+// The common case: motion is allowed, so ProcessTimeline is "enhanced"
+// (closed-by-default, scroll-revealed) and its IntersectionObserver effect
+// runs — both need a stub the way HomeHero's tests stub the same pair.
+function renderEnhanced() {
+  mockMatchMedia(false);
+  const io = mockIntersectionObserver();
+  const view = renderWithIntl(<ProcessTimeline />);
+  return { io, ...view };
+}
+
 describe("ProcessTimeline", () => {
-  it("renders all eight stations, each as a toggle button", () => {
-    renderWithIntl(<ProcessTimeline />);
+  it(`renders all eight stations, ${CHECKLIST_STEP_COUNT} of them as a toggle button, and two — kickOff and ideation — as plain description blocks`, () => {
+    renderEnhanced();
     const buttons = screen.getAllByRole("button");
-    expect(buttons).toHaveLength(steps.length);
-    expect(buttons[0]).toHaveAccessibleName(/kick-off/i);
-    expect(buttons[buttons.length - 1]).toHaveAccessibleName(/startup/i);
+    expect(buttons).toHaveLength(CHECKLIST_STEP_COUNT);
+    expect(screen.getByText("Kick-off")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /kick-off/i })).toBeNull();
+    expect(screen.queryByRole("button", { name: /ideation-phase/i })).toBeNull();
   });
 
   it("exposes the track as a labelled region", () => {
-    renderWithIntl(<ProcessTimeline />);
+    renderEnhanced();
     expect(screen.getByRole("group", { name: "Prozessschritte" })).toBeInTheDocument();
   });
 
   it("keeps every checklist item and every description in the document without any interaction", () => {
-    renderWithIntl(<ProcessTimeline />);
+    renderEnhanced();
     expect(screen.getAllByText("Problem-Solution-Fit")).not.toHaveLength(0);
     expect(
       screen.getAllByText(/Im Team entwickelt ihr gemeinsam mit anderen/),
@@ -42,64 +61,73 @@ describe("ProcessTimeline", () => {
   });
 
   it("gives a checklist to the six stations the board confirmed one for, and none to kickOff or ideation", () => {
-    renderWithIntl(<ProcessTimeline />);
+    renderEnhanced();
     expect(screen.getAllByText("Preisgeld")).not.toHaveLength(0);
     expect(screen.getAllByText("Rechtsberatung")).not.toHaveLength(0);
     expect(screen.getAllByText("Kick-off")).not.toHaveLength(0);
-    // Neither kickOff nor ideation ever renders a Prüfpunkte/Vorteile label
-    // of its own — both share the region's two labels with the other six
-    // stations, so absence has to be checked per panel, not via the shared
-    // label text itself. The mocked GateMarker below is the more direct
-    // signal that content and rendering stay in lockstep; this test only
-    // guards that the two checklist-less steps' own descriptions are real
-    // sentences, not the removed placeholder tokens.
     expect(screen.queryByText("PRÜFPUNKT_1")).toBeNull();
   });
 
   it("renders GateMarker for exactly the three confirmed gates, a calm dot for the other five", () => {
-    renderWithIntl(<ProcessTimeline />);
+    renderEnhanced();
     const calls = vi.mocked(GateMarker).mock.calls;
     const labels = new Set(calls.map(([props]) => props.label));
     expect(labels).toEqual(new Set(["Inno-Gating", "Operations-Gating", "Legal-Gating/Ausgründung"]));
   });
 
   it("distinguishes milestones from phases for screen readers, not only through the gate rule", () => {
-    renderWithIntl(<ProcessTimeline />);
+    renderEnhanced();
     expect(screen.getByRole("button", { name: /Meilenstein: Inno-Gating/ })).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /Phase: Ideation-Phase \(InnoLab\)/ }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Phase: MVP-Phase/ })).toBeInTheDocument();
   });
 
-  it("opens a station's panel on keyboard focus and points aria-controls at a real panel", () => {
+  it("falls back to permanently open under prefers-reduced-motion", () => {
+    mockMatchMedia(true);
     renderWithIntl(<ProcessTimeline />);
-    const button = screen.getByRole("button", { name: /inno-gating/i });
+    expect(screen.getByRole("button", { name: /inno-gating/i })).toHaveAttribute("aria-expanded", "true");
+  });
 
+  it("starts closed once enhanced, and opens on click", async () => {
+    const user = userEvent.setup();
+    renderEnhanced();
+
+    const button = screen.getByRole("button", { name: /mvp-phase/i });
     expect(button).toHaveAttribute("aria-expanded", "false");
-    fireEvent.focus(button);
+
+    await user.click(button);
+    expect(button).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("lets a manually opened station close again, as long as it hasn't been auto-revealed by scroll", async () => {
+    const user = userEvent.setup();
+    renderEnhanced();
+
+    const button = screen.getByRole("button", { name: /mvp-phase/i });
+    await user.click(button);
     expect(button).toHaveAttribute("aria-expanded", "true");
 
-    const panelId = button.getAttribute("aria-controls");
-    expect(panelId).toBeTruthy();
-    expect(document.getElementById(panelId!)).toBeInTheDocument();
+    await user.click(button);
+    expect(button).toHaveAttribute("aria-expanded", "false");
   });
 
-  it("closes the previously open station when a second one is activated", async () => {
+  it("latches a station open once it scrolls into view, and keeps it open even after a manual close attempt", async () => {
+    const { io } = renderEnhanced();
     const user = userEvent.setup();
-    renderWithIntl(<ProcessTimeline />);
-    const first = screen.getByRole("button", { name: /inno-gating/i });
-    const second = screen.getByRole("button", { name: /mvp-phase/i });
 
-    await user.click(first);
-    expect(first).toHaveAttribute("aria-expanded", "true");
+    const button = screen.getByRole("button", { name: /mvp-phase/i });
+    expect(button).toHaveAttribute("aria-expanded", "false");
 
-    await user.click(second);
-    expect(second).toHaveAttribute("aria-expanded", "true");
-    expect(first).toHaveAttribute("aria-expanded", "false");
+    act(() => {
+      io.intersect(true);
+    });
+    expect(button).toHaveAttribute("aria-expanded", "true");
+
+    await user.click(button);
+    expect(button).toHaveAttribute("aria-expanded", "true");
   });
 
   it("has no accessibility violations", async () => {
-    const { container } = renderWithIntl(<ProcessTimeline />);
+    const { container } = renderEnhanced();
     expect(await axe(container)).toHaveNoViolations();
   });
 });

@@ -22,87 +22,96 @@ test.describe("/prozess", () => {
     }
   });
 
-  test("desktop: the first and last stations sit close enough together to be found without a long scroll", async ({
+  test("every station with a checklist is a toggle button, at both a narrow and a wide viewport", async ({
     page,
-    isMobile,
   }) => {
-    test.skip(isMobile, "the compressed layout is a desktop-width claim, checked against the horizontal line");
-    await page.setViewportSize({ width: 1280, height: 900 });
-    await page.goto("/prozess");
-
-    const first = page.getByRole("button", { name: /Kick-off/ });
-    const last = page.getByRole("button", { name: /Startup/ });
-    await first.scrollIntoViewIfNeeded();
-    const firstBox = await first.boundingBox();
-    const lastBox = await last.boundingBox();
-    expect(Math.abs(firstBox!.y - lastBox!.y)).toBeLessThan(400);
-  });
-
-  test("desktop: every station, including the two without a checklist, is a toggle button", async ({
-    page,
-    isMobile,
-  }) => {
-    test.skip(isMobile, "ab lg every station gains a panel — the mobile-only static case is covered separately");
-    await page.setViewportSize({ width: 1280, height: 900 });
-    await page.goto("/prozess");
-
-    const kickOff = page.getByRole("button", { name: /Kick-off/ });
-    await expect(kickOff).toHaveAttribute("aria-expanded", "false");
-    await kickOff.focus();
-    await expect(kickOff).toHaveAttribute("aria-expanded", "true");
-  });
-
-  test("mobile: a station without a checklist renders as plain text, not a toggle button", async ({
-    page,
-    isMobile,
-  }) => {
-    test.skip(!isMobile, "below lg is where kickOff/ideation drop the panel — covered separately ab lg");
-    await page.goto("/prozess");
-
-    // "Kick-off" appears several times in the DOM at once (Marker renders
-    // both the ab-lg and below-lg presentation so the CSS switch between
-    // them never needs a client-only breakpoint check) — .and() narrows to
-    // the one instance the real CSS engine actually shows on this viewport.
-    const visibleKickOff = page.getByText("Kick-off", { exact: true }).and(page.locator(":visible"));
-    await expect(visibleKickOff).toHaveCount(1);
-    await expect(page.getByRole("button", { name: /Kick-off/ })).toHaveCount(0);
-  });
-
-  test("opening a station's checklist never moves a neighboring station", async ({
-    page,
-    isMobile,
-  }) => {
-    await page.goto("/prozess");
-    const first = page.getByRole("button", { name: /Inno-Gating/ });
-    const second = page.getByRole("button", { name: /MVP-Phase/ });
-    await first.scrollIntoViewIfNeeded();
-
-    const before = await second.boundingBox();
-    if (isMobile) {
-      await first.tap();
-    } else {
-      await first.focus();
+    for (const width of [360, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/prozess");
+      await expect(page.getByRole("button", { name: /inno-gating/i })).toBeVisible();
+      await expect(page.getByRole("button", { name: /mvp-phase/i })).toBeVisible();
     }
-    await expect(first).toHaveAttribute("aria-expanded", "true");
-    const after = await second.boundingBox();
-    expect(after).toEqual(before);
   });
 
-  test("touch: tapping a station reveals a checklist that was already in the DOM beforehand", async ({
+  test("kickOff and ideation have no toggle button and no expand affordance, at any width", async ({
+    page,
+  }) => {
+    for (const width of [360, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/prozess");
+      await expect(page.getByText("Kick-off", { exact: true })).toBeVisible();
+      await expect(page.getByRole("button", { name: /kick-off/i })).toHaveCount(0);
+      await expect(page.getByRole("button", { name: /ideation-phase/i })).toHaveCount(0);
+    }
+  });
+
+  test("a station's checklist opens on its own once scrolled into view, and stays open after scrolling away again", async ({
+    page,
+  }) => {
+    // Short enough that Inno-Gating is reliably below the fold on load
+    // regardless of the engine's exact text-layout metrics — at a taller
+    // viewport it landed on-screen (and so already latched open) on one
+    // engine but not the other.
+    await page.setViewportSize({ width: 1280, height: 500 });
+    await page.goto("/prozess");
+
+    const button = page.getByRole("button", { name: /inno-gating/i });
+    await expect(button).toHaveAttribute("aria-expanded", "false");
+
+    await button.scrollIntoViewIfNeeded();
+    // The IntersectionObserver latch fires asynchronously off the browser's
+    // own rendering pipeline, not a React state update polling can race —
+    // toHaveAttribute already retries until this resolves or times out.
+    await expect(button).toHaveAttribute("aria-expanded", "true");
+
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect(button).toHaveAttribute("aria-expanded", "true");
+  });
+
+  test("a station also opens on click or keyboard activation, independent of scroll position", async ({
     page,
     isMobile,
   }) => {
-    test.skip(!isMobile, "hover/focus reveal on desktop is covered separately");
     await page.goto("/prozess");
-    const button = page.getByRole("button", { name: /Inno-Gating/ });
-    await button.scrollIntoViewIfNeeded();
+    const button = page.getByRole("button", { name: /startup/i });
+    await expect(button).toHaveAttribute("aria-expanded", "false");
 
-    const panelId = await button.getAttribute("aria-controls");
-    const panel = page.locator(`[id="${panelId}"]`);
-    await expect(panel).toContainText("Problem-Solution-Fit");
-    await expect(panel).toHaveCSS("opacity", "0");
+    if (isMobile) {
+      await button.tap();
+    } else {
+      await button.focus();
+      await page.keyboard.press("Enter");
+    }
+    await expect(button).toHaveAttribute("aria-expanded", "true");
+  });
 
-    await button.tap();
-    await expect(panel).toHaveCSS("opacity", "1");
+  test("opening a station's checklist pushes a later station down, since panels now take real layout space", async ({
+    page,
+  }) => {
+    // A short viewport so the auto-scroll-open latch (threshold 0.4) never
+    // fires for either station on initial paint — otherwise "before" would
+    // already capture the panel open and the click below would be a no-op.
+    await page.setViewportSize({ width: 1280, height: 400 });
+    await page.goto("/prozess");
+    const first = page.getByRole("button", { name: /inno-gating/i });
+    const second = page.getByRole("button", { name: /mvp-phase/i });
+
+    // Document-absolute Y, not the viewport-relative value boundingBox()
+    // returns on its own — clicking `first` scrolls the page (Playwright
+    // scrolls a target into view before clicking it), and that scroll alone
+    // would swamp any Y change from the panel actually pushing content
+    // down.
+    async function documentY(locator: typeof second) {
+      const box = await locator.boundingBox();
+      const scrollY = await page.evaluate(() => window.scrollY);
+      return box!.y + scrollY;
+    }
+
+    await expect(first).toHaveAttribute("aria-expanded", "false");
+    const before = await documentY(second);
+    await first.click();
+    await expect(first).toHaveAttribute("aria-expanded", "true");
+    const after = await documentY(second);
+    expect(after).toBeGreaterThan(before);
   });
 });

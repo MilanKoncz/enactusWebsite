@@ -494,6 +494,44 @@ h6 {
     }
   }
 
+  /* /prozess timeline stations (ProcessTimeline.tsx). A station with a
+     checklist now takes real layout space once open, pushing a later
+     station down instead of floating a panel over it (see the file
+     comment in ProcessTimeline.tsx) — an opacity/transform-only reveal
+     can't do that, since neither property affects layout, so this collapses
+     and expands via the 0fr/1fr `grid-template-rows` trick instead. That
+     stays inside motion rule 5's documented exception for a discrete,
+     user-triggered toggle on one element (the same risk class as the FAQ
+     accordion's real height animation above): it never runs continuously or
+     scroll-linked the way `.pillar-detail` does, so it was never a
+     candidate for `animation-timeline: view()` the way that one is — the
+     actual "open on scroll" behaviour here is a plain IntersectionObserver
+     latch in ProcessTimeline.tsx, not a CSS scroll-timeline.
+
+     `[data-open]` is the one mechanism that decides "open": React sets it
+     once a station's IntersectionObserver latch fires (permanently, never
+     cleared) or a reader manually toggles it. Because `isOpen` in
+     ProcessTimeline.tsx defaults to true until the client actually confirms
+     it should be closed-by-default, the server-rendered markup already
+     carries `data-open` on first paint — a no-JS reader's HTML is already
+     open, with no separate fallback rule needed here. The child selector
+     needs its own `overflow: hidden` — a grid row transitioning through
+     `0fr` doesn't clip its content on its own. */
+  .station-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows var(--duration-calm) var(--ease-signature);
+  }
+
+  .station-panel > div {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  [data-open] .station-panel {
+    grid-template-rows: 1fr;
+  }
+
   /* Board portraits' LinkedIn mark (BoardGrid.tsx). Visible and in place by
      default — the safe fallback for touch (no hover to enhance), keyboard
      use without a hovering pointer, and reduced motion. Only inside
