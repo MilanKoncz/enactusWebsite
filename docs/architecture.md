@@ -79,10 +79,10 @@ This is the one boundary to internalize before changing anything:
   roster, project list, KPIs, partner tiers, the calendar's category list.
   Every file is Zod-validated, so a typo during a board handover fails the
   build loudly instead of breaking a page silently. Data the board edits
-  often — application windows, calendar events — has moved out of
-  `content/` into the database instead, managed from the matching admin
-  page rather than a code change; `docs/content-guide.md` says which is
-  which per feature.
+  often — application windows, calendar events, job postings — has moved
+  out of `content/` into the database instead, managed from the matching
+  admin page rather than a code change; `docs/content-guide.md` says which
+  is which per feature.
 - **`src/messages/{de,en}.json`** holds every word a visitor reads:
   headlines, button labels, error messages, FAQ answers, even the bios and
   descriptions *for* the people/projects listed in `content/`.
@@ -119,10 +119,10 @@ limiting, is in `docs/engineering.md`.
 
 ## The admin area
 
-Nine sections under `[locale]/admin` — applications, failed mails,
-application windows, calendar events, the reminder list, contact messages,
-deletion requests, system status, plus an overview. Full list and what each
-is for: `docs/deployment.md`'s "The admin area".
+Ten sections under `[locale]/admin` — applications, failed mails,
+application windows, calendar events, job postings, the reminder list,
+contact messages, deletion requests, system status, plus an overview. Full
+list and what each is for: `docs/deployment.md`'s "The admin area".
 
 Gated by comparing a password (`ADMIN_PASSWORD`) against a signed, httpOnly
 session cookie (`src/lib/adminAuth.ts`, signed with `ADMIN_SESSION_SECRET`)

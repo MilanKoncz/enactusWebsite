@@ -125,6 +125,39 @@ contains "now", or the soonest future one if none does.
 Every application gets tagged with the matching window's `semester` label
 automatically (`src/lib/recruitingSemester.ts`) — nothing else to update.
 
+## Manage job postings (the Jobwall)
+
+Partner companies' open positions live in the `job_postings` table, not a
+content file — the same move recruiting windows and the event calendar
+made. Manage them at **`/admin/jobs`**: list, create, edit, delete. Each
+posting has a company, title, employment type (`praktikum` /
+`werkstudent` / `abschlussarbeit` / `einstieg`), an optional location, a
+remote setting (`vor_ort` / `hybrid` / `remote`), an optional short
+description, an absolute https application link, an expiry date, and an
+optional partner (matched against `src/content/partners.ts` by slug — set
+this to show that partner's logo on the public card, leave it unset for a
+company that isn't a listed partner).
+
+There is no partner self-service and no partner login: the board is the
+only one who ever enters a posting, the same as every other admin-managed
+list on this site.
+
+The expiry date can't be in the past when a posting is first created, but
+editing an already-expired one to fix a typo stays possible — that
+restriction is create-only. Once a posting's expiry date has passed it
+stops appearing on the public page automatically (filtered server-side, not
+just hidden in the UI) and is swept by the daily cron cleanup twelve months
+after it expires — see `docs/deployment.md`.
+
+Live at **`/jobs`** (English: `/en/jobs`), filterable by employment type.
+The page itself is always reachable and stays in the sitemap even with zero
+postings — the "Jobs" link in the header nav and footer is the only thing
+that's conditional, appearing only while at least one non-expired posting
+exists. There is no application form on this site for any posting: every
+"Zur Stellenanzeige" button opens the listing on the partner's own site in
+a new tab. Never build one — that would mean collecting applicant data on
+their behalf, which this feature deliberately does not do.
+
 ## Check or export submitted applications
 
 `/admin/bewerbungen` (password from `ADMIN_PASSWORD`, see

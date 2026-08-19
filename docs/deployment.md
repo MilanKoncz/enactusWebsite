@@ -192,7 +192,7 @@ nothing for the deployed site.
 
 `/admin` (German URLs only — `proxy.ts` returns 404 for the `/en`-prefixed
 variants, since board tooling has no translated UI worth a second URL).
-Nine sections, all behind the same gate:
+Ten sections, all behind the same gate:
 
 | Path | What it's for |
 | --- | --- |
@@ -201,6 +201,7 @@ Nine sections, all behind the same gate:
 | `/admin/mails` | Every failed send across all three tables, with a resend |
 | `/admin/bewerbungsfenster` | Create, edit, delete application windows |
 | `/admin/termine` | Create, edit, delete the homepage's calendar events |
+| `/admin/jobs` | Create, edit, delete partner job postings shown on `/jobs` |
 | `/admin/erinnerungen` | Reminder list, confirmed/unconfirmed/unsubscribed, CSV |
 | `/admin/kontakt` | Contact messages and their delivery status |
 | `/admin/loeschanfragen` | GDPR Art. 15 and 17 for one address |
@@ -260,8 +261,20 @@ not as alternatives to each other but as a primary path and a fallback:
    set in Vercel. Use this if Cron turns out to be unavailable for this
    project, or just to check the routine ran correctly.
 
-Retention periods themselves are stated in `content/retention.ts` with a
-`confirmedByBoard: false` flag on each one — set, not a placeholder, but
-still awaiting the board's sign-off. Update the numbers there (and the
-matching `Datenschutz` copy in `src/messages/{de,en}.json`) once confirmed,
-not in the cleanup route itself.
+Retention periods themselves are stated in `content/retention.ts`, each
+with its own `confirmedByBoard` flag — most are `false` (set, not a
+placeholder, but still awaiting the board's sign-off); `rateLimitHits` and
+`jobPostings` are `true`, the latter a direct board instruction rather than
+a guess. Update the numbers there (and the matching `Datenschutz` copy in
+`src/messages/{de,en}.json`) once confirmed, not in the cleanup route
+itself. Every period anchors to each row's own `created_at` except
+`jobPostings`, which anchors to `expires_at` — a posting is swept twelve
+months after it lapses, not twelve months after it was entered.
+
+`job_postings` cleanup runs in this same route but isn't part of the counts
+written to `cron_runs`: that table (`migrations/0005`) has no
+`deleted_job_postings` column, and `job_postings` (`migrations/0008`) is
+purely additive, so adding one was out of scope alongside it. The deleted
+count still appears in the route's own JSON response, just not in
+`/admin/system`'s persisted run history — a job posting's row count there
+comes from `countRowsPerTable` directly, same as every other table.
