@@ -12,7 +12,7 @@ describe("content/org", () => {
   });
 
   it("has the registered office, register entry, and board contact email confirmed by the board", () => {
-    expect(org.registeredOffice).toBe("P4 9, 68161 Mannheim");
+    expect(org.registeredOffice).toBe("L1, 1 Postfach 31, 68161 Mannheim");
     expect(org.registerEntry).toBe("Amtsgericht Mannheim, Vereinsregister VR 700965");
     expect(org.contactEmails.board).toBe("teamvorstand@unimannheim.enactus.team");
   });

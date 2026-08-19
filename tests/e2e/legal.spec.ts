@@ -19,7 +19,7 @@ test.describe("/impressum", () => {
   test("renders the real operator facts, not a placeholder page", async ({ page }) => {
     await page.goto("/impressum");
     await expect(page.getByRole("heading", { level: 1, name: "Impressum" })).toBeVisible();
-    await expect(page.getByText("P4 9, 68161 Mannheim")).toBeVisible();
+    await expect(page.getByText("L1, 1 Postfach 31, 68161 Mannheim")).toBeVisible();
     await expect(page.getByText("Amtsgericht Mannheim, Vereinsregister VR 700965")).toBeVisible();
     await expect(
       page.getByRole("link", { name: "teamvorstand@unimannheim.enactus.team" }),

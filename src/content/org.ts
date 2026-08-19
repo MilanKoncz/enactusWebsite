@@ -56,7 +56,7 @@ export const org: Org = orgSchema.parse({
   // Shown "seit {year}" in the footer rather than as a KPI. Board-confirmed
   // 2026-08-19.
   foundingYear: { year: 2003, verified: true },
-  registeredOffice: "P4 9, 68161 Mannheim",
+  registeredOffice: "L1, 1 Postfach 31, 68161 Mannheim",
   registerEntry: "Amtsgericht Mannheim, Vereinsregister VR 700965",
   // Board-confirmed 2026-08-15 — see the field comment above for the vacant
   // third seat.
