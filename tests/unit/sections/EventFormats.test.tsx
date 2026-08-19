@@ -20,14 +20,22 @@ describe("EventFormats", () => {
     expect(screen.getByRole("heading", { name: "Semesterabschluss" })).toBeInTheDocument();
   });
 
-  it("renders a real photo for the three confirmed formats, and a placeholder for teamweekend", () => {
+  it("renders a real photo for all four formats, none left as a placeholder", () => {
     const { container } = renderWithIntl(<EventFormats />);
     expect(container.querySelectorAll('img[src*="socials.webp"]').length).toBeGreaterThan(0);
     expect(container.querySelectorAll('img[src*="workshops.webp"]').length).toBeGreaterThan(0);
+    expect(container.querySelectorAll('img[src*="teamweekend.webp"]').length).toBeGreaterThan(0);
     expect(container.querySelectorAll('img[src*="gala.webp"]').length).toBeGreaterThan(0);
-    // Teamwochenende still has no photo — it keeps the dashed Placeholder,
-    // identifiable by its "Bild" kind label rather than an <img>.
-    expect(screen.getAllByText("Bild").length).toBeGreaterThan(0);
+    expect(screen.queryByText("Bild")).not.toBeInTheDocument();
+  });
+
+  it("gives the teamweekend photo real, descriptive alt text — the others stay decorative", () => {
+    const { container } = renderWithIntl(<EventFormats />);
+    const teamweekendImg = container.querySelector('img[src*="teamweekend.webp"]');
+    expect(teamweekendImg).toHaveAttribute("alt", expect.stringContaining("ENACTUS"));
+    for (const src of ["socials.webp", "workshops.webp", "gala.webp"]) {
+      expect(container.querySelector(`img[src*="${src}"]`)).toHaveAttribute("alt", "");
+    }
   });
 
   it("has no accessibility violations", async () => {

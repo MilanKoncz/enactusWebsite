@@ -17,7 +17,15 @@ type FormatCopyKey = Parameters<ReturnType<typeof useTranslations<"EventFormats"
 // formats now have real detail copy (see messages/{locale}.json), so there
 // is nothing left to reveal on demand; every card is readable at a glance,
 // same as "hover enhances, hover never hides" already asks for elsewhere.
-function FormatMedia({ format, title }: { format: EventFormat; title: string }) {
+// alt defaults to "" (decorative) for socials/workshops/gala — messages/
+// {locale}.json's own "" values for their imageAlt keys, not a fallback
+// coded here — the format's title (rendered as visible text right below
+// the image) already names it, and none of those three has a confirmed
+// description of what the photo itself shows. teamweekend is the one
+// exception with real prose, describing the actual photo per the board's
+// own request (2026-08-19) — same per-item pattern content-guide.md
+// documents for EgEvents' `.imageAlt`.
+function FormatMedia({ format, title, alt }: { format: EventFormat; title: string; alt: string }) {
   if (!format.image) {
     return (
       <Placeholder kind="Bild" label={title} ratio="3 / 4" className="rounded-b-none" />
@@ -25,7 +33,7 @@ function FormatMedia({ format, title }: { format: EventFormat; title: string }) 
   }
   return (
     <div className="relative aspect-3/4 overflow-hidden">
-      <Image src={format.image} alt="" fill sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" className="object-cover" />
+      <Image src={format.image} alt={alt} fill sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" className="object-cover" />
     </div>
   );
 }
@@ -40,12 +48,13 @@ export function EventFormats() {
         <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {eventFormats.map((format) => {
             const title = t(`${format.key}.title` as FormatCopyKey);
+            const alt = t(`${format.key}.imageAlt` as FormatCopyKey);
             return (
               <li
                 key={format.key}
                 className="flex flex-col overflow-hidden rounded-md border border-ink/10 bg-paper"
               >
-                <FormatMedia format={format} title={title} />
+                <FormatMedia format={format} title={title} alt={alt} />
                 <div className="flex flex-col gap-2 p-5">
                   <h3 className="font-mono text-mono-s uppercase">{title}</h3>
                   <p className="text-body-m opacity-80">{t(`${format.key}.detail` as FormatCopyKey)}</p>

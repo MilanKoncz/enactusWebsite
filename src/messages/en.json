@@ -449,19 +449,23 @@
     "title": "Four formats",
     "socials": {
       "title": "Socials",
-      "detail": "Like many student initiatives, we host socials such as running dinners and casual bar nights."
+      "detail": "Like many student initiatives, we host socials such as running dinners and casual bar nights.",
+      "imageAlt": ""
     },
     "workshops": {
       "title": "Workshops",
-      "detail": "We also run workshops that give our projects and members hands-on support. That's why they're mostly reserved for club members."
+      "detail": "We also run workshops that give our projects and members hands-on support. That's why they're mostly reserved for club members.",
+      "imageAlt": ""
     },
     "teamweekend": {
       "title": "Team weekend",
-      "detail": "At the start of every semester, we organise a team weekend to welcome new members."
+      "detail": "At the start of every semester, we organise a team weekend to welcome new members.",
+      "imageAlt": "Members photographed from behind, facing a projector screen showing the Enactus logo. In the foreground, the word \"ENACTUS\" spelled out in colorful Lego Duplo bricks sits on a table."
     },
     "gala": {
       "title": "End of semester",
-      "detail": "Every semester wraps up with the Christmas party or the summer festival, held as our general assembly."
+      "detail": "Every semester wraps up with the Christmas party or the summer festival, held as our general assembly.",
+      "imageAlt": ""
     }
   },
   "JourneysSection": {

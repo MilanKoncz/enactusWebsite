@@ -449,19 +449,23 @@
     "title": "Vier Formate",
     "socials": {
       "title": "Socials",
-      "detail": "Wir veranstalten wie viele Initiativen Socials wie Running Dinners und gemeinsame Barabende."
+      "detail": "Wir veranstalten wie viele Initiativen Socials wie Running Dinners und gemeinsame Barabende.",
+      "imageAlt": ""
     },
     "workshops": {
       "title": "Workshops",
-      "detail": "Außerdem planen wir Workshops, die unseren Projekten und Mitgliedern eine handfeste Hilfe sind. Daher sind diese meist auch nur für Vereinsmitglieder."
+      "detail": "Außerdem planen wir Workshops, die unseren Projekten und Mitgliedern eine handfeste Hilfe sind. Daher sind diese meist auch nur für Vereinsmitglieder.",
+      "imageAlt": ""
     },
     "teamweekend": {
       "title": "Teamwochenende",
-      "detail": "Außerdem organisieren wir zu Beginn jedes Semesters ein Teamwochenende, um neue Mitglieder willkommen zu heißen."
+      "detail": "Außerdem organisieren wir zu Beginn jedes Semesters ein Teamwochenende, um neue Mitglieder willkommen zu heißen.",
+      "imageAlt": "Mitglieder von hinten fotografiert, den Blick auf eine Projektionsleinwand mit dem Enactus-Logo gerichtet. Im Vordergrund liegt auf einem Tisch der Schriftzug „ENACTUS“, aus bunten Lego-Duplo-Steinen gelegt."
     },
     "gala": {
       "title": "Semesterabschluss",
-      "detail": "Abgeschlossen wird jedes Semester mit der Weihnachtsfeier oder dem Sommerfest als Hauptversammlung."
+      "detail": "Abgeschlossen wird jedes Semester mit der Weihnachtsfeier oder dem Sommerfest als Hauptversammlung.",
+      "imageAlt": ""
     }
   },
   "JourneysSection": {

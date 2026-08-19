@@ -7,12 +7,12 @@ describe("content/eventFormats", () => {
     expect(eventFormats.map((f) => f.order)).toEqual([1, 2, 3, 4]);
   });
 
-  it("has a real photo for every format except teamweekend", () => {
+  it("has a real photo for every format", () => {
     const byKey = Object.fromEntries(eventFormats.map((f) => [f.key, f.image]));
     expect(byKey.socials).toBe("/events/socials.webp");
     expect(byKey.workshops).toBe("/events/workshops.webp");
+    expect(byKey.teamweekend).toBe("/events/teamweekend.webp");
     expect(byKey.gala).toBe("/events/gala.webp");
-    expect(byKey.teamweekend).toBeNull();
   });
 
   it("validates every exported format against the schema", () => {

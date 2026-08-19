@@ -16,8 +16,10 @@ import { z } from "zod";
  * `gala` per board feedback: the trip history already gets its own detailed
  * section right below this one (JourneysSection.tsx / content/journeys.ts),
  * so listing it a second time as a format tile here was redundant. Real
- * photos (board media handover, `neue medien/`) exist for `socials`,
- * `workshops`, and `gala`; `teamweekend` stays `null` until one exists.
+ * photos exist for all four formats as of 2026-08-19 — `socials`,
+ * `workshops`, and `gala` from the board media handover (`neue medien/`),
+ * `teamweekend` from a member photo (`Events_Teamwochenende.jpg`, root of
+ * the repo, processed into `public/events/teamweekend.webp`).
  */
 
 const eventFormatKeySchema = z.enum(["socials", "workshops", "teamweekend", "gala"]);
@@ -37,7 +39,7 @@ function eventFormat(key: EventFormatKey, order: number, image: string | null): 
 export const eventFormats: EventFormat[] = [
   eventFormat("socials", 1, "/events/socials.webp"),
   eventFormat("workshops", 2, "/events/workshops.webp"),
-  eventFormat("teamweekend", 3, null),
+  eventFormat("teamweekend", 3, "/events/teamweekend.webp"),
   eventFormat("gala", 4, "/events/gala.webp"),
 ];
 
