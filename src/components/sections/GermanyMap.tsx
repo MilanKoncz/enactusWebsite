@@ -1,34 +1,38 @@
 import { useTranslations } from "next-intl";
 import { teamLinks, type TeamKey } from "@/content/network";
 
-// A self-drawn, heavily simplified silhouette of Germany — no third-party
-// map data, no map tile provider, no runtime request. Ten straight-line
-// vertices, just enough to read as the country's outline (the Baltic/North
-// Sea coast in the north, the Saxon bulge east, the Alpine edge south, the
-// Rhine-valley indent west) at the scale a small in-page graphic is ever
-// seen. Not a survey-accurate boundary — see the datenschutz non-negotiable
-// this replaces a real map provider for.
+// Germany's real Admin-0 country boundary (Natural Earth v4.1.0, 1:10m,
+// public domain), simplified to ~20 vertices and projected with an
+// equal-area conic centered on Germany — not a hand-drawn approximation.
+// Source, license, exact simplification steps, and how to regenerate this
+// path all live in docs/content-guide.md ("Update the Germany map on
+// /events") rather than here, so they survive independently of this one
+// component. No third-party map data loaded at runtime either way — this
+// is a static path, no map tile provider, no request.
 const OUTLINE_PATH =
-  "M140,15 L200,25 L230,70 L255,140 L230,250 L190,380 L110,390 L55,300 L30,230 L25,160 L30,100 L60,50 L100,25 Z";
+  "M370.3,450.9L337.0,543.0L169.0,542.0L74.8,536.0L107.2,439.4L22.5,400.2L14.9,352.3L12,307.1L73.7,132.4L150.8,88.4L139.0,17.0L170.8,23.7L225.0,78.5L318.4,48.6L373.1,98.8L408,299.7L305.9,337.6Z";
 
-const VIEWBOX_WIDTH = 300;
-const VIEWBOX_HEIGHT = 410;
+const VIEWBOX_WIDTH = 420;
+const VIEWBOX_HEIGHT = 560;
 
-// Hand-placed to read as roughly the right position relative to each other
-// and to the outline above, not digitised from a real coordinate source —
-// presentation detail, so it lives here rather than in content/network.ts
-// (see that file's comment on the same six locations).
-const MANNHEIM_POINT = { x: 90, y: 240 };
+// Each city's real center coordinates, run through the exact same
+// geoConicEqualArea projection as OUTLINE_PATH above (not eyeballed) — see
+// docs/content-guide.md for the projection parameters and how to add a
+// point that stays consistent with the outline. Presentation detail (pixel
+// coordinates, not the underlying lon/lat facts), so it lives here rather
+// than in content/network.ts — see that file's comment on the same six
+// locations.
+const MANNHEIM_POINT = { x: 120.7, y: 402 };
 const TEAM_POINTS: Record<TeamKey, { x: number; y: number }> = {
-  muenchen: { x: 175, y: 330 },
-  muenster: { x: 85, y: 135 },
-  hamburg: { x: 135, y: 75 },
-  koeln: { x: 65, y: 180 },
-  karlsruhe: { x: 88, y: 262 },
+  muenchen: { x: 266.2, y: 499.1 },
+  muenster: { x: 88.6, y: 224.6 },
+  hamburg: { x: 193.1, y: 113.6 },
+  koeln: { x: 56, y: 296.2 },
+  karlsruhe: { x: 116.8, y: 436.1 },
 };
 
-const MANNHEIM_DOT_RADIUS = 7;
-const TEAM_DOT_RADIUS = 4;
+const MANNHEIM_DOT_RADIUS = 9;
+const TEAM_DOT_RADIUS = 5.5;
 
 // The team dots are real, keyboard-reachable links, laid out as siblings of
 // the decorative SVG rather than inside it: an element with role="img"
@@ -46,7 +50,7 @@ export function GermanyMap() {
 
   return (
     <div
-      className="relative mx-auto w-full max-w-[240px]"
+      className="relative mx-auto w-full max-w-md"
       style={{ aspectRatio: `${VIEWBOX_WIDTH} / ${VIEWBOX_HEIGHT}` }}
     >
       <svg

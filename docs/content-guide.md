@@ -175,6 +175,49 @@ resend. `/admin` links every section; `docs/deployment.md` describes them.
   editing, these are network-wide, not this club's own numbers.
 - Founding year in the footer: `src/content/org.ts`.
 
+## Update the Germany map on `/events` (`GermanyMap.tsx`)
+
+The outline is a static SVG path baked into `GermanyMap.tsx` at
+`OUTLINE_PATH` — no map library, no tile provider, no request at runtime,
+per CLAUDE.md's third-party-script rule.
+
+**Source and license.** The path is Germany's Admin-0 country boundary from
+[Natural Earth](https://www.naturalearthdata.com/) v4.1.0, 1:10m resolution
+— public domain, no attribution required. Fetched via the
+[`world-atlas`](https://github.com/topojson/world-atlas) npm package
+(`countries-10m.json`, a TopoJSON redistribution of the same Natural Earth
+release), not hand-drawn and not copied from any map provider's own
+rendered tiles or graphic.
+
+**Simplification.** A one-off Node script (not checked into the repo —
+recreate from this description if the outline ever needs regenerating):
+
+1. `topojson-client` extracts Germany's feature (ISO 3166-1 numeric `276`)
+   from `world-atlas`'s `countries-10m.json`.
+2. `topojson-simplify`'s `presimplify`/`simplify` (weight `0.9`) reduces the
+   ring to ~20 vertices — enough to keep the coastline's real shape (the
+   Jutland notch, the Oder bulge east, the Alpine edge south, the Rhine
+   indent west) recognizable at the small size this graphic is ever shown,
+   without the thousands of points the raw 1:10m boundary carries.
+3. Any polygon ring under 0.2% of the mainland ring's area is dropped (a
+   handful of small North Sea islets render as stray specks at this scale,
+   not as visible islands).
+4. The remaining ring is projected with `d3-geo`'s `geoConicEqualArea`,
+   standard parallels 48.66°N/53.66°N, centered on 10.45°E — the same
+   equal-area conic German federal mapping agencies use for the country's
+   own territory, chosen so the outline's proportions read correctly
+   instead of stretching the way a world-scale Mercator would at this
+   latitude range.
+5. The projected path's coordinates are rounded to one decimal place.
+
+**Points.** `MANNHEIM_POINT` and `TEAM_POINTS` in `GermanyMap.tsx` are the
+same six cities' real center coordinates (decimal degrees, public
+knowledge — Mannheim, München, Münster, Hamburg, Köln, Karlsruhe) run
+through the identical projection instance, not eyeballed. To add a
+seventh point, project its lon/lat through the same `geoConicEqualArea`
+setup (parallels/rotate above, `fitExtent` against the current outline) so
+it lands consistently with the rest.
+
 ## Edit the four Enactus Germany event cards on `/events`
 
 `src/content/egEvents.ts` — a fixed set of four (`nc`/`esa`/`oew`/`twe`),
