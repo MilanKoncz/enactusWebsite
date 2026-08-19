@@ -7,8 +7,8 @@ describe("content/org", () => {
     expect(() => orgSchema.parse(org)).not.toThrow();
   });
 
-  it("marks the founding year unverified until the board confirms it", () => {
-    expect(org.foundingYear).toEqual({ year: 2003, verified: false });
+  it("marks the founding year as board-confirmed", () => {
+    expect(org.foundingYear).toEqual({ year: 2003, verified: true });
   });
 
   it("has the registered office, register entry, and board contact email confirmed by the board", () => {

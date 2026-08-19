@@ -53,9 +53,9 @@ export type Org = z.infer<typeof orgSchema>;
 export const org: Org = orgSchema.parse({
   legalName: "Enactus Mannheim e.V.",
   shortName: "Enactus Mannheim",
-  // Shown "seit {year}" in the footer rather than as a KPI — unconfirmed,
-  // see ASSETS-TODO.md.
-  foundingYear: { year: 2003, verified: false },
+  // Shown "seit {year}" in the footer rather than as a KPI. Board-confirmed
+  // 2026-08-19.
+  foundingYear: { year: 2003, verified: true },
   registeredOffice: "P4 9, 68161 Mannheim",
   registerEntry: "Amtsgericht Mannheim, Vereinsregister VR 700965",
   // Board-confirmed 2026-08-15 — see the field comment above for the vacant
