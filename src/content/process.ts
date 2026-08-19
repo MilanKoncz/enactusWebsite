@@ -121,16 +121,18 @@ export const steps: Step[] = [
 /**
  * The Project Guide PDF, downloadable from /prozess. Real file since
  * 2026-08-18, recompressed from the board's original 16.7 MB handover down
- * to the size below (photos re-encoded as JPEG at a reasonable resolution
- * and quality; every text/vector object untouched) — see the commit that
- * added `public/downloads/enactus-mannheim-project-guide.pdf` for the exact
- * before/after numbers and method. `fileSizeLabel` is asserted against the
- * real file on disk by tests/unit/content/process.test.ts, so a future
- * replacement that forgets to update this string fails the build instead of
- * silently drifting. `available`/`href` stay in the schema (rather than
- * being dropped now that the file is real) so a future gap between handovers
- * degrades to the same disabled-button state this component already knows
- * how to render, instead of a broken link.
+ * to the size below (embedded photo XObjects re-encoded as JPEG at a
+ * reasonable resolution and quality; every text/vector object untouched) —
+ * see the commit that added `public/downloads/enactus-mannheim-project-guide.pdf`
+ * for the exact before/after numbers and method. A second board handover on
+ * 2026-08-19 replaced the file (still 16.7 MB uncompressed) and it was
+ * recompressed the same way, landing smaller than the first pass. `fileSizeLabel`
+ * is asserted against the real file on disk by tests/unit/content/process.test.ts,
+ * so a future replacement that forgets to update this string fails the build
+ * instead of silently drifting. `available`/`href` stay in the schema (rather
+ * than being dropped now that the file is real) so a future gap between
+ * handovers degrades to the same disabled-button state this component
+ * already knows how to render, instead of a broken link.
  */
 const projectGuideSchema = z
   .object({
@@ -153,8 +155,8 @@ export type ProjectGuide = z.infer<typeof projectGuideSchema>;
 export const projectGuide: ProjectGuide = projectGuideSchema.parse({
   available: true,
   href: "/downloads/enactus-mannheim-project-guide.pdf",
-  fileSizeLabel: "2,3 MB",
-  updatedAt: "2026-08-18",
+  fileSizeLabel: "1,9 MB",
+  updatedAt: "2026-08-19",
 });
 
 export { stepSchema, stageKeySchema, stepKindSchema, iconKeySchema, projectGuideSchema };
