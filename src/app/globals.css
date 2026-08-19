@@ -800,23 +800,57 @@ body {
    be one" mistake the calendar category layer's own token-reuse test
    guards against.
 
-   Redone 2026-08-19: the original heavily color-mix()'d both endpoints
-   toward --color-paper (28%/42%) so that --color-ink text could sit
-   directly on the gradient at any point and still clear 4.5:1. That made
-   the left edge (#b1b5c1) read as plain grey, not navy, and the right edge
-   (#f8e09e) as pale yellow, not gold — the board flagged exactly this. The
-   AA-everywhere constraint that produced those washed-out stops is gone:
-   both consumers (JourneysSection.tsx, ProjectsActive.tsx) already put
-   every line of text on its own opaque bg-paper card or label, never
-   directly on this background — see each component's own comment. With
-   that constraint lifted, the gradient runs the real tokens, full stop:
-   --color-ink at the left, --color-gold at the right, a plain two-stop
-   linear-gradient with no color-mix() involved.
+   Redone a second time 2026-08-19: the first redo (see git history) ran the
+   real tokens at both ends but put every line of text on its own opaque
+   bg-paper card, which the board then flagged as looking "stuck on" —
+   pasted-in white boxes rather than content that actually sits on the
+   gradient. This version drops every opaque card: text sits directly on
+   the gradient, in --color-paper, and the *weighting* of the stops does the
+   contrast work the opaque cards used to do. --color-ink holds flat through
+   most of the width — where JourneysSection's and ProjectsActive's text
+   actually lives, both self-start/max-width-bounded — and only ramps to the
+   real, unmixed --color-gold in the last stretch near the right edge. Not a
+   linear 50/50: the plateau is deliberately wide so gold reads as an accent,
+   not half the section.
 
-   tests/unit/contrast.test.ts's gradient case now asserts the two stops
-   equal the tokens exactly (a drift guard, not an AA check) — if this ever
-   needs to carry text directly again, that's a reason to put the text on
-   an opaque card, not to re-mix the endpoints toward paper. */
+   Two stop sets, not one: below md, a max-width-bounded paragraph still has
+   to wrap inside a narrow container, and a wrapped block's shrink-to-fit
+   width fills essentially the whole available column — there's no room on
+   the side for gold to live without a wrapped line's last few glyphs
+   crossing into it. From md up, the same bounded block has real room to its
+   right (the container is wide enough that the bound actually binds), so
+   the plateau can end earlier and gold gets more presence. 94% and 58% are
+   not round numbers: each is the lowest plateau that still keeps a
+   full-width-shrink-to-fit block's rendered pixels above 4.5:1 contrast
+   against --color-paper at that breakpoint, worked out against
+   JourneysSection's lead paragraph (its widest bounded text) — see that
+   file's own comment on its max-w-lg for the box-width arithmetic this
+   traces back to.
+
+   The one thing still not allowed to sit directly on this gradient:
+   unbounded-width text (a paragraph with no max-width) — see
+   JourneysSection.tsx / ProjectsActive.tsx for how each consumer keeps
+   every text run bounded, and how the two sections' small cards (dark ink
+   fill, gold edge) opt out of the gradient's contrast question entirely by
+   being opaque, so it never matters where across the width they land.
+
+   tests/unit/contrast.test.ts's gradient case asserts the plateau stops and
+   the real end tokens (a drift guard, not a full AA sweep — the 7-point
+   sweep across the actual measured stops lives in that same test). */
 @utility signature-gradient {
-  background-image: linear-gradient(to right, var(--color-ink), var(--color-gold));
+  background-image: linear-gradient(
+    to right,
+    var(--color-ink) 0%,
+    var(--color-ink) 94%,
+    var(--color-gold) 100%
+  );
+
+  @media (min-width: 48rem) {
+    background-image: linear-gradient(
+      to right,
+      var(--color-ink) 0%,
+      var(--color-ink) 58%,
+      var(--color-gold) 100%
+    );
+  }
 }

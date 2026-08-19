@@ -22,24 +22,44 @@ export function JourneysSection() {
   const t = useTranslations("JourneysSection");
 
   return (
-    <Section className="relative isolate signature-gradient">
+    <Section surface="ink" className="relative isolate signature-gradient">
       <Container className="relative flex flex-col gap-10">
-        {/* bg-paper: the heading's title/lead are full-opacity ink (safe
-            across the whole gradient, measured — see .signature-gradient's
-            comment in globals.css), but Eyebrow's muted 60%-opacity
-            treatment was only ever verified against a plain paper or ink
-            surface, not this gradient's intermediate tones — it dips as low
-            as 3.78:1 there. An opaque backing sidesteps re-deriving a
-            gradient-safe muted color for one line of text. */}
-        <div className="inline-flex flex-col gap-4 self-start bg-paper p-6">
-          <SectionHeading eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
-        </div>
+        {/* max-w-lg: the heading sits directly on the gradient now (no
+            opaque card, per the board's 2026-08-19 follow-up), in paper —
+            see .signature-gradient's comment in globals.css for the stop
+            weighting this width is bounded to stay inside. surface="ink"
+            above gives the section (and this currentColor-based heading)
+            paper as its base text color, and Eyebrow's own opacity-60 is
+            already verified against a flat ink background in
+            tests/unit/contrast.test.ts.
+
+            Box-width arithmetic .signature-gradient's comment refers to:
+            below `sm` the lead paragraph doesn't fit on one line, and a
+            wrapped block's shrink-to-fit width fills essentially the whole
+            available column regardless of max-w-lg (512px never binds
+            below ~600px of available space) — measured with Playwright,
+            the heading block's right edge lands at 95.6% of the section
+            width at a 360px viewport and 95.9% at 390px. From `md` up
+            (768px container, 1280px container) max-w-lg actually binds,
+            and the block's right edge falls back to 69.8% / 43.1%. All
+            four are asserted against the gradient's real stops in
+            tests/unit/contrast.test.ts. */}
+        <SectionHeading
+          eyebrow={t("eyebrow")}
+          title={t("title")}
+          lead={t("lead")}
+          className="max-w-lg self-start"
+        />
         <ol className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {trips.map((trip) => (
-            <li key={trip.key} className="border-l-2 border-gold bg-paper py-3 pl-4 pr-4">
-              {/* Same reasoning as the heading above — the season label is
-                  muted, so this whole card gets an opaque backing rather
-                  than just the one line. */}
+            // Ink fill + the gate-marker's left gold rule (not a new
+            // full-border motif) — a dark card on the gradient rather than
+            // the old opaque bg-paper block. Opaque on purpose: unlike the
+            // heading above, these cards aren't width-bounded (the grid
+            // fills the full row from `sm` up), so they can land anywhere
+            // across the gradient, including the gold end, without ever
+            // needing to justify their own contrast against it.
+            <li key={trip.key} className="border-l-2 border-gold bg-ink px-4 py-3">
               <p className="font-mono text-mono-xs uppercase opacity-60">
                 {seasonLabel(trip.key)} {trip.year}
               </p>

@@ -56,14 +56,14 @@ function ProjectCard({ project, isOpen, onToggle }: ProjectCardProps) {
     // content.
     <motion.li
       layout={reducedMotion ? false : "position"}
-      className="list-none rounded-md border border-ink/10 bg-paper"
+      className="list-none rounded-md border border-gold/40 bg-ink"
     >
       <button
         type="button"
         aria-expanded={isOpen}
         aria-controls={panelId}
         onClick={onToggle}
-        className="flex w-full items-center gap-4 rounded-md p-6 text-left transition-[background-color,transform] duration-[var(--duration-fast)] ease-signature hover:-translate-y-px hover:bg-ink/5 focus-visible:-translate-y-px focus-visible:bg-ink/5"
+        className="flex w-full items-center gap-4 rounded-md p-6 text-left transition-[background-color,transform] duration-[var(--duration-fast)] ease-signature hover:-translate-y-px hover:bg-paper/5 focus-visible:-translate-y-px focus-visible:bg-paper/5"
       >
         {project.logo ? (
           <span className="relative size-14 shrink-0">
@@ -110,15 +110,27 @@ function ProjectCard({ project, isOpen, onToggle }: ProjectCardProps) {
             transition={{ duration: reducedMotion ? 0 : 0.2 }}
             className="overflow-hidden px-6 pb-6"
           >
-            <ProjectDetailContent
-              project={project}
-              labels={{
-                leadHeading: tPage("leadHeading"),
-                leadMissingHint: tPage("leadMissingHint"),
-                photosHeading: tPage("photosHeading"),
-                externalLinkLabel: tPage("externalLinkLabel"),
-              }}
-            />
+            {/* ProjectDetailContent is written surface-agnostic (currentColor
+                + opacity, like SectionHeading/Eyebrow) for its usual home on
+                a plain paper Section, not for the ink card it now expands
+                inside of — nested components it pulls in (Placeholder's
+                label, LinkCard) do hardcode ink/paper. Rather than touching
+                every one of those for this one dark-card context, the panel
+                opens as its own opaque paper inset, same rule the small
+                gate-marker cards above use: it's simpler and more robust to
+                make a block opaque than to re-verify every color inside it
+                against a gradient. */}
+            <div className="rounded-md bg-paper p-4 text-ink sm:p-6">
+              <ProjectDetailContent
+                project={project}
+                labels={{
+                  leadHeading: tPage("leadHeading"),
+                  leadMissingHint: tPage("leadMissingHint"),
+                  photosHeading: tPage("photosHeading"),
+                  externalLinkLabel: tPage("externalLinkLabel"),
+                }}
+              />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -136,15 +148,15 @@ export function ProjectsActive() {
   const [openSlug, setOpenSlug] = useState<string | null>(null);
 
   return (
-    <Section className="relative isolate signature-gradient">
+    <Section surface="ink" className="relative isolate signature-gradient">
       <Container className="relative flex flex-col gap-6">
-        {/* bg-paper: this label is muted (opacity-60), and that treatment
-            was only ever verified against a plain paper or ink surface —
-            see .signature-gradient's comment in globals.css for the
-            measured contrast that makes an opaque backing necessary here.
-            The cards below already sit on their own opaque bg-paper, so
-            they need no change. */}
-        <p className="inline-block self-start bg-paper px-3 py-1.5 font-mono text-mono-xs uppercase opacity-60">
+        {/* This label now sits directly on the gradient, same as
+            JourneysSection's eyebrow — surface="ink" gives it paper as its
+            base (currentColor) text color, and opacity-60 on a flat ink
+            background is already verified in tests/unit/contrast.test.ts.
+            The cards below are opaque (ink fill, gold edge) so they don't
+            depend on where they land across the gradient. */}
+        <p className="inline-block self-start font-mono text-mono-xs uppercase opacity-60">
           {t("heading")}
         </p>
         <ul className="flex flex-col gap-4">
