@@ -8,7 +8,7 @@ import { Link } from "@/lib/navigation";
 // relies on the request-scoped locale the [locale] layout already set via
 // setRequestLocale rather than an explicit locale override.
 //
-// "404" is the motif, not a warning: large Instrument Serif, the same
+// "404" is the motif, not a warning: large display font, the same
 // register as a homepage headline, not an alarm color or a filled button
 // telling the visitor what to do next. The heading itself stays the
 // meaningful text (t("title")) for anyone using a screen reader; "404" is a

@@ -15,12 +15,14 @@ import type { Application } from "./db";
  * governs their confirmation email instead (see lib/mail.ts), which does
  * go through messages/{locale}.json like every other user-facing string.
  *
- * No custom font registered: the site self-hosts Geist/Instrument Serif
- * via next/font at build time and ships no font files in the repo, and
- * @react-pdf/renderer can't read next/font's output. Fetching a font from
+ * No custom font registered: the site self-hosts Geist via next/font/google
+ * at build time and ships no Geist file in the repo (unlike the display
+ * font, Lilita One, which does live under src/fonts/ since it's loaded via
+ * next/font/local instead — see the root layout), and @react-pdf/renderer
+ * can't read next/font/google's output either way. Fetching a font from
  * Google at render time would be exactly the tracking-request problem
  * CLAUDE.md rules out for the site itself. Helvetica (react-pdf's built-in)
- * stands in until real font files are added — see ASSETS-TODO.md.
+ * stands in until a real Geist font file is added — see ASSETS-TODO.md.
  */
 
 const styles = StyleSheet.create({

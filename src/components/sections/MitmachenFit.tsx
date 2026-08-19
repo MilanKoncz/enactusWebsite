@@ -29,7 +29,7 @@ export function MitmachenFit() {
         <SectionHeading as="h1" eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
         <Reveal className="grid grid-cols-1 gap-12 lg:grid-cols-2">
           <div className="flex flex-col gap-8">
-            <h2 className="text-heading-2 font-display">{t("expectationsHeading")}</h2>
+            <h2 className="text-heading-2 font-display font-normal!">{t("expectationsHeading")}</h2>
             <div className="flex flex-col gap-6">
               {expectations.map((item) => (
                 <div key={item.key} className="hover-grow flex flex-col gap-2 rounded-md p-2">
@@ -41,7 +41,7 @@ export function MitmachenFit() {
             </div>
           </div>
           <div className="flex flex-col gap-8">
-            <h2 className="text-heading-2 font-display">{t("offersHeading")}</h2>
+            <h2 className="text-heading-2 font-display font-normal!">{t("offersHeading")}</h2>
             <div className="flex flex-col gap-6">
               {offers.map((item) => (
                 <div key={item.key} className="hover-grow flex flex-col gap-2 rounded-md p-2">
@@ -54,7 +54,7 @@ export function MitmachenFit() {
           </div>
         </Reveal>
         <div className="rounded-md border-l-2 border-gold bg-gold/5 px-6 py-6 md:px-10 md:py-8">
-          <p className="text-heading-3 font-display">{t("fitNote.lead")}</p>
+          <p className="text-heading-3 font-display font-normal!">{t("fitNote.lead")}</p>
           <p className="mt-2 text-body-l opacity-80">{t("fitNote.detail")}</p>
         </div>
       </Container>

@@ -163,7 +163,7 @@ export function RecruitingWindowsManager({ windows }: { windows: ManagedWindow[]
       />
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-6 border-t border-ink/10 pt-8">
-        <h2 className="text-heading-3 font-display">{editingId ? t("editHeading") : t("createHeading")}</h2>
+        <h2 className="text-heading-3 font-display font-normal!">{editingId ? t("editHeading") : t("createHeading")}</h2>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           <Field

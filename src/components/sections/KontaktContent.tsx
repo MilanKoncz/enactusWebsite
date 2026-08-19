@@ -21,11 +21,11 @@ export function KontaktContent() {
         <SectionHeading as="h1" eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-2">
           <div className="flex flex-col gap-6">
-            <h2 className="text-heading-2 font-display">{t("faq.heading")}</h2>
+            <h2 className="text-heading-2 font-display font-normal!">{t("faq.heading")}</h2>
             <Faq />
           </div>
           <div className="flex flex-col gap-6">
-            <h2 className="text-heading-2 font-display">{t("form.heading")}</h2>
+            <h2 className="text-heading-2 font-display font-normal!">{t("form.heading")}</h2>
             <ContactForm />
           </div>
         </div>

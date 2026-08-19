@@ -90,7 +90,7 @@ export function MitmachenApplication({
         ) : (
           <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-4">
-              <h3 className="text-heading-3 font-display">
+              <h3 className="text-heading-3 font-display font-normal!">
                 {phase === "after" ? t("notOpen.afterHeading") : t("notOpen.beforeHeading")}
               </h3>
               <p className="text-body-m opacity-80">

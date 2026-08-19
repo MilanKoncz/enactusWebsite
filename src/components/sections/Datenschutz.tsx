@@ -17,7 +17,7 @@ import { retention } from "@/content/retention";
 function LegalSection({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-heading-2 font-display">{title}</h2>
+      <h2 className="text-heading-2 font-display font-normal!">{title}</h2>
       <div className="flex flex-col gap-3 text-body-m">{children}</div>
     </section>
   );

@@ -48,7 +48,7 @@ export function ReminderSignupForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-6">
-      <h4 className="text-heading-3 font-display">{t("heading")}</h4>
+      <h4 className="text-heading-3 font-display font-normal!">{t("heading")}</h4>
       <p className="text-body-m opacity-80">{t("lead")}</p>
       <Field
         label={t("emailLabel")}

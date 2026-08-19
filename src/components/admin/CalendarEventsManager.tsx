@@ -206,7 +206,7 @@ export function CalendarEventsManager({ events }: { events: ManagedCalendarEvent
       />
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-6 border-t border-ink/10 pt-8">
-        <h2 className="text-heading-3 font-display">{editingId ? t("editHeading") : t("createHeading")}</h2>
+        <h2 className="text-heading-3 font-display font-normal!">{editingId ? t("editHeading") : t("createHeading")}</h2>
 
         <fieldset className="flex flex-col gap-2">
           <legend className="text-body-s font-medium text-ink">{t("categoryLabel")}</legend>

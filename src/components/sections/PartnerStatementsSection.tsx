@@ -32,7 +32,7 @@ export function PartnerStatementsSection() {
           <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
             {partnerStatements.map((statement) => (
               <figure key={statement.slug} className="flex flex-col gap-4">
-                <blockquote className="text-heading-2 font-display">
+                <blockquote className="text-heading-2 font-display font-normal!">
                   “{tStatements(`${statement.slug}.quote` as StatementCopyKey)}”
                 </blockquote>
                 <figcaption className="flex flex-col text-body-s opacity-70">

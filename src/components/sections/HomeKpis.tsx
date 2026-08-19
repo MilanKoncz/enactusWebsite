@@ -177,22 +177,30 @@ export function HomeKpis() {
                     columns from lg — and display-2's widest figure
                     (">150.000 €") runs past either one and collides with its
                     neighbour, confirmed by measuring the rendered width, not
-                    eyeballed. display-3 (2.5rem) is the size that clears both
-                    narrow cases. The spin-off tile's "5 Projekte" is wider
-                    than every other tile's figure at exactly the width the
-                    five-column row gets tightest (lg, before lg:text-display-3
-                    would apply) — display-4 (2rem) is the one step down that
-                    still clears the column there; every other breakpoint
-                    keeps the same size as the rest of the row. display-4, not
+                    eyeballed. Below sm that figure needs display-4 (2rem),
+                    not display-3 (2.5rem) — measured at 154px against a
+                    152px column, right at the edge — after the Lilita One
+                    swap (2026-08-19): its glyphs run noticeably wider per
+                    character than Instrument Serif's did, and the currency
+                    formatter's non-breaking space between the amount and
+                    "€" means the browser has nowhere to wrap this string, so
+                    an even slightly-too-wide size overflows the column
+                    outright rather than breaking to a second line. The
+                    spin-off tile's "5 Projekte" is wider than every other
+                    tile's figure at exactly the width the five-column row
+                    gets tightest (lg, before lg:text-display-3 would apply)
+                    — display-4 also clears the column there; sm keeps the
+                    same size as the rest of the row. display-4, not
                     heading-1: same 2rem size, but weight 400 like every other
                     figure in this row — heading-1's weight 600 read as a
                     different typeface next to the other four (getComputedStyle
-                    confirmed: 600 vs 400, both nominally "Instrument Serif",
-                    the browser synthesizing a bold Instrument Serif has no
-                    600 cut). */}
+                    confirmed: 600 vs 400, both nominally the display font —
+                    Instrument Serif at the time this was found, Lilita One
+                    since 2026-08-19 — neither ships a 600 cut, so either one
+                    synthesized a fake bold here). */}
                 <p
                   className={cn(
-                    "text-display-3 font-display sm:text-display-2 lg:text-display-3",
+                    "text-display-4 font-display sm:text-display-2 lg:text-display-3",
                     isLast && "lg:text-display-4",
                   )}
                 >

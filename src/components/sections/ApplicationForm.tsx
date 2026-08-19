@@ -113,7 +113,7 @@ export function ApplicationForm() {
 
   return (
     <form onSubmit={handleFormSubmit} noValidate className="flex flex-col gap-8">
-      <h3 className="text-heading-2 font-display">{t("heading")}</h3>
+      <h3 className="text-heading-2 font-display font-normal!">{t("heading")}</h3>
 
       <input
         type="text"

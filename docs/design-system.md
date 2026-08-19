@@ -160,9 +160,18 @@ information.
 
 ## Typography
 
-- **Display — Instrument Serif.** Headlines only, large, tight tracking. Never
-  below 28px. Never for UI or labels. It is the voice for statements, not for
-  structure.
+- **Display — Lilita One.** Headlines only, large, tight tracking. Never below
+  28px. Never for UI or labels. It is the voice for statements, not for
+  structure. Self-hosted via `next/font/local` (`src/fonts/lilita-one/`, SIL
+  Open Font License, license file alongside it) — never Google's CDN,
+  matching every other font on this site. One weight (400), no italic: that's
+  the whole font, so nothing may pair it with a bold/italic utility and ask
+  the browser to fake a cut that doesn't exist (`font-normal!` sits next to
+  `font-display` wherever the paired size token would otherwise carry a
+  heavier weight, e.g. `text-heading-2`/`text-heading-3`'s 600). Since Lilita
+  One reads noticeably heavier and rounder than Instrument Serif (its
+  predecessor until 2026-08-19), don't reach for a bold weight anywhere near
+  it — the typeface already carries plenty of presence on its own.
 - **Body and UI — Geist.** All copy, navigation, buttons, forms.
 - **Data and eyebrows — Geist Mono.** Uppercase, wide tracking, small. One
   named exception: the calendar's `CategoryBadge` (`ui/CategoryBadge.tsx`)
@@ -329,3 +338,13 @@ Sentence case throughout. No filler. Specific beats clever.
 CSS specificity collisions between section-level and element-level classes,
 especially on vertical padding. Two rules that cancel each other out is the most
 common source of inconsistent spacing.
+
+Any hand-written selector in `globals.css` that targets a real HTML element
+(`h1`, `body`, ...) must sit inside `@layer base`. Tailwind v4's own utilities
+(`@import "tailwindcss"`, generated into `@layer utilities`) always lose to
+*unlayered* CSS regardless of specificity — a bare `h1 { font-family: ... }`
+below the import silently out-ranks `.font-display` on every actual heading
+element, no matter how the class list reads. This exact bug sat undetected in
+the base h1-h6 reset until the Lilita One swap (2026-08-19) surfaced it via
+`getComputedStyle`, not by eye — a synthesized-but-visually-close font can
+hide this for a long time.

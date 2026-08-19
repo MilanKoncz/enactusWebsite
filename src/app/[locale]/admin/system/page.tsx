@@ -91,7 +91,7 @@ export default async function AdminSystemPage({ params }: PageProps) {
       )}
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-heading-3 font-display">{t("system.cronHeading")}</h2>
+        <h2 className="text-heading-3 font-display font-normal!">{t("system.cronHeading")}</h2>
         <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Card>
             <dt className="text-body-s opacity-60">{t("system.lastRun")}</dt>
@@ -140,7 +140,7 @@ export default async function AdminSystemPage({ params }: PageProps) {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-heading-3 font-display">{t("system.servicesHeading")}</h2>
+        <h2 className="text-heading-3 font-display font-normal!">{t("system.servicesHeading")}</h2>
         <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <li>
             <Card className="flex flex-col gap-1">
@@ -164,7 +164,7 @@ export default async function AdminSystemPage({ params }: PageProps) {
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-heading-3 font-display">{t("system.rowsHeading")}</h2>
+        <h2 className="text-heading-3 font-display font-normal!">{t("system.rowsHeading")}</h2>
         {counts ? (
           <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             {TABLE_KEYS.map((key) => (

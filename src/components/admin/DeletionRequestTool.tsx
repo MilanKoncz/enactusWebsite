@@ -121,7 +121,7 @@ export function DeletionRequestTool() {
 
       {matches && (
         <section className="flex flex-col gap-4 border-t border-ink/10 pt-8">
-          <h2 className="text-heading-3 font-display">{t("resultsHeading", { email: searchedEmail })}</h2>
+          <h2 className="text-heading-3 font-display font-normal!">{t("resultsHeading", { email: searchedEmail })}</h2>
 
           {total(matches) === 0 ? (
             <p className="text-body-m opacity-60">{t("noMatches")}</p>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { NextIntlClientProvider } from "next-intl";
 import { requireLocale } from "@/i18n/requireLocale";
 import { routing } from "@/i18n/routing";
@@ -15,11 +16,24 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const instrumentSerif = Instrument_Serif({
-  variable: "--font-instrument-serif",
+// Self-hosted, not next/font/google: Lilita One isn't a font this project
+// hotlinks from Google's CDN (CLAUDE.md — that's a ruled GDPR violation in
+// Germany), so the file lives in the repo under src/fonts/lilita-one/,
+// fetched from Google's own official fonts repository, OFL license
+// included alongside it. One weight, no italic — that's the whole font;
+// every display-font usage in this codebase was audited to make sure none
+// asks for a cut that doesn't exist (see the font-normal! overrides next to
+// text-heading-2/3 elsewhere — those sizes carry a 600 weight of their own,
+// which a single-weight font can't honor without the browser faking it).
+// adjustFontFallback (default, left on) computes size-adjusted metrics for
+// the fallback stack automatically from the font file itself, so a
+// layout-shift-free load doesn't need a hand-tuned override here.
+const lilitaOne = localFont({
+  src: "../../fonts/lilita-one/LilitaOne-Regular.woff2",
+  variable: "--font-lilita-one",
   weight: "400",
-  style: ["normal", "italic"],
-  subsets: ["latin"],
+  style: "normal",
+  display: "swap",
 });
 
 export function generateStaticParams() {
@@ -53,7 +67,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${lilitaOne.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider>{children}</NextIntlClientProvider>

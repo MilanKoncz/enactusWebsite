@@ -4,7 +4,7 @@
    in layout.tsx. @theme inline is required because Tailwind must reference
    the runtime variable, not bake in a static value. */
 @theme inline {
-  --font-display: var(--font-instrument-serif);
+  --font-display: var(--font-lilita-one);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -32,7 +32,7 @@
   --color-cal-workshops: #4A5D23;
   --color-cal-bewerbung: #300612; /* == --color-oxblood, kept equal by a test */
 
-  /* Type scale — display is Instrument Serif, everything else Geist/Geist Mono.
+  /* Type scale — display is Lilita One, everything else Geist/Geist Mono.
      Never write an arbitrary text-[Npx] value in a component; add a step here
      instead. */
   --text-display-1: 6rem;
@@ -250,15 +250,26 @@ body {
   font-family: var(--font-sans);
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-sans);
-  font-weight: 600;
-  margin: 0;
+/* @layer base, not a bare rule: Tailwind v4's own utilities (@import
+   "tailwindcss" above) live in @layer utilities, which the cascade always
+   ranks below any unlayered CSS regardless of specificity — a bare h1{}
+   rule here would out-rank .font-display and font-normal! on every actual
+   heading element site-wide no matter what, silently keeping every h1-h6
+   in Geist. Discovered auditing the Lilita One swap (F, 2026-08-19): every
+   SectionHeading-driven h2 and every hand-written h3/h4 in this codebase
+   was rendering the wrong font-family for exactly this reason, not
+   anything specific to the old or new display font. */
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    margin: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

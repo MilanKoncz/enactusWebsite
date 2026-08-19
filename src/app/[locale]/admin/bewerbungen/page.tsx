@@ -54,7 +54,7 @@ export default async function AdminBewerbungenPage({ params }: PageProps) {
       {groups.map((group) => (
         <section key={group.semester} className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-ink/10 pb-3">
-            <h2 className="text-heading-3 font-display">{group.semester}</h2>
+            <h2 className="text-heading-3 font-display font-normal!">{group.semester}</h2>
             <RawLink
               href={`/api/admin/bewerbungen/csv?semester=${encodeURIComponent(group.semester)}`}
               className={DOWNLOAD_LINK_CLASSES}
