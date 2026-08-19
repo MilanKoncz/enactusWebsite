@@ -23,10 +23,25 @@ describe("PartnerTiers", () => {
     expect(link).toHaveAttribute("target", "_blank");
   });
 
-  it("marks the one partner without a confirmed website as a placeholder, not a dead link", () => {
-    renderWithIntl(<PartnerTiers />);
+  // MCEI and HTGF both have a real logo but no confirmed url — see
+  // content/partners.ts and ASSETS-TODO.md, which tracks the open question.
+  // The tile renders exactly like every confirmed partner's (no visible
+  // caption calling out the gap), just not wrapped in a link; the name still
+  // reaches a screen reader as the tile's only accessible text.
+  it("renders an unconfirmed-url partner's tile without a link, and without a visible name caption", () => {
+    const { container } = renderWithIntl(<PartnerTiers />);
     expect(screen.queryByRole("link", { name: /MCEI/ })).not.toBeInTheDocument();
-    expect(screen.getByText("MCEI")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /HTGF/ })).not.toBeInTheDocument();
+
+    const mceiName = screen.getByText("MCEI");
+    expect(mceiName).toHaveClass("sr-only");
+    const htgfName = screen.getByText("HTGF");
+    expect(htgfName).toHaveClass("sr-only");
+
+    // PlaceholderMark sets a `title` tooltip on its wrapping span — asserting
+    // none exists confirms the dashed-border caption is gone, not just
+    // visually but structurally.
+    expect(container.querySelectorAll("[title]")).toHaveLength(0);
   });
 
   it("shows an empty-state note for the Advisor tier, which has no partner yet", () => {

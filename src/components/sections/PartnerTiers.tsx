@@ -2,7 +2,6 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { GateMarker } from "@/components/ui/GateMarker";
-import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { partners, type Partner } from "@/content/partners";
@@ -36,7 +35,6 @@ const TIER_MESSAGE_KEY: Record<TierKey, "knowledge" | "flagship" | "sponsoring" 
 export function PartnerTiers() {
   const t = useTranslations("PartnerPage");
   const tTiers = useTranslations("PartnerPage.tiers");
-  const tPlaceholder = useTranslations("Placeholder");
 
   return (
     <Section className="relative isolate">
@@ -59,7 +57,7 @@ export function PartnerTiers() {
                 // the grid felt cramped.
                 <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                   {tierPartners.map((partner) => (
-                    <TierLogo key={partner.slug} partner={partner} websiteLabel={tTiers("websiteLabel", { name: partner.name })} placeholderHint={tPlaceholder("missingHint")} />
+                    <TierLogo key={partner.slug} partner={partner} websiteLabel={tTiers("websiteLabel", { name: partner.name })} />
                   ))}
                 </ul>
               ) : (
@@ -76,18 +74,20 @@ export function PartnerTiers() {
 }
 
 // A confirmed partner (has a url) is a clean, big logo tile — no caption,
-// same restraint as the homepage marquee. An unconfirmed one (mcei — see
-// content/partners.ts) keeps the visible PlaceholderMark name it always
-// had: the point of that mark is to flag "not linked because unverified,"
-// which a caption-less tile would quietly lose.
+// same restraint as the homepage marquee. An unconfirmed one (mcei, htgf —
+// see content/partners.ts) renders the exact same tile, just not wrapped in
+// a link: the missing url is an open question tracked in ASSETS-TODO.md,
+// not something the page itself should flag with a visible caption (board
+// feedback, 2026-08-20 — the PlaceholderMark name this used to show read as
+// a stray label, not a "here's why" note). The partner's name still reaches
+// a screen reader, as an sr-only span, so removing the visible caption
+// doesn't also remove the tile's only accessible name.
 function TierLogo({
   partner,
   websiteLabel,
-  placeholderHint,
 }: {
   partner: Partner;
   websiteLabel: string;
-  placeholderHint: string;
 }) {
   const logo = partner.logo && (
     <span className="relative block h-full w-full">
@@ -118,11 +118,15 @@ function TierLogo({
   }
 
   return (
-    <li className="flex h-32 flex-col items-center justify-center gap-2 rounded-md border border-ink/10 bg-paper p-4">
-      {logo}
-      <PlaceholderMark hint={placeholderHint} className="text-body-s font-medium">
-        {partner.name}
-      </PlaceholderMark>
+    <li className="flex h-32 items-center justify-center rounded-md border border-ink/10 bg-paper p-6">
+      {logo ? (
+        <>
+          {logo}
+          <span className="sr-only">{partner.name}</span>
+        </>
+      ) : (
+        <span className="text-body-s font-medium">{partner.name}</span>
+      )}
     </li>
   );
 }
