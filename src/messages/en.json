@@ -60,9 +60,12 @@
     "note": "This page is being built. More soon."
   },
   "NotFound": {
-    "title": "Page not found",
-    "note": "This page doesn't exist (anymore).",
-    "backHome": "Go to homepage"
+    "title": "404. This page is still under construction in the InnoLab.",
+    "note": "This one's still a building site, but the homepage and every other section is long since finished.",
+    "backHome": "Go to homepage",
+    "moreLinks": "Or head to:",
+    "gateConstruction": "Construction site",
+    "gateInnolab": "InnoLab"
   },
   "Home": {
     "dividers": {

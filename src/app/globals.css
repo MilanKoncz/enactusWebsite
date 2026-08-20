@@ -164,6 +164,11 @@
      confirming the local hour, per that component's own comment. */
   --animate-zzz-float: zzz-float 2.4s ease-in infinite;
 
+  /* 404 construction scene (not-found.tsx, easter egg 5/7) — a slow,
+     gentle bob for the scattered SDG tiles, so the page reads as a mildly
+     alive building site rather than a static graphic. Transform only. */
+  --animate-construction-float: construction-float 4.5s ease-in-out infinite;
+
   /* Interaction — docs/design-system.md. Registered under @theme (unlike
      --duration-fast/--duration-calm below) because --ease-* is a real
      Tailwind v4 theme namespace: this generates the `ease-signature` utility
@@ -351,6 +356,16 @@ body {
   100% {
     opacity: 0;
     transform: translate(0.6rem, -1.2rem) scale(1.1);
+  }
+}
+
+@keyframes construction-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.5rem);
   }
 }
 

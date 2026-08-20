@@ -60,9 +60,12 @@
     "note": "Diese Seite entsteht gerade. Bald steht hier mehr."
   },
   "NotFound": {
-    "title": "Seite nicht gefunden",
-    "note": "Diese Seite gibt es nicht (mehr).",
-    "backHome": "Zur Startseite"
+    "title": "404. Diese Seite wird gerade noch im InnoLab entwickelt.",
+    "note": "Hier ist noch Baustelle, die Startseite und alle anderen Bereiche sind aber längst startklar.",
+    "backHome": "Zur Startseite",
+    "moreLinks": "Oder weiter zu:",
+    "gateConstruction": "Baustelle",
+    "gateInnolab": "InnoLab"
   },
   "Home": {
     "dividers": {
