@@ -18,10 +18,15 @@ just happens to be clickable.
 
 ## 2. Hero logo → confetti
 
-Three clicks on the Enactus logo in the homepage hero, within roughly two
-seconds of each other, trigger a short confetti burst in the brand colors
-(gold, navy, sand). See `src/components/motion/HeroLogoConfetti.tsx` (or
-wherever it ends up — update this line once built).
+Three clicks on the Enactus logo in the homepage hero, within two seconds
+of each other, trigger a short (1.4s) confetti burst in the brand colors
+(gold, navy, sand) — `src/components/motion/HeroLogoConfetti.tsx`, wrapping
+`HomeHero.tsx`'s logo. Self-built with a `<canvas>` and `requestAnimationFrame`,
+no library. The canvas mounts only for the burst's own duration and is
+removed the moment it ends. Inert entirely under `prefers-reduced-motion`
+— not a calmer variant, no effect at all. The logo stays a plain image (no
+button role, no added tab stop); the click handler only matters to a
+mouse/touch user, and the effect changes nothing else about the page.
 
 ## 3. Footer 8-bit mode
 

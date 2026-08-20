@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { HeaderOverlay } from "@/components/layout/HeaderOverlay";
-import { Logo } from "@/components/layout/Logo";
+import { HeroLogoConfetti } from "@/components/motion/HeroLogoConfetti";
 import { HeroVideo } from "@/components/motion/HeroVideo";
 import { RotatingText } from "@/components/motion/RotatingText";
 import { heroMedia } from "@/content/media";
@@ -54,8 +54,9 @@ export function HomeHero() {
             as the central element"), so the headline underneath drops to
             roughly 40% of its previous size (text-display-1 at lg was
             6rem; text-display-3 is 2.5rem, ~42%) instead of scaling up
-            across breakpoints the way it used to. */}
-        <Logo variant="full" surface="ink" className="h-20 w-auto sm:h-32 md:h-40 lg:h-48" />
+            across breakpoints the way it used to. Three clicks trigger a
+            confetti burst — easter egg 2/3, docs/eastereggs.md. */}
+        <HeroLogoConfetti variant="full" surface="ink" className="h-20 w-auto sm:h-32 md:h-40 lg:h-48" />
         {/* Gold as a text colour is only ever legible on ink, never on paper
             (docs/design-system.md). Here it measures 11.6:1 against the ink
             surface and 6.4:1 against the worst case the video can produce —
