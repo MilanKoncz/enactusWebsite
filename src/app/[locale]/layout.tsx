@@ -36,6 +36,23 @@ const lilitaOne = localFont({
   display: "swap",
 });
 
+// The 8-bit easter egg's typeface (docs/eastereggs.md), self-hosted for the
+// same reason as Lilita One above — fetched from Google's official fonts
+// repository, OFL license included alongside it (src/fonts/press-start-2p/).
+// Loaded unconditionally rather than only while the mode is active: a
+// dynamic per-session font load would need its own loading/flash-of-
+// fallback handling for a 60-second novelty, which next/font's
+// build-time-generated stylesheet already avoids by just always being
+// available — the mode's CSS layer (globals.css) is what actually decides
+// whether anything ever uses it.
+const pressStart2P = localFont({
+  src: "../../fonts/press-start-2p/PressStart2P-Regular.ttf",
+  variable: "--font-press-start-2p",
+  weight: "400",
+  style: "normal",
+  display: "swap",
+});
+
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
@@ -67,7 +84,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} ${lilitaOne.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${lilitaOne.variable} ${pressStart2P.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider>{children}</NextIntlClientProvider>

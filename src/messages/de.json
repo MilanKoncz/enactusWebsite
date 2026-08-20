@@ -1107,6 +1107,10 @@
       "subject": "Neue Kontaktanfrage von {name}"
     }
   },
+  "EightBit": {
+    "peekButtonLabel": "8-Bit-Modus aktivieren",
+    "offSwitchLabel": "8-Bit-Modus beenden"
+  },
   "Admin": {
     "eyebrow": "Admin",
     "logout": "Abmelden",

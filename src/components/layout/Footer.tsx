@@ -7,6 +7,7 @@ import { Container } from "@/components/ui/Container";
 import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { Section } from "@/components/ui/Section";
 import { Logo } from "@/components/layout/Logo";
+import { EightBitEasterEgg } from "@/components/motion/EightBitEasterEgg";
 import {
   footerColumns,
   jobsNavItem,
@@ -71,7 +72,12 @@ export function Footer({ hasJobs = false }: FooterProps) {
   const associationLinks = hasJobs ? [...footerColumns.association, jobsNavItem] : footerColumns.association;
 
   return (
-    <footer className="mt-auto">
+    <footer className="relative mt-auto">
+      {/* Easter egg 3/3 (docs/eastereggs.md) — a sibling of Section, not a
+          child, so its absolute bottom-anchored button positions against
+          the whole footer's box rather than Container's narrower, padded
+          one. */}
+      <EightBitEasterEgg />
       <Section surface="ink">
         <Container className="flex flex-col gap-12">
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">

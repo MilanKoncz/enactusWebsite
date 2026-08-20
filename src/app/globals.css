@@ -903,3 +903,114 @@ body {
     );
   }
 }
+
+/* Easter egg 3/3 (docs/eastereggs.md), the whole visual side of it —
+   EightBitEasterEgg.tsx owns only the timing/state machine and writes
+   nothing here but the one attribute this reads. One attribute, one CSS
+   layer, no component duplicated and no existing component touched, per
+   the brief.
+
+   html[data-eight-bit] cycles through four values: absent (normal),
+   "entering" (the ~1s transition into the mode, current look still
+   showing), "active" (the mode itself, no transition), "exiting" (the
+   same ~1s transition, reversed). @layer base, same reasoning as the
+   h1-h6 block above: every selector here targets a real element (html,
+   body, img, *), which loses to Tailwind's own unlayered utilities by
+   default if left bare.
+
+   Colors are a full second palette, not the brand tokens dimmed or
+   tinted — redefining the same --color-* custom properties on html means
+   every existing bg-ink/text-gold/border-sand/etc. utility site-wide
+   picks the new values up automatically (Tailwind v4 utilities resolve a
+   custom property at paint time, not at build time), without touching a
+   single component. Chosen to preserve the exact same pass/fail shape the
+   brand palette has — paper-on-ink, ink-on-gold, sand-on-ink, oxblood-on-
+   paper all already cleared 4.5:1 by a wide margin and still do; moss and
+   amber needed to move noticeably darker than a first punchier draft
+   (tested against paper directly, matching how Badge actually renders
+   each) before they cleared it too. tests/unit/contrast.test.ts asserts
+   every pair below the palette. */
+@layer base {
+  html[data-eight-bit="exiting"],
+  html[data-eight-bit="active"] {
+    --color-ink: #0c0c2c;
+    --color-paper: #eef0e6;
+    --color-gold: #ffd400;
+    --color-sand: #c9a227;
+    --color-oxblood: #8b0018;
+    --color-moss: #146b2d;
+    --color-amber: #6b4f06;
+
+    /* Press Start 2P runs noticeably wider per character than Geist/
+       Lilita One at the same size — left alone, the hero's rotating term
+       and HomeKpis' figures (both single-line, width-constrained
+       containers sized for the original font) clipped or overlapped
+       their neighbors. Same trick as the colors above: these are the
+       exact custom properties text-display-1..4/text-heading-1 already
+       resolve through, so scaling them down here reflows every consumer
+       automatically, no component touched. Only the headline-scale steps
+       move — body/mono text wraps normally instead of living in a
+       fixed-width box, so it was never at risk the same way. */
+    --text-display-1: 3.25rem;
+    --text-display-2: 2.2rem;
+    --text-display-3: 1.4rem;
+    --text-display-4: 1.1rem;
+    --text-heading-1: 1.1rem;
+  }
+
+  /* !important, not layer ordering, is what actually wins here: these
+     three properties are set directly by utility classes all over the
+     codebase (rounded-md, shadow-lg, font-mono/font-display/...), not
+     indirected through a custom property the way color is above — @layer
+     base alone would still lose to those unlayered utilities, the same
+     trap the file-level comment on the h1-h6 block above describes. */
+  html[data-eight-bit="exiting"] *,
+  html[data-eight-bit="active"] * {
+    font-family: var(--font-press-start-2p), ui-monospace, monospace !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  html[data-eight-bit="exiting"] img,
+  html[data-eight-bit="exiting"] video,
+  html[data-eight-bit="active"] img,
+  html[data-eight-bit="active"] video {
+    image-rendering: pixelated !important;
+  }
+
+  /* The transition itself: ~1s of blur/brightness flicker on the whole
+     page, entering and exiting alike — motion rule 5 in design-system.md
+     restricts continuous/scroll-linked animation to transform and
+     opacity, but this is a discrete, one-shot toggle (the same documented
+     exception class as the header's scroll-compact padding), and filter
+     is explicitly allowed for interaction/state-change animation in the
+     Interaction section. Reachable only via the peek button, which never
+     renders under prefers-reduced-motion (EightBitEasterEgg.tsx) — so
+     this animation itself never needs its own reduced-motion guard, there
+     is no path to it with that preference on. */
+  html[data-eight-bit="entering"] body,
+  html[data-eight-bit="exiting"] body {
+    animation: eight-bit-flicker 1s ease;
+  }
+}
+
+@keyframes eight-bit-flicker {
+  0% {
+    filter: blur(0) brightness(1);
+  }
+  15% {
+    filter: blur(3px) brightness(1.4);
+  }
+  30% {
+    filter: blur(0) brightness(0.7);
+  }
+  45% {
+    filter: blur(4px) brightness(1.3);
+  }
+  60% {
+    filter: blur(0) brightness(1);
+  }
+  100% {
+    filter: blur(0) brightness(1);
+  }
+}

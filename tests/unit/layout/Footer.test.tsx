@@ -1,7 +1,9 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { screen, within } from "@testing-library/react";
 import { axe } from "jest-axe";
 import { renderWithIntl } from "../../fixtures/intl";
+import { mockMatchMedia } from "../../fixtures/matchMedia";
+import { mockPathname, nextNavigationMock } from "../../fixtures/navigation";
 
 vi.mock("@/content/navigation", async () => {
   const actual = await vi.importActual<typeof import("@/content/navigation")>(
@@ -16,7 +18,22 @@ vi.mock("@/content/navigation", async () => {
   };
 });
 
+vi.mock("next/navigation", () => nextNavigationMock);
+
 const { Footer } = await import("@/components/layout/Footer");
+
+// Footer now also renders EightBitEasterEgg (docs/eastereggs.md), which
+// needs both a pathname (to check the excluded-route list) and
+// window.matchMedia (usePrefersReducedMotion) — neither existed before
+// that component, so every Footer test needs them now too.
+beforeEach(() => {
+  mockPathname.mockReturnValue("/");
+  mockMatchMedia(false);
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe("Footer", () => {
   it("exposes a contentinfo landmark containing the claim", () => {

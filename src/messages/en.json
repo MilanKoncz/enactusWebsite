@@ -1107,6 +1107,10 @@
       "subject": "New contact message from {name}"
     }
   },
+  "EightBit": {
+    "peekButtonLabel": "Activate 8-bit mode",
+    "offSwitchLabel": "Exit 8-bit mode"
+  },
   "Admin": {
     "eyebrow": "Admin",
     "logout": "Log out",

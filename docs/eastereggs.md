@@ -30,8 +30,31 @@ mouse/touch user, and the effect changes nothing else about the page.
 
 ## 3. Footer 8-bit mode
 
-A small Enactus logo occasionally peeks out from the bottom of the footer
-and withdraws again after a few seconds. Clicking it switches the entire
-site into an 8-bit visual mode for 60 seconds. See
-`src/components/layout/Footer.tsx` and the 8-bit CSS layer in
-`globals.css` (update this line once built) for the mechanism.
+A small Enactus logo occasionally peeks up from the bottom of the footer
+(random position, hidden 10-90s, visible 3-6s) and withdraws again.
+Clicking it switches the whole site into an 8-bit visual mode for 60
+seconds. `src/components/motion/EightBitEasterEgg.tsx`, rendered by
+`Footer.tsx`, owns only the timing state machine and writes a single
+`data-eight-bit` attribute (`entering` / `active` / `exiting`) onto
+`<html>`; the entire visual side — a second color palette, the self-hosted
+Press Start 2P pixel font (`src/fonts/press-start-2p/`, OFL-licensed, same
+pattern as Lilita One), zeroed border-radius, no shadows, pixelated
+images, and reduced headline-scale font sizes so the wider pixel glyphs
+don't clip inside containers sized for Geist/Lilita One — lives entirely
+in `globals.css`'s `html[data-eight-bit]` rules. No component was
+duplicated or modified to build the look itself.
+
+Exits: 60s auto-timeout, Escape, or a visible on-screen off-switch (a
+normal, fully tabbable button — unlike the peek button, this one is meant
+to be found). Never survives a pathname change (an immediate reset, no
+transition) and never activates at all on `/impressum`, `/datenschutz`,
+or anywhere under `/admin`. The ~1s entry/exit transition is a blur/
+brightness flicker (`@keyframes eight-bit-flicker`), reachable only via
+the peek button, which itself never renders under
+`prefers-reduced-motion`.
+
+The whole second palette is contrast-checked in
+`tests/unit/contrast.test.ts` ("8-bit mode palette") against every pair
+the brand palette relies on (paper-on-ink, ink-on-gold, sand-on-ink,
+paper-on-moss, amber/oxblood-on-paper, both 60%-opacity muted-text cases)
+— all clear 4.5:1.

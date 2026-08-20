@@ -31,9 +31,17 @@ function hexToRgb(hex: string): [number, number, number] {
 
 function readCssColorTokens(): { tokens: Record<string, string>; calendarTokens: Record<string, string> } {
   const css = readFileSync(resolve(process.cwd(), "src/app/globals.css"), "utf-8");
+  // Scoped to the @theme block specifically, not the whole file: the 8-bit
+  // easter egg (docs/eastereggs.md) redefines these same custom property
+  // names again further down, deliberately — that's how its whole CSS
+  // layer works (globals.css's own comment on it) — and a file-wide scan
+  // would pick up that second, unrelated palette as if it were a drifted
+  // brand token.
+  const themeMatch = css.match(/@theme\s*\{([\s\S]*?)\n\}/);
+  const themeBlock = themeMatch?.[1] ?? "";
   const tokens: Record<string, string> = {};
   const calendarTokens: Record<string, string> = {};
-  for (const match of css.matchAll(/--color-([a-z-]+):\s*(#[0-9a-fA-F]{6});/g)) {
+  for (const match of themeBlock.matchAll(/--color-([a-z-]+):\s*(#[0-9a-fA-F]{6});/g)) {
     const [, name, value] = match;
     if (name.startsWith("cal-")) {
       calendarTokens[name] = value;
@@ -275,6 +283,52 @@ describe("design tokens: color contrast", () => {
         }
       },
     );
+  });
+
+  // Easter egg 3/3 (docs/eastereggs.md): html[data-eight-bit="active"]'s
+  // second color palette (globals.css). Read directly from the CSS file
+  // rather than hand-copied here, so an edit to one can't silently drift
+  // from the other — the same reasoning readCssColorTokens() above exists
+  // for the brand palette.
+  describe("8-bit mode palette (html[data-eight-bit])", () => {
+    const eightBitCss = readFileSync(resolve(process.cwd(), "src/app/globals.css"), "utf-8");
+    const eightBitBlockMatch = eightBitCss.match(
+      /html\[data-eight-bit="exiting"\],\s*html\[data-eight-bit="active"\] \{([\s\S]*?)\n {2}\}/,
+    );
+    const eightBitBlock = eightBitBlockMatch?.[1] ?? "";
+    const eightBit: Record<string, string> = {};
+    for (const match of eightBitBlock.matchAll(/--color-([a-z]+):\s*(#[0-9a-fA-F]{6});/g)) {
+      const [, name, value] = match;
+      eightBit[name] = value;
+    }
+
+    it("is actually found in globals.css (a sanity check on the regex above, not the palette itself)", () => {
+      expect(Object.keys(eightBit).sort()).toEqual(
+        ["amber", "gold", "ink", "moss", "oxblood", "paper", "sand"].sort(),
+      );
+    });
+
+    it("keeps every pair the brand palette relies on at 4.5:1 or better", () => {
+      const pairs: Array<[string, string, string]> = [
+        ["ink text on gold (Badge spinoff, Button primary, hero rotating term)", eightBit.ink, eightBit.gold],
+        ["ink body text on paper", eightBit.ink, eightBit.paper],
+        ["paper text on ink (dark sections, footer, Badge active fill)", eightBit.paper, eightBit.ink],
+        ["sand text on ink", eightBit.sand, eightBit.ink],
+        ["paper text on moss (Badge active fill)", eightBit.paper, eightBit.moss],
+        ["amber text on paper (Badge paused)", eightBit.amber, eightBit.paper],
+        ["oxblood text on paper (Badge cancelled)", eightBit.oxblood, eightBit.paper],
+      ];
+      for (const [, fg, bg] of pairs) {
+        expect(passesAA(contrastRatio(fg, bg))).toBe(true);
+      }
+    });
+
+    it("keeps muted (60%-opacity) text readable on both surfaces", () => {
+      const mutedOnPaper = blendOverBackground(eightBit.ink, 0.6, eightBit.paper);
+      const mutedOnInk = blendOverBackground(eightBit.paper, 0.6, eightBit.ink);
+      expect(passesAA(contrastRatio(mutedOnPaper, eightBit.paper))).toBe(true);
+      expect(passesAA(contrastRatio(mutedOnInk, eightBit.ink))).toBe(true);
+    });
   });
 
   it("sand on paper fails AA — this combination must never ship", () => {
