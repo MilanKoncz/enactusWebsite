@@ -88,7 +88,20 @@ function ProjectCard({ project, isOpen, onToggle }: ProjectCardProps) {
                   unlike plain DOM textContent, which only concatenates. */}
               <span className="sr-only">{isOpen ? tPage("collapseLabel") : tPage("expandLabel")}</span>
             </p>
-            <Badge status={project.status}>{tStatus(project.status)}</Badge>
+            {/* Badge's default "active" fill (bg-moss, opaque) is tuned for
+                paper — a fully saturated green patch read as an unrelated
+                color note against this card's ink background, sitting on
+                .signature-gradient. bg-moss/35 tints the same ink instead of
+                covering it outright, so the fill still reads as green (the
+                fill/outline pairing colorblind users rely on is unchanged)
+                without introducing a hue the navy-to-gold gradient never
+                otherwise has. Only safe to override this way because
+                activeProjects above is filtered to status "active" only —
+                Badge's other three statuses aren't verified against ink and
+                would need their own treatment before ever rendering here. */}
+            <Badge status={project.status} className="bg-moss/35">
+              {tStatus(project.status)}
+            </Badge>
           </div>
           <p className="text-body-s opacity-70">{t(`${project.slug}.oneLiner` as ProjectCopyKey)}</p>
         </div>

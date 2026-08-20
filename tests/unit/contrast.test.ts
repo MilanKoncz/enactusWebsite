@@ -93,6 +93,19 @@ describe("design tokens: color contrast", () => {
     expect(passesAA(contrastRatio(paper, moss))).toBe(true);
   });
 
+  // ProjectsActive.tsx overrides Badge's default active fill to bg-moss/35
+  // on its ink-surfaced cards (signature-gradient's dark section) — the
+  // fully saturated bg-moss fill read as a clashing, unrelated color note
+  // there. Composited over the card's own solid --color-ink background
+  // (not the gradient — the card is opaque), same math as any other
+  // opacity-blended pair in this file.
+  it("Badge active on ProjectsActive's ink cards — paper text on moss/35 tinted onto ink — passes AA with real margin", () => {
+    const tinted = blendOverBackground(moss, 0.35, ink);
+    const ratio = contrastRatio(paper, tinted);
+    expect(passesAA(ratio)).toBe(true);
+    expect(ratio).toBeGreaterThan(WCAG_AA_NORMAL_TEXT + 5);
+  });
+
   it("Badge paused — amber (yellow) text on paper — passes AA", () => {
     expect(passesAA(contrastRatio(amber, paper))).toBe(true);
   });
