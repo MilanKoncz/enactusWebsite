@@ -817,35 +817,47 @@ body {
    linear 50/50: the plateau is deliberately wide so gold reads as an accent,
    not half the section.
 
-   Two stop sets, not one: below md, a max-width-bounded paragraph still has
-   to wrap inside a narrow container, and a wrapped block's shrink-to-fit
-   width fills essentially the whole available column — there's no room on
-   the side for gold to live without a wrapped line's last few glyphs
-   crossing into it. From md up, the same bounded block has real room to its
-   right (the container is wide enough that the bound actually binds), so
-   the plateau can end earlier and gold gets more presence. 94% and 58% are
-   not round numbers: each is the lowest plateau that still keeps a
-   full-width-shrink-to-fit block's rendered pixels above 4.5:1 contrast
-   against --color-paper at that breakpoint, worked out against
-   JourneysSection's lead paragraph (its widest bounded text) — see that
+   Two axes, not one: from md up, JourneysSection's bounded heading block has
+   real room to its right (the container is wide enough that max-w-lg
+   actually binds), so a horizontal ramp with a 58% plateau gives gold real
+   presence while the text stays clear of it (worked out against
+   JourneysSection's lead paragraph, its widest bounded text — see that
    file's own comment on its max-w-lg for the box-width arithmetic this
-   traces back to.
+   traces back to). Below md a horizontal ramp doesn't work at all: a
+   wrapped block's shrink-to-fit width fills essentially the whole available
+   column, so any plateau low enough to give gold real width also put text
+   on top of it — measured at 95.6%/95.9% of the section width at 360/390px,
+   there was no plateau that cleared both goals at once (board feedback,
+   2026-08-20: "practically the whole area is navy, gold only shows as a
+   thin edge"). Below md the ramp instead runs top to bottom: both
+   consumers' text is always top-anchored (SectionHeading's / the mono
+   label's own top position, never centered or bottom-aligned) with opaque
+   cards filling the rest of the section's height below it (ProjectsActive's
+   ProjectCard, JourneysSection's <ol> items — both ink-filled, gold-edged,
+   so they never depend on where they land against this background either).
+   That means the two goals stop competing on this axis: text stays inside
+   the flat plateau, and gold gets the entire lower portion of the section
+   to actually read as gold instead of a sliver at one edge. 46% is not a
+   round number by accident — it's JourneysSection's heading+lead block
+   (measured with Playwright at 41.2% of the section's height, identically
+   at 360px and 390px — the taller of the two consumers' text blocks;
+   ProjectsActive's mono label ends at 7.8%/8.7%) plus headroom, so the
+   block sits inside the flat ink stop outright rather than relying on the
+   ramp's own contrast the way the horizontal 58%/94% plateaus below did.
 
    The one thing still not allowed to sit directly on this gradient:
    unbounded-width text (a paragraph with no max-width) — see
    JourneysSection.tsx / ProjectsActive.tsx for how each consumer keeps
-   every text run bounded, and how the two sections' small cards (dark ink
-   fill, gold edge) opt out of the gradient's contrast question entirely by
-   being opaque, so it never matters where across the width they land.
+   every text run bounded.
 
    tests/unit/contrast.test.ts's gradient case asserts the plateau stops and
    the real end tokens (a drift guard, not a full AA sweep — the 7-point
    sweep across the actual measured stops lives in that same test). */
 @utility signature-gradient {
   background-image: linear-gradient(
-    to right,
+    to bottom,
     var(--color-ink) 0%,
-    var(--color-ink) 94%,
+    var(--color-ink) 46%,
     var(--color-gold) 100%
   );
 

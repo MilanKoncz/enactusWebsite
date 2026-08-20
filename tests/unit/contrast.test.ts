@@ -103,23 +103,27 @@ describe("design tokens: color contrast", () => {
 
   // .signature-gradient (globals.css) — the shared navy-to-gold background
   // on /events' Journeys section and /projekte's active-projects section.
-  // Redone a second time 2026-08-19: text now sits directly on the
-  // gradient (no opaque bg-paper card), so the stops are weighted instead
-  // of mixed — a wide flat --color-ink plateau where the two consumers'
-  // text actually lives, ramping to the real, unmixed --color-gold only
-  // near the right edge. Two plateaus (94% below md, 58% from md up) — see
-  // the utility's own comment in globals.css for why text needs more room
-  // reserved on a narrow viewport, where a wrapped paragraph's
-  // shrink-to-fit box fills nearly the whole width.
+  // Redone a third time 2026-08-20: below md the ramp runs top to bottom
+  // instead of left to right — a horizontal ramp narrow enough to clear a
+  // wrapped block's shrink-to-fit width (which fills nearly the whole
+  // section on a narrow viewport) left gold as a sliver at one edge, not a
+  // real area (board feedback). Both consumers' text is always top-anchored
+  // with opaque cards filling the section below it, so a vertical ramp lets
+  // text stay in the flat plateau while gold gets the entire lower portion
+  // of the section. From md up the ramp is unchanged: horizontal, 58%
+  // plateau — see the utility's own comment in globals.css for the full
+  // reasoning on both axes.
   describe(".signature-gradient: weighted ink-to-gold, real tokens, no color-mix()", () => {
     const css = readFileSync(resolve(process.cwd(), "src/app/globals.css"), "utf-8");
     const declaration = css.match(/@utility signature-gradient \{[\s\S]*?\n\}/)?.[0] ?? "";
 
-    it("has a mobile-first plateau at 94% and a md-and-up plateau at 58%, both ending at --color-gold, no color-mix()", () => {
-      expect(declaration).toContain("var(--color-ink) 94%");
+    it("is vertical (top to bottom) with a 46% plateau below md, and horizontal (to right) with a 58% plateau from md up, both ending at --color-gold, no color-mix()", () => {
+      expect(declaration).toContain("to bottom");
+      expect(declaration).toContain("var(--color-ink) 46%");
+      expect(declaration).toContain("@media (min-width: 48rem)");
+      expect(declaration).toContain("to right");
       expect(declaration).toContain("var(--color-ink) 58%");
       expect(declaration).toContain("var(--color-gold) 100%");
-      expect(declaration).toContain("@media (min-width: 48rem)");
       expect(declaration).not.toContain("color-mix");
     });
 
@@ -135,8 +139,9 @@ describe("design tokens: color contrast", () => {
       expect(g).toBeGreaterThan(b);
     });
 
-    // The color the gradient actually paints at a given % across its width,
-    // replicating the flat-then-ramp CSS above in plain JS.
+    // The color the gradient actually paints at a given % along its axis
+    // (width for the horizontal md+ ramp, height for the vertical
+    // below-md ramp), replicating the flat-then-ramp CSS above in plain JS.
     function gradientColorAt(pct: number, plateau: number): string {
       if (pct <= plateau) return ink;
       const t = (pct - plateau) / (100 - plateau);
@@ -148,34 +153,51 @@ describe("design tokens: color contrast", () => {
 
     const SAMPLE_POINTS = [0, 16.67, 33.33, 50, 66.67, 83.33, 100];
 
-    // Real max right edge of JourneysSection's lead paragraph — its
-    // max-w-lg wrapper, self-start, is the widest bounded text either
-    // consumer puts directly on the gradient — measured with Playwright at
-    // each tested viewport (see the PR/commit that added this test for the
-    // script): 95.6% at 360px, 95.9% at 390px (both use the 94% plateau),
-    // 69.8% at 768px, 43.1% at 1280px (both use the 58% plateau).
-    const REAL_TEXT_EDGES: Array<{ label: string; pct: number; plateau: number }> = [
-      { label: "360px heading/lead right edge", pct: 95.6, plateau: 94 },
-      { label: "390px heading/lead right edge", pct: 95.9, plateau: 94 },
+    // Real max right edge of JourneysSection's lead paragraph at md and up
+    // — its max-w-lg wrapper, self-start, is the widest bounded text either
+    // consumer puts directly on the gradient — measured with Playwright:
+    // 69.8% at 768px, 43.1% at 1280px (both use the horizontal 58% plateau).
+    const REAL_TEXT_RIGHT_EDGES: Array<{ label: string; pct: number; plateau: number }> = [
       { label: "768px heading/lead right edge", pct: 69.8, plateau: 58 },
       { label: "1280px heading/lead right edge", pct: 43.1, plateau: 58 },
     ];
 
-    it.each(REAL_TEXT_EDGES)(
-      "full-opacity paper heading/lead text clears 4.5:1 at its real measured edge ($label)",
+    it.each(REAL_TEXT_RIGHT_EDGES)(
+      "from md up, full-opacity paper heading/lead text clears 4.5:1 at its real measured right edge ($label)",
       ({ pct, plateau }) => {
         const bg = gradientColorAt(pct, plateau);
         expect(passesAA(contrastRatio(paper, bg))).toBe(true);
       },
     );
 
-    it.each([94, 58])(
+    // Below md, real bottom edge of each consumer's text block — measured
+    // with Playwright, identically at 360px and 390px in both cases.
+    // JourneysSection's heading+lead group (SectionHeading's own wrapper)
+    // is the taller of the two and sits well inside the 46% plateau;
+    // ProjectsActive's mono label barely uses the top of the section.
+    const REAL_TEXT_BOTTOM_EDGES: Array<{ label: string; pct: number }> = [
+      { label: "JourneysSection heading+lead block bottom", pct: 41.2 },
+      { label: "ProjectsActive label bottom", pct: 8.7 },
+    ];
+
+    it.each(REAL_TEXT_BOTTOM_EDGES)(
+      "below md, full-opacity paper text clears 4.5:1 at its real measured bottom edge, inside the flat plateau ($label)",
+      ({ pct }) => {
+        expect(pct).toBeLessThan(46);
+        const bg = gradientColorAt(pct, 46);
+        expect(bg).toBe(ink);
+        expect(passesAA(contrastRatio(paper, bg))).toBe(true);
+      },
+    );
+
+    it.each([46, 58])(
       "paper heading/lead text clears 4.5:1 at every sample point up to the plateau's own text-safe boundary (plateau %i%%)",
       (plateau) => {
-        // The two rightmost sample points sit past every real text edge
-        // above — that's the gradient's pure decorative tail, always
-        // covered by the two sections' opaque ink-fill/gold-edge cards
-        // (JourneysSection.tsx / ProjectsActive.tsx), never by raw text.
+        // The two rightmost/bottommost sample points sit past every real
+        // text edge above — that's the gradient's pure decorative tail,
+        // always covered by the two sections' opaque ink-fill/gold-edge
+        // cards (JourneysSection.tsx / ProjectsActive.tsx), never by raw
+        // text.
         const textSafePoints = SAMPLE_POINTS.filter((p) => p <= 70);
         for (const pct of textSafePoints) {
           const bg = gradientColorAt(pct, plateau);
@@ -189,8 +211,8 @@ describe("design tokens: color contrast", () => {
       expect(passesAA(contrastRatio(paper, gradientColorAt(100, 58)))).toBe(false);
     });
 
-    it("Eyebrow's opacity-60 treatment clears 4.5:1 anywhere the eyebrow itself can render (it's a short, left-anchored line, always inside the flat plateau)", () => {
-      for (const plateau of [94, 58]) {
+    it("Eyebrow's opacity-60 treatment clears 4.5:1 anywhere the eyebrow itself can render (it's a short, top-anchored line, always inside the flat plateau)", () => {
+      for (const plateau of [46, 58]) {
         const bg = gradientColorAt(0, plateau);
         const muted = blendOverBackground(paper, 0.6, bg);
         expect(passesAA(contrastRatio(muted, bg))).toBe(true);
