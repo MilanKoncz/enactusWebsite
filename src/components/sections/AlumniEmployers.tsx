@@ -64,25 +64,78 @@ function AlumniLogoField() {
   );
 }
 
-// A deliberate minimum height, not just "as tall as the heading": below
-// this the logo wallpaper read as a cramped sliver rather than the section
-// this content deserves — the same reasoning the old combined section got
-// its height from the quote track that used to sit here too.
+// Below md, AlumniLogoField's auto-fill grid clips against the section's own
+// overflow-hidden well before it reaches the end of even one repeat of the
+// 54 logos — a narrow column count times a height-capped section only ever
+// shows the first handful of rows, with no way to reach the rest (board
+// feedback: most of the 54 were simply never visible on a phone). This is a
+// second, mobile-only layout, not a responsive tweak to AlumniLogoField:
+// every logo, once, flowing into 5 fixed rows and scrolling sideways
+// instead of wrapping into more rows than the section has height for.
 //
-// 34rem below `md`, taller than the 32rem from `md` up, even though the
-// section holds less real content on mobile: the heading wraps to three
-// lines there (it fits on two from `md`), and its own opaque bg-paper card
-// sits in front of the field's first couple of rows either way — at 26rem
-// (the value this used to carry) that card's card alone covered most of the
-// section's height, leaving one half-height row of logos stranded between
-// the card and the bottom fade. 34rem leaves genuine room for a full band
-// of logos below the card before the fade takes over.
+// grid-flow-col with a fixed row count (not auto-fill/wrap) is what makes a
+// grid scroll horizontally at all — a wrapping grid has no "sideways" axis
+// to scroll along. overflow-x-auto alone isn't enough to keep the track
+// from inflating the page's own scrollWidth on some layouts; contain-content
+// (paint+layout containment) is the same fix the calendar's filter-chip row
+// needed for the same reason (EventCalendar.tsx) — it stops this track's
+// internal size from leaking out to the document. No scroll-snap: a logo
+// wall has no "current item" the way a chip row or a card carousel does, so
+// nothing here should feel like it's advancing through discrete pages.
+//
+// aria-hidden, same as AlumniLogoField: decorative texture, nothing
+// interactive inside (content/alumniEmployers.ts's own comment: no logo
+// here links out), so there's no focusable content whose focus ring
+// contain-content could clip either.
+function AlumniLogoStrip() {
+  return (
+    <div className="relative">
+      <div aria-hidden="true" className="overflow-x-auto contain-content">
+        <div className="grid w-max grid-flow-col grid-rows-5 gap-3 auto-cols-[5rem]">
+          {alumniEmployers.map((employer) => (
+            <div key={employer.slug} className="flex h-11 items-center justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element -- see
+                  AlumniLogoField's identical comment above. */}
+              <img src={employer.logo} alt="" className="h-7 w-full object-contain" />
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* Visible overflow hint, not just the native scrollbar (often invisible
+          on touch): a soft fade into the page background at each edge, the
+          same to-paper treatment AlumniLogoField's own bottom fade uses.
+          aria-hidden — a hint for sighted pointer/touch users, redundant
+          with the strip's own aria-hidden state for anyone using a screen
+          reader. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-paper to-transparent"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-paper to-transparent"
+      />
+    </div>
+  );
+}
+
+// A deliberate minimum height from `md` up, not just "as tall as the
+// heading": below that the logo wallpaper read as a cramped sliver rather
+// than the section this content deserves — the same reasoning the old
+// combined section got its height from the quote track that used to sit
+// here too. Below `md`, AlumniLogoStrip is real, height-determining content
+// now (not a background texture competing with the heading card for a
+// fixed box height), so it no longer needs — or wants — a forced minimum:
+// see that component's own comment for why the old 34rem was specific to
+// the layout this replaces.
 export function AlumniEmployers() {
   const t = useTranslations("AlumniEmployers");
 
   return (
-    <Section className="relative isolate min-h-[34rem] overflow-hidden md:min-h-[32rem]">
-      <AlumniLogoField />
+    <Section className="relative isolate overflow-hidden md:min-h-[32rem]">
+      <div className="hidden md:block">
+        <AlumniLogoField />
+      </div>
       {/* z-0, not ThreadSegment's own default -z-10: that default assumes it
           sits directly on the section's own background, but here
           AlumniLogoField is itself a full-bleed, z-index:auto layer between
@@ -99,6 +152,9 @@ export function AlumniEmployers() {
       <Container className="relative flex flex-col gap-10">
         <div className="inline-flex flex-col gap-4 self-start bg-paper p-6 md:p-8">
           <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
+        </div>
+        <div className="md:hidden">
+          <AlumniLogoStrip />
         </div>
       </Container>
     </Section>

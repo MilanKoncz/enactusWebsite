@@ -99,7 +99,7 @@ test.describe("homepage", () => {
   test("shows the pillar detail text without any hover or focus interaction", async ({ page }) => {
     await page.goto("/");
     const detail = page
-      .getByText("Wir wählen Projekte danach aus, welches SDG sie voranbringen")
+      .getByText("Dieser Impact Charakter stößt bei Firmen auf Begeisterung")
       .first();
     await detail.scrollIntoViewIfNeeded();
     await expect(detail).toHaveCSS("opacity", "0.6");
