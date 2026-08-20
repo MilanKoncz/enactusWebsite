@@ -53,8 +53,15 @@ test.describe("/events", () => {
   test("keeps the four Enactus Germany event cards the same height despite unequal text length", async ({
     page,
   }) => {
-    await page.setViewportSize({ width: 1280, height: 900 });
+    // goto before setViewportSize, not after: this was the one test in the
+    // file resizing before the first navigation of a fresh page/context,
+    // and the one test that kept intermittently failing in CI on WebKit
+    // with a page.goto timeout — a known category of Playwright/WebKit
+    // flakiness (resizing before the initial load can stall the
+    // subsequent navigation). Every sibling test here navigates first and
+    // has never shown the same failure.
     await page.goto("/events");
+    await page.setViewportSize({ width: 1280, height: 900 });
 
     const heights = await page.evaluate(() => {
       const headings = ["National Cup", "Enactus Startup Accelerator", "One Enactus Weekend", "Trainingswochenende"];
