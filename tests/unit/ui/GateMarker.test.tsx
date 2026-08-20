@@ -41,6 +41,14 @@ describe("GateMarker", () => {
     ).toBeInTheDocument();
   });
 
+  it("hides the divider variant's rule below md, since without the golden thread passing through it, it has nothing to connect to", () => {
+    const { container: divider } = render(<GateMarker label="Operations Gating" variant="divider" />);
+    expect(divider.querySelector('[aria-hidden="true"]')).toHaveClass("hidden", "md:block");
+
+    const { container: milestone } = render(<GateMarker label="Inno Gating" variant="milestone" />);
+    expect(milestone.querySelector('[aria-hidden="true"]')).not.toHaveClass("hidden");
+  });
+
   it("has no accessibility violations in either variant", async () => {
     const { container } = render(
       <>

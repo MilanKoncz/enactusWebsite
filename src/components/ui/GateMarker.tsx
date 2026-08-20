@@ -22,9 +22,21 @@ export function GateMarker({ label, variant = "milestone", as = "div", className
   const isDivider = variant === "divider";
   return (
     <Wrapper className={cn("flex items-center gap-3", isDivider ? "mx-auto flex-col" : "flex-row", className)}>
+      {/* The divider variant's rule only reads as intentional where it
+          coincides with the golden thread passing through it (ThreadSegment,
+          also 2px, also gold, also centered) — on the homepage the thread
+          continues above and below this short stub, so together they read as
+          one continuous line becoming the gate's rule for a moment. Below
+          md the thread doesn't render at all (ThreadSegment.tsx: "hidden
+          md:block"), which left this stub floating above the label with
+          nothing to connect to — an unexplained gold streak, not a
+          divider (board feedback, 2026-08-20). Hiding it in lockstep with
+          the thread it depends on removes the orphan rather than papering
+          over it; the milestone variant's rule needs no such gate, since it
+          always stands beside its own label, never in front of a thread. */}
       <span
         aria-hidden="true"
-        className={cn("w-[2px] bg-gold", isDivider ? "h-8" : "min-h-8 self-stretch")}
+        className={cn("w-[2px] bg-gold", isDivider ? "hidden h-8 md:block" : "min-h-8 self-stretch")}
       />
       {/* currentColor, not a hardcoded ink, so this reads correctly on an
           ink-surfaced (dark) section too — same pattern as Eyebrow. The
