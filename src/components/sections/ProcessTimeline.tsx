@@ -236,12 +236,18 @@ export function ProcessTimeline() {
   const enhanced = hasMounted && !prefersReducedMotion;
 
   return (
-    <Section className="relative isolate">
+    // Own, deliberately smaller rhythm than Section's default py-16/24: this
+    // page has no hero, so ProcessIntro's heading and ProjectGuideDownload's
+    // follow-up sit right above/below with nothing else competing for
+    // attention — the full default gap plus the group's own inner padding
+    // (removed below, it duplicated this Section's job) stacked into
+    // visible dead air the timeline had to swim in.
+    <Section className="relative isolate py-10 md:py-14">
       <Container>
         <div
           role="group"
           aria-label={t("timeline.regionLabel")}
-          className="relative isolate flex flex-col gap-10 py-8 md:py-10"
+          className="relative isolate flex flex-col gap-10"
         >
           <span
             aria-hidden="true"
