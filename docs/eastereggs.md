@@ -1,9 +1,12 @@
 # Easter eggs
 
-Three intentional, board-approved easter eggs live on this site. They are
-listed here so the next Head of IT recognizes them as deliberate features
-during a future redesign or accessibility audit, not as bugs to "fix" by
-deleting.
+Seven intentional easter eggs live on this site. They are listed here so the
+next Head of IT recognizes them as deliberate features during a future
+redesign or accessibility audit, not as bugs to "fix" by deleting. All seven
+are beiwerk (extras): wherever one would collide with existing
+functionality, accessibility, or privacy, the existing thing wins — none of
+them changes a route's status code, skips validation, adds tracking, or
+hides content a keyboard/screen-reader user would otherwise get.
 
 ## 1. Admin footer credit → mkoncz.me
 
@@ -22,11 +25,14 @@ Three clicks on the Enactus logo in the homepage hero, within two seconds
 of each other, trigger a short (1.4s) confetti burst in the brand colors
 (gold, navy, sand) — `src/components/motion/HeroLogoConfetti.tsx`, wrapping
 `HomeHero.tsx`'s logo. Self-built with a `<canvas>` and `requestAnimationFrame`,
-no library. The canvas mounts only for the burst's own duration and is
-removed the moment it ends. Inert entirely under `prefers-reduced-motion`
-— not a calmer variant, no effect at all. The logo stays a plain image (no
-button role, no added tab stop); the click handler only matters to a
-mouse/touch user, and the effect changes nothing else about the page.
+no library — the actual burst logic lives in
+`src/components/motion/ConfettiBurst.tsx`, the one confetti engine on the
+site, shared with eggs 4 and 7 below rather than reimplemented per caller.
+The canvas mounts only for the burst's own duration and is removed the
+moment it ends. Inert entirely under `prefers-reduced-motion` — not a
+calmer variant, no effect at all. The logo stays a plain image (no button
+role, no added tab stop); the click handler only matters to a mouse/touch
+user, and the effect changes nothing else about the page.
 
 ## 3. Footer 8-bit mode
 
@@ -61,3 +67,94 @@ The whole second palette is contrast-checked in
 the brand palette relies on (paper-on-ink, ink-on-gold, sand-on-ink,
 paper-on-moss, amber/oxblood-on-paper, both 60%-opacity muted-text cases)
 — all clear 4.5:1.
+
+## 4. Contact form success → confetti
+
+Submitting the contact form (`/kontakt`) successfully triggers the same
+confetti burst as the hero logo click (`ConfettiBurst`, see egg 2) —
+`ContactForm.tsx` reads the success message's own rendered position
+(`getBoundingClientRect()` on a ref around it, right after mount) and bursts
+from there. Only on a real, confirmed success — never on validation
+failure, never while pending, and never on the network/mail-provider error
+path, which still shows the plain error message with the mailto fallback,
+unchanged. The announced confirmation text (`FormStatusMessage`, `role=
+"status"`) is identical to before and unaffected either way; the burst
+itself is `aria-hidden` and purely decorative. Inert entirely under
+`prefers-reduced-motion`, same as egg 2. The application form
+(`/mitmachen`) deliberately gets none of this — a Bewerbung is a serious
+step, not a moment for particles.
+
+## 5. The 404 page is a small building site
+
+`not-found.tsx` (both locales) reads as a corner of the InnoLab under
+construction rather than a plain error page: a handful of real, unmodified
+UN SDG icons (`public/sdg/`, via `sdgIconSrc()` — the same source every SDG
+reference on the site uses, never recolored or cropped, per the UN's own
+usage terms) float gently at the section's edges, and two `GateMarker`s
+(the site's one signature motif — a gold rule plus a mono label) stand in
+as a construction barrier, labelled "Baustelle" / "InnoLab". Everything
+decorative sits in a single `aria-hidden`, `pointer-events-none` layer,
+pinned to the corners and well clear of the centered heading, note, and
+link list, so the joke can never get between a visitor and the way back —
+the heading itself stays the real, meaningful text
+(`t("title")`, "404. Diese Seite wird gerade noch im InnoLab entwickelt."),
+not a replacement for it. Below the note, the existing "back to homepage"
+link is joined by the full main-nav link list (same `content/navigation.ts`
+`mainNav` Header and Footer already read from), so a visitor who lands here
+from a dead link can reach any main section directly, not just the
+homepage.
+
+The tiles' float (`animate-construction-float`, `globals.css`) is a plain
+transform-only CSS loop, no JavaScript — like every other looping animation
+on this site, it collapses to a single near-instant frame under
+`prefers-reduced-motion` via the blanket override already in `globals.css`,
+rather than carrying its own reduced-motion guard. The route's status code
+and Next's own `not-found.tsx` behavior are untouched — this only changes
+what renders inside it.
+
+## 6. Hero logo → night mode zzZ
+
+Load the site between 22:00 and 06:00 in your browser's local time and a
+small zzZ sequence drifts up beside the Enactus logo in the homepage hero,
+as if it were asleep — `HeroLogoConfetti.tsx` (the same component that owns
+egg 2, since both are effects on the same logo). The check runs
+exclusively client-side, after mount, off the visitor's own local clock —
+never server-evaluated: the pages are static and served from a CDN, so a
+server-side check would either freeze at build time or disagree with the
+client and cause a hydration mismatch, the exact failure class this
+project has already hit twice. It reuses the existing `useNow` hook
+(`src/lib/useNow.ts`) rather than a new interval/clock hook — polled once a
+minute, not once a second, since the display only needs to catch a
+night/day transition, not tick visibly. `useNow`'s documented epoch (`0`)
+snapshot for the server and the first client render is what keeps this
+egg fully absent at both of those points (`now > 0` gates it) — the exact
+same safe-default pattern the hook's own file comment describes for
+`/mitmachen`'s recruiting-window check, reused here rather than
+reinvented.
+
+The zzZ are `aria-hidden`, absolutely positioned so they can never affect
+the logo's own box, size, or the surrounding layout — nothing shifts when
+they appear after mount. Never rendered under `prefers-reduced-motion`. The
+logo itself, its size, and its click-for-confetti behavior (egg 2) are
+completely unchanged; the zzZ are a sibling overlay, not a modification to
+the logo or its wrapper's dimensions.
+
+## 7. `/secret` — the chill area
+
+A hidden page at `/secret` (and `/en/secret`), reachable only by typing the
+URL. It is not one of `content/navigation.ts`'s `routes` — not in
+`mainNav`, not in the Header, not in the Footer, and therefore not in
+`sitemap.ts` either, since that page builds its path list from exactly that
+record. `robots.ts` disallows it explicitly on top of that, and the page's
+own metadata sets `robots: { index: false, follow: false }` — the same
+belt-and-braces layering `/admin/bewerbungen` already uses for its own
+noindex. It carries no real data, no form, and no database access — just a
+playful dark, gold-accented moment (`Section surface="ink"`) with a real
+heading ("Du hast die geheime Chill Area gefunden!"), a short note, and a
+link back to the homepage.
+
+On entry it fires the same `ConfettiBurst` egg 2 and egg 4 use
+(`SecretEntryConfetti.tsx`), centered in the viewport since — unlike those
+two — there's no single element on this page for it to burst from. Inert
+under `prefers-reduced-motion`; the page itself stays fully reachable and
+readable either way, it just never renders that one component's burst.

@@ -55,7 +55,7 @@ export function HomeHero() {
             roughly 40% of its previous size (text-display-1 at lg was
             6rem; text-display-3 is 2.5rem, ~42%) instead of scaling up
             across breakpoints the way it used to. Three clicks trigger a
-            confetti burst — easter egg 2/3, docs/eastereggs.md. */}
+            confetti burst — easter egg 2/7, docs/eastereggs.md. */}
         <HeroLogoConfetti variant="full" surface="ink" className="h-20 w-auto sm:h-32 md:h-40 lg:h-48" />
         {/* Gold as a text colour is only ever legible on ink, never on paper
             (docs/design-system.md). Here it measures 11.6:1 against the ink

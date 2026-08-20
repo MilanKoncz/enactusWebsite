@@ -62,7 +62,7 @@ afterEach(() => {
 });
 
 /**
- * Easter egg 3/3 (docs/eastereggs.md). Covers the timing state machine;
+ * Easter egg 3/7 (docs/eastereggs.md). Covers the timing state machine;
  * the CSS layer it drives (globals.css's html[data-eight-bit] rules) was
  * verified by hand in a real browser (Playwright), including the actual
  * computed font-family/border-radius/box-shadow/image-rendering and the

@@ -6,7 +6,7 @@ import { routes } from "@/content/navigation";
 import { usePathname } from "@/lib/navigation";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
-// Easter egg 3/3 (docs/eastereggs.md). A small logo occasionally peeks up
+// Easter egg 3/7 (docs/eastereggs.md). A small logo occasionally peeks up
 // from the bottom of the footer; clicking it switches the whole site into
 // an 8-bit look for 60 seconds. The look itself is a single CSS layer keyed
 // off html[data-eight-bit] (globals.css) — this component only owns the

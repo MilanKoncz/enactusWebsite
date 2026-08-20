@@ -73,7 +73,7 @@ export function Footer({ hasJobs = false }: FooterProps) {
 
   return (
     <footer className="relative mt-auto">
-      {/* Easter egg 3/3 (docs/eastereggs.md) — a sibling of Section, not a
+      {/* Easter egg 3/7 (docs/eastereggs.md) — a sibling of Section, not a
           child, so its absolute bottom-anchored button positions against
           the whole footer's box rather than Container's narrower, padded
           one. */}

@@ -255,7 +255,7 @@ describe("design tokens: color contrast", () => {
     });
   });
 
-  // Easter egg 3/3 (docs/eastereggs.md): html[data-eight-bit="active"]'s
+  // Easter egg 3/7 (docs/eastereggs.md): html[data-eight-bit="active"]'s
   // second color palette (globals.css). Read directly from the CSS file
   // rather than hand-copied here, so an edit to one can't silently drift
   // from the other — the same reasoning readCssColorTokens() above exists
