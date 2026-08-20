@@ -16,7 +16,7 @@ describe("EventsNetwork", () => {
     mockMatchMedia(false);
     renderWithIntl(<EventsNetwork />);
     expect(screen.getByText("rund 1.700")).toBeInTheDocument();
-    expect(screen.getByText("über 30")).toBeInTheDocument();
+    expect(screen.getByText("über 24")).toBeInTheDocument();
   });
 
   it("renders the global country count as a plain figure, no qualifier", () => {
@@ -86,7 +86,7 @@ describe("EventsNetwork", () => {
       io.intersect(true);
     });
     expect(screen.getByText("rund 1.700")).toBeInTheDocument();
-    expect(screen.getByText("über 30")).toBeInTheDocument();
+    expect(screen.getByText("über 24")).toBeInTheDocument();
     expect(screen.getByText("34")).toBeInTheDocument();
   });
 });

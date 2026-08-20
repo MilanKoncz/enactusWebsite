@@ -1,11 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { networkStats, networkStatsSchema, teamLinkSchema, teamLinks } from "@/content/network";
+import {
+  germanTeamCities,
+  germanTeamCitySchema,
+  networkStats,
+  networkStatsSchema,
+  teamLinkSchema,
+  teamLinks,
+} from "@/content/network";
 
 describe("content/network", () => {
   it("matches the confirmed Enactus Germany and Enactus Global figures", () => {
     expect(networkStats).toMatchObject({
       studentsGermany: 1700,
-      universitiesGermany: 30,
+      universitiesGermany: 24,
       countriesGlobal: 34,
       verified: true,
     });
@@ -48,5 +55,25 @@ describe("content/network", () => {
     expect(() =>
       teamLinkSchema.parse({ key: "not-a-team", name: "Test", url: null }),
     ).toThrow();
+  });
+
+  it("lists exactly the 18 other German locations, none overlapping the five linked teams or Mannheim", () => {
+    expect(germanTeamCities).toHaveLength(18);
+    const linkedNames = teamLinks.map((t) => t.name);
+    for (const city of germanTeamCities) {
+      expect(linkedNames).not.toContain(city.name);
+      expect(city.name).not.toBe("Mannheim");
+    }
+  });
+
+  it("validates every exported German team city against the schema", () => {
+    for (const city of germanTeamCities) {
+      expect(() => germanTeamCitySchema.parse(city)).not.toThrow();
+    }
+  });
+
+  it("gives every German team city a unique key", () => {
+    const keys = germanTeamCities.map((c) => c.key);
+    expect(new Set(keys).size).toBe(keys.length);
   });
 });

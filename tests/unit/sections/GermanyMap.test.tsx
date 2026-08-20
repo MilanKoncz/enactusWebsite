@@ -3,7 +3,7 @@ import { screen } from "@testing-library/react";
 import { axe } from "jest-axe";
 import { renderWithIntl } from "../../fixtures/intl";
 import { GermanyMap } from "@/components/sections/GermanyMap";
-import { teamLinks } from "@/content/network";
+import { germanTeamCities, teamLinks } from "@/content/network";
 
 describe("GermanyMap", () => {
   it("gives the map one describing accessible name, in German by default", () => {
@@ -50,6 +50,23 @@ describe("GermanyMap", () => {
   it("renders exactly as many overlay links as teams", () => {
     renderWithIntl(<GermanyMap />);
     expect(screen.getAllByRole("link")).toHaveLength(teamLinks.length);
+  });
+
+  it("names every other German location in a text list, not just as a dot", () => {
+    renderWithIntl(<GermanyMap />);
+    for (const city of germanTeamCities) {
+      expect(screen.getByText(city.name)).toBeInTheDocument();
+    }
+  });
+
+  it("keeps every unlinked city dot aria-hidden, same as the rest of the picture", () => {
+    const { container } = renderWithIntl(<GermanyMap />);
+    const svg = container.querySelector('svg[role="img"]')!;
+    const circles = svg.querySelectorAll("circle");
+    expect(circles.length).toBeGreaterThanOrEqual(germanTeamCities.length);
+    for (const circle of Array.from(circles)) {
+      expect(circle.closest('[aria-hidden="true"]')).not.toBeNull();
+    }
   });
 
   it("has no accessibility violations", async () => {

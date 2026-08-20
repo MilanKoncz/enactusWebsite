@@ -213,10 +213,38 @@ recreate from this description if the outline ever needs regenerating):
 **Points.** `MANNHEIM_POINT` and `TEAM_POINTS` in `GermanyMap.tsx` are the
 same six cities' real center coordinates (decimal degrees, public
 knowledge — Mannheim, München, Münster, Hamburg, Köln, Karlsruhe) run
-through the identical projection instance, not eyeballed. To add a
-seventh point, project its lon/lat through the same `geoConicEqualArea`
-setup (parallels/rotate above, `fitExtent` against the current outline) so
-it lands consistently with the rest.
+through the identical projection instance, not eyeballed. `OTHER_CITY_POINTS`
+covers every other German Enactus location (`content/network.ts`'s
+`germanTeamCities`, 18 entries as of 2026-08-20) the same way, rendered as
+smaller unlinked dots with no inline label — at 24 points total on this
+small a silhouette, labelling all of them would overlap unreadably, so
+only Mannheim and the five linked partner teams get one; every other
+city's name is listed in text below the map instead
+(`moreLocationsHeading`), never available only by picking out a dot.
+
+To add a new point (linked or not), project its lon/lat through the same
+`geoConicEqualArea` setup (parallels 48.66°N/53.66°N, center 10.45°E). The
+original `fitExtent` scale/translate aren't reproduced in this codebase —
+they were instead recovered by least-squares fitting the projection's raw
+output against the six known points' known pixel positions (residual error
+under 0.05px on all six), which is the same method `OTHER_CITY_POINTS`
+used and the one to reuse for a new point.
+
+**Retrieving the full German roster, if it needs updating.** The list
+lives on enactus.de/network behind a "Liste aller Enactus Teams in
+Deutschland" accordion. That page is a Next.js app; the accordion's
+content is not present in a naive text scrape of the collapsed page, and
+the CMS its data comes from (`cms.enactus-germany.foldland.services`)
+exposes no public API — its root redirects straight to a Strapi admin
+login. What does work: the accordion is still server-rendered, so a plain
+`curl` of the page's HTML contains the full list pre-serialized inside a
+React Server Components ("flight") payload embedded in a `<script>` tag —
+search the fetched HTML for `Liste aller Enactus Teams in Deutschland`,
+then read the `<ul>` of `<li>` city names immediately following it in that
+same payload. No headless browser or CMS credentials needed. The same
+page's prose separately claims a "28 Hochschulen" figure that the payload
+itself doesn't back up with a 25th–28th named entry — re-count rather than
+trusting the prose number if this list is ever regenerated.
 
 ## Edit the four Enactus Germany event cards on `/events`
 

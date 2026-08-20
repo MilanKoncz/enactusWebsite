@@ -484,8 +484,9 @@
     "atLeast": "über {value}",
     "teamsHeading": "Weitere starke Enactus-Teams",
     "teamLinkLabel": "Enactus {name} öffnet in neuem Tab",
-    "mapTitle": "Karte der Enactus-Standorte in Deutschland: Mannheim sowie die Partnerteams in München, Münster, Hamburg, Köln und Karlsruhe",
-    "mapMannheimLabel": "Mannheim"
+    "mapTitle": "Karte der Enactus-Standorte in Deutschland: Mannheim, die Partnerteams in München, Münster, Hamburg, Köln und Karlsruhe sowie 18 weitere deutsche Standorte",
+    "mapMannheimLabel": "Mannheim",
+    "moreLocationsHeading": "Weitere Enactus-Standorte in Deutschland"
   },
   "EgEvents": {
     "nc": {
