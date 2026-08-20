@@ -25,7 +25,19 @@ jobs:
     # the other. Bumping: change the version in both places, and the tag
     # suffix (-noble is Ubuntu 24.04) if Playwright's own image support
     # changes — full tag list at https://mcr.microsoft.com/v2/playwright/tags/list.
-    container: mcr.microsoft.com/playwright:v1.62.0-noble
+    #
+    # options: Docker's own default shared-memory size (/dev/shm, 64 MB) is
+    # too small for a browser under real load — confirmed the hard way on
+    # the first run of this container: every other test passed, but
+    # Mobile Safari (WebKit) consistently timed out on page.goto, all three
+    # attempts (2 workers, matching playwright.config.ts's CI cap), while
+    # the exact same suite was reliable on the previous bare-runner setup,
+    # which has the full host's shared memory rather than Docker's default.
+    # This is Playwright's own documented fix for running under Docker, not
+    # a guess — see https://playwright.dev/docs/ci#running-playwright-in-docker.
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.0-noble
+      options: --shm-size=2gb
     steps:
       - uses: actions/checkout@v4
 
