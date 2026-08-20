@@ -18,10 +18,10 @@ const emailSchema = z.email().nullable();
 // person). Kept separate from content/board.ts's five-seat public "Vorstand"
 // roster on purpose: the legally representing board (Vorstand im Sinne des
 // Vereinsrechts) is a subset of the five-seat public-facing roster, and the
-// two lists can diverge — see ASSETS-TODO.md. Confirmed 2026-08-15: only two
-// of the three legally representing seats are currently held (Thorben Ossig,
-// Anton Osuhovskiy); the third is formally vacant, so `names` has two
-// entries rather than three — that's the confirmed fact, not a gap.
+// two lists can diverge — see ASSETS-TODO.md. Confirmed 2026-08-15 (Thorben
+// Ossig, Anton Osuhovskiy) and 2026-08-20 (Tom Iizuka, filling the
+// previously vacant third seat) — all three legally representing seats are
+// now held.
 const legalRepresentativesSchema = z.object({
   names: z.array(z.string()),
   verified: z.boolean(),
@@ -58,10 +58,10 @@ export const org: Org = orgSchema.parse({
   foundingYear: { year: 2003, verified: true },
   registeredOffice: "L1, 1 Postfach 31, 68161 Mannheim",
   registerEntry: "Amtsgericht Mannheim, Vereinsregister VR 700965",
-  // Board-confirmed 2026-08-15 — see the field comment above for the vacant
-  // third seat.
+  // Board-confirmed — see the field comment above for the two confirmation
+  // dates.
   legalRepresentatives: {
-    names: ["Thorben Ossig", "Anton Osuhovskiy"],
+    names: ["Thorben Ossig", "Anton Osuhovskiy", "Tom Iizuka"],
     verified: true,
   },
   contactEmails: {
