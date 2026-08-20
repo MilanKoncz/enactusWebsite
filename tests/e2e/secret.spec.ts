@@ -18,6 +18,14 @@ test.describe("/secret", () => {
     await expect(page.getByRole("link", { name: "Back to the homepage" })).toBeVisible();
   });
 
+  test("glows and beats the logo, and bursts confetti", async ({ page }) => {
+    await page.goto("/secret");
+    const logo = page.getByRole("main").locator("img").first();
+    await expect(logo).toHaveClass(/animate-party-glow/);
+    await expect(logo).toHaveClass(/animate-party-beat/);
+    await expect(page.locator("canvas")).toBeVisible();
+  });
+
   test("carries noindex, nofollow metadata", async ({ page }) => {
     await page.goto("/secret");
     const content = await page.locator('meta[name="robots"]').getAttribute("content");

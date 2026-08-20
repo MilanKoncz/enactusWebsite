@@ -90,13 +90,19 @@ step, not a moment for particles.
 construction rather than a plain error page: a handful of real, unmodified
 UN SDG icons (`public/sdg/`, via `sdgIconSrc()` — the same source every SDG
 reference on the site uses, never recolored or cropped, per the UN's own
-usage terms) float gently at the section's edges, and two `GateMarker`s
-(the site's one signature motif — a gold rule plus a mono label) stand in
-as a construction barrier, labelled "Baustelle" / "InnoLab". Everything
-decorative sits in a single `aria-hidden`, `pointer-events-none` layer,
-pinned to the corners and well clear of the centered heading, note, and
-link list, so the joke can never get between a visitor and the way back —
-the heading itself stays the real, meaningful text
+usage terms) float gently at the section's edges, a minimal gold-line crane
+(`ConstructionCrane`, same 150×190px pixel geometry regardless of viewport
+— the three bars have to line up exactly, which a set of Tailwind spacing
+utilities would only approximate) hoists one of them by a dashed cable,
+gold/ink hazard-stripe tape (`globals.css`'s `.hazard-stripes` utility, a
+`repeating-linear-gradient` — the same two brand tokens conventional hazard
+tape already uses, yellow/black) runs along the section's bottom edge, and
+two `GateMarker`s (the site's one signature motif — a gold rule plus a mono
+label) stand in as a barrier too, labelled "Baustelle" / "InnoLab".
+Everything decorative sits in a single `aria-hidden`, `pointer-events-none`
+layer, pinned to the corners and edges and well clear of the centered
+heading, note, and link list, so the joke can never get between a visitor
+and the way back — the heading itself stays the real, meaningful text
 (`t("title")`, "404. Diese Seite wird gerade noch im InnoLab entwickelt."),
 not a replacement for it. Below the note, the existing "back to homepage"
 link is joined by the full main-nav link list (same `content/navigation.ts`
@@ -104,20 +110,25 @@ link is joined by the full main-nav link list (same `content/navigation.ts`
 from a dead link can reach any main section directly, not just the
 homepage.
 
-The tiles' float (`animate-construction-float`, `globals.css`) is a plain
-transform-only CSS loop, no JavaScript — like every other looping animation
-on this site, it collapses to a single near-instant frame under
-`prefers-reduced-motion` via the blanket override already in `globals.css`,
-rather than carrying its own reduced-motion guard. The route's status code
-and Next's own `not-found.tsx` behavior are untouched — this only changes
-what renders inside it.
+The cable reuses the site's existing dashed-gold-border vocabulary (the
+calendar's "tentative" event treatment, docs/design-system.md) rather than
+inventing a new line style — a tile still "in progress" reads the same way
+here as it does on an unconfirmed calendar event. The tiles' float
+(`animate-construction-float`, `globals.css`) is a plain transform-only CSS
+loop, no JavaScript — like every other looping animation on this site, it
+collapses to a single near-instant frame under `prefers-reduced-motion` via
+the blanket override already in `globals.css`, rather than carrying its own
+reduced-motion guard. The route's status code and Next's own `not-found.tsx`
+behavior are untouched — this only changes what renders inside it.
 
-## 6. Hero logo → night mode zzZ
+## 6. Header logo → night mode zzZ
 
 Load the site between 22:00 and 06:00 in your browser's local time and a
-small zzZ sequence drifts up beside the Enactus logo in the homepage hero,
-as if it were asleep — `HeroLogoConfetti.tsx` (the same component that owns
-egg 2, since both are effects on the same logo). The check runs
+small zzZ sequence drifts up beside the Enactus logo in the header, as if
+it were asleep — `NightModeZzz.tsx`, wrapped around `Header.tsx`'s logo
+link. Deliberately the *header's* logo, not the homepage hero's
+(`HeroLogoConfetti.tsx`, egg 2, which owns none of this): the header is on
+every page, so the sleepy logo is too, not just on `/`. The check runs
 exclusively client-side, after mount, off the visitor's own local clock —
 never server-evaluated: the pages are static and served from a CDN, so a
 server-side check would either freeze at build time or disagree with the
@@ -132,14 +143,15 @@ same safe-default pattern the hook's own file comment describes for
 `/mitmachen`'s recruiting-window check, reused here rather than
 reinvented.
 
-The zzZ are `aria-hidden`, absolutely positioned so they can never affect
-the logo's own box, size, or the surrounding layout — nothing shifts when
-they appear after mount. Never rendered under `prefers-reduced-motion`. The
-logo itself, its size, and its click-for-confetti behavior (egg 2) are
-completely unchanged; the zzZ are a sibling overlay, not a modification to
-the logo or its wrapper's dimensions.
+The zzZ are `aria-hidden`, absolutely positioned inside the header's own
+logo link (which the header link itself is `position: relative` for) so
+they can never affect the logo's own box, size, or the surrounding
+layout — nothing shifts when they appear after mount. Never rendered under
+`prefers-reduced-motion`. The logo itself and its size are completely
+unchanged; the zzZ are a sibling overlay, not a modification to the logo
+or the link's own dimensions.
 
-## 7. `/secret` — the chill area
+## 7. `/secret` — the party
 
 A hidden page at `/secret` (and `/en/secret`), reachable only by typing the
 URL. It is not one of `content/navigation.ts`'s `routes` — not in
@@ -148,13 +160,30 @@ URL. It is not one of `content/navigation.ts`'s `routes` — not in
 record. `robots.ts` disallows it explicitly on top of that, and the page's
 own metadata sets `robots: { index: false, follow: false }` — the same
 belt-and-braces layering `/admin/bewerbungen` already uses for its own
-noindex. It carries no real data, no form, and no database access — just a
-playful dark, gold-accented moment (`Section surface="ink"`) with a real
-heading ("Du hast die geheime Chill Area gefunden!"), a short note, and a
-link back to the homepage.
+noindex. It carries no real data, no form, and no database access — a
+party, not a quiet chill-out room: a dark, gold-accented moment
+(`Section surface="ink"`) with a real heading ("Du hast die geheime Chill
+Area gefunden!"), a short note, a link back to the homepage, a logo mark
+that glows through every hue and pulses to a beat, and confetti that keeps
+coming back.
 
-On entry it fires the same `ConfettiBurst` egg 2 and egg 4 use
-(`SecretEntryConfetti.tsx`), centered in the viewport since — unlike those
-two — there's no single element on this page for it to burst from. Inert
-under `prefers-reduced-motion`; the page itself stays fully reachable and
-readable either way, it just never renders that one component's burst.
+The logo (`Logo variant="compact"`) carries two concurrent CSS animations,
+`animate-party-glow` and `animate-party-beat` (`globals.css`) — one cycles
+a `hue-rotate` filter continuously through the color wheel (with two
+gold `drop-shadow`s riding along, since they're composited before the
+final hue-rotate stage), the other gives it a snappy, off-beat scale/rotate
+pulse. Both are a deliberate, contained exception to
+docs/design-system.md's usual transform/opacity-only motion rule — see the
+`@keyframes party-glow` comment for why a single decorative element on one
+hidden, intentionally over-the-top page doesn't carry the performance risk
+that rule otherwise guards against. Both collapse to their neutral resting
+frame under `prefers-reduced-motion` via the blanket override already in
+`globals.css`, no separate guard needed.
+
+`SecretPartyConfetti.tsx` fires the same `ConfettiBurst` egg 2 and egg 4
+use — once on mount, then again every four seconds for as long as the page
+stays open, each time from a fresh, slightly randomized point near the top
+of the viewport, since unlike those two callers there's no single element
+on this page for a burst to be "from". Inert under `prefers-reduced-motion`;
+the page itself stays fully reachable and readable either way, it just
+never renders a burst.
