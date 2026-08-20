@@ -1,12 +1,20 @@
 import { describe, expect, it } from "vitest";
 import { jobPostingCreateSchema, jobPostingFormSchema } from "@/lib/jobPostingFormSchema";
+import { SITE_TIMEZONE } from "@/content/timezone";
 
-// Relative to the real clock, comfortably clear of any timezone rounding at
-// the day boundary — same reasoning as tests/e2e/calendar.spec.ts's isoDate.
+// Relative to the real clock, formatted in the same timezone
+// jobPostingFormSchema.ts's own todayInSiteTimezone() validates against —
+// not UTC (the bug this replaced): Berlin runs two hours ahead of UTC in
+// summer, so isoDate(0) computed via toISOString().slice(0, 10) named
+// "today" as still-yesterday for the two hours a day (22:00-24:00 UTC)
+// where Berlin's calendar date has already turned over. setUTCDate's
+// day-arithmetic itself is fine (adding N whole days is timezone-agnostic);
+// only the final formatting step needs to happen in SITE_TIMEZONE, exactly
+// like the schema's own check.
 function isoDate(daysFromToday: number): string {
   const date = new Date();
   date.setUTCDate(date.getUTCDate() + daysFromToday);
-  return date.toISOString().slice(0, 10);
+  return new Intl.DateTimeFormat("en-CA", { timeZone: SITE_TIMEZONE }).format(date);
 }
 
 const BASE = {
