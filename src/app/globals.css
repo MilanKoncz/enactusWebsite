@@ -157,6 +157,13 @@
   --animate-orbit-spin: orbit-spin var(--orbit-duration) linear infinite;
   --animate-orbit-counter-spin: orbit-counter-spin var(--orbit-duration) linear infinite;
 
+  /* Night-mode zzZ (HeroLogoConfetti.tsx, easter egg 6/7) — each of the
+     three z's drifts up and to the right while fading, on a loop, staggered
+     by its own animation-delay. Transform and opacity only, and the whole
+     zzZ group is aria-hidden and only ever rendered client-side after
+     confirming the local hour, per that component's own comment. */
+  --animate-zzz-float: zzz-float 2.4s ease-in infinite;
+
   /* Interaction — docs/design-system.md. Registered under @theme (unlike
      --duration-fast/--duration-calm below) because --ease-* is a real
      Tailwind v4 theme namespace: this generates the `ease-signature` utility
@@ -327,6 +334,23 @@ body {
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+@keyframes zzz-float {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.8);
+  }
+  15% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0.6rem, -1.2rem) scale(1.1);
   }
 }
 
