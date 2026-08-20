@@ -60,8 +60,20 @@ test.describe("homepage", () => {
       // ones, which this page has none of among these candidates) — this is
       // what excludes the mobile-menu trigger, correctly display:none at
       // desktop width (lg:hidden) and covered instead by mobile-nav.spec.ts.
+      //
+      // button:not([disabled]):not([tabindex="-1"]) — the 8-bit easter
+      // egg's peek button (EightBitEasterEgg.tsx, docs/eastereggs.md) is a
+      // real, non-disabled <button> deliberately given tabindex="-1" so it
+      // never joins the page's tab order; a plain button:not([disabled])
+      // selector still matched it here (tabindex doesn't affect element
+      // matching), counting it as a candidate the real Tab key then
+      // correctly never focuses. Excluding tabindex="-1" explicitly keeps
+      // this test asserting what "keyboard-traversable" actually means:
+      // every element real Tab presses can reach.
       const candidates = Array.from(
-        document.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex="0"]'),
+        document.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]):not([tabindex="-1"]), [tabindex="0"]',
+        ),
       ).filter((el) => el.offsetParent !== null);
       candidates.forEach((el, index) => el.setAttribute("data-tab-order", String(index)));
       return candidates.length;
