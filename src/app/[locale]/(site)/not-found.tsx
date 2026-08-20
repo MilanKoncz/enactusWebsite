@@ -15,16 +15,18 @@ import { cn } from "@/lib/cn";
 // here changes either.
 //
 // Easter egg 5/7 (docs/eastereggs.md): the 404 reads as a small InnoLab
-// building site — scattered, real SDG icons and a couple of GateMarkers
-// standing in as barriers — built entirely from existing tokens and shapes,
-// no new imagery. The decorative layer is a single aria-hidden,
-// pointer-events-none div positioned at the section's edges, well clear of
-// the centered text column, so it can never sit between a visitor and the
-// links back into the site. Its gentle float (animate-construction-float,
-// globals.css) is transform-only and, like every other looping animation on
-// this site, collapses to a single near-instant frame under
-// prefers-reduced-motion via the blanket override in globals.css — nothing
-// here needs its own reduced-motion guard on top of that.
+// building site — scattered, real SDG icons, a crane hoisting one of them
+// by a dashed cable, hazard-stripe tape along the bottom edge, and a couple
+// of GateMarkers standing in as barriers — built entirely from existing
+// tokens and shapes, no new imagery. The decorative layer is a single
+// aria-hidden, pointer-events-none div positioned at the section's edges,
+// well clear of the centered text column, so it can never sit between a
+// visitor and the links back into the site. The tiles' gentle float
+// (animate-construction-float, globals.css) is transform-only and, like
+// every other looping animation on this site, collapses to a single
+// near-instant frame under prefers-reduced-motion via the blanket override
+// in globals.css — nothing here needs its own reduced-motion guard on top
+// of that.
 //
 // "404" is the motif, not a warning: large display font, the same register
 // as a homepage headline, not an alarm color or a filled button telling the
@@ -36,10 +38,42 @@ import { cn } from "@/lib/cn";
 // reason, not on paper with a gold override.
 const CONSTRUCTION_TILES: { goal: SdgGoal; position: string; rotate: string; delay: string; hideBelow?: string }[] = [
   { goal: 9, position: "top-10 left-6 sm:left-10", rotate: "-rotate-6", delay: "0s" },
-  { goal: 17, position: "top-14 right-6 sm:right-10", rotate: "rotate-6", delay: "0.9s" },
   { goal: 4, position: "bottom-12 left-8", rotate: "rotate-3", delay: "1.6s", hideBelow: "hidden sm:block" },
   { goal: 13, position: "bottom-16 right-10", rotate: "-rotate-3", delay: "0.5s", hideBelow: "hidden sm:block" },
 ];
+
+// A minimal gold-line crane — the same 2px rule weight as GateMarker's own
+// signature motif — hoisting one SDG tile by a dashed cable. The cable
+// reuses the site's existing "tentative" dashed-gold-border vocabulary
+// (docs/design-system.md's calendar section) rather than inventing a new
+// line style: a gate/goal still "in progress" reads the same way here as it
+// does on an unconfirmed calendar event. Plain pixel offsets, not Tailwind
+// spacing steps — the three bars have to line up with each other exactly,
+// and expressing that as a handful of arbitrary utilities would read far
+// more awkwardly than the geometry itself.
+function ConstructionCrane({
+  className,
+  tileGoal,
+  tileDelay,
+}: {
+  className?: string;
+  tileGoal: SdgGoal;
+  tileDelay: string;
+}) {
+  return (
+    <div aria-hidden="true" className={cn("absolute", className)} style={{ width: 150, height: 190 }}>
+      <div className="absolute bottom-0 w-[2px] bg-gold" style={{ left: 24, height: 160 }} />
+      <div className="absolute h-[2px] bg-gold" style={{ top: 0, left: 4, width: 130 }} />
+      <div className="absolute border-l-2 border-dashed border-gold" style={{ top: 0, left: 128, height: 92 }} />
+      <span
+        className="absolute block size-10 animate-construction-float opacity-70 sm:size-12"
+        style={{ top: 86, left: 106, animationDelay: tileDelay }}
+      >
+        <Image src={sdgIconSrc(tileGoal)} alt="" fill sizes="48px" className="object-contain" />
+      </span>
+    </div>
+  );
+}
 
 export default async function NotFound() {
   const t = await getTranslations("NotFound");
@@ -58,11 +92,16 @@ export default async function NotFound() {
             </span>
           </span>
         ))}
+        <ConstructionCrane tileGoal={17} tileDelay="0.9s" className="top-3 right-3 hidden opacity-80 sm:block" />
         <GateMarker
           label={t("gateConstruction")}
           className="absolute bottom-8 left-[12%] hidden opacity-70 md:flex"
         />
         <GateMarker label={t("gateInnolab")} className="absolute bottom-8 right-[12%] hidden opacity-70 md:flex" />
+        {/* Hazard-stripe tape (globals.css's .hazard-stripes) — a literal
+            construction barrier, gold/ink diagonal stripes, along the
+            section's bottom edge. */}
+        <div className="hazard-stripes absolute inset-x-0 bottom-0 h-3 opacity-90" />
       </div>
 
       <Container className="relative flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">

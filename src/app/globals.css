@@ -910,6 +910,20 @@ body {
   }
 }
 
+/* Hazard-stripe "under construction" tape — 404 page's crane/barrier
+   dressing (not-found.tsx, easter egg 5/7). Gold and ink are literally the
+   same two tokens conventional hazard tape uses (yellow/black), so this
+   reuses the brand palette rather than introducing a third color pair. */
+@utility hazard-stripes {
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--color-gold) 0,
+    var(--color-gold) 14px,
+    var(--color-ink) 14px,
+    var(--color-ink) 28px
+  );
+}
+
 /* Easter egg 3/7 (docs/eastereggs.md), the whole visual side of it —
    EightBitEasterEgg.tsx owns only the timing/state machine and writes
    nothing here but the one attribute this reads. One attribute, one CSS
