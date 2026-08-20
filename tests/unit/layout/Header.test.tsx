@@ -1,7 +1,8 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, screen, within } from "@testing-library/react";
 import { axe } from "jest-axe";
 import { renderWithIntl } from "../../fixtures/intl";
+import { mockMatchMedia } from "../../fixtures/matchMedia";
 import { mockPathname } from "../../fixtures/navigation";
 import { mockIntersectionObserver } from "../../fixtures/observers";
 import { Header } from "@/components/layout/Header";
@@ -15,6 +16,7 @@ afterEach(() => {
 
 describe("Header", () => {
   it("exposes a banner landmark containing the home link, nav, CTA and locale switch", () => {
+    mockMatchMedia(false);
     mockIntersectionObserver();
     mockPathname.mockReturnValue("/");
     renderWithIntl(<Header />);
@@ -26,6 +28,7 @@ describe("Header", () => {
   });
 
   it("is not compact initially", () => {
+    mockMatchMedia(false);
     mockIntersectionObserver();
     mockPathname.mockReturnValue("/");
     renderWithIntl(<Header />);
@@ -33,6 +36,7 @@ describe("Header", () => {
   });
 
   it("sets data-compact when the sentinel leaves the viewport", () => {
+    mockMatchMedia(false);
     const io = mockIntersectionObserver();
     mockPathname.mockReturnValue("/");
     renderWithIntl(<Header />);
@@ -41,6 +45,7 @@ describe("Header", () => {
   });
 
   it("clears data-compact when the sentinel returns to the viewport", () => {
+    mockMatchMedia(false);
     const io = mockIntersectionObserver();
     mockPathname.mockReturnValue("/");
     renderWithIntl(<Header />);
@@ -50,6 +55,7 @@ describe("Header", () => {
   });
 
   it("has no accessibility violations with the mobile menu closed", async () => {
+    mockMatchMedia(false);
     mockIntersectionObserver();
     mockPathname.mockReturnValue("/");
     const { container } = renderWithIntl(<Header />);
@@ -57,6 +63,7 @@ describe("Header", () => {
   });
 
   it("stays solid by default, outside any HeaderSurfaceProvider", () => {
+    mockMatchMedia(false);
     mockIntersectionObserver();
     mockPathname.mockReturnValue("/");
     renderWithIntl(<Header />);
@@ -64,6 +71,7 @@ describe("Header", () => {
   });
 
   it("switches to the ink surface (transparent, gold focus ring) when overlaid", () => {
+    mockMatchMedia(false);
     mockIntersectionObserver();
     mockPathname.mockReturnValue("/");
     renderWithIntl(
@@ -77,6 +85,7 @@ describe("Header", () => {
   });
 
   it("has no accessibility violations while overlaid", async () => {
+    mockMatchMedia(false);
     mockIntersectionObserver();
     mockPathname.mockReturnValue("/");
     const { container } = renderWithIntl(
@@ -85,5 +94,47 @@ describe("Header", () => {
       </HeaderSurfaceContext.Provider>,
     );
     expect(await axe(container)).toHaveNoViolations();
+  });
+});
+
+/**
+ * Easter egg 6/7 (docs/eastereggs.md) — moved here from the homepage hero
+ * so it's visible on every page, not just /. Local-time Date constructor
+ * overload (new Date(year, month, day, hour)), not an ISO string — it
+ * builds the Date directly in whatever timezone the test runner's process
+ * is actually in, so `.getHours()` always reads back the intended hour
+ * regardless of CI/local TZ.
+ */
+describe("Header night mode", () => {
+  function setLocalHour(hour: number) {
+    vi.setSystemTime(new Date(2026, 7, 20, hour, 0, 0));
+  }
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("shows a zzZ sequence beside the header logo between 22:00 and 06:00 local time", () => {
+    setLocalHour(23);
+    mockMatchMedia(false);
+    mockIntersectionObserver();
+    mockPathname.mockReturnValue("/");
+    renderWithIntl(<Header />);
+
+    expect(screen.getByRole("banner")).toHaveTextContent("zZz");
+  });
+
+  it("shows nothing during the day", () => {
+    setLocalHour(14);
+    mockMatchMedia(false);
+    mockIntersectionObserver();
+    mockPathname.mockReturnValue("/");
+    renderWithIntl(<Header />);
+
+    expect(screen.getByRole("banner")).not.toHaveTextContent("zZz");
   });
 });

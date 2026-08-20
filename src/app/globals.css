@@ -157,7 +157,7 @@
   --animate-orbit-spin: orbit-spin var(--orbit-duration) linear infinite;
   --animate-orbit-counter-spin: orbit-counter-spin var(--orbit-duration) linear infinite;
 
-  /* Night-mode zzZ (HeroLogoConfetti.tsx, easter egg 6/7) — each of the
+  /* Night-mode zzZ (NightModeZzz.tsx, easter egg 6/7) — each of the
      three z's drifts up and to the right while fading, on a loop, staggered
      by its own animation-delay. Transform and opacity only, and the whole
      zzZ group is aria-hidden and only ever rendered client-side after
@@ -910,7 +910,7 @@ body {
   }
 }
 
-/* Easter egg 3/3 (docs/eastereggs.md), the whole visual side of it —
+/* Easter egg 3/7 (docs/eastereggs.md), the whole visual side of it —
    EightBitEasterEgg.tsx owns only the timing/state machine and writes
    nothing here but the one attribute this reads. One attribute, one CSS
    layer, no component duplicated and no existing component touched, per

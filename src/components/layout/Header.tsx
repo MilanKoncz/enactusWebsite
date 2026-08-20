@@ -8,6 +8,7 @@ import { Logo } from "@/components/layout/Logo";
 import { Nav } from "@/components/layout/Nav";
 import { LocaleSwitch } from "@/components/layout/LocaleSwitch";
 import { MobileMenu } from "@/components/layout/MobileMenu";
+import { NightModeZzz } from "@/components/motion/NightModeZzz";
 import { SkipLink } from "@/components/layout/SkipLink";
 import { useHeaderSurface } from "@/components/layout/HeaderSurface";
 import { Link } from "@/lib/navigation";
@@ -77,8 +78,12 @@ export function Header({ hasJobs = false }: HeaderProps) {
           <Link
             href="/"
             aria-label={t("home")}
-            className="transition-opacity duration-(--duration-fast) ease-signature hover:opacity-80 focus-visible:opacity-80">
+            className="relative transition-opacity duration-(--duration-fast) ease-signature hover:opacity-80 focus-visible:opacity-80">
             <Logo variant="full" surface={overlaid ? "ink" : "paper"} />
+            {/* Easter egg 6/7 (docs/eastereggs.md) — on every page, not just
+                the homepage hero, since the header logo is the one Enactus
+                mark a visitor sees regardless of route. */}
+            <NightModeZzz surface={overlaid ? "ink" : "paper"} className="-top-1 -right-2" />
           </Link>
           <Nav variant="desktop" showJobs={hasJobs} className="hidden lg:flex" />
           <div className="flex items-center gap-4">

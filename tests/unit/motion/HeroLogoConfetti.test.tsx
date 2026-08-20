@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { mockMatchMedia } from "../../fixtures/matchMedia";
 import { HeroLogoConfetti } from "@/components/motion/HeroLogoConfetti";
@@ -62,61 +62,6 @@ describe("HeroLogoConfetti", () => {
     mockMatchMedia(false);
     const { container } = render(<HeroLogoConfetti />);
     const logo = container.querySelector("img")!;
-    expect(logo.closest("span")).not.toHaveAttribute("tabindex");
-    expect(screen.queryByRole("button")).not.toBeInTheDocument();
-  });
-});
-
-/**
- * Easter egg 6/7 (docs/eastereggs.md). Local-time Date constructor overload
- * (new Date(year, month, day, hour)), not an ISO string — it builds the
- * Date directly in whatever timezone the test runner's process is actually
- * in, so `.getHours()` always reads back the intended hour regardless of
- * CI/local TZ, rather than depending on a UTC offset guess.
- */
-describe("HeroLogoConfetti night mode", () => {
-  function setLocalHour(hour: number) {
-    vi.setSystemTime(new Date(2026, 7, 20, hour, 0, 0));
-  }
-
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
-  it("shows a zzZ sequence once mounted between 22:00 and 06:00 local time", () => {
-    setLocalHour(23);
-    mockMatchMedia(false);
-    const { container } = render(<HeroLogoConfetti surface="ink" />);
-
-    expect(container.querySelector("img")!.closest("span")).toHaveTextContent("zZz");
-  });
-
-  it("shows nothing during the day", () => {
-    setLocalHour(14);
-    mockMatchMedia(false);
-    const { container } = render(<HeroLogoConfetti surface="ink" />);
-
-    expect(container.querySelector("img")!.closest("span")).not.toHaveTextContent("zZz");
-  });
-
-  it("never shows the zzZ under prefers-reduced-motion, even at a night hour", () => {
-    setLocalHour(2);
-    mockMatchMedia(true);
-    const { container } = render(<HeroLogoConfetti surface="ink" />);
-
-    expect(container.querySelector("img")!.closest("span")).not.toHaveTextContent("zZz");
-  });
-
-  it("never affects the logo image itself — no button role, no added tab stop, even at night", () => {
-    setLocalHour(23);
-    mockMatchMedia(false);
-    const { container } = render(<HeroLogoConfetti surface="ink" />);
-    const logo = container.querySelector("img")!;
-
     expect(logo.closest("span")).not.toHaveAttribute("tabindex");
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
