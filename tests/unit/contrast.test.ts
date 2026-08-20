@@ -124,26 +124,39 @@ describe("design tokens: color contrast", () => {
 
   // .signature-gradient (globals.css) — the shared navy-to-gold background
   // on /events' Journeys section and /projekte's active-projects section.
-  // Redone a third time 2026-08-20: dropped the plateau-then-linear-ramp
-  // shape entirely (board feedback: still read as a hard edge, however far
-  // back the plateau moved) for a single CSS color-interpolation hint
-  // between the same two literal tokens — `ink 0%, 88%, gold 100%` — which
-  // biases the gradient's perceptual midpoint late instead of adding a
-  // third color. Still no color-mix(), still both ends real/unmixed tokens.
-  // One shared curve for both axes now (see globals.css's own comment for
-  // why the axis split stopped needing separate tuning).
-  describe(".signature-gradient: weighted ink-to-gold via a color-interpolation hint, real tokens, no color-mix()", () => {
+  // Redone a fourth time 2026-08-20: the single-hint-at-88% version (see
+  // git history) softened the old plateau-then-ramp kink, but board
+  // feedback was that it still read as "too much blue" — the shift off
+  // pure ink barely started before ~80% of the axis. This version keeps
+  // real flat zones at both ends again (20% ink, 20% gold) with an eased
+  // transition through the middle 60% — `ink 0%, ink 20%, 74%, gold 80%,
+  // gold 100%`. The bare `74%` is the same kind of CSS color-interpolation
+  // hint as before, just scoped to the one sub-range between the 20%-ink
+  // and 80%-gold stops (still no color-mix(), still no third literal
+  // color) — still biased late within that sub-range for text-safety
+  // (see the real edges below), but the shift off pure ink now starts at
+  // 20% instead of ~88%, visible across much more of the section.
+  describe(".signature-gradient: ink/gold flat zones at both ends, eased transition through the middle, real tokens, no color-mix()", () => {
     const css = readFileSync(resolve(process.cwd(), "src/app/globals.css"), "utf-8");
     const declaration = css.match(/@utility signature-gradient \{[\s\S]*?\n\}/)?.[0] ?? "";
-    const HINT = 88;
+    const P0 = 20;
+    const P1 = 80;
+    const HINT = 74;
 
-    it("is vertical (top to bottom) below md and horizontal (to right) from md up, both a single ink-to-gold hinted stop, no color-mix()", () => {
+    it("is vertical (top to bottom) below md and horizontal (to right) from md up, both the same four-stop ink/hint/gold shape, no color-mix()", () => {
       expect(declaration).toContain("to bottom");
       expect(declaration).toContain("to right");
       expect(declaration).toContain("@media (min-width: 48rem)");
       // Both directions use the exact same stop list — one shared curve.
-      const stopList = "var(--color-ink) 0%, 88%, var(--color-gold) 100%";
-      expect(declaration.match(new RegExp(stopList.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"))).toHaveLength(2);
+      for (const fragment of [
+        "var(--color-ink) 0%",
+        "var(--color-ink) 20%",
+        "74%",
+        "var(--color-gold) 80%",
+        "var(--color-gold) 100%",
+      ]) {
+        expect(declaration.match(new RegExp(fragment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"))).toHaveLength(2);
+      }
       expect(declaration).not.toContain("color-mix");
     });
 
@@ -160,13 +173,17 @@ describe("design tokens: color contrast", () => {
     });
 
     // The color the gradient actually paints at a given % along its axis,
-    // replicating the CSS hinted-interpolation formula (CSS Images spec)
-    // in plain JS: a bare percentage between two color stops biases where
+    // replicating the CSS four-stop, one-hint formula (CSS Images spec) in
+    // plain JS: flat ink up to P0, flat gold from P1, and in between a
+    // color-interpolation hint (within that sub-range only) biases where
     // the 50% perceptual mixing point falls, without a third literal color.
     function gradientColorAt(pct: number): string {
-      if (pct <= 0) return ink;
-      if (pct >= 100) return gold;
-      const t = pct <= HINT ? 0.5 * (pct / HINT) : 0.5 + 0.5 * ((pct - HINT) / (100 - HINT));
+      if (pct <= P0) return ink;
+      if (pct >= P1) return gold;
+      const localP = pct - P0;
+      const localHint = HINT - P0;
+      const localSpan = P1 - P0;
+      const t = localP <= localHint ? 0.5 * (localP / localHint) : 0.5 + 0.5 * ((localP - localHint) / (localSpan - localHint));
       const a = hexToRgb(ink);
       const b = hexToRgb(gold);
       const mixed = a.map((v, i) => v + (b[i] - v) * t);
@@ -177,9 +194,9 @@ describe("design tokens: color contrast", () => {
     // quote directly — one shared curve now, so one sweep covers both axes.
     const SAMPLE_POINTS = [0, 16.67, 33.33, 50, 66.67, 83.33, 100];
 
-    // Real measured text edges — same Playwright measurements the previous
-    // plateau-based design used (pulling the plateau back never moved
-    // where the text itself sits, and neither does dropping it).
+    // Real measured text edges — same Playwright measurements every earlier
+    // version of this gradient used (moving the flat-zone boundaries never
+    // moved where the text itself sits).
     const REAL_TEXT_EDGES: Array<{ label: string; pct: number }> = [
       { label: "768px heading/lead right edge", pct: 69.8 },
       { label: "1280px heading/lead right edge", pct: 43.1 },
@@ -195,23 +212,25 @@ describe("design tokens: color contrast", () => {
       },
     );
 
-    // The curve doesn't actually fail 4.5:1 until 89% — every general
-    // sample point up to 83.33% clears it too, a far wider safe range than
-    // either real text edge above needs. Past it is the gradient's pure
-    // decorative tail, always covered by the two sections' opaque
-    // ink-fill/gold-edge cards (JourneysSection.tsx / ProjectsActive.tsx),
-    // never by raw text.
-    it("paper heading/lead text clears 4.5:1 at every sample point up to 83.33%", () => {
-      for (const pct of SAMPLE_POINTS.filter((p) => p <= 83.33)) {
+    // The curve doesn't actually fail 4.5:1 until 75% — the 768px edge
+    // above (69.8%) is the binding case, the reason the hint sits as late
+    // as 74% within [20%, 80%] rather than a plainer, more even split.
+    // Every general sample point up to 66.67% clears it too. Past the
+    // failure point is the gradient's pure decorative tail, always covered
+    // by the two sections' opaque ink-fill/gold-edge cards
+    // (JourneysSection.tsx / ProjectsActive.tsx), never by raw text.
+    it("paper heading/lead text clears 4.5:1 at every sample point up to 66.67%", () => {
+      for (const pct of SAMPLE_POINTS.filter((p) => p <= 66.67)) {
         expect(passesAA(contrastRatio(paper, gradientColorAt(pct)))).toBe(true);
       }
     });
 
-    it("the gradient's pure-gold tail (100%) does fail paper-text contrast — by design, always covered by an opaque card, never by raw text", () => {
+    it("the gradient's pure-gold tail (83.33%/100%) does fail paper-text contrast — by design, always covered by an opaque card, never by raw text", () => {
+      expect(passesAA(contrastRatio(paper, gradientColorAt(83.33)))).toBe(false);
       expect(passesAA(contrastRatio(paper, gradientColorAt(100)))).toBe(false);
     });
 
-    it("Eyebrow's opacity-60 treatment clears 4.5:1 anywhere the eyebrow itself can render (it's a short, top-anchored line, always at 0%)", () => {
+    it("Eyebrow's opacity-60 treatment clears 4.5:1 anywhere the eyebrow itself can render (it's a short, top-anchored line, always inside the flat 20% ink zone)", () => {
       const bg = gradientColorAt(0);
       const muted = blendOverBackground(paper, 0.6, bg);
       expect(passesAA(contrastRatio(muted, bg))).toBe(true);
@@ -228,7 +247,7 @@ describe("design tokens: color contrast", () => {
         // Every point up to 100% is a real, finite ratio — this test's job
         // is to force the numbers to exist and be inspectable (e.g. via
         // --reporter=verbose), not to assert AA everywhere: the tail past
-        // 83.33% is expected to fail, covered by an opaque card, asserted
+        // 66.67% is expected to fail, covered by an opaque card, asserted
         // separately above.
         expect(headingBodyRatio).toBeGreaterThan(1);
         expect(eyebrowRatio).toBeGreaterThan(1);

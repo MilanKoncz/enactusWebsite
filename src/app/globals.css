@@ -804,35 +804,32 @@ body {
    be one" mistake the calendar category layer's own token-reuse test
    guards against.
 
-   Redone a third time 2026-08-20: the previous version (plateau then a
-   plain two-stop linear ramp — see git history) still had a kink where the
-   flat plateau's zero slope met the ramp's constant slope head-on, which
-   read as a hard cut rather than a soft gradient no matter how far back
-   the plateau moved (board feedback: "still a visible edge, pull it
-   longer and softer"). This version drops the plateau concept entirely —
-   there's no flat zone left as such — in favor of a single CSS color
-   interpolation hint: `var(--color-ink) 0%, 88%, var(--color-gold) 100%`.
-   That bare `88%` between the two color stops is standard CSS (Images
-   spec), not a proprietary trick — it biases where the gradient's
-   perceptual 50% midpoint falls, letting the same two literal tokens
-   (still "real, unmixed tokens at both ends," still no color-mix(), no
-   third literal color, no exception to that rule) blend far more slowly
-   for most of the run and then rush to gold only in the last stretch.
-   That both softens the curve (no more slope discontinuity to read as an
-   edge — the derivative is continuous throughout, it just isn't constant)
-   and makes it read as much longer, since the color barely moves for the
-   first ~80% of the axis.
+   Redone a fourth time 2026-08-20: the previous version (a single color-
+   interpolation hint at 88%, no flat zone at either end) softened the old
+   plateau-then-ramp kink, but board feedback was that it still read as
+   "too much blue" — the hint sat so close to the gold end that the whole
+   first ~70-80% of the axis barely shifted off pure ink before rushing to
+   gold in the last stretch. This version keeps real flat zones at both
+   ends again (20% ink, 20% gold) with an eased transition through the
+   middle 60% — `ink 0%, ink 20%, 74%, gold 80%, gold 100%`. The bare `74%`
+   is the same kind of color-interpolation hint as before, just now
+   scoped to the one sub-range between the 20%-ink stop and the 80%-gold
+   stop (still standard CSS, still no color-mix(), still no third literal
+   color) — it still has to bias late within that sub-range for text-
+   safety reasons (see the real edges below), but the transition zone
+   itself starts at 20% instead of ~88%, so the shift away from pure ink
+   is visible much earlier and across much more of the section: by the
+   halfway mark the background already reads as a clear dark olive/bronze,
+   not still-navy — see the swatches in tests/unit/contrast.test.ts's
+   7-point sweep.
 
-   One shared shape for both axes now, not two separately-tuned plateaus:
-   the hint math made the vertical/horizontal split about *safety margin*
-   moot (both real text edges clear 4.5:1 by 6:1 or more now — see below),
-   so there's no longer a reason for the two axes to carry different
-   numbers. `to bottom` below md, `to right` from md up — same two stops,
-   same hint, only the direction differs, for the same layout reason the
-   two-axis design always existed (JourneysSection's bounded heading block
-   has real room to its right only once the container is wide enough that
-   its max-w-lg actually binds; below that a horizontal ramp put text on
-   top of the gold end no matter where the ramp started — see that
+   One shared shape for both axes still, not two separately-tuned curves:
+   `to bottom` below md, `to right` from md up — same four stops, same
+   hint, only the direction differs, for the same layout reason the two-
+   axis design always existed (JourneysSection's bounded heading block has
+   real room to its right only once the container is wide enough that its
+   max-w-lg actually binds; below that a horizontal ramp put text on top
+   of the gold end no matter where the ramp started — see that
    component's own comment on the box-width arithmetic this traces back
    to). Below md the ramp still runs top to bottom instead, with both
    consumers' text top-anchored and opaque ink-filled/gold-edged cards
@@ -847,20 +844,30 @@ body {
    Real measured text edges against the new curve, full-opacity paper text
    (tests/unit/contrast.test.ts asserts all of these, plus the full
    7-point sweep this comment's numbers are drawn from):
-   - 768px lead-paragraph right edge (69.8% of the horizontal axis): 6.42:1
-   - 1280px lead-paragraph right edge (43.1%): 10.01:1
+   - 768px lead-paragraph right edge (69.8% of the horizontal axis): 5.30:1
+     — the binding case: it's what forces the hint as late as 74% rather
+     than a plainer, more even split within [20%, 80%]
+   - 1280px lead-paragraph right edge (43.1%): 10.97:1
    - JourneysSection heading+lead bottom, below md (41.2% of the vertical
-     axis): 10.34:1
-   - ProjectsActive's mono label, below md (8.7%): 15.93:1
-   Every one of the 7 general sample points up to 83.33% clears 4.5:1 too
-   — the curve doesn't actually fail until 89%, deep in the gradient's
-   pure-decorative tail that's always covered by an opaque card, never by
-   raw text, on both axes. */
+     axis): 11.48:1
+   - ProjectsActive's mono label, below md (8.7%): sits inside the flat
+     20% ink zone outright, 17.08:1
+   Every one of the 7 general sample points up to 66.67% clears 4.5:1 too
+   — the curve doesn't actually fail until 75%, still comfortably past
+   every real edge and well inside the gradient's decorative tail, always
+   covered by an opaque card, never by raw text, on both axes. */
 @utility signature-gradient {
-  background-image: linear-gradient(to bottom, var(--color-ink) 0%, 88%, var(--color-gold) 100%);
+  background-image: linear-gradient(to bottom, var(--color-ink) 0%, var(--color-ink) 20%, 74%, var(--color-gold) 80%, var(--color-gold) 100%);
 
   @media (min-width: 48rem) {
-    background-image: linear-gradient(to right, var(--color-ink) 0%, 88%, var(--color-gold) 100%);
+    background-image: linear-gradient(
+      to right,
+      var(--color-ink) 0%,
+      var(--color-ink) 20%,
+      74%,
+      var(--color-gold) 80%,
+      var(--color-gold) 100%
+    );
   }
 }
 
