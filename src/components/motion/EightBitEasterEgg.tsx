@@ -13,10 +13,13 @@ import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 // timing state machine, never touches component markup or styling
 // directly, so there is no second layout and nothing here duplicates an
 // existing component.
-const MIN_HIDDEN_MS = 10_000;
-const MAX_HIDDEN_MS = 90_000;
-const MIN_PEEK_MS = 3_000;
-const MAX_PEEK_MS = 6_000;
+// Shortened from an original 10-90s hidden window (board feedback,
+// 2026-08-20: "waited ages, nothing came") — 5-15s keeps it a surprise
+// without ever being a genuine wait.
+const MIN_HIDDEN_MS = 5_000;
+const MAX_HIDDEN_MS = 15_000;
+const MIN_PEEK_MS = 4_000;
+const MAX_PEEK_MS = 7_000;
 const TRANSITION_MS = 1_000;
 const ACTIVE_DURATION_MS = 60_000;
 

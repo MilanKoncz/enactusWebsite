@@ -31,16 +31,19 @@ mouse/touch user, and the effect changes nothing else about the page.
 ## 3. Footer 8-bit mode
 
 A small Enactus logo occasionally peeks up from the bottom of the footer
-(random position, hidden 10-90s, visible 3-6s) and withdraws again.
-Clicking it switches the whole site into an 8-bit visual mode for 60
-seconds. `src/components/motion/EightBitEasterEgg.tsx`, rendered by
-`Footer.tsx`, owns only the timing state machine and writes a single
-`data-eight-bit` attribute (`entering` / `active` / `exiting`) onto
+(random position, hidden 5-15s, visible 4-7s — shortened from an original
+10-90s hidden window, board feedback: "waited ages, nothing came") and
+withdraws again. Clicking it switches the whole site into an 8-bit visual
+mode for 60 seconds. `src/components/motion/EightBitEasterEgg.tsx`,
+rendered by `Footer.tsx`, owns only the timing state machine and writes a
+single `data-eight-bit` attribute (`entering` / `active` / `exiting`) onto
 `<html>`; the entire visual side — a second color palette, the self-hosted
 Press Start 2P pixel font (`src/fonts/press-start-2p/`, OFL-licensed, same
 pattern as Lilita One), zeroed border-radius, no shadows, pixelated
-images, and reduced headline-scale font sizes so the wider pixel glyphs
-don't clip inside containers sized for Geist/Lilita One — lives entirely
+images, and reduced font sizes across the whole type scale (headline steps
+the most, since those risked real clipping/overlap; body and mono text a
+lighter pass, purely to cut the font's visual weight) so the wider pixel
+glyphs don't clip inside containers sized for Geist/Lilita One — lives entirely
 in `globals.css`'s `html[data-eight-bit]` rules. No component was
 duplicated or modified to build the look itself.
 

@@ -7,8 +7,8 @@ import { EightBitEasterEgg } from "@/components/motion/EightBitEasterEgg";
 
 vi.mock("next/navigation", () => nextNavigationMock);
 
-const MIN_HIDDEN_MS = 10_000;
-const MAX_HIDDEN_MS = 90_000;
+const MIN_HIDDEN_MS = 5_000;
+const MAX_HIDDEN_MS = 15_000;
 const TRANSITION_MS = 1_000;
 const ACTIVE_DURATION_MS = 60_000;
 
