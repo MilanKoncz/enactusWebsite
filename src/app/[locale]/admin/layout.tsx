@@ -35,7 +35,23 @@ export default async function AdminLayout({
 
         <footer className="border-t border-ink/10 py-6">
           <Container className="max-w-4xl">
-            <p className="text-body-s opacity-60">{t("credit")}</p>
+            {/* mkoncz.me, not a generic credit line — board-invisible easter
+                egg, documented in docs/eastereggs.md. link-underline is the
+                site's one hover/focus treatment for prose links (globals.css):
+                a gold rule grows in under the text, never gold as the text
+                color itself — paper is the surface here, and gold text on
+                paper fails contrast outright, no exception for a footer
+                credit either. */}
+            <p className="text-body-s opacity-60">
+              <a
+                href="https://mkoncz.me"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link-underline"
+              >
+                {t("credit")}
+              </a>
+            </p>
           </Container>
         </footer>
       </div>
