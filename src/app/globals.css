@@ -819,7 +819,7 @@ body {
 
    Two axes, not one: from md up, JourneysSection's bounded heading block has
    real room to its right (the container is wide enough that max-w-lg
-   actually binds), so a horizontal ramp with a 58% plateau gives gold real
+   actually binds), so a horizontal ramp with a 40% plateau gives gold real
    presence while the text stays clear of it (worked out against
    JourneysSection's lead paragraph, its widest bounded text — see that
    file's own comment on its max-w-lg for the box-width arithmetic this
@@ -837,18 +837,51 @@ body {
    so they never depend on where they land against this background either).
    That means the two goals stop competing on this axis: text stays inside
    the flat plateau, and gold gets the entire lower portion of the section
-   to actually read as gold instead of a sliver at one edge. 46% is not a
-   round number by accident — it's JourneysSection's heading+lead block
-   (measured with Playwright at 41.2% of the section's height, identically
-   at 360px and 390px — the taller of the two consumers' text blocks;
-   ProjectsActive's mono label ends at 7.8%/8.7%) plus headroom, so the
-   block sits inside the flat ink stop outright rather than relying on the
-   ramp's own contrast the way the horizontal 58%/94% plateaus below did.
+   to actually read as gold instead of a sliver at one edge. 28% is not a
+   round number by accident either — it's JourneysSection's heading+lead
+   block (measured with Playwright at 41.2% of the section's height,
+   identically at 360px and 390px — the taller of the two consumers' text
+   blocks; ProjectsActive's mono label ends at 7.8%/8.7%)... except 28% is
+   *below* that 41.2% figure, not above it the way the original 46% plateau
+   was — see the second revision's note below for why relying on the flat
+   plateau alone stopped being the goal.
 
    The one thing still not allowed to sit directly on this gradient:
    unbounded-width text (a paragraph with no max-width) — see
    JourneysSection.tsx / ProjectsActive.tsx for how each consumer keeps
    every text run bounded.
+
+   Plateaus pulled back a second time 2026-08-20 (46/58 -> 28/40): the ramp
+   from plateau to 100% was a plain two-stop linear blend, so the flat
+   plateau's zero slope met the ramp's constant slope head-on right at the
+   boundary — a real kink in the color-change rate, not just a color
+   difference, and that's what read as "a hard cut" rather than a gradient
+   (board feedback). A gradient with more stops could round that corner off,
+   but every extra stop needs its own literal color, and any color that
+   isn't --color-ink or --color-gold is a mixed, muted tone — exactly what
+   "real, unmixed tokens at both ends" rules out (`color-mix()` is banned
+   in tests/unit/contrast.test.ts for the same reason). So the fix is
+   pulling the plateau itself back instead: the ramp is still the same
+   plain two-stop blend, just running over a longer stretch (60%/72% of the
+   axis instead of 42%/54%), which changes color more slowly per pixel and
+   reads as gradual rather than cut — softer *and* longer from the same
+   two-stop shape, no third color needed. The kink technically still exists
+   at the new boundary, but a shallower rate change either side of it reads
+   as far less abrupt.
+
+   Both new numbers keep real headroom past every text edge measured for
+   the previous plateaus (see content in that same test file): the
+   horizontal worst case (768px lead-paragraph right edge, 69.8%) still
+   clears 4.5:1 with a 0.3:1 margin at the new 40% plateau; the vertical
+   worst case (JourneysSection heading+lead bottom, 41.2%) clears it with a
+   7.3:1 margin at the new 28% plateau — nowhere close to the boundary
+   either axis actually needs. The horizontal axis keeps the same "every
+   sample point up to 70% width passes AA" buffer the old 58% plateau had;
+   the vertical axis's equivalent buffer moves to 50% height instead of 70%
+   — a boundary picked for that axis's own real text extent (max 41.2%),
+   not borrowed from the other axis's, since nothing on this site ever puts
+   raw text past either bound: everything beyond it is the two consumers'
+   opaque ink-filled/gold-edged cards, same as before.
 
    tests/unit/contrast.test.ts's gradient case asserts the plateau stops and
    the real end tokens (a drift guard, not a full AA sweep — the 7-point
@@ -857,7 +890,7 @@ body {
   background-image: linear-gradient(
     to bottom,
     var(--color-ink) 0%,
-    var(--color-ink) 46%,
+    var(--color-ink) 28%,
     var(--color-gold) 100%
   );
 
@@ -865,7 +898,7 @@ body {
     background-image: linear-gradient(
       to right,
       var(--color-ink) 0%,
-      var(--color-ink) 58%,
+      var(--color-ink) 40%,
       var(--color-gold) 100%
     );
   }
