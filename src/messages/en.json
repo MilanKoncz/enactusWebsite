@@ -67,6 +67,11 @@
     "gateConstruction": "Construction site",
     "gateInnolab": "InnoLab"
   },
+  "Secret": {
+    "title": "You found the secret chill area!",
+    "body": "Nothing to get done here, just take a breath. Nobody's expecting you, so make yourself at home.",
+    "backHome": "Back to the homepage"
+  },
   "Home": {
     "dividers": {
       "alumni": "Voices from the network",

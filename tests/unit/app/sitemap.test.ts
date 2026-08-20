@@ -16,6 +16,10 @@ describe("sitemap", () => {
     expect(entries.some((entry) => entry.url.includes("styleguide"))).toBe(false);
   });
 
+  it("never includes /secret — a hidden, unlinked page (docs/eastereggs.md)", () => {
+    expect(entries.some((entry) => entry.url.includes("secret"))).toBe(false);
+  });
+
   it("includes the German route unprefixed and the English route under /en", () => {
     expect(entries.some((entry) => entry.url.endsWith("/prozess"))).toBe(true);
     expect(entries.some((entry) => entry.url.endsWith("/en/prozess"))).toBe(true);

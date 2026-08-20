@@ -8,7 +8,9 @@ import { isProductionDeployment } from "@/lib/productionDeployment";
 // belt-and-braces — see admin/bewerbungen/page.tsx) — neither is public
 // content, kept out of the crawl in both locales, same reasoning as
 // sitemap.ts excluding both entirely. /api/ has no crawlable pages, just
-// endpoints.
+// endpoints. /secret is easter egg 7/7 (docs/eastereggs.md) — a hidden,
+// unlinked page that also carries its own noindex/nofollow metadata,
+// disallowed here on top of that for the same belt-and-braces reason.
 //
 // Only the confirmed production domain, on a real production deployment,
 // may be indexed — see productionDeployment.ts. Everything else (a preview
@@ -32,7 +34,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/api/", "/styleguide", "/en/styleguide", "/admin", "/en/admin"],
+      disallow: ["/api/", "/styleguide", "/en/styleguide", "/admin", "/en/admin", "/secret", "/en/secret"],
     },
     sitemap: `${base}/sitemap.xml`,
   };
