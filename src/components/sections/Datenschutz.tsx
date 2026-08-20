@@ -1,10 +1,9 @@
 import type { ReactNode } from "react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { org } from "@/content/org";
-import { privacyReviewStatus } from "@/content/privacy";
 import { retention } from "@/content/retention";
 
 // No blanket opacity on the body wrapper: legal text should stay at full
@@ -93,20 +92,19 @@ function LegalTable({ caption, columns, rows }: { caption: string; columns: stri
   );
 }
 
-// The one piece of state that changes what this page says: privacy.ts's
-// `privacyReviewStatus`. Draft state shows `draftNotice`; flipping
-// `reviewed` to true (with a `reviewedAt` date, enforced by the schema)
-// swaps it for `reviewedNotice` — see privacy.ts's own comment. Every other
-// section below is static copy from messages/{locale}.json's "Datenschutz"
-// namespace, with the responsible party's facts pulled from content/org.ts
-// the same way Impressum.tsx does, so the two pages can never state the
-// operator's identity differently. No PlaceholderMark anywhere on this
-// page: every fact it states is confirmed (org.ts's own
+// privacy.ts's `privacyReviewStatus` still tracks whether the Enactus
+// Germany data protection officer has signed off, but that fact isn't shown
+// to visitors here (board request, 2026-08-20) — it told them nothing they
+// could act on. The field stays in content/ for whoever needs it next.
+// Every section below is static copy from messages/{locale}.json's
+// "Datenschutz" namespace, with the responsible party's facts pulled from
+// content/org.ts the same way Impressum.tsx does, so the two pages can never
+// state the operator's identity differently. No PlaceholderMark anywhere on
+// this page: every fact it states is confirmed (org.ts's own
 // `legalRepresentatives.verified`), unlike Impressum, which still carries
 // optional fields this association hasn't filled in for every scenario.
 export function Datenschutz() {
   const t = useTranslations("Datenschutz");
-  const locale = useLocale();
 
   const contactEmail = org.contactEmails.board ?? org.contactEmails.general;
 
@@ -116,16 +114,6 @@ export function Datenschutz() {
         <SectionHeading as="h1" eyebrow={t("eyebrow")} title={t("title")} />
 
         <p className="text-mono-s font-mono uppercase opacity-60">{t("effectiveDate")}</p>
-
-        <div className="flex flex-col gap-1 border-l-2 border-dashed border-gold py-1 pl-4">
-          <p className="text-body-m">
-            {privacyReviewStatus.reviewed
-              ? t("reviewedNotice", {
-                  date: new Intl.DateTimeFormat(locale).format(new Date(privacyReviewStatus.reviewedAt!)),
-                })
-              : t("draftNotice")}
-          </p>
-        </div>
 
         <div className="flex max-w-prose flex-col gap-14">
           <LegalSection title={t("responsible.title")}>

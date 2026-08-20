@@ -741,8 +741,6 @@
     "eyebrow": "Rechtliches",
     "title": "Datenschutzerklärung",
     "effectiveDate": "Stand: August 2026",
-    "draftNotice": "Entwurf. Diese Erklärung ist noch nicht vom Datenschutzbeauftragten von Enactus Germany geprüft und freigegeben.",
-    "reviewedNotice": "Zuletzt geprüft am {date} durch den Datenschutzbeauftragten von Enactus Germany.",
     "scope": {
       "title": "Geltungsbereich",
       "body": [
@@ -992,8 +990,8 @@
         }
       },
       "fitNote": {
-        "lead": "Du musst nicht alles davon mitbringen.",
-        "detail": "Rund 80 % Übereinstimmung reicht für eine gute Passung. Jedes Skillset hilft uns weiter."
+        "lead": "Du musst nicht alles können",
+        "detail": "Niemand bringt alles mit, und das erwarten wir auch nicht. Wichtig sind Teamfähigkeit, Neugier und die Bereitschaft, Verantwortung zu übernehmen. Alles Weitere lernst du bei uns, im Team und in echten Projekten."
       }
     },
     "timeline": {

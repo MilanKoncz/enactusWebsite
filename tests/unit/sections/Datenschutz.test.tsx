@@ -4,7 +4,6 @@ import { axe } from "jest-axe";
 import { renderWithIntl } from "../../fixtures/intl";
 import { Datenschutz } from "@/components/sections/Datenschutz";
 import { org } from "@/content/org";
-import { privacyReviewStatus } from "@/content/privacy";
 
 describe("Datenschutz", () => {
   it("renders exactly one h1 titled Datenschutzerklärung", () => {
@@ -20,10 +19,10 @@ describe("Datenschutz", () => {
     expect(headings).toHaveLength(18);
   });
 
-  it("shows the reviewed notice, and never the draft notice", () => {
-    expect(privacyReviewStatus.reviewed).toBe(true);
+  it("shows the effective date but not a review-confirmation notice", () => {
     renderWithIntl(<Datenschutz />);
-    expect(screen.getByText(/^Zuletzt geprüft am/)).toBeInTheDocument();
+    expect(screen.getByText("Stand: August 2026")).toBeInTheDocument();
+    expect(screen.queryByText(/^Zuletzt geprüft am/)).not.toBeInTheDocument();
     expect(screen.queryByText(/^Entwurf\./)).not.toBeInTheDocument();
   });
 

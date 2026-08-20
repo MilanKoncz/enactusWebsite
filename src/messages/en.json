@@ -741,8 +741,6 @@
     "eyebrow": "Legal",
     "title": "Privacy policy",
     "effectiveDate": "Last updated: August 2026",
-    "draftNotice": "Draft. This policy has not yet been reviewed and approved by Enactus Germany's data protection officer.",
-    "reviewedNotice": "Last reviewed on {date} by Enactus Germany's data protection officer.",
     "scope": {
       "title": "Scope",
       "body": [
@@ -992,8 +990,8 @@
         }
       },
       "fitNote": {
-        "lead": "You don't need to bring all of this.",
-        "detail": "Around 80% overlap is a good fit. Every skill set helps us."
+        "lead": "You don't need to know it all already",
+        "detail": "Nobody brings everything on day one, and we don't expect that either. What matters is teamwork, curiosity, and the willingness to take on responsibility. You'll learn everything else with us, in the team and on real projects."
       }
     },
     "timeline": {
