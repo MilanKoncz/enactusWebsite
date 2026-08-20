@@ -8,6 +8,7 @@ import { Logo } from "@/components/layout/Logo";
 import { Nav } from "@/components/layout/Nav";
 import { LocaleSwitch } from "@/components/layout/LocaleSwitch";
 import { MobileMenu } from "@/components/layout/MobileMenu";
+import { SkipLink } from "@/components/layout/SkipLink";
 import { useHeaderSurface } from "@/components/layout/HeaderSurface";
 import { Link } from "@/lib/navigation";
 import { cn } from "@/lib/cn";
@@ -64,6 +65,14 @@ export function Header({ hasJobs = false }: HeaderProps) {
             : "border-ink/0 bg-paper text-ink data-[compact=true]:border-ink/10",
           compact && "py-3",
         )}>
+        {/* Rendered here rather than as a preceding sibling in the site
+            layout, so it's always contained within the <header> element's
+            own "banner" landmark — `focus:fixed` in SkipLink.tsx means its
+            focused position and visual appearance don't depend on where in
+            the DOM it lives, so this doesn't change how it looks or
+            behaves, only that it's guaranteed to sit inside a landmark on
+            every route (axe's "region" rule, tests/e2e/not-found.spec.ts). */}
+        <SkipLink />
         <Container className="flex items-center justify-between gap-6">
           <Link
             href="/"

@@ -1,5 +1,4 @@
 import { requireLocale } from "@/i18n/requireLocale";
-import { SkipLink } from "@/components/layout/SkipLink";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { HeaderSurfaceProviderClient } from "@/components/HeaderSurfaceProviderClient";
@@ -14,8 +13,9 @@ export default async function SiteLayout({
   params: Promise<{ locale: string }>;
 }) {
   // Every layout/page segment needs its own call, not just the root layout's
-  // — this is what let next-intl's server-side useTranslations (in SkipLink)
-  // opt this route back into static rendering instead of forcing it dynamic.
+  // — this is what opts this route back into static rendering instead of
+  // forcing it dynamic, which every server-rendered page under this layout
+  // (Impressum, NotFound, ...) relies on via their own getTranslations calls.
   await requireLocale(params);
 
   // getJobPostings() is already the non-expired list (lib/db.ts's
@@ -29,7 +29,8 @@ export default async function SiteLayout({
 
   return (
     <HeaderSurfaceProviderClient>
-      <SkipLink />
+      {/* SkipLink itself renders inside Header, as its first child — see
+          that component's own comment for why. */}
       <Header hasJobs={hasJobs} />
       <main id="inhalt" tabIndex={-1} className="flex-1">
         {children}
