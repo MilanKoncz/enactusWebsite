@@ -1,12 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  germanTeamCities,
-  germanTeamCitySchema,
-  networkStats,
-  networkStatsSchema,
-  teamLinkSchema,
-  teamLinks,
-} from "@/content/network";
+import { germanTeamCities, germanTeamCitySchema, networkStats, networkStatsSchema } from "@/content/network";
 
 describe("content/network", () => {
   it("matches the confirmed Enactus Germany and Enactus Global figures", () => {
@@ -35,42 +28,18 @@ describe("content/network", () => {
     expect(() => networkStatsSchema.parse({ ...networkStats, asOf: "not-a-date" })).toThrow();
   });
 
-  it("links exactly the five sibling teams named in the /events brief", () => {
-    expect(teamLinks.map((t) => t.name)).toEqual(["München", "Münster", "Hamburg", "Köln", "Karlsruhe"]);
-  });
-
-  it("has a confirmed URL for every team — none needed a placeholder", () => {
-    for (const team of teamLinks) {
-      expect(team.url).toMatch(/^https:\/\//);
-    }
-  });
-
-  it("validates every exported team link against the schema", () => {
-    for (const team of teamLinks) {
-      expect(() => teamLinkSchema.parse(team)).not.toThrow();
-    }
-  });
-
-  it("rejects a team link with an unknown key", () => {
-    expect(() =>
-      teamLinkSchema.parse({ key: "not-a-team", name: "Test", url: null }),
-    ).toThrow();
-  });
-
   // 23, not 24: every German location except Mannheim itself, which has
   // its own dedicated, always-labelled, unlinked point on the map
-  // (GermanyMap.tsx) rather than an entry here. teamLinks' five names all
-  // appear again in here too — the map's full roster, not a "the other
-  // ones" list the way it used to be (board feedback, 2026-08-20: link
-  // every team, not just the five originally-named partners).
-  it("lists all 23 German locations except Mannheim, including the five teamLinks names", () => {
+  // (GermanyMap.tsx) rather than an entry here — the map's one and only
+  // roster (board feedback, 2026-08-20: no more separate "featured five"
+  // list to keep in sync with it).
+  it("lists all 23 German locations except Mannheim", () => {
     expect(germanTeamCities).toHaveLength(23);
-    const cityNames = germanTeamCities.map((c) => c.name);
     for (const city of germanTeamCities) {
       expect(city.name).not.toBe("Mannheim");
     }
-    for (const team of teamLinks) {
-      expect(cityNames).toContain(team.name);
+    for (const name of ["München", "Münster", "Hamburg", "Köln", "Karlsruhe"]) {
+      expect(germanTeamCities.map((c) => c.name)).toContain(name);
     }
   });
 

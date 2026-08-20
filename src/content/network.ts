@@ -41,43 +41,15 @@ export const networkStats: NetworkStats = networkStatsSchema.parse({
 });
 
 /**
- * Sibling Enactus teams linked from /events as their own text-link cards
- * above the map, alongside this stats block — the brief named five:
- * München, Münster, Hamburg, Köln, Karlsruhe. Every URL below was fetched
- * and confirmed live on 2026-08-15, each page self-identifying as that
- * city's Enactus chapter — not guessed from a domain-naming pattern. None
- * needed a placeholder. These same five also appear in germanTeamCities
- * below (the map's full roster) — two lists sharing five entries on
- * purpose, since the card grid and the map are separate UI surfaces with
- * different jobs, not two views of one dataset.
- */
-const teamKeySchema = z.enum(["muenchen", "muenster", "hamburg", "koeln", "karlsruhe"]);
-export type TeamKey = z.infer<typeof teamKeySchema>;
-
-const teamLinkSchema = z.object({
-  key: teamKeySchema,
-  name: z.string(),
-  url: z.url().nullable(),
-});
-export type TeamLink = z.infer<typeof teamLinkSchema>;
-
-function teamLink(key: TeamKey, name: string, url: string): TeamLink {
-  return teamLinkSchema.parse({ key, name, url });
-}
-
-export const teamLinks: TeamLink[] = [
-  teamLink("muenchen", "München", "https://enactus-muenchen.de/"),
-  teamLink("muenster", "Münster", "https://enactus-muenster.de/"),
-  teamLink("hamburg", "Hamburg", "https://enactus-hh.de/"),
-  teamLink("koeln", "Köln", "https://enactus-koeln.de/"),
-  teamLink("karlsruhe", "Karlsruhe", "https://enactus-karlsruhe.de/"),
-];
-
-/**
  * Every German Enactus team location except Mannheim itself (which has its
  * own always-labelled, unlinked point — GermanyMap.tsx) — the map's full
  * 23-point roster, each one now a real link (board feedback, 2026-08-20:
- * "link every team's website", not just these five).
+ * "link every team's website", not just a named few). /events used to lead
+ * with a separate text-card grid for five "featured" partner teams above
+ * the map; dropped the same day (board feedback: singling five out read as
+ * if the other eighteen-plus weren't "strong" teams too) — the map alone
+ * carries every sibling team now, so there's only one roster left to
+ * maintain, not two overlapping ones.
  *
  * Source: enactus.de/network's "Liste aller Enactus Teams in Deutschland"
  * accordion, both the city names and their per-team URLs. That section has
@@ -107,20 +79,21 @@ export const teamLinks: TeamLink[] = [
  * `straubing`, whose enactus.de-listed URL (still their current one as of
  * this retrieval) 404s on its own hosting platform; url is null there and
  * the gap is logged in ASSETS-TODO.md rather than linking a dead page.
- * Five of these (muenchen/muenster/hamburg/koeln/karlsruhe) are the same
- * five teamLinks above names — this list's hamburg keeps teamLinks' own
- * enactus-hh.de rather than the LinkedIn page enactus.de/network links
- * instead, since a dedicated site beats a LinkedIn redirect when both
- * exist and enactus-hh.de was independently confirmed live the same day.
+ * `hamburg` keeps their own dedicated enactus-hh.de (fetched and confirmed
+ * live 2026-08-15, before this list existed) rather than the LinkedIn page
+ * enactus.de/network links instead — a dedicated site beats a LinkedIn
+ * redirect when both exist and the dedicated one is independently
+ * confirmed live.
  *
  * Coordinates are each city's public, well-known center point (decimal
  * degrees) — geographic fact, not presentation, so it lives here rather
  * than in GermanyMap.tsx, the same split MANNHEIM_POINT's own comment
  * there documents. GermanyMap.tsx runs each pair through the identical
  * geoConicEqualArea projection MANNHEIM_POINT uses to place its dot,
- * fitted against that point's and these five confirmed teams' known pixel
- * positions rather than re-deriving fitExtent's bounds — see that file's
- * comment for the method.
+ * fitted against that point's and five originally-confirmed teams'
+ * (München/Münster/Hamburg/Köln/Karlsruhe) known pixel positions rather
+ * than re-deriving fitExtent's bounds — see that file's comment for the
+ * method.
  */
 const germanTeamCitySchema = z.object({
   key: z.string(),
@@ -161,4 +134,4 @@ export const germanTeamCities: GermanTeamCity[] = [
   city("stuttgart", "Stuttgart", 48.7758, 9.1829, "https://de.linkedin.com/company/enactus-stuttgart"),
 ];
 
-export { networkStatsSchema, teamLinkSchema, teamKeySchema, germanTeamCitySchema };
+export { networkStatsSchema, germanTeamCitySchema };

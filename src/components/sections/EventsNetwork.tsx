@@ -4,13 +4,11 @@ import { useFormatter, useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { ImageWithPlaceholder } from "@/components/ui/ImageWithPlaceholder";
-import { LinkCard } from "@/components/ui/LinkCard";
-import { PlaceholderMark } from "@/components/ui/PlaceholderMark";
 import { Section } from "@/components/ui/Section";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { AnimatedFigure, useSeenOnce } from "@/components/motion/AnimatedFigure";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
-import { networkStats, teamLinks } from "@/content/network";
+import { networkStats } from "@/content/network";
 import { egEvents } from "@/content/egEvents";
 import { GermanyMap } from "@/components/sections/GermanyMap";
 
@@ -26,7 +24,6 @@ type EgEventCopyKey = Parameters<ReturnType<typeof useTranslations<"EgEvents">>>
 export function EventsNetwork() {
   const t = useTranslations("EventsNetwork");
   const tEgEvents = useTranslations("EgEvents");
-  const tPlaceholder = useTranslations("Placeholder");
   const format = useFormatter();
   const reducedMotion = usePrefersReducedMotion();
   const [statsRef, statsSeen] = useSeenOnce<HTMLDivElement>();
@@ -109,30 +106,14 @@ export function EventsNetwork() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-6">
-          <Eyebrow>{t("teamsHeading")}</Eyebrow>
-          <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-            {teamLinks.map((team) => (
-              <li key={team.key}>
-                {team.url ? (
-                  <LinkCard
-                    href={team.url}
-                    title={team.name}
-                    ariaLabel={t("teamLinkLabel", { name: team.name })}
-                  />
-                ) : (
-                  <PlaceholderMark hint={tPlaceholder("missingHint")} className="w-fit text-body-m font-medium">
-                    {team.name}
-                  </PlaceholderMark>
-                )}
-              </li>
-            ))}
-          </ul>
-
-          {/* Below the text links, as a supplement — not a replacement, so
-              pointer-free navigation never loses the sibling teams. */}
-          <GermanyMap />
-        </div>
+        {/* Used to lead with a text-card grid of just five "featured"
+            teams above the map — dropped (board feedback, 2026-08-20):
+            singling five out as their own heading read as if the other
+            eighteen-plus weren't "strong" teams too. The map alone now
+            carries every sibling team, each one a real link
+            (GermanyMap.tsx), so nothing about pointer-free navigation is
+            lost — every team was already independently reachable there. */}
+        <GermanyMap />
       </Container>
     </Section>
   );

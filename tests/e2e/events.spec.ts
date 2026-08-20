@@ -84,22 +84,19 @@ test.describe("/events", () => {
     await expect(page.getByText("HWS 2024")).toBeVisible();
   });
 
-  // Two links now, not one: the text LinkCard and the Germany map's overlay
-  // link (GermanyMap.tsx) — the map is a supplement, not a replacement, so
-  // both keep working.
-  test("links every sibling team to a real, external URL, from both the text list and the map", async ({
-    page,
-  }) => {
+  // The map is the only place a sibling team is linked now — the separate
+  // "featured five" text-card grid above it was removed (board feedback,
+  // 2026-08-20: singling five out read as if the rest weren't "strong"
+  // teams too).
+  test("links every sibling team to a real, external URL, from the map", async ({ page }) => {
     await page.goto("/events");
-    const links = page.getByRole("link", { name: /München/ });
-    await expect(links).toHaveCount(2);
-    for (const link of await links.all()) {
-      await expect(link).toHaveAttribute("href", "https://enactus-muenchen.de/");
-      await expect(link).toHaveAttribute("target", "_blank");
-    }
+    const link = page.getByRole("link", { name: /München/ });
+    await expect(link).toHaveCount(1);
+    await expect(link).toHaveAttribute("href", "https://enactus-muenchen.de/");
+    await expect(link).toHaveAttribute("target", "_blank");
   });
 
-  test("shows a Germany map with a describing label, below the team links", async ({ page }) => {
+  test("shows a Germany map with a describing label", async ({ page }) => {
     await page.goto("/events");
     const map = page.getByRole("img", { name: /Karte der Enactus-Standorte in Deutschland/ });
     await expect(map).toBeVisible();

@@ -5,7 +5,6 @@ import { renderWithIntl } from "../../fixtures/intl";
 import { mockMatchMedia } from "../../fixtures/matchMedia";
 import { mockIntersectionObserver } from "../../fixtures/observers";
 import { EventsNetwork } from "@/components/sections/EventsNetwork";
-import { teamLinks } from "@/content/network";
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -25,23 +24,15 @@ describe("EventsNetwork", () => {
     expect(screen.getByText("34")).toBeInTheDocument();
   });
 
-  // Two links per team now, not one: the text LinkCard and the map's
-  // overlay link (GermanyMap.tsx) — both real, both pointing at the same
-  // URL, since the map is a supplement to the text links, not a
-  // replacement (docs/content-guide.md-style redundancy for pointer-free
-  // navigation).
-  it("links every sibling team to its confirmed URL in a new tab, from both the text list and the map", () => {
+  // No separate "featured five" text-card grid above the map any more
+  // (board feedback, 2026-08-20: singling five out read as if the other
+  // eighteen-plus sibling teams weren't "strong" too) — the map alone
+  // carries every sibling team now. Full link-by-link coverage lives in
+  // GermanyMap.test.tsx; this just confirms the map actually renders here.
+  it("renders the Germany map with every sibling team", () => {
     mockMatchMedia(false);
     renderWithIntl(<EventsNetwork />);
-    for (const team of teamLinks) {
-      const links = screen.getAllByRole("link", { name: new RegExp(team.name) });
-      expect(links).toHaveLength(2);
-      for (const link of links) {
-        expect(link).toHaveAttribute("href", team.url!);
-        expect(link).toHaveAttribute("target", "_blank");
-        expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
-      }
-    }
+    expect(screen.getByRole("img", { name: /Karte der Enactus-Standorte in Deutschland/ })).toBeInTheDocument();
   });
 
   it("has no accessibility violations", async () => {
