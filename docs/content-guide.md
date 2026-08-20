@@ -210,25 +210,29 @@ recreate from this description if the outline ever needs regenerating):
    latitude range.
 5. The projected path's coordinates are rounded to one decimal place.
 
-**Points.** `MANNHEIM_POINT` and `TEAM_POINTS` in `GermanyMap.tsx` are the
-same six cities' real center coordinates (decimal degrees, public
-knowledge — Mannheim, München, Münster, Hamburg, Köln, Karlsruhe) run
-through the identical projection instance, not eyeballed. `OTHER_CITY_POINTS`
-covers every other German Enactus location (`content/network.ts`'s
-`germanTeamCities`, 18 entries as of 2026-08-20) the same way, rendered as
-smaller unlinked dots with no inline label — at 24 points total on this
-small a silhouette, labelling all of them would overlap unreadably, so
-only Mannheim and the five linked partner teams get one; every other
-city's name is listed in text below the map instead
-(`moreLocationsHeading`), never available only by picking out a dot.
+**Points.** `MANNHEIM_POINT` in `GermanyMap.tsx` is Mannheim's real center
+coordinates (decimal degrees, public knowledge) run through the projection,
+not eyeballed. `CITY_POINTS` covers every other German Enactus location
+(`content/network.ts`'s `germanTeamCities`, 23 entries as of 2026-08-20)
+the same way — one shared roster now, not a "five linked, the rest
+unlinked" split: every city with a confirmed URL renders as a real link,
+hover/focus-reveals its name as a small HTML tooltip next to the dot, and
+opens the site in a new tab; the one exception (Straubing, whose listed
+site currently 404s — ASSETS-TODO.md) renders as a dimmer, unlinked dot
+with the same hover-reveal name. Mannheim alone keeps a permanent, always-
+visible label — with 24 points total on this small a silhouette, labelling
+the rest permanently would overlap unreadably, so every other name is
+hover/focus-only plus listed in text below the map
+(`moreLocationsHeading`), never available *only* by hovering a dot.
 
-To add a new point (linked or not), project its lon/lat through the same
+To add a new point, project its lon/lat through the same
 `geoConicEqualArea` setup (parallels 48.66°N/53.66°N, center 10.45°E). The
 original `fitExtent` scale/translate aren't reproduced in this codebase —
 they were instead recovered by least-squares fitting the projection's raw
-output against the six known points' known pixel positions (residual error
-under 0.05px on all six), which is the same method `OTHER_CITY_POINTS`
-used and the one to reuse for a new point.
+output against Mannheim's and five originally-confirmed teams'
+(München/Münster/Hamburg/Köln/Karlsruhe) known pixel positions (residual
+error under 0.05px on all six), which is the same method every other
+`CITY_POINTS` entry used and the one to reuse for a new point.
 
 **Retrieving the full German roster, if it needs updating.** The list
 lives on enactus.de/network behind a "Liste aller Enactus Teams in
@@ -237,14 +241,24 @@ content is not present in a naive text scrape of the collapsed page, and
 the CMS its data comes from (`cms.enactus-germany.foldland.services`)
 exposes no public API — its root redirects straight to a Strapi admin
 login. What does work: the accordion is still server-rendered, so a plain
-`curl` of the page's HTML contains the full list pre-serialized inside a
-React Server Components ("flight") payload embedded in a `<script>` tag —
-search the fetched HTML for `Liste aller Enactus Teams in Deutschland`,
-then read the `<ul>` of `<li>` city names immediately following it in that
-same payload. No headless browser or CMS credentials needed. The same
-page's prose separately claims a "28 Hochschulen" figure that the payload
-itself doesn't back up with a 25th–28th named entry — re-count rather than
-trusting the prose number if this list is ever regenerated.
+`curl` of the page's HTML contains the full list — city names *and* each
+one's linked URL — pre-serialized inside a React Server Components
+("flight") payload embedded in a `<script>` tag. For the names, search the
+fetched HTML for `Liste aller Enactus Teams in Deutschland`, then read the
+`<ul>` of `<li>` city names immediately following it in that same payload.
+For each city's URL, search for `\"children\\":\\"<City name>\\"` and look
+backward in the same payload for the nearest preceding `\"href\\":\\"...\"`
+— the RSC payload defines each link component (with its `href`) once,
+elsewhere in the stream, and the `<li>` only references it by an opaque
+chunk id, so proximity search is more reliable than trying to resolve that
+id directly. No headless browser or CMS credentials needed either way.
+Verify every URL actually resolves (a plain `curl -o /dev/null -w
+"%{http_code}"` per link) before publishing it — the source listing itself
+can lag a team's real current URL, which is exactly what happened with
+Straubing. The same page's prose separately claims a "28 Hochschulen"
+figure that the payload itself doesn't back up with a 25th–28th named
+entry — re-count rather than trusting the prose number if this list is
+ever regenerated.
 
 ## Edit the four Enactus Germany event cards on `/events`
 

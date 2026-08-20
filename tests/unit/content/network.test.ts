@@ -57,12 +57,20 @@ describe("content/network", () => {
     ).toThrow();
   });
 
-  it("lists exactly the 18 other German locations, none overlapping the five linked teams or Mannheim", () => {
-    expect(germanTeamCities).toHaveLength(18);
-    const linkedNames = teamLinks.map((t) => t.name);
+  // 23, not 24: every German location except Mannheim itself, which has
+  // its own dedicated, always-labelled, unlinked point on the map
+  // (GermanyMap.tsx) rather than an entry here. teamLinks' five names all
+  // appear again in here too — the map's full roster, not a "the other
+  // ones" list the way it used to be (board feedback, 2026-08-20: link
+  // every team, not just the five originally-named partners).
+  it("lists all 23 German locations except Mannheim, including the five teamLinks names", () => {
+    expect(germanTeamCities).toHaveLength(23);
+    const cityNames = germanTeamCities.map((c) => c.name);
     for (const city of germanTeamCities) {
-      expect(linkedNames).not.toContain(city.name);
       expect(city.name).not.toBe("Mannheim");
+    }
+    for (const team of teamLinks) {
+      expect(cityNames).toContain(team.name);
     }
   });
 
@@ -75,5 +83,19 @@ describe("content/network", () => {
   it("gives every German team city a unique key", () => {
     const keys = germanTeamCities.map((c) => c.key);
     expect(new Set(keys).size).toBe(keys.length);
+  });
+
+  // Straubing is the one confirmed exception (ASSETS-TODO.md: its listed
+  // site 404s) — every other city was opened and confirmed live
+  // 2026-08-20, the same per-URL standard content-guide.md sets for
+  // partner links.
+  it("has a confirmed https URL for every German team city except Straubing", () => {
+    for (const city of germanTeamCities) {
+      if (city.key === "straubing") {
+        expect(city.url).toBeNull();
+      } else {
+        expect(city.url).toMatch(/^https:\/\//);
+      }
+    }
   });
 });
