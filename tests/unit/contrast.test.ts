@@ -124,26 +124,26 @@ describe("design tokens: color contrast", () => {
 
   // .signature-gradient (globals.css) — the shared navy-to-gold background
   // on /events' Journeys section and /projekte's active-projects section.
-  // Redone a fourth time 2026-08-20: the plateau-to-100% ramp was a plain
-  // two-stop linear blend meeting the flat plateau's zero slope head-on at
-  // the boundary — a real kink in the rate of color change, which read as
-  // "a hard cut" rather than a gradient (board feedback). Pulling the
-  // plateau back (46/58 -> 28/40) keeps the same plain two-stop shape (no
-  // color-mix(), no third literal color — see the utility's own comment in
-  // globals.css for why a third color was ruled out) but stretches it over
-  // a longer run, which changes color more slowly per pixel and reads as
-  // soft and gradual instead of an edge.
-  describe(".signature-gradient: weighted ink-to-gold, real tokens, no color-mix()", () => {
+  // Redone a third time 2026-08-20: dropped the plateau-then-linear-ramp
+  // shape entirely (board feedback: still read as a hard edge, however far
+  // back the plateau moved) for a single CSS color-interpolation hint
+  // between the same two literal tokens — `ink 0%, 88%, gold 100%` — which
+  // biases the gradient's perceptual midpoint late instead of adding a
+  // third color. Still no color-mix(), still both ends real/unmixed tokens.
+  // One shared curve for both axes now (see globals.css's own comment for
+  // why the axis split stopped needing separate tuning).
+  describe(".signature-gradient: weighted ink-to-gold via a color-interpolation hint, real tokens, no color-mix()", () => {
     const css = readFileSync(resolve(process.cwd(), "src/app/globals.css"), "utf-8");
     const declaration = css.match(/@utility signature-gradient \{[\s\S]*?\n\}/)?.[0] ?? "";
+    const HINT = 88;
 
-    it("is vertical (top to bottom) with a 28% plateau below md, and horizontal (to right) with a 40% plateau from md up, both ending at --color-gold, no color-mix()", () => {
+    it("is vertical (top to bottom) below md and horizontal (to right) from md up, both a single ink-to-gold hinted stop, no color-mix()", () => {
       expect(declaration).toContain("to bottom");
-      expect(declaration).toContain("var(--color-ink) 28%");
-      expect(declaration).toContain("@media (min-width: 48rem)");
       expect(declaration).toContain("to right");
-      expect(declaration).toContain("var(--color-ink) 40%");
-      expect(declaration).toContain("var(--color-gold) 100%");
+      expect(declaration).toContain("@media (min-width: 48rem)");
+      // Both directions use the exact same stop list — one shared curve.
+      const stopList = "var(--color-ink) 0%, 88%, var(--color-gold) 100%";
+      expect(declaration.match(new RegExp(stopList.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"))).toHaveLength(2);
       expect(declaration).not.toContain("color-mix");
     });
 
@@ -159,130 +159,81 @@ describe("design tokens: color contrast", () => {
       expect(g).toBeGreaterThan(b);
     });
 
-    // The color the gradient actually paints at a given % along its axis
-    // (width for the horizontal md+ ramp, height for the vertical
-    // below-md ramp), replicating the flat-then-ramp CSS above in plain JS.
-    function gradientColorAt(pct: number, plateau: number): string {
-      if (pct <= plateau) return ink;
-      const t = (pct - plateau) / (100 - plateau);
+    // The color the gradient actually paints at a given % along its axis,
+    // replicating the CSS hinted-interpolation formula (CSS Images spec)
+    // in plain JS: a bare percentage between two color stops biases where
+    // the 50% perceptual mixing point falls, without a third literal color.
+    function gradientColorAt(pct: number): string {
+      if (pct <= 0) return ink;
+      if (pct >= 100) return gold;
+      const t = pct <= HINT ? 0.5 * (pct / HINT) : 0.5 + 0.5 * ((pct - HINT) / (100 - HINT));
       const a = hexToRgb(ink);
       const b = hexToRgb(gold);
       const mixed = a.map((v, i) => v + (b[i] - v) * t);
       return `#${mixed.map((v) => Math.round(v).toString(16).padStart(2, "0")).join("")}`;
     }
 
-    // The 7-point sweep this file's own history refers to — every point is
-    // checked below for both the heading/body category (full-opacity
-    // paper — a heading and its lead paragraph are the same color against
-    // the same background pixel, so one figure covers both) and the
-    // eyebrow category (opacity-60 paper), at both the vertical (below md)
-    // and horizontal (md+) plateau.
+    // The 7-point sweep this file's own history and globals.css's comment
+    // quote directly — one shared curve now, so one sweep covers both axes.
     const SAMPLE_POINTS = [0, 16.67, 33.33, 50, 66.67, 83.33, 100];
-    const H_PLATEAU = 40;
-    const V_PLATEAU = 28;
 
-    // Real max right edge of JourneysSection's lead paragraph at md and up
-    // — its max-w-lg wrapper, self-start, is the widest bounded text either
-    // consumer puts directly on the gradient — measured with Playwright:
-    // 69.8% at 768px, 43.1% at 1280px (both use the horizontal 40% plateau,
-    // the same measurement that stood against the earlier 58% plateau —
-    // pulling the plateau back doesn't move where the text itself sits).
-    const REAL_TEXT_RIGHT_EDGES: Array<{ label: string; pct: number; plateau: number }> = [
-      { label: "768px heading/lead right edge", pct: 69.8, plateau: H_PLATEAU },
-      { label: "1280px heading/lead right edge", pct: 43.1, plateau: H_PLATEAU },
+    // Real measured text edges — same Playwright measurements the previous
+    // plateau-based design used (pulling the plateau back never moved
+    // where the text itself sits, and neither does dropping it).
+    const REAL_TEXT_EDGES: Array<{ label: string; pct: number }> = [
+      { label: "768px heading/lead right edge", pct: 69.8 },
+      { label: "1280px heading/lead right edge", pct: 43.1 },
+      { label: "JourneysSection heading+lead block bottom (below md)", pct: 41.2 },
+      { label: "ProjectsActive label bottom (below md)", pct: 8.7 },
     ];
 
-    it.each(REAL_TEXT_RIGHT_EDGES)(
-      "from md up, full-opacity paper heading/lead text clears 4.5:1 at its real measured right edge ($label)",
-      ({ pct, plateau }) => {
-        const bg = gradientColorAt(pct, plateau);
-        expect(passesAA(contrastRatio(paper, bg))).toBe(true);
-      },
-    );
-
-    // Below md, real bottom edge of each consumer's text block — measured
-    // with Playwright, identically at 360px and 390px in both cases.
-    // JourneysSection's heading+lead group is the taller of the two and, at
-    // the pulled-back 28% plateau, now sits past it on the ramp itself —
-    // unlike the horizontal axis's real edges, which still land inside the
-    // 40% plateau. Safety here comes from the ramp's own contrast headroom
-    // (verified below), the same way the horizontal axis always worked,
-    // not from a "still pure ink" guarantee.
-    const REAL_TEXT_BOTTOM_EDGES: Array<{ label: string; pct: number }> = [
-      { label: "JourneysSection heading+lead block bottom", pct: 41.2 },
-      { label: "ProjectsActive label bottom", pct: 8.7 },
-    ];
-
-    it.each(REAL_TEXT_BOTTOM_EDGES)(
-      "below md, full-opacity paper text clears 4.5:1 at its real measured bottom edge ($label)",
+    it.each(REAL_TEXT_EDGES)(
+      "full-opacity paper heading/lead text clears 4.5:1 at its real measured edge ($label)",
       ({ pct }) => {
-        const bg = gradientColorAt(pct, V_PLATEAU);
+        const bg = gradientColorAt(pct);
         expect(passesAA(contrastRatio(paper, bg))).toBe(true);
       },
     );
 
-    it("ProjectsActive's label, well above the 28% plateau, still sits on pure ink", () => {
-      expect(gradientColorAt(8.7, V_PLATEAU)).toBe(ink);
-    });
-
-    // Each axis keeps a safety buffer past its own real text edges above —
-    // not the same round number for both, since the two axes' real edges
-    // sit at very different points (max 69.8% horizontal, max 41.2%
-    // vertical). Past its buffer, a sample point is the gradient's pure
+    // The curve doesn't actually fail 4.5:1 until 89% — every general
+    // sample point up to 83.33% clears it too, a far wider safe range than
+    // either real text edge above needs. Past it is the gradient's pure
     // decorative tail, always covered by the two sections' opaque
     // ink-fill/gold-edge cards (JourneysSection.tsx / ProjectsActive.tsx),
     // never by raw text.
-    const AXES: Array<{ label: string; plateau: number; safeUpToPct: number }> = [
-      { label: "horizontal (md+)", plateau: H_PLATEAU, safeUpToPct: 70 },
-      { label: "vertical (below md)", plateau: V_PLATEAU, safeUpToPct: 50 },
-    ];
-
-    it.each(AXES)(
-      "paper heading/lead text clears 4.5:1 at every sample point up to the $label axis's text-safe boundary",
-      ({ plateau, safeUpToPct }) => {
-        const textSafePoints = SAMPLE_POINTS.filter((p) => p <= safeUpToPct);
-        for (const pct of textSafePoints) {
-          const bg = gradientColorAt(pct, plateau);
-          expect(passesAA(contrastRatio(paper, bg))).toBe(true);
-        }
-      },
-    );
-
-    it("the gradient's pure-gold tail (83.33%/100%, both axes) does fail paper-text contrast — by design, always covered by an opaque card, never by raw text", () => {
-      for (const { plateau } of AXES) {
-        expect(passesAA(contrastRatio(paper, gradientColorAt(83.33, plateau)))).toBe(false);
-        expect(passesAA(contrastRatio(paper, gradientColorAt(100, plateau)))).toBe(false);
+    it("paper heading/lead text clears 4.5:1 at every sample point up to 83.33%", () => {
+      for (const pct of SAMPLE_POINTS.filter((p) => p <= 83.33)) {
+        expect(passesAA(contrastRatio(paper, gradientColorAt(pct)))).toBe(true);
       }
     });
 
-    it("Eyebrow's opacity-60 treatment clears 4.5:1 anywhere the eyebrow itself can render (it's a short, top-anchored line, always inside the flat plateau)", () => {
-      for (const { plateau } of AXES) {
-        const bg = gradientColorAt(0, plateau);
-        const muted = blendOverBackground(paper, 0.6, bg);
-        expect(passesAA(contrastRatio(muted, bg))).toBe(true);
-      }
+    it("the gradient's pure-gold tail (100%) does fail paper-text contrast — by design, always covered by an opaque card, never by raw text", () => {
+      expect(passesAA(contrastRatio(paper, gradientColorAt(100)))).toBe(false);
     });
 
-    // The full 7-point sweep, both categories, both axes — the numbers
-    // this file's own history and globals.css's comment quote directly.
-    it.each(AXES)(
-      "records the full 7-point contrast sweep for heading/body and eyebrow text on the $label axis",
-      ({ plateau }) => {
-        for (const pct of SAMPLE_POINTS) {
-          const bg = gradientColorAt(pct, plateau);
-          const headingBodyRatio = contrastRatio(paper, bg);
-          const eyebrowColor = blendOverBackground(paper, 0.6, bg);
-          const eyebrowRatio = contrastRatio(eyebrowColor, bg);
-          // Every point up to 100% is a real, finite ratio — this test's
-          // job is to force the numbers to exist and be inspectable (e.g.
-          // via --reporter=verbose), not to assert AA everywhere: the
-          // decorative tail past each axis's safe boundary is expected to
-          // fail, covered by an opaque card, asserted separately above.
-          expect(headingBodyRatio).toBeGreaterThan(1);
-          expect(eyebrowRatio).toBeGreaterThan(1);
-        }
-      },
-    );
+    it("Eyebrow's opacity-60 treatment clears 4.5:1 anywhere the eyebrow itself can render (it's a short, top-anchored line, always at 0%)", () => {
+      const bg = gradientColorAt(0);
+      const muted = blendOverBackground(paper, 0.6, bg);
+      expect(passesAA(contrastRatio(muted, bg))).toBe(true);
+    });
+
+    // The full 7-point sweep, both categories — the numbers this file's
+    // own history and globals.css's comment quote directly.
+    it("records the full 7-point contrast sweep for heading/body and eyebrow text", () => {
+      for (const pct of SAMPLE_POINTS) {
+        const bg = gradientColorAt(pct);
+        const headingBodyRatio = contrastRatio(paper, bg);
+        const eyebrowColor = blendOverBackground(paper, 0.6, bg);
+        const eyebrowRatio = contrastRatio(eyebrowColor, bg);
+        // Every point up to 100% is a real, finite ratio — this test's job
+        // is to force the numbers to exist and be inspectable (e.g. via
+        // --reporter=verbose), not to assert AA everywhere: the tail past
+        // 83.33% is expected to fail, covered by an opaque card, asserted
+        // separately above.
+        expect(headingBodyRatio).toBeGreaterThan(1);
+        expect(eyebrowRatio).toBeGreaterThan(1);
+      }
+    });
   });
 
   // Easter egg 3/3 (docs/eastereggs.md): html[data-eight-bit="active"]'s

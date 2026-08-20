@@ -804,103 +804,63 @@ body {
    be one" mistake the calendar category layer's own token-reuse test
    guards against.
 
-   Redone a second time 2026-08-19: the first redo (see git history) ran the
-   real tokens at both ends but put every line of text on its own opaque
-   bg-paper card, which the board then flagged as looking "stuck on" —
-   pasted-in white boxes rather than content that actually sits on the
-   gradient. This version drops every opaque card: text sits directly on
-   the gradient, in --color-paper, and the *weighting* of the stops does the
-   contrast work the opaque cards used to do. --color-ink holds flat through
-   most of the width — where JourneysSection's and ProjectsActive's text
-   actually lives, both self-start/max-width-bounded — and only ramps to the
-   real, unmixed --color-gold in the last stretch near the right edge. Not a
-   linear 50/50: the plateau is deliberately wide so gold reads as an accent,
-   not half the section.
+   Redone a third time 2026-08-20: the previous version (plateau then a
+   plain two-stop linear ramp — see git history) still had a kink where the
+   flat plateau's zero slope met the ramp's constant slope head-on, which
+   read as a hard cut rather than a soft gradient no matter how far back
+   the plateau moved (board feedback: "still a visible edge, pull it
+   longer and softer"). This version drops the plateau concept entirely —
+   there's no flat zone left as such — in favor of a single CSS color
+   interpolation hint: `var(--color-ink) 0%, 88%, var(--color-gold) 100%`.
+   That bare `88%` between the two color stops is standard CSS (Images
+   spec), not a proprietary trick — it biases where the gradient's
+   perceptual 50% midpoint falls, letting the same two literal tokens
+   (still "real, unmixed tokens at both ends," still no color-mix(), no
+   third literal color, no exception to that rule) blend far more slowly
+   for most of the run and then rush to gold only in the last stretch.
+   That both softens the curve (no more slope discontinuity to read as an
+   edge — the derivative is continuous throughout, it just isn't constant)
+   and makes it read as much longer, since the color barely moves for the
+   first ~80% of the axis.
 
-   Two axes, not one: from md up, JourneysSection's bounded heading block has
-   real room to its right (the container is wide enough that max-w-lg
-   actually binds), so a horizontal ramp with a 40% plateau gives gold real
-   presence while the text stays clear of it (worked out against
-   JourneysSection's lead paragraph, its widest bounded text — see that
-   file's own comment on its max-w-lg for the box-width arithmetic this
-   traces back to). Below md a horizontal ramp doesn't work at all: a
-   wrapped block's shrink-to-fit width fills essentially the whole available
-   column, so any plateau low enough to give gold real width also put text
-   on top of it — measured at 95.6%/95.9% of the section width at 360/390px,
-   there was no plateau that cleared both goals at once (board feedback,
-   2026-08-20: "practically the whole area is navy, gold only shows as a
-   thin edge"). Below md the ramp instead runs top to bottom: both
-   consumers' text is always top-anchored (SectionHeading's / the mono
-   label's own top position, never centered or bottom-aligned) with opaque
-   cards filling the rest of the section's height below it (ProjectsActive's
-   ProjectCard, JourneysSection's <ol> items — both ink-filled, gold-edged,
-   so they never depend on where they land against this background either).
-   That means the two goals stop competing on this axis: text stays inside
-   the flat plateau, and gold gets the entire lower portion of the section
-   to actually read as gold instead of a sliver at one edge. 28% is not a
-   round number by accident either — it's JourneysSection's heading+lead
-   block (measured with Playwright at 41.2% of the section's height,
-   identically at 360px and 390px — the taller of the two consumers' text
-   blocks; ProjectsActive's mono label ends at 7.8%/8.7%)... except 28% is
-   *below* that 41.2% figure, not above it the way the original 46% plateau
-   was — see the second revision's note below for why relying on the flat
-   plateau alone stopped being the goal.
+   One shared shape for both axes now, not two separately-tuned plateaus:
+   the hint math made the vertical/horizontal split about *safety margin*
+   moot (both real text edges clear 4.5:1 by 6:1 or more now — see below),
+   so there's no longer a reason for the two axes to carry different
+   numbers. `to bottom` below md, `to right` from md up — same two stops,
+   same hint, only the direction differs, for the same layout reason the
+   two-axis design always existed (JourneysSection's bounded heading block
+   has real room to its right only once the container is wide enough that
+   its max-w-lg actually binds; below that a horizontal ramp put text on
+   top of the gold end no matter where the ramp started — see that
+   component's own comment on the box-width arithmetic this traces back
+   to). Below md the ramp still runs top to bottom instead, with both
+   consumers' text top-anchored and opaque ink-filled/gold-edged cards
+   (ProjectsActive's ProjectCard, JourneysSection's <ol> items) filling the
+   rest of the section's height, same as every earlier version.
 
    The one thing still not allowed to sit directly on this gradient:
    unbounded-width text (a paragraph with no max-width) — see
    JourneysSection.tsx / ProjectsActive.tsx for how each consumer keeps
    every text run bounded.
 
-   Plateaus pulled back a second time 2026-08-20 (46/58 -> 28/40): the ramp
-   from plateau to 100% was a plain two-stop linear blend, so the flat
-   plateau's zero slope met the ramp's constant slope head-on right at the
-   boundary — a real kink in the color-change rate, not just a color
-   difference, and that's what read as "a hard cut" rather than a gradient
-   (board feedback). A gradient with more stops could round that corner off,
-   but every extra stop needs its own literal color, and any color that
-   isn't --color-ink or --color-gold is a mixed, muted tone — exactly what
-   "real, unmixed tokens at both ends" rules out (`color-mix()` is banned
-   in tests/unit/contrast.test.ts for the same reason). So the fix is
-   pulling the plateau itself back instead: the ramp is still the same
-   plain two-stop blend, just running over a longer stretch (60%/72% of the
-   axis instead of 42%/54%), which changes color more slowly per pixel and
-   reads as gradual rather than cut — softer *and* longer from the same
-   two-stop shape, no third color needed. The kink technically still exists
-   at the new boundary, but a shallower rate change either side of it reads
-   as far less abrupt.
-
-   Both new numbers keep real headroom past every text edge measured for
-   the previous plateaus (see content in that same test file): the
-   horizontal worst case (768px lead-paragraph right edge, 69.8%) still
-   clears 4.5:1 with a 0.3:1 margin at the new 40% plateau; the vertical
-   worst case (JourneysSection heading+lead bottom, 41.2%) clears it with a
-   7.3:1 margin at the new 28% plateau — nowhere close to the boundary
-   either axis actually needs. The horizontal axis keeps the same "every
-   sample point up to 70% width passes AA" buffer the old 58% plateau had;
-   the vertical axis's equivalent buffer moves to 50% height instead of 70%
-   — a boundary picked for that axis's own real text extent (max 41.2%),
-   not borrowed from the other axis's, since nothing on this site ever puts
-   raw text past either bound: everything beyond it is the two consumers'
-   opaque ink-filled/gold-edged cards, same as before.
-
-   tests/unit/contrast.test.ts's gradient case asserts the plateau stops and
-   the real end tokens (a drift guard, not a full AA sweep — the 7-point
-   sweep across the actual measured stops lives in that same test). */
+   Real measured text edges against the new curve, full-opacity paper text
+   (tests/unit/contrast.test.ts asserts all of these, plus the full
+   7-point sweep this comment's numbers are drawn from):
+   - 768px lead-paragraph right edge (69.8% of the horizontal axis): 6.42:1
+   - 1280px lead-paragraph right edge (43.1%): 10.01:1
+   - JourneysSection heading+lead bottom, below md (41.2% of the vertical
+     axis): 10.34:1
+   - ProjectsActive's mono label, below md (8.7%): 15.93:1
+   Every one of the 7 general sample points up to 83.33% clears 4.5:1 too
+   — the curve doesn't actually fail until 89%, deep in the gradient's
+   pure-decorative tail that's always covered by an opaque card, never by
+   raw text, on both axes. */
 @utility signature-gradient {
-  background-image: linear-gradient(
-    to bottom,
-    var(--color-ink) 0%,
-    var(--color-ink) 28%,
-    var(--color-gold) 100%
-  );
+  background-image: linear-gradient(to bottom, var(--color-ink) 0%, 88%, var(--color-gold) 100%);
 
   @media (min-width: 48rem) {
-    background-image: linear-gradient(
-      to right,
-      var(--color-ink) 0%,
-      var(--color-ink) 40%,
-      var(--color-gold) 100%
-    );
+    background-image: linear-gradient(to right, var(--color-ink) 0%, 88%, var(--color-gold) 100%);
   }
 }
 
@@ -941,21 +901,32 @@ body {
     --color-moss: #146b2d;
     --color-amber: #6b4f06;
 
-    /* Press Start 2P runs noticeably wider per character than Geist/
-       Lilita One at the same size — left alone, the hero's rotating term
-       and HomeKpis' figures (both single-line, width-constrained
-       containers sized for the original font) clipped or overlapped
-       their neighbors. Same trick as the colors above: these are the
-       exact custom properties text-display-1..4/text-heading-1 already
-       resolve through, so scaling them down here reflows every consumer
-       automatically, no component touched. Only the headline-scale steps
-       move — body/mono text wraps normally instead of living in a
-       fixed-width box, so it was never at risk the same way. */
+    /* Press Start 2P runs noticeably wider and visually heavier per
+       character than Geist/Lilita One at the same size — left alone, the
+       hero's rotating term and HomeKpis' figures (both single-line,
+       width-constrained containers sized for the original font) clipped
+       or overlapped their neighbors, and body copy read as uniformly
+       bold. Same trick as the colors above: these are the exact custom
+       properties every text-* utility already resolves through, so
+       scaling them down here reflows every consumer automatically, no
+       component touched. The headline scale drops the most (~55%, where
+       the clipping risk was real); body and mono text only needed a
+       lighter pass (~75-80%) purely to cut the font's visual weight, not
+       to fix an overflow — it wraps normally, so it was never at risk of
+       clipping the way a single-line box was. */
     --text-display-1: 3.25rem;
     --text-display-2: 2.2rem;
     --text-display-3: 1.4rem;
     --text-display-4: 1.1rem;
     --text-heading-1: 1.1rem;
+    --text-heading-2: 1.1rem;
+    --text-heading-3: 0.95rem;
+    --text-body-l: 0.85rem;
+    --text-body-m: 0.75rem;
+    --text-body-s: 0.7rem;
+    --text-mono-m: 0.75rem;
+    --text-mono-s: 0.68rem;
+    --text-mono-xs: 0.58rem;
   }
 
   /* !important, not layer ordering, is what actually wins here: these
