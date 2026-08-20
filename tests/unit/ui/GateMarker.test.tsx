@@ -14,12 +14,20 @@ describe("GateMarker", () => {
     expect(screen.getByText("Operations Gating")).toBeInTheDocument();
   });
 
-  it("hides the decorative gold rule from assistive technology in both variants", () => {
+  it("hides the milestone variant's decorative gold rule from assistive technology", () => {
     const { container: milestone } = render(<GateMarker label="Inno Gating" variant="milestone" />);
     expect(milestone.querySelector('[aria-hidden="true"]')).toBeInTheDocument();
+  });
 
+  // The divider variant used to draw its own 2px gold rule meant to
+  // coincide with the golden thread already passing through the same
+  // point (GateDivider.tsx/ThreadSegment) — the two never lined up
+  // pixel-for-pixel, visibly thickening the thread at every divider
+  // (board feedback, 2026-08-20). Removed rather than realigned: the
+  // thread alone is already the divider's rule.
+  it("renders no rule of its own in the divider variant — the golden thread it sits on is the rule", () => {
     const { container: divider } = render(<GateMarker label="Operations Gating" variant="divider" />);
-    expect(divider.querySelector('[aria-hidden="true"]')).toBeInTheDocument();
+    expect(divider.querySelector('[aria-hidden="true"]')).not.toBeInTheDocument();
   });
 
   it("exposes only the label as accessible content, not the decorative rule", () => {
@@ -39,14 +47,6 @@ describe("GateMarker", () => {
     expect(
       screen.getByRole("heading", { level: 3, name: "Was uns einzigartig macht" }),
     ).toBeInTheDocument();
-  });
-
-  it("hides the divider variant's rule below md, since without the golden thread passing through it, it has nothing to connect to", () => {
-    const { container: divider } = render(<GateMarker label="Operations Gating" variant="divider" />);
-    expect(divider.querySelector('[aria-hidden="true"]')).toHaveClass("hidden", "md:block");
-
-    const { container: milestone } = render(<GateMarker label="Inno Gating" variant="milestone" />);
-    expect(milestone.querySelector('[aria-hidden="true"]')).not.toHaveClass("hidden");
   });
 
   it("has no accessibility violations in either variant", async () => {
