@@ -27,10 +27,10 @@ describe("MitmachenFit", () => {
     expect(headings).toHaveLength(8);
   });
 
-  it("shows the 80% fit note prominently, not as a footnote", () => {
+  it("shows the fit note prominently, not as a footnote", () => {
     renderWithIntl(<MitmachenFit />);
-    expect(screen.getByText("Du musst nicht alles davon mitbringen.")).toBeInTheDocument();
-    expect(screen.getByText(/Rund 80 % Übereinstimmung/)).toBeInTheDocument();
+    expect(screen.getByText("Du musst nicht alles können")).toBeInTheDocument();
+    expect(screen.getByText(/Teamfähigkeit, Neugier/)).toBeInTheDocument();
   });
 
   it("has no accessibility violations", async () => {
