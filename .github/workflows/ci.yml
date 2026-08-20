@@ -11,6 +11,21 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # Chromium, Firefox, and WebKit, plus every OS-level shared library they
+    # link against, already installed — this is the whole reason to use it.
+    # The old setup instead ran `playwright install-deps` on a bare runner,
+    # which shells out to apt-get and repeatedly hung until the job's own
+    # timeout killed it (three separate runs, each needing a manual
+    # cancel+rerun). The tag pins an exact Playwright version, not a moving
+    # "latest": it must match @playwright/test's version in package.json /
+    # package-lock.json exactly, or the npm package and the pre-installed
+    # browsers can drift out of sync — the "Verify Playwright version"
+    # step below fails loudly if a future dependency bump (Dependabot
+    # manages this package, see .github/dependabot.yml) moves one without
+    # the other. Bumping: change the version in both places, and the tag
+    # suffix (-noble is Ubuntu 24.04) if Playwright's own image support
+    # changes — full tag list at https://mcr.microsoft.com/v2/playwright/tags/list.
+    container: mcr.microsoft.com/playwright:v1.62.0-noble
     steps:
       - uses: actions/checkout@v4
 
@@ -21,6 +36,15 @@ jobs:
 
       - run: npm ci
 
+      - name: Verify Playwright version matches the container image
+        run: |
+          installed=$(node -p "require('./package-lock.json').packages['node_modules/@playwright/test'].version")
+          expected="1.62.0"
+          if [ "$installed" != "$expected" ]; then
+            echo "package-lock.json pins @playwright/test $installed, but .github/workflows/ci.yml's container tag is v$expected-noble. Update the container tag (and this expected version) to match." >&2
+            exit 1
+          fi
+
       - run: npm run typecheck
 
       - run: npm run lint
@@ -28,30 +52,6 @@ jobs:
       - run: npm run test
 
       - run: npm run build
-
-      - name: Read Playwright version
-        id: playwright-version
-        run: echo "version=$(node -p "require('./package-lock.json').packages['node_modules/@playwright/test'].version")" >> "$GITHUB_OUTPUT"
-
-      - name: Cache Playwright browsers
-        id: playwright-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-browsers-${{ runner.os }}-${{ steps.playwright-version.outputs.version }}
-
-      # Only Chromium and WebKit run in tests/e2e (see playwright.config.ts) —
-      # installing Firefox too would cache and download a browser nothing uses.
-      - name: Install Playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium webkit
-
-      # On a cache hit the browser binaries are already in place, but the
-      # runner image itself is fresh each run and still needs the OS-level
-      # shared libraries those binaries link against.
-      - name: Install Playwright OS dependencies
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium webkit
 
       - run: npm run test:e2e
 
