@@ -40,6 +40,10 @@ protection checklist.
    (`mail_status`, `mail_error`), same as the other two forms — otherwise a
    subscriber whose link never arrived is indistinguishable from one who
    chose not to click. `/admin/mails` lists the failures and can resend.
+7. Both the confirm and unsubscribe links land on `/erinnerung-status`, a
+   real confirmation page with four states (confirmed, already confirmed,
+   unsubscribed, invalid/expired) — noindex and excluded from the sitemap,
+   same as `/secret`.
 
 `/admin/erinnerungen` shows the list with confirmed, unconfirmed, and
 unsubscribed counted separately; only the confirmed figure is the number of
@@ -72,8 +76,16 @@ people who may be mailed. Its CSV export deliberately carries no tokens.
 
 ## SEO
 
-- `generateMetadata` per route and locale, with OG images.
-- `hreflang` alternates between locales.
+- `generateMetadata` per route and locale, with OG images, a real
+  per-page/per-locale description, and a canonical URL — all three via the
+  shared `pageAlternates()` helper (`src/lib/seo.ts`) plus each page's own
+  `Seo.<key>` message, so a route can't end up with a canonical or hreflang
+  pair that doesn't match what it actually renders.
+- `hreflang` alternates between locales, reciprocal in both directions plus
+  `x-default` pointing at German (`pageAlternates()` again).
+- Organization structured data (JSON-LD, `components/OrganizationJsonLd.tsx`)
+  on the homepage only, sourced entirely from `content/org.ts` /
+  `content/navigation.ts` — never a fact invented for the schema alone.
 - **301 redirects from the old Webflow URLs** in `next.config.ts`: `/team`
   (→ `/`, since there's no dedicated team route on this site — the Vorstand
   only appears on the homepage), `/projekte`, `/innolab`, `/mitmachen`,
