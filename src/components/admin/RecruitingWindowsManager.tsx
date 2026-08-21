@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { FormStatusMessage } from "@/components/ui/FormStatusMessage";
 import { AdminTable } from "@/components/admin/AdminTable";
+import { SendReminderWindowMailButton } from "@/components/admin/SendReminderWindowMailButton";
 import { recruitingWindowFormSchema } from "@/lib/recruitingWindowFormSchema";
 
 export type ManagedWindow = {
@@ -150,13 +151,14 @@ export function RecruitingWindowsManager({ windows }: { windows: ManagedWindow[]
             window.semester,
             dateFormatter.format(new Date(window.start)),
             dateFormatter.format(new Date(window.end)),
-            <span key="actions" className="flex gap-2">
+            <span key="actions" className="flex flex-wrap items-center gap-2">
               <Button variant="ghost" size="sm" onClick={() => startEditing(window)} disabled={pending}>
                 {t("edit")}
               </Button>
               <Button variant="ghost" size="sm" onClick={() => handleDelete(window)} disabled={pending}>
                 {t("delete")}
               </Button>
+              <SendReminderWindowMailButton windowId={window.id} semester={window.semester} />
             </span>,
           ],
         }))}

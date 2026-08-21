@@ -6,17 +6,21 @@ import {
   findApplicationById,
   findContactMessageById,
   findReminderSignupById,
+  findReminderWindowMailById,
   markApplicationMailed,
   markApplicationMailFailed,
   markContactMessageMailed,
   markContactMessageMailFailed,
   markReminderMailed,
   markReminderMailFailed,
+  markReminderWindowMailFailed,
+  markReminderWindowMailSent,
 } from "@/lib/db";
 import {
   dispatchApplicationMails,
   dispatchContactNotification,
   dispatchReminderConfirmation,
+  dispatchReminderWindowOpen,
 } from "@/lib/mailDispatch";
 
 /**
@@ -38,7 +42,7 @@ import {
 // rejecting an id the database would happily have found would be a bug in
 // the validator rather than a caught attack.
 const requestSchema = z.object({
-  source: z.enum(["applications", "contact_messages", "reminder_signups"]),
+  source: z.enum(["applications", "contact_messages", "reminder_signups", "reminder_window_mails"]),
   id: z.guid(),
 });
 
@@ -91,21 +95,37 @@ async function resend(source: string, id: string): Promise<boolean> {
     return true;
   }
 
-  const signup = await findReminderSignupById(id);
-  if (!signup) return false;
-  // A confirmed subscriber has already used their link; re-sending the
-  // double-opt-in request would be confusing at best. The list never offers
-  // one of these (only mail_status = 'failed' rows appear, and confirming
-  // requires the mail to have arrived), so this is a guard against a
-  // hand-made request, not a case the UI can produce.
-  if (signup.confirmed) return false;
-  await dispatchReminderConfirmation(signup);
-  await markReminderMailed(id);
+  if (source === "reminder_signups") {
+    const signup = await findReminderSignupById(id);
+    if (!signup) return false;
+    // A confirmed subscriber has already used their link; re-sending the
+    // double-opt-in request would be confusing at best. The list never
+    // offers one of these (only mail_status = 'failed' rows appear, and
+    // confirming requires the mail to have arrived), so this is a guard
+    // against a hand-made request, not a case the UI can produce.
+    if (signup.confirmed) return false;
+    await dispatchReminderConfirmation(signup);
+    await markReminderMailed(id);
+    return true;
+  }
+
+  // reminder_window_mails: rebuilds the exact mail from the row's own
+  // stored semester/windowEndsAt (no join to recruiting_windows — the row
+  // outlives a since-deleted window, same reasoning as the other sources
+  // storing email redundantly). No "already succeeded" guard is needed
+  // here the way reminder_signups has one: the list only ever offers a
+  // mail_status = 'failed' row, and a failed send never confirmed anything
+  // that a resend could double up on.
+  const windowMail = await findReminderWindowMailById(id);
+  if (!windowMail) return false;
+  await dispatchReminderWindowOpen(windowMail);
+  await markReminderWindowMailSent(id);
   return true;
 }
 
 async function recordFailure(source: string, id: string, message: string): Promise<void> {
   if (source === "applications") return markApplicationMailFailed(id, message);
   if (source === "contact_messages") return markContactMessageMailFailed(id, message);
-  return markReminderMailFailed(id, message);
+  if (source === "reminder_signups") return markReminderMailFailed(id, message);
+  return markReminderWindowMailFailed(id, message);
 }

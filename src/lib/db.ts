@@ -383,6 +383,46 @@ export async function deleteRecruitingWindow(id: string): Promise<boolean> {
   return rows.length > 0;
 }
 
+// Single-record lookup for the admin manual-trigger button
+// (reminderWindowMail.ts) — picks one window by id regardless of whether
+// it's open, past, or future, unlike findRecruitingWindowsNeedingReminderMail
+// below.
+export async function findRecruitingWindowById(id: string): Promise<RecruitingWindowRow | null> {
+  const rows = await sql()`
+    select id, semester, starts_at, ends_at, created_at
+    from recruiting_windows where id = ${id}
+  `;
+  return rows.length > 0 ? toRecruitingWindowRow(rows[0] as Record<string, unknown>) : null;
+}
+
+/**
+ * Self-healing detection for the cron's reminder-window job: a window
+ * qualifies once it has opened (starts_at <= now()) AND at least one
+ * confirmed, still-subscribed signup has no reminder_window_mails row for
+ * it yet. No "since the last run" timestamp anywhere — a missed cron slot,
+ * a slow deploy, or clock drift all correct themselves on the very next
+ * run instead of needing separately-tracked state, and a window
+ * automatically stops being returned once every confirmed signup has a row
+ * (sent or failed) for it.
+ */
+export async function findRecruitingWindowsNeedingReminderMail(now: Date): Promise<RecruitingWindowRow[]> {
+  const rows = await sql()`
+    select id, semester, starts_at, ends_at, created_at
+    from recruiting_windows w
+    where w.starts_at <= ${now.toISOString()}
+      and exists (
+        select 1 from reminder_signups rs
+        where rs.confirmed = true and rs.unsubscribed_at is null
+          and not exists (
+            select 1 from reminder_window_mails rwm
+            where rwm.reminder_signup_id = rs.id and rwm.recruiting_window_id = w.id
+          )
+      )
+    order by w.starts_at asc
+  `;
+  return (rows as Record<string, unknown>[]).map(toRecruitingWindowRow);
+}
+
 export type CalendarCategory =
   | "innolab"
   | "projekte"
@@ -704,6 +744,7 @@ export type ConfirmedReminderSignup = {
   id: string;
   email: string;
   locale: Locale;
+  unsubscribeToken: string;
 };
 
 // The same mail bookkeeping applications and contact_messages already had
@@ -867,16 +908,21 @@ export async function unsubscribeReminder(token: string): Promise<UnsubscribeRem
 
 // The query the "unconfirmed rows are never mailed" guarantee rests on:
 // both conditions are enforced here, in the query itself, rather than left
-// to a caller to remember to filter for.
+// to a caller to remember to filter for. Includes unsubscribe_token (unlike
+// most reminder_signups reads) because this list's one consumer,
+// reminderWindowMail.ts, has to build a working unsubscribe link into every
+// window-open mail it sends — reusing each signup's existing token, the
+// same one dispatchReminderConfirmation already used, never reissued.
 export async function findConfirmedReminderSignups(): Promise<ConfirmedReminderSignup[]> {
   const rows = await sql()`
-    select id, email, locale from reminder_signups
+    select id, email, locale, unsubscribe_token from reminder_signups
     where confirmed = true and unsubscribed_at is null
   `;
   return (rows as Record<string, unknown>[]).map((row) => ({
     id: row.id as string,
     email: row.email as string,
     locale: row.locale as Locale,
+    unsubscribeToken: row.unsubscribe_token as string,
   }));
 }
 
@@ -892,6 +938,87 @@ export async function deleteExpiredReminderSignups(unconfirmedCutoff: Date): Pro
     returning id
   `;
   return rows.length;
+}
+
+/**
+ * The "an application window just opened" mail (reminderWindowMail.ts),
+ * migrations/0009. Sending is claim-then-send: this insert is the entire
+ * once-per-(signup, window) guarantee, enforced by the table's own unique
+ * constraint rather than by anything in application code. Zero rows back
+ * means another cron run — or the admin's manual-trigger button, racing it
+ * — already claimed this exact pair; the caller skips, no send attempted.
+ * No caller ever needs an id back to *not* send, only to send, which is
+ * why this returns null instead of throwing on a conflict.
+ */
+export async function claimReminderWindowMail(params: {
+  reminderSignupId: string;
+  recruitingWindowId: string;
+  email: string;
+  locale: Locale;
+  semester: string;
+  windowEndsAt: string;
+}): Promise<string | null> {
+  const rows = await sql()`
+    insert into reminder_window_mails (
+      reminder_signup_id, recruiting_window_id, email, locale, semester, window_ends_at
+    ) values (
+      ${params.reminderSignupId}, ${params.recruitingWindowId}, ${params.email}, ${params.locale},
+      ${params.semester}, ${params.windowEndsAt}
+    )
+    on conflict (reminder_signup_id, recruiting_window_id) do nothing
+    returning id
+  `;
+  return rows.length > 0 ? ((rows[0] as Record<string, unknown>).id as string) : null;
+}
+
+export async function markReminderWindowMailSent(id: string): Promise<void> {
+  await sql()`
+    update reminder_window_mails set mail_status = 'sent', mailed_at = now(), mail_error = null
+    where id = ${id}
+  `;
+}
+
+export async function markReminderWindowMailFailed(id: string, error: string): Promise<void> {
+  await sql()`
+    update reminder_window_mails set mail_status = 'failed', mail_error = ${error}
+    where id = ${id}
+  `;
+}
+
+export type ReminderWindowMailRecord = {
+  id: string;
+  email: string;
+  locale: Locale;
+  semester: string;
+  windowEndsAt: string;
+  unsubscribeToken: string;
+};
+
+// Powers /admin/mails's resend for this source. Reads semester/windowEndsAt
+// back off the row itself, not a join to recruiting_windows — the row has
+// to stay resendable even after its window has since been deleted, same
+// reasoning as storing email redundantly (listFailedMails). The join to
+// reminder_signups is safe unconditionally, unlike that one: reminder_signup_id
+// is `references reminder_signups(id) on delete cascade`, so this row can
+// never outlive the signup it points at — there is no case where the join
+// finds nothing.
+export async function findReminderWindowMailById(id: string): Promise<ReminderWindowMailRecord | null> {
+  const rows = await sql()`
+    select rwm.id, rwm.email, rwm.locale, rwm.semester, rwm.window_ends_at, rs.unsubscribe_token
+    from reminder_window_mails rwm
+    join reminder_signups rs on rs.id = rwm.reminder_signup_id
+    where rwm.id = ${id}
+  `;
+  if (rows.length === 0) return null;
+  const row = rows[0] as Record<string, unknown>;
+  return {
+    id: row.id as string,
+    email: row.email as string,
+    locale: row.locale as Locale,
+    semester: row.semester as string,
+    windowEndsAt: (row.window_ends_at as Date).toISOString(),
+    unsubscribeToken: row.unsubscribe_token as string,
+  };
 }
 
 export type ContactMessageInput = {
@@ -1000,7 +1127,11 @@ export async function findContactMessageById(id: string): Promise<ContactMessage
  * failed, not why, which is the difference between a fixable problem and a
  * mystery.
  */
-export type FailedMailSource = "applications" | "contact_messages" | "reminder_signups";
+export type FailedMailSource =
+  | "applications"
+  | "contact_messages"
+  | "reminder_signups"
+  | "reminder_window_mails";
 
 export type FailedMail = {
   source: FailedMailSource;
@@ -1024,6 +1155,10 @@ export async function listFailedMails(): Promise<FailedMail[]> {
     select 'reminder_signups' as source, id, created_at, email,
            '' as label, mail_error
     from reminder_signups where mail_status = 'failed'
+    union all
+    select 'reminder_window_mails' as source, id, created_at, email,
+           semester as label, mail_error
+    from reminder_window_mails where mail_status = 'failed'
     order by created_at desc
   `;
   return (rows as Record<string, unknown>[]).map((row) => ({
@@ -1059,6 +1194,9 @@ export async function mailHealthSnapshot(): Promise<MailHealthSnapshot> {
       union all
       select 'reminder_signups' as source, mail_status, created_at
       from reminder_signups where mail_status <> 'pending'
+      union all
+      select 'reminder_window_mails' as source, mail_status, created_at
+      from reminder_window_mails where mail_status <> 'pending'
     )
     select
       (select source from attempts order by created_at desc limit 1) as last_source,
@@ -1094,6 +1232,8 @@ export type CronRun = {
   deletedContactMessages: number;
   deletedReminderSignups: number;
   prunedRateLimitHits: number;
+  sentReminderWindowMails: number;
+  failedReminderWindowMails: number;
   error: string | null;
 };
 
@@ -1108,6 +1248,8 @@ function toCronRun(row: Record<string, unknown>): CronRun {
     deletedContactMessages: row.deleted_contact_messages as number,
     deletedReminderSignups: row.deleted_reminder_signups as number,
     prunedRateLimitHits: row.pruned_rate_limit_hits as number,
+    sentReminderWindowMails: row.sent_reminder_window_mails as number,
+    failedReminderWindowMails: row.failed_reminder_window_mails as number,
     error: (row.error as string | null) ?? null,
   };
 }
@@ -1121,13 +1263,19 @@ export async function startCronRun(job: string): Promise<string> {
   return (rows[0] as Record<string, unknown>).id as string;
 }
 
+// `counts` is a partial: the cleanup job only ever populates its four
+// deleted/pruned fields, the reminder-window job only its two
+// sent/failed fields, and each leaves the other job's columns at their
+// default 0 — the two jobs share this table but never share a row.
 export async function finishCronRun(
   id: string,
   counts: {
-    applications: number | null;
-    contactMessages: number | null;
-    reminderSignups: number | null;
-    rateLimitHits: number | null;
+    applications?: number | null;
+    contactMessages?: number | null;
+    reminderSignups?: number | null;
+    rateLimitHits?: number | null;
+    sentReminderWindowMails?: number | null;
+    failedReminderWindowMails?: number | null;
   },
   error: string | null,
 ): Promise<void> {
@@ -1139,6 +1287,8 @@ export async function finishCronRun(
       deleted_contact_messages = ${counts.contactMessages ?? 0},
       deleted_reminder_signups = ${counts.reminderSignups ?? 0},
       pruned_rate_limit_hits = ${counts.rateLimitHits ?? 0},
+      sent_reminder_window_mails = ${counts.sentReminderWindowMails ?? 0},
+      failed_reminder_window_mails = ${counts.failedReminderWindowMails ?? 0},
       error = ${error}
     where id = ${id}
   `;
@@ -1148,7 +1298,8 @@ export async function listCronRuns(limit = 10): Promise<CronRun[]> {
   const rows = await sql()`
     select id, job, started_at, finished_at, ok, deleted_applications,
            deleted_contact_messages, deleted_reminder_signups,
-           pruned_rate_limit_hits, error
+           pruned_rate_limit_hits, sent_reminder_window_mails,
+           failed_reminder_window_mails, error
     from cron_runs
     order by started_at desc
     limit ${limit}

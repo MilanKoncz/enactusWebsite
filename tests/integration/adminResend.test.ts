@@ -5,33 +5,41 @@ import { NextRequest } from "next/server";
 const findApplicationById = vi.fn();
 const findContactMessageById = vi.fn();
 const findReminderSignupById = vi.fn();
+const findReminderWindowMailById = vi.fn();
 const markApplicationMailed = vi.fn();
 const markApplicationMailFailed = vi.fn();
 const markContactMessageMailed = vi.fn();
 const markContactMessageMailFailed = vi.fn();
 const markReminderMailed = vi.fn();
 const markReminderMailFailed = vi.fn();
+const markReminderWindowMailSent = vi.fn();
+const markReminderWindowMailFailed = vi.fn();
 
 const dispatchApplicationMails = vi.fn();
 const dispatchContactNotification = vi.fn();
 const dispatchReminderConfirmation = vi.fn();
+const dispatchReminderWindowOpen = vi.fn();
 
 vi.mock("@/lib/db", () => ({
   findApplicationById: (...a: unknown[]) => findApplicationById(...a),
   findContactMessageById: (...a: unknown[]) => findContactMessageById(...a),
   findReminderSignupById: (...a: unknown[]) => findReminderSignupById(...a),
+  findReminderWindowMailById: (...a: unknown[]) => findReminderWindowMailById(...a),
   markApplicationMailed: (...a: unknown[]) => markApplicationMailed(...a),
   markApplicationMailFailed: (...a: unknown[]) => markApplicationMailFailed(...a),
   markContactMessageMailed: (...a: unknown[]) => markContactMessageMailed(...a),
   markContactMessageMailFailed: (...a: unknown[]) => markContactMessageMailFailed(...a),
   markReminderMailed: (...a: unknown[]) => markReminderMailed(...a),
   markReminderMailFailed: (...a: unknown[]) => markReminderMailFailed(...a),
+  markReminderWindowMailSent: (...a: unknown[]) => markReminderWindowMailSent(...a),
+  markReminderWindowMailFailed: (...a: unknown[]) => markReminderWindowMailFailed(...a),
 }));
 
 vi.mock("@/lib/mailDispatch", () => ({
   dispatchApplicationMails: (...a: unknown[]) => dispatchApplicationMails(...a),
   dispatchContactNotification: (...a: unknown[]) => dispatchContactNotification(...a),
   dispatchReminderConfirmation: (...a: unknown[]) => dispatchReminderConfirmation(...a),
+  dispatchReminderWindowOpen: (...a: unknown[]) => dispatchReminderWindowOpen(...a),
 }));
 
 const ORIGINAL_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET;
@@ -151,6 +159,47 @@ describe("POST /api/admin/mails/resend", () => {
 
     expect(response.status).toBe(404);
     expect(dispatchReminderConfirmation).not.toHaveBeenCalled();
+  });
+
+  it("resends a reminder-window mail and marks the row sent", async () => {
+    const windowMail = {
+      id: ID,
+      email: "jane@example.com",
+      locale: "de",
+      semester: "HWS26",
+      windowEndsAt: "2026-09-13T23:59:00+02:00",
+      unsubscribeToken: "unsub-token",
+    };
+    findReminderWindowMailById.mockResolvedValue(windowMail);
+    dispatchReminderWindowOpen.mockResolvedValue(undefined);
+    markReminderWindowMailSent.mockResolvedValue(undefined);
+
+    const { POST } = await import("@/app/api/admin/mails/resend/route");
+    const response = await POST(await resendRequest({ source: "reminder_window_mails", id: ID }));
+
+    expect(response.status).toBe(200);
+    expect(dispatchReminderWindowOpen).toHaveBeenCalledWith(windowMail);
+    expect(markReminderWindowMailSent).toHaveBeenCalledWith(ID);
+    expect(markReminderWindowMailFailed).not.toHaveBeenCalled();
+  });
+
+  it("records a second reminder-window failure plainly", async () => {
+    findReminderWindowMailById.mockResolvedValue({
+      id: ID,
+      email: "jane@example.com",
+      locale: "de",
+      semester: "HWS26",
+      windowEndsAt: "2026-09-13T23:59:00+02:00",
+      unsubscribeToken: "unsub-token",
+    });
+    dispatchReminderWindowOpen.mockRejectedValue(new Error("Resend is still down"));
+    markReminderWindowMailFailed.mockResolvedValue(undefined);
+
+    const { POST } = await import("@/app/api/admin/mails/resend/route");
+    const response = await POST(await resendRequest({ source: "reminder_window_mails", id: ID }));
+
+    expect(response.status).toBe(502);
+    expect(markReminderWindowMailFailed).toHaveBeenCalledWith(ID, "Resend is still down");
   });
 
   it("answers 404 without sending when the row was deleted since the page rendered", async () => {

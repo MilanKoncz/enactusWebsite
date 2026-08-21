@@ -6,7 +6,10 @@ import {
   sendApplicationNotification,
   sendContactMessageNotification,
   sendReminderConfirmationEmail,
+  sendReminderWindowOpenEmail,
 } from "@/lib/mail";
+import { localizedPath } from "@/lib/localizedPath";
+import { RECRUITING_TIMEZONE } from "@/content/recruiting";
 import { siteUrl } from "@/lib/siteUrl";
 import type { Application, ContactMessage, Locale } from "@/lib/db";
 
@@ -74,6 +77,41 @@ export async function dispatchReminderConfirmation(signup: ReminderConfirmationT
     subject: t("subject"),
     text: t("body", {
       confirmUrl: `${base}/api/reminder/bestaetigen?token=${signup.confirmToken}`,
+      unsubscribeUrl,
+    }),
+    unsubscribeUrl,
+  });
+}
+
+// The "an application window just opened" mail, sent once per (signup,
+// window) — reminderWindowMail.ts owns the once-only guarantee (the
+// database's unique constraint), this only composes the mail itself.
+// Takes the fields the caller already has in hand from
+// findConfirmedReminderSignups() plus the window being announced, not a
+// whole row — same reasoning as ReminderConfirmationTarget above.
+export type ReminderWindowOpenTarget = {
+  email: string;
+  locale: Locale;
+  unsubscribeToken: string;
+  semester: string;
+  windowEndsAt: string;
+};
+
+export async function dispatchReminderWindowOpen(target: ReminderWindowOpenTarget): Promise<void> {
+  const t = await getTranslations({ locale: target.locale, namespace: "Mail.reminderWindowOpen" });
+  const base = siteUrl();
+  const unsubscribeUrl = `${base}/api/reminder/abmelden?token=${target.unsubscribeToken}`;
+  const endsAt = new Intl.DateTimeFormat(target.locale, {
+    dateStyle: "long",
+    timeZone: RECRUITING_TIMEZONE,
+  }).format(new Date(target.windowEndsAt));
+
+  await sendReminderWindowOpenEmail({
+    email: target.email,
+    subject: t("subject"),
+    text: t("body", {
+      applyUrl: `${base}${localizedPath("/mitmachen", target.locale)}`,
+      endsAt,
       unsubscribeUrl,
     }),
     unsubscribeUrl,

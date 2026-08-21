@@ -95,6 +95,26 @@ export async function sendReminderConfirmationEmail(params: {
   });
 }
 
+export async function sendReminderWindowOpenEmail(params: {
+  email: string;
+  subject: string;
+  text: string;
+  unsubscribeUrl: string;
+}): Promise<string> {
+  // Same RFC 8058 one-click headers as sendReminderConfirmationEmail — this
+  // mail reuses the subscriber's existing unsubscribe token/link, so the
+  // same POST handler (/api/reminder/abmelden) answers a click on either.
+  return send({
+    to: params.email,
+    subject: params.subject,
+    text: params.text,
+    headers: {
+      "List-Unsubscribe": `<${params.unsubscribeUrl}>`,
+      "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+    },
+  });
+}
+
 export async function sendContactMessageNotification(params: {
   name: string;
   email: string;

@@ -44,7 +44,10 @@ export default async function AdminSystemPage({ params }: PageProps) {
   // the page from reporting on the others, which is precisely when someone
   // is looking at it.
   const [runsResult, countsResult, resend] = await Promise.all([
-    listCronRuns(10).then(
+    // 20, not 10: cron_runs now interleaves two job types (cleanup,
+    // reminder-window) on the same daily trigger, so 10 rows would often
+    // show only one of them.
+    listCronRuns(20).then(
       (runs) => ({ ok: true as const, runs }),
       (error: unknown) => ({ ok: false as const, error }),
     ),
@@ -61,9 +64,14 @@ export default async function AdminSystemPage({ params }: PageProps) {
   // lib/serviceHealth.ts on why there's no separate ping.
   const databaseReachable = countsResult.ok;
 
+  // The stale-cron warning is specifically about the retention promise
+  // cleanup enforces — filtered to that job alone, so a healthy
+  // reminder-window run can never mask a broken cleanup run (or vice
+  // versa) just because they now share one table.
+  const cleanupRuns = runs.filter((run) => run.job === "cleanup");
   const now = new Date();
-  const lastRun = runs[0] ?? null;
-  const lastSuccessful = runs.find((run) => run.ok) ?? null;
+  const lastRun = cleanupRuns[0] ?? null;
+  const lastSuccessful = cleanupRuns.find((run) => run.ok) ?? null;
   const stale = isCleanupStale(lastSuccessful?.startedAt ?? null, now);
   const nextDue = nextCleanupRun(now);
 
@@ -107,9 +115,10 @@ export default async function AdminSystemPage({ params }: PageProps) {
         </dl>
 
         <AdminTable
-          minWidthClassName="min-w-[720px]"
+          minWidthClassName="min-w-[820px]"
           columns={[
             t("system.columns.startedAt"),
+            t("system.columns.job"),
             t("system.columns.result"),
             t("system.columns.deleted"),
             t("system.columns.error"),
@@ -119,18 +128,24 @@ export default async function AdminSystemPage({ params }: PageProps) {
             key: run.id,
             cells: [
               dateFormatter.format(run.startedAt),
+              t(run.job === "cleanup" ? "system.jobs.cleanup" : "system.jobs.reminderWindow"),
               <StatusIndicator
                 key="ok"
                 level={run.ok ? "ok" : "error"}
                 label={run.ok ? t("system.ok") : t("system.failed")}
               />,
               <span key="counts" className="font-mono text-mono-s">
-                {t("system.deletedCounts", {
-                  applications: run.deletedApplications,
-                  contactMessages: run.deletedContactMessages,
-                  reminderSignups: run.deletedReminderSignups,
-                  rateLimitHits: run.prunedRateLimitHits,
-                })}
+                {run.job === "cleanup"
+                  ? t("system.deletedCounts", {
+                      applications: run.deletedApplications,
+                      contactMessages: run.deletedContactMessages,
+                      reminderSignups: run.deletedReminderSignups,
+                      rateLimitHits: run.prunedRateLimitHits,
+                    })
+                  : t("system.reminderWindowCounts", {
+                      sent: run.sentReminderWindowMails,
+                      failed: run.failedReminderWindowMails,
+                    })}
               </span>,
               <span key="error" className="font-mono text-mono-s opacity-80">
                 {run.error ?? "—"}

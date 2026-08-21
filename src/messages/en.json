@@ -1158,6 +1158,10 @@
       "subject": "Please confirm your reminder",
       "body": "Hi,\n\nplease confirm with one click that we may email you once the application window opens:\n\n{confirmUrl}\n\nIf this wasn't you, you can simply ignore this email.\n\nUnsubscribe any time: {unsubscribeUrl}"
     },
+    "reminderWindowOpen": {
+      "subject": "The application window is now open",
+      "body": "Hi,\n\nthe application window is now open. You can apply until {endsAt}:\n\n{applyUrl}\n\nUnsubscribe any time: {unsubscribeUrl}"
+    },
     "contactNotification": {
       "subject": "New contact message from {name}"
     }
@@ -1266,7 +1270,8 @@
       "sources": {
         "applications": "Application",
         "contact_messages": "Contact message",
-        "reminder_signups": "Reminder"
+        "reminder_signups": "Reminder",
+        "reminder_window_mails": "Window reminder"
       }
     },
     "recruitingWindows": {
@@ -1287,6 +1292,10 @@
       "edit": "Edit",
       "delete": "Delete",
       "confirmDelete": "Really delete the {semester} application window?",
+      "sendReminder": "Send reminder mail",
+      "confirmSendReminder": "Send the reminder mail for {semester} now to everyone confirmed on the reminder list? Anyone already mailed won't be mailed twice.",
+      "reminderSentResult": "{sent} sent, {failed} failed.",
+      "sendReminderFailed": "That didn't work. Please try again.",
       "errorGeneric": "That didn't work. Please try again.",
       "errorOverlaps": "This window overlaps an existing one.",
       "errorOverlapsWith": "This window overlaps {semester}.",
@@ -1442,8 +1451,14 @@
       "ok": "succeeded",
       "failed": "failed",
       "deletedCounts": "{applications} appl. / {contactMessages} cont. / {reminderSignups} rem. / {rateLimitHits} limits",
+      "reminderWindowCounts": "{sent} sent / {failed} failed",
+      "jobs": {
+        "cleanup": "Cleanup routine",
+        "reminderWindow": "Window reminder"
+      },
       "columns": {
         "startedAt": "Started",
+        "job": "Job",
         "result": "Result",
         "deleted": "Deleted",
         "error": "Error"

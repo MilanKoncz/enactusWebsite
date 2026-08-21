@@ -1158,6 +1158,10 @@
       "subject": "Bitte bestätige deine Erinnerung",
       "body": "Hallo,\n\nbitte bestätige mit einem Klick, dass wir dich per E-Mail erinnern dürfen, sobald das Bewerbungsfenster öffnet:\n\n{confirmUrl}\n\nWenn du das nicht warst, kannst du diese E-Mail einfach ignorieren.\n\nJederzeit abmelden: {unsubscribeUrl}"
     },
+    "reminderWindowOpen": {
+      "subject": "Das Bewerbungsfenster ist jetzt offen",
+      "body": "Hallo,\n\ndas Bewerbungsfenster ist jetzt offen. Du kannst dich bis {endsAt} bewerben:\n\n{applyUrl}\n\nJederzeit abmelden: {unsubscribeUrl}"
+    },
     "contactNotification": {
       "subject": "Neue Kontaktanfrage von {name}"
     }
@@ -1266,7 +1270,8 @@
       "sources": {
         "applications": "Bewerbung",
         "contact_messages": "Kontaktanfrage",
-        "reminder_signups": "Erinnerung"
+        "reminder_signups": "Erinnerung",
+        "reminder_window_mails": "Fenster-Erinnerung"
       }
     },
     "recruitingWindows": {
@@ -1287,6 +1292,10 @@
       "edit": "Bearbeiten",
       "delete": "Löschen",
       "confirmDelete": "Bewerbungsfenster {semester} wirklich löschen?",
+      "sendReminder": "Erinnerungsmail senden",
+      "confirmSendReminder": "Erinnerungsmail für {semester} jetzt an alle bestätigten Einträge der Erinnerungsliste senden? Bereits gemailte Einträge werden nicht doppelt angeschrieben.",
+      "reminderSentResult": "{sent} gesendet, {failed} fehlgeschlagen.",
+      "sendReminderFailed": "Das hat nicht geklappt. Bitte versuch es noch einmal.",
       "errorGeneric": "Das hat nicht geklappt. Bitte versuch es noch einmal.",
       "errorOverlaps": "Das Fenster überschneidet sich mit einem bestehenden.",
       "errorOverlapsWith": "Das Fenster überschneidet sich mit {semester}.",
@@ -1442,8 +1451,14 @@
       "ok": "erfolgreich",
       "failed": "fehlgeschlagen",
       "deletedCounts": "{applications} Bew. / {contactMessages} Kont. / {reminderSignups} Erin. / {rateLimitHits} Limits",
+      "reminderWindowCounts": "{sent} gesendet / {failed} fehlgeschlagen",
+      "jobs": {
+        "cleanup": "Löschroutine",
+        "reminderWindow": "Fenster-Erinnerung"
+      },
       "columns": {
         "startedAt": "Gestartet",
+        "job": "Job",
         "result": "Ergebnis",
         "deleted": "Gelöscht",
         "error": "Fehler"

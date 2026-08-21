@@ -9,6 +9,9 @@ const deleteExpiredJobPostings = vi.fn();
 const pruneRateLimitHits = vi.fn();
 const startCronRun = vi.fn();
 const finishCronRun = vi.fn();
+const findRecruitingWindowsNeedingReminderMail = vi.fn();
+
+const sendReminderWindowMailsForWindow = vi.fn();
 
 vi.mock("@/lib/db", () => ({
   deleteExpiredApplications: (...args: unknown[]) => deleteExpiredApplications(...args),
@@ -18,6 +21,15 @@ vi.mock("@/lib/db", () => ({
   pruneRateLimitHits: (...args: unknown[]) => pruneRateLimitHits(...args),
   startCronRun: (...args: unknown[]) => startCronRun(...args),
   finishCronRun: (...args: unknown[]) => finishCronRun(...args),
+  findRecruitingWindowsNeedingReminderMail: (...args: unknown[]) => findRecruitingWindowsNeedingReminderMail(...args),
+}));
+
+// The reminder-window job's own send/claim logic (idempotency, batching) is
+// covered by tests/unit/lib/reminderWindowMail.test.ts — this file only
+// needs to prove the route wires the two jobs together correctly and
+// independently, so sendReminderWindowMailsForWindow is a plain stub here.
+vi.mock("@/lib/reminderWindowMail", () => ({
+  sendReminderWindowMailsForWindow: (...args: unknown[]) => sendReminderWindowMailsForWindow(...args),
 }));
 
 function request(authHeader?: string) {
@@ -32,6 +44,9 @@ describe("GET /api/cron/cleanup", () => {
   beforeEach(() => {
     startCronRun.mockResolvedValue("run-1");
     finishCronRun.mockResolvedValue(undefined);
+    // Nothing due by default — most tests care about cleanup or about job
+    // independence, not about what a window actually sends.
+    findRecruitingWindowsNeedingReminderMail.mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -90,6 +105,7 @@ describe("GET /api/cron/cleanup", () => {
     expect(await response.json()).toEqual({
       ok: true,
       deleted: { applications: 2, contactMessages: 1, reminderSignups: 3, jobPostings: 4, rateLimitHits: 10 },
+      reminderWindowMails: { sent: 0, failed: 0, error: null },
     });
   });
 
@@ -136,7 +152,7 @@ describe("GET /api/cron/cleanup", () => {
     expect(startCronRun).not.toHaveBeenCalled();
   });
 
-  it("closes the run with the counts and no error on a clean sweep", async () => {
+  it("closes the cleanup run with the counts and no error on a clean sweep", async () => {
     process.env.CRON_SECRET = "test-secret";
     vi.resetModules();
     deleteExpiredApplications.mockResolvedValue(2);
@@ -154,7 +170,7 @@ describe("GET /api/cron/cleanup", () => {
     );
   });
 
-  it("closes the run with the failing step's reason when one throws", async () => {
+  it("closes the cleanup run with the failing step's reason when one throws", async () => {
     process.env.CRON_SECRET = "test-secret";
     vi.resetModules();
     deleteExpiredApplications.mockRejectedValue(new Error("db unreachable"));
@@ -165,7 +181,8 @@ describe("GET /api/cron/cleanup", () => {
     const { GET } = await import("@/app/api/cron/cleanup/route");
     await GET(request("Bearer test-secret"));
 
-    const [, , error] = finishCronRun.mock.calls[0] as [string, unknown, string | null];
+    const cleanupCall = finishCronRun.mock.calls.find((call) => "applications" in (call[1] as object));
+    const [, , error] = cleanupCall as [string, unknown, string | null];
     expect(error).toContain("applications");
     expect(error).toContain("db unreachable");
   });
@@ -187,5 +204,88 @@ describe("GET /api/cron/cleanup", () => {
     expect(response.status).toBe(200);
     expect(deleteExpiredApplications).toHaveBeenCalled();
     expect(finishCronRun).not.toHaveBeenCalled();
+  });
+
+  describe("the reminder-window job", () => {
+    beforeEach(() => {
+      process.env.CRON_SECRET = "test-secret";
+      vi.resetModules();
+      deleteExpiredApplications.mockResolvedValue(0);
+      deleteExpiredContactMessages.mockResolvedValue(0);
+      deleteExpiredReminderSignups.mockResolvedValue(0);
+      deleteExpiredJobPostings.mockResolvedValue(0);
+      pruneRateLimitHits.mockResolvedValue(0);
+    });
+
+    it("sends for every window that needs it and logs its own cron_runs row", async () => {
+      const windowA = { id: "window-a", semester: "HWS26", start: "2026-09-01T00:00:00+02:00", end: "2026-09-13T23:59:00+02:00" };
+      const windowB = { id: "window-b", semester: "FSS27", start: "2027-03-01T00:00:00+01:00", end: "2027-03-13T23:59:00+01:00" };
+      findRecruitingWindowsNeedingReminderMail.mockResolvedValue([windowA, windowB]);
+      sendReminderWindowMailsForWindow.mockResolvedValueOnce({ sent: 3, failed: 1 }).mockResolvedValueOnce({ sent: 2, failed: 0 });
+
+      const { GET } = await import("@/app/api/cron/cleanup/route");
+      const response = await GET(request("Bearer test-secret"));
+
+      expect(sendReminderWindowMailsForWindow).toHaveBeenCalledWith(windowA);
+      expect(sendReminderWindowMailsForWindow).toHaveBeenCalledWith(windowB);
+      const body = await response.json();
+      expect(body.reminderWindowMails).toEqual({ sent: 5, failed: 1, error: null });
+
+      expect(startCronRun).toHaveBeenCalledWith("reminder-window");
+      expect(finishCronRun).toHaveBeenCalledWith("run-1", { sentReminderWindowMails: 5, failedReminderWindowMails: 1 }, null);
+    });
+
+    it("records the failure and still answers 200 when finding due windows itself throws", async () => {
+      findRecruitingWindowsNeedingReminderMail.mockRejectedValue(new Error("db unreachable"));
+
+      const { GET } = await import("@/app/api/cron/cleanup/route");
+      const response = await GET(request("Bearer test-secret"));
+
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.reminderWindowMails.error).toContain("db unreachable");
+      expect(finishCronRun).toHaveBeenCalledWith(
+        "run-1",
+        { sentReminderWindowMails: 0, failedReminderWindowMails: 0 },
+        expect.stringContaining("db unreachable"),
+      );
+    });
+
+    // The amendment this whole describe block exists for: neither job's
+    // failure may suppress the other's work or its own cron_runs row.
+    it("still runs when every cleanup step fails outright", async () => {
+      deleteExpiredApplications.mockRejectedValue(new Error("db unreachable"));
+      deleteExpiredContactMessages.mockRejectedValue(new Error("db unreachable"));
+      deleteExpiredReminderSignups.mockRejectedValue(new Error("db unreachable"));
+      deleteExpiredJobPostings.mockRejectedValue(new Error("db unreachable"));
+      pruneRateLimitHits.mockRejectedValue(new Error("db unreachable"));
+      findRecruitingWindowsNeedingReminderMail.mockResolvedValue([{ id: "w", semester: "HWS26", end: "2026-09-13T23:59:00+02:00" }]);
+      sendReminderWindowMailsForWindow.mockResolvedValue({ sent: 1, failed: 0 });
+
+      const { GET } = await import("@/app/api/cron/cleanup/route");
+      const response = await GET(request("Bearer test-secret"));
+
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.reminderWindowMails).toEqual({ sent: 1, failed: 0, error: null });
+      expect(startCronRun).toHaveBeenCalledWith("reminder-window");
+    });
+
+    it("still runs cleanup when the reminder-window job fails outright", async () => {
+      deleteExpiredApplications.mockResolvedValue(2);
+      deleteExpiredContactMessages.mockResolvedValue(1);
+      deleteExpiredReminderSignups.mockResolvedValue(0);
+      deleteExpiredJobPostings.mockResolvedValue(0);
+      pruneRateLimitHits.mockResolvedValue(0);
+      findRecruitingWindowsNeedingReminderMail.mockRejectedValue(new Error("db unreachable"));
+
+      const { GET } = await import("@/app/api/cron/cleanup/route");
+      const response = await GET(request("Bearer test-secret"));
+
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.deleted).toEqual({ applications: 2, contactMessages: 1, reminderSignups: 0, jobPostings: 0, rateLimitHits: 0 });
+      expect(startCronRun).toHaveBeenCalledWith("cleanup");
+    });
   });
 });
