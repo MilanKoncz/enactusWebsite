@@ -373,6 +373,18 @@
     "greenscape": {
       "oneLiner": "TEASER_MISSING",
       "description": "DESCRIPTION_MISSING"
+    },
+    "back-on-track": {
+      "oneLiner": "Back on Track helped a former inmate into a full-time position running his own vegan food truck.",
+      "description": "Back on Track helped a former inmate into a full-time position running his own vegan food truck."
+    },
+    "stadthonig": {
+      "oneLiner": "TEASER_MISSING",
+      "description": "DESCRIPTION_MISSING"
+    },
+    "flat-mates": {
+      "oneLiner": "Flat Mates reached the National Cup final round in 2013.",
+      "description": "Flat Mates reached the National Cup final round in 2013."
     }
   },
   "ProjectStatus": {
@@ -396,9 +408,12 @@
     "stars": {
       "eyebrow": "Our stars",
       "title": "Our stars",
-      "lead": "Eight former flagship projects that impressed at national Enactus competitions.",
+      "lead": "Former flagship projects that impressed at national Enactus competitions.",
       "noVideoHint": "No video available.",
-      "playLabel": "Watch {name}'s pitch"
+      "playLabel": "Watch {name}'s pitch",
+      "emptySlotLabel": "Still open",
+      "emptySlotHint": "The next Star project goes here.",
+      "unverifiedHint": "This fact hasn't been finally confirmed by the board yet."
     },
     "archiveLink": {
       "label": "See every past project in the archive"
@@ -714,13 +729,10 @@
       "description": "Sanagua gave the population of Arica, Chile, access to clean and affordable drinking water. The project was successfully spun off."
     },
     "STAR_5": {
-      "description": "Back on Track helped a former inmate into a full-time position running his own vegan food truck."
+      "description": "Afya fought malnutrition in Uganda with the algae spirulina, building its own local production with local distribution partners."
     },
     "STAR_6": {
-      "description": "Flat Mates reached the National Cup final round in 2013."
-    },
-    "STAR_7": {
-      "description": "Stadthonig was handed over to a partner."
+      "description": "Differgy advises companies on integrating autistic employees into the workforce long term, from the job posting through the application process to onboarding. The project was successfully spun off and now operates as an independent inclusion consultancy."
     },
     "STAR_8": {
       "description": "Sunte brought solar power and education to hospitals in Togo."

@@ -35,6 +35,9 @@ describe("content/projects", () => {
       "mushroom",
       "moufense",
       "greenscape",
+      "back-on-track",
+      "stadthonig",
+      "flat-mates",
     ]);
   });
 
@@ -44,11 +47,24 @@ describe("content/projects", () => {
     expect(bySlug.safesteps).toBe("paused");
     expect(bySlug.vela).toBe("paused");
     expect(bySlug.moufense).toBe("cancelled");
+    // Carried over from its former content/stars.ts entry (verified: true
+    // there) when the board moved it off the Stars roster 2026-08-21 — a
+    // confirmed fact, not a placeholder default like the block below.
+    expect(bySlug["back-on-track"]).toBe("cancelled");
   });
 
-  it("defaults the six unconfirmed archive projects to cancelled", () => {
+  it("defaults the eight unconfirmed archive projects to cancelled", () => {
     const bySlug = Object.fromEntries(projects.map((p) => [p.slug, p.status]));
-    for (const slug of ["sun-n-soil", "green-heat", "reverze", "afya", "mushroom", "greenscape"]) {
+    for (const slug of [
+      "sun-n-soil",
+      "green-heat",
+      "reverze",
+      "afya",
+      "mushroom",
+      "greenscape",
+      "stadthonig",
+      "flat-mates",
+    ]) {
       expect(bySlug[slug]).toBe("cancelled");
     }
   });

@@ -373,6 +373,18 @@
     "greenscape": {
       "oneLiner": "ANREISSER_FEHLT",
       "description": "BESCHREIBUNG_FEHLT"
+    },
+    "back-on-track": {
+      "oneLiner": "Back on Track verhalf einem ehemaligen Strafgefangenen zu einer Vollzeitstelle im eigenen veganen Food Truck.",
+      "description": "Back on Track verhalf einem ehemaligen Strafgefangenen zu einer Vollzeitstelle im eigenen veganen Food Truck."
+    },
+    "stadthonig": {
+      "oneLiner": "ANREISSER_FEHLT",
+      "description": "BESCHREIBUNG_FEHLT"
+    },
+    "flat-mates": {
+      "oneLiner": "Flat Mates erreichte 2013 die Endrunde des National Cup.",
+      "description": "Flat Mates erreichte 2013 die Endrunde des National Cup."
     }
   },
   "ProjectStatus": {
@@ -396,9 +408,12 @@
     "stars": {
       "eyebrow": "Unsere Stars",
       "title": "Unsere Stars",
-      "lead": "Acht ehemalige Vorzeigeprojekte, die bei nationalen Enactus-Wettbewerben überzeugt haben.",
+      "lead": "Ehemalige Vorzeigeprojekte, die bei nationalen Enactus-Wettbewerben überzeugt haben.",
       "noVideoHint": "Kein Video verfügbar.",
-      "playLabel": "Pitch von {name} ansehen"
+      "playLabel": "Pitch von {name} ansehen",
+      "emptySlotLabel": "Noch offen",
+      "emptySlotHint": "Hier steht bald das nächste Star-Projekt.",
+      "unverifiedHint": "Dieser Fakt ist noch nicht endgültig vom Vorstand bestätigt."
     },
     "archiveLink": {
       "label": "Alle bisherigen Projekte im Archiv ansehen"
@@ -714,13 +729,10 @@
       "description": "Sanagua verschaffte der Bevölkerung von Arica, Chile, Zugang zu sauberem und günstigem Trinkwasser. Das Projekt wurde erfolgreich ausgegründet."
     },
     "STAR_5": {
-      "description": "Back on Track verhalf einem ehemaligen Strafgefangenen zu einer Vollzeitstelle im eigenen veganen Food Truck."
+      "description": "Afya bekämpfte Mangelernährung in Uganda mit der Alge Spirulina und baute vor Ort eine eigene Produktion mit lokalen Vertriebspartnerinnen auf."
     },
     "STAR_6": {
-      "description": "Flat Mates erreichte 2013 die Endrunde des National Cup."
-    },
-    "STAR_7": {
-      "description": "Stadthonig wurde an einen Partner übergeben."
+      "description": "Differgy berät Unternehmen dabei, Autistinnen und Autisten langfristig in den Arbeitsmarkt zu integrieren, von der Stellenausschreibung über den Bewerbungsprozess bis zum Onboarding. Das Projekt wurde erfolgreich ausgegründet und arbeitet heute als eigenständige Inklusionsberatung."
     },
     "STAR_8": {
       "description": "Sunte brachte Solarstrom und Aufklärung an Krankenhäuser in Togo."

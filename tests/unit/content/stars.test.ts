@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { starSchema, stars } from "@/content/stars";
 
 describe("content/stars", () => {
-  it("has exactly 8 entries named STAR_1 through STAR_8", () => {
+  it("has exactly 7 entries — STAR_7 stays unassigned so an 8th slot renders as a visible empty state", () => {
     expect(stars.map((s) => s.key)).toEqual([
       "STAR_1",
       "STAR_2",
@@ -10,7 +10,6 @@ describe("content/stars", () => {
       "STAR_4",
       "STAR_5",
       "STAR_6",
-      "STAR_7",
       "STAR_8",
     ]);
   });
@@ -21,36 +20,34 @@ describe("content/stars", () => {
       "Moufense",
       "effishent",
       "Sanagua",
-      "Back on Track",
-      "Flat Mates",
-      "Stadthonig",
+      "Afya",
+      "Differgy",
       "Sunte",
     ]);
   });
 
-  it("marks six stars as board-confirmed and two as not yet confirmed", () => {
+  it("marks six stars as board-confirmed and one (Sunte) as not yet confirmed", () => {
     const byKey = Object.fromEntries(stars.map((s) => [s.key, s.verified]));
-    expect(byKey.STAR_7).toBe(false);
     expect(byKey.STAR_8).toBe(false);
     for (const key of ["STAR_1", "STAR_2", "STAR_3", "STAR_4", "STAR_5", "STAR_6"]) {
       expect(byKey[key]).toBe(true);
     }
   });
 
-  it("has real logos for Blauherz and Moufense, null for the rest", () => {
+  it("has real logos for Blauherz, Moufense, and Afya, null for the rest", () => {
     const byKey = Object.fromEntries(stars.map((s) => [s.key, s.logo]));
     expect(byKey.STAR_1).toBe("/stars/blauherz-logo.png");
     expect(byKey.STAR_2).toBe("/stars/moufense-logo.png");
-    for (const key of ["STAR_3", "STAR_4", "STAR_5", "STAR_6", "STAR_7", "STAR_8"]) {
+    expect(byKey.STAR_5).toBe("/projects/afya-logo.png");
+    for (const key of ["STAR_3", "STAR_4", "STAR_6", "STAR_8"]) {
       expect(byKey[key]).toBeNull();
     }
   });
 
-  it("has YouTube IDs only for Moufense and Flat Mates", () => {
+  it("has a YouTube ID only for Moufense", () => {
     const byKey = Object.fromEntries(stars.map((s) => [s.key, s.youtubeId]));
     expect(byKey.STAR_2).toBe("9Ord09u363s");
-    expect(byKey.STAR_6).toBe("cY6dSD79fqo");
-    for (const key of ["STAR_1", "STAR_3", "STAR_4", "STAR_5", "STAR_7", "STAR_8"]) {
+    for (const key of ["STAR_1", "STAR_3", "STAR_4", "STAR_5", "STAR_6", "STAR_8"]) {
       expect(byKey[key]).toBeNull();
     }
   });

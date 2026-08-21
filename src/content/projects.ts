@@ -23,6 +23,13 @@ import { projectStageSchema } from "./process";
  * "cancelled" — a deliberate placeholder default, not a confirmed fact, see
  * ASSETS-TODO.md. Differgy, Safesteps, and Vela's statuses are confirmed.
  *
+ * back-on-track, stadthonig, and flat-mates were added 2026-08-21 when the
+ * board moved them off the /projekte Stars roster (content/stars.ts) —
+ * they remain real archive entries, not deleted. back-on-track keeps its
+ * previously-confirmed "cancelled" status; stadthonig and flat-mates had no
+ * status on file even as Stars, so they fall back to the same "cancelled"
+ * placeholder default as the six above, not a confirmed fact either.
+ *
  * `year` (shown on the /projekte/archiv grid) is null for every project —
  * no start/end year has been confirmed for any of them yet, active or
  * archived, see ASSETS-TODO.md. Never inferred from a project's position in
@@ -220,6 +227,9 @@ export const projects: Project[] = [
   project({ slug: "mushroom", name: "mushROOM", status: "cancelled" }),
   project({ slug: "moufense", name: "Moufense", status: "cancelled", logo: "/stars/moufense-logo.png" }),
   project({ slug: "greenscape", name: "Greenscape", status: "cancelled" }),
+  project({ slug: "back-on-track", name: "Back on Track", status: "cancelled" }),
+  project({ slug: "stadthonig", name: "Stadthonig", status: "cancelled" }),
+  project({ slug: "flat-mates", name: "Flat Mates", status: "cancelled" }),
 ];
 
 export { projectSchema, projectStatusSchema, projectLeadSchema };
