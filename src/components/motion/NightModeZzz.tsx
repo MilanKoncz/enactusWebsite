@@ -56,13 +56,13 @@ export function NightModeZzz({ surface = "paper", className }: NightModeZzzProps
         className,
       )}
     >
-      <span className="absolute top-0 right-0 animate-zzz-float text-mono-xs" style={{ animationDelay: "0s" }}>
+      <span className="absolute top-0 right-0 animate-zzz-float text-mono-s" style={{ animationDelay: "0s" }}>
         z
       </span>
-      <span className="absolute top-1 right-2 animate-zzz-float text-mono-s" style={{ animationDelay: "0.6s" }}>
+      <span className="absolute top-1 right-3 animate-zzz-float text-mono-m" style={{ animationDelay: "0.6s" }}>
         Z
       </span>
-      <span className="absolute top-2 right-4 animate-zzz-float text-mono-xs" style={{ animationDelay: "1.2s" }}>
+      <span className="absolute top-3 right-5 animate-zzz-float text-mono-s" style={{ animationDelay: "1.2s" }}>
         z
       </span>
     </span>
