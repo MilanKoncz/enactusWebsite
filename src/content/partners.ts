@@ -107,7 +107,7 @@ export const partners: Partner[] = [
   partner({
     slug: "eon-inhouse-consulting",
     name: "E.ON Inhouse Consulting",
-    logo: "/brand/partners/eon-inhouse-consulting.jpg",
+    logo: "/brand/partners/eon-inhouse-consulting.png",
     tier: "Flagship",
     url: "https://www.eon.com/en/about-us/business-units/eon-inhouse-consulting.html",
   }),
