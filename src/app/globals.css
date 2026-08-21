@@ -887,70 +887,120 @@ body {
    be one" mistake the calendar category layer's own token-reuse test
    guards against.
 
-   Redone a fourth time 2026-08-20: the previous version (a single color-
-   interpolation hint at 88%, no flat zone at either end) softened the old
-   plateau-then-ramp kink, but board feedback was that it still read as
-   "too much blue" — the hint sat so close to the gold end that the whole
-   first ~70-80% of the axis barely shifted off pure ink before rushing to
-   gold in the last stretch. This version keeps real flat zones at both
-   ends again (20% ink, 20% gold) with an eased transition through the
-   middle 60% — `ink 0%, ink 20%, 74%, gold 80%, gold 100%`. The bare `74%`
-   is the same kind of color-interpolation hint as before, just now
-   scoped to the one sub-range between the 20%-ink stop and the 80%-gold
-   stop (still standard CSS, still no color-mix(), still no third literal
-   color) — it still has to bias late within that sub-range for text-
-   safety reasons (see the real edges below), but the transition zone
-   itself starts at 20% instead of ~88%, so the shift away from pure ink
-   is visible much earlier and across much more of the section: by the
-   halfway mark the background already reads as a clear dark olive/bronze,
-   not still-navy — see the swatches in tests/unit/contrast.test.ts's
-   7-point sweep.
+   Redone a fifth time 2026-08-21: every earlier version interpolated
+   ink→gold directly in sRGB, and a straight line between a dark blue and a
+   yellow-gold in sRGB always crosses a desaturated olive/brown belt partway
+   through — the actual complaint ("looks like a stain," near-flat with a
+   hard edge), not the plateau size. Widening or narrowing the old flat
+   zones only ever moved *where* that olive belt sat, never removed it.
+
+   Two changes, not one:
+   1. Interpolate `in oklab` — a perceptually uniform space where the
+      straight line between two colors doesn't dip through a third, muddy
+      hue the way sRGB's does. `@supports` guards it (Chrome 111+, Safari
+      16.4+, Firefox 128+); browsers below that get a plain sRGB fallback
+      with the same three color stops, declared first so it's the default
+      and simply gets overridden where the interpolation syntax is
+      supported.
+   2. A real middle stop on --color-oxblood, not just a hint. The path is
+      now ink → oxblood → gold: two dark, low-chroma colors first (near-
+      identical lightness, so the first leg stays visually flat and warm
+      rather than fading), then a single leg from deep wine-red up to
+      gold — through warm reds/oranges, never through olive, because olive
+      only ever came from mixing blue and yellow directly.
+
+   Stops: `ink 0%, ink 12%, oxblood 60%, gold 88%, gold 100%`. The flat
+   zones shrink to 12% a side (previously 20%) — the "plateau" the board
+   flagged as oversized — and the transition (12%–88%) now carries 76% of
+   the axis, the majority share that was the original ask. It isn't a flat
+   ramp end to end: because ink and oxblood sit close in lightness, the
+   background reads as dark navy-into-wine for the first half of that
+   transition (12%–60%) and only starts visibly lifting toward gold in the
+   back half (60%–88%) — real darkness for most of the area, not merely a
+   pass on paper. Every text placement that used to rely on the wide ink
+   plateau now sits inside that same dark stretch instead; nothing was
+   moved to compensate.
 
    One shared shape for both axes still, not two separately-tuned curves:
-   `to bottom` below md, `to right` from md up — same four stops, same
-   hint, only the direction differs, for the same layout reason the two-
-   axis design always existed (JourneysSection's bounded heading block has
-   real room to its right only once the container is wide enough that its
-   max-w-lg actually binds; below that a horizontal ramp put text on top
-   of the gold end no matter where the ramp started — see that
-   component's own comment on the box-width arithmetic this traces back
-   to). Below md the ramp still runs top to bottom instead, with both
+   `to bottom` below md, `to right` from md up — same five stops (three
+   colors), same direction logic as every earlier version (JourneysSection's
+   bounded heading block has real room to its right only once the container
+   is wide enough that its max-w-lg actually binds; below that a horizontal
+   ramp put text on top of the gold end no matter where the ramp started —
+   see that component's own comment on the box-width arithmetic this traces
+   back to). Below md the ramp still runs top to bottom instead, with both
    consumers' text top-anchored and opaque ink-filled/gold-edged cards
    (ProjectsActive's ProjectCard, JourneysSection's <ol> items) filling the
-   rest of the section's height, same as every earlier version.
+   rest of the section's height.
 
    The one thing still not allowed to sit directly on this gradient:
    unbounded-width text (a paragraph with no max-width) — see
    JourneysSection.tsx / ProjectsActive.tsx for how each consumer keeps
    every text run bounded.
 
-   Real measured text edges against the new curve, full-opacity paper text
-   (tests/unit/contrast.test.ts asserts all of these, plus the full
-   7-point sweep this comment's numbers are drawn from):
-   - 768px lead-paragraph right edge (69.8% of the horizontal axis): 5.30:1
-     — the binding case: it's what forces the hint as late as 74% rather
-     than a plainer, more even split within [20%, 80%]
-   - 1280px lead-paragraph right edge (43.1%): 10.97:1
-   - JourneysSection heading+lead bottom, below md (41.2% of the vertical
-     axis): 11.48:1
+   Real measured text edges — box positions are unchanged from the previous
+   version (no layout moved, only the color function did), so the same
+   Playwright-measured percentages still describe where each text block
+   actually sits; only the contrast numbers below are recomputed against
+   the new oklab curve (tests/unit/contrast.test.ts asserts all of these,
+   plus the full 7-point sweep this comment's numbers are drawn from):
+   - 768px heading/lead right edge (69.8% of the horizontal axis): 7.53:1
+     — the binding case, and still comfortably clear of 4.5:1 with margin
+     to spare, unlike the old hint-based curve's 5.30:1 at the same point
+   - 1280px heading/lead right edge (43.1%): 16.76:1
+   - JourneysSection heading+lead block bottom, below md (41.2% of the
+     vertical axis): 16.72:1
    - ProjectsActive's mono label, below md (8.7%): sits inside the flat
-     20% ink zone outright, 17.08:1
+     12% ink zone outright, 17.08:1
    Every one of the 7 general sample points up to 66.67% clears 4.5:1 too
-   — the curve doesn't actually fail until 75%, still comfortably past
-   every real edge and well inside the gradient's decorative tail, always
-   covered by an opaque card, never by raw text, on both axes. */
+   (the 66.67% point alone measures 10.18:1, versus 5.90:1 on the old
+   curve) — the curve doesn't fail until past 75%, still inside the
+   gradient's decorative tail, always covered by an opaque card, never by
+   raw text, on both axes. The sRGB fallback clears the same real edges
+   with equivalent margin (7.03:1 at 69.8%), so a browser without oklab
+   support degrades to a slightly different warm curve, never to a failing
+   one. */
 @utility signature-gradient {
-  background-image: linear-gradient(to bottom, var(--color-ink) 0%, var(--color-ink) 20%, 74%, var(--color-gold) 80%, var(--color-gold) 100%);
+  background-image: linear-gradient(
+    to bottom,
+    var(--color-ink) 0%,
+    var(--color-ink) 12%,
+    var(--color-oxblood) 60%,
+    var(--color-gold) 88%,
+    var(--color-gold) 100%
+  );
+
+  @supports (background: linear-gradient(in oklab, red, blue)) {
+    background-image: linear-gradient(
+      to bottom in oklab,
+      var(--color-ink) 0%,
+      var(--color-ink) 12%,
+      var(--color-oxblood) 60%,
+      var(--color-gold) 88%,
+      var(--color-gold) 100%
+    );
+  }
 
   @media (min-width: 48rem) {
     background-image: linear-gradient(
       to right,
       var(--color-ink) 0%,
-      var(--color-ink) 20%,
-      74%,
-      var(--color-gold) 80%,
+      var(--color-ink) 12%,
+      var(--color-oxblood) 60%,
+      var(--color-gold) 88%,
       var(--color-gold) 100%
     );
+
+    @supports (background: linear-gradient(in oklab, red, blue)) {
+      background-image: linear-gradient(
+        to right in oklab,
+        var(--color-ink) 0%,
+        var(--color-ink) 12%,
+        var(--color-oxblood) 60%,
+        var(--color-gold) 88%,
+        var(--color-gold) 100%
+      );
+    }
   }
 }
 

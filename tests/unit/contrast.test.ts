@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   blendOverBackground,
   contrastRatio,
+  mixOklab,
   passesAA,
   WCAG_AA_NORMAL_TEXT,
 } from "@/lib/contrast";
@@ -124,38 +125,42 @@ describe("design tokens: color contrast", () => {
 
   // .signature-gradient (globals.css) — the shared navy-to-gold background
   // on /events' Journeys section and /projekte's active-projects section.
-  // Redone a fourth time 2026-08-20: the single-hint-at-88% version (see
-  // git history) softened the old plateau-then-ramp kink, but board
-  // feedback was that it still read as "too much blue" — the shift off
-  // pure ink barely started before ~80% of the axis. This version keeps
-  // real flat zones at both ends again (20% ink, 20% gold) with an eased
-  // transition through the middle 60% — `ink 0%, ink 20%, 74%, gold 80%,
-  // gold 100%`. The bare `74%` is the same kind of CSS color-interpolation
-  // hint as before, just scoped to the one sub-range between the 20%-ink
-  // and 80%-gold stops (still no color-mix(), still no third literal
-  // color) — still biased late within that sub-range for text-safety
-  // (see the real edges below), but the shift off pure ink now starts at
-  // 20% instead of ~88%, visible across much more of the section.
-  describe(".signature-gradient: ink/gold flat zones at both ends, eased transition through the middle, real tokens, no color-mix()", () => {
+  // Redone a fifth time 2026-08-21: every sRGB-interpolated version (see git
+  // history) crossed a desaturated olive belt partway through, because a
+  // straight sRGB line between a dark blue and a gold always does — widening
+  // or narrowing the flat zones only moved where the belt sat, never removed
+  // it. This version changes the interpolation itself (`in oklab`, a
+  // perceptually uniform space, `@supports`-gated with a same-stops sRGB
+  // fallback for older browsers) and routes through a real --color-oxblood
+  // middle stop instead of a bare color-interpolation hint, so the path is
+  // ink → oxblood → gold — two dark, close-lightness colors first, then one
+  // warm leg up to gold, never a blue-to-yellow mix. Flat zones shrink to
+  // 12% a side (previously 20%); the transition (12%–88%) now carries 76%
+  // of the axis, the majority share the board asked for.
+  describe(".signature-gradient: oklab ink→oxblood→gold with a same-stops sRGB fallback, 12% flat zones, no color-mix()", () => {
     const css = readFileSync(resolve(process.cwd(), "src/app/globals.css"), "utf-8");
     const declaration = css.match(/@utility signature-gradient \{[\s\S]*?\n\}/)?.[0] ?? "";
-    const P0 = 20;
-    const P1 = 80;
-    const HINT = 74;
+    const P0 = 12;
+    const MID = 60;
+    const P1 = 88;
 
-    it("is vertical (top to bottom) below md and horizontal (to right) from md up, both the same four-stop ink/hint/gold shape, no color-mix()", () => {
+    it("declares a plain sRGB gradient first, then overrides it with an oklab one under @supports — both directions, same three color stops", () => {
       expect(declaration).toContain("to bottom");
       expect(declaration).toContain("to right");
+      expect(declaration).toContain("to bottom in oklab");
+      expect(declaration).toContain("to right in oklab");
       expect(declaration).toContain("@media (min-width: 48rem)");
-      // Both directions use the exact same stop list — one shared curve.
+      expect(declaration.match(/@supports \(background: linear-gradient\(in oklab, red, blue\)\)/g)).toHaveLength(2);
+      // Every stop appears twice per interpolation mode (sRGB fallback +
+      // oklab override) and twice per mode across the two axes — 4 total.
       for (const fragment of [
         "var(--color-ink) 0%",
-        "var(--color-ink) 20%",
-        "74%",
-        "var(--color-gold) 80%",
+        "var(--color-ink) 12%",
+        "var(--color-oxblood) 60%",
+        "var(--color-gold) 88%",
         "var(--color-gold) 100%",
       ]) {
-        expect(declaration.match(new RegExp(fragment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"))).toHaveLength(2);
+        expect(declaration.match(new RegExp(fragment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"))).toHaveLength(4);
       }
       expect(declaration).not.toContain("color-mix");
     });
@@ -172,31 +177,32 @@ describe("design tokens: color contrast", () => {
       expect(g).toBeGreaterThan(b);
     });
 
-    // The color the gradient actually paints at a given % along its axis,
-    // replicating the CSS four-stop, one-hint formula (CSS Images spec) in
-    // plain JS: flat ink up to P0, flat gold from P1, and in between a
-    // color-interpolation hint (within that sub-range only) biases where
-    // the 50% perceptual mixing point falls, without a third literal color.
+    it("the middle stop (oxblood) reads warm, not olive: red dominates green and blue", () => {
+      const [r, g, b] = hexToRgb(oxblood);
+      expect(r).toBeGreaterThan(g);
+      expect(r).toBeGreaterThan(b);
+    });
+
+    // The color the gradient actually paints at a given % along its axis —
+    // two oklab-interpolated legs (ink→oxblood, then oxblood→gold), matching
+    // what `linear-gradient(in oklab, ink 0%, ink 12%, oxblood 60%, gold
+    // 88%, gold 100%)` computes per the CSS Images spec's multi-stop
+    // formula.
     function gradientColorAt(pct: number): string {
       if (pct <= P0) return ink;
       if (pct >= P1) return gold;
-      const localP = pct - P0;
-      const localHint = HINT - P0;
-      const localSpan = P1 - P0;
-      const t = localP <= localHint ? 0.5 * (localP / localHint) : 0.5 + 0.5 * ((localP - localHint) / (localSpan - localHint));
-      const a = hexToRgb(ink);
-      const b = hexToRgb(gold);
-      const mixed = a.map((v, i) => v + (b[i] - v) * t);
-      return `#${mixed.map((v) => Math.round(v).toString(16).padStart(2, "0")).join("")}`;
+      if (pct <= MID) return mixOklab(ink, oxblood, (pct - P0) / (MID - P0));
+      return mixOklab(oxblood, gold, (pct - MID) / (P1 - MID));
     }
 
     // The 7-point sweep this file's own history and globals.css's comment
     // quote directly — one shared curve now, so one sweep covers both axes.
     const SAMPLE_POINTS = [0, 16.67, 33.33, 50, 66.67, 83.33, 100];
 
-    // Real measured text edges — same Playwright measurements every earlier
-    // version of this gradient used (moving the flat-zone boundaries never
-    // moved where the text itself sits).
+    // Real measured text edges — box positions are unchanged from the
+    // previous version (no layout moved, only the color function did), so
+    // the same Playwright-measured percentages still describe where each
+    // text block actually sits.
     const REAL_TEXT_EDGES: Array<{ label: string; pct: number }> = [
       { label: "768px heading/lead right edge", pct: 69.8 },
       { label: "1280px heading/lead right edge", pct: 43.1 },
@@ -212,13 +218,35 @@ describe("design tokens: color contrast", () => {
       },
     );
 
-    // The curve doesn't actually fail 4.5:1 until 75% — the 768px edge
-    // above (69.8%) is the binding case, the reason the hint sits as late
-    // as 74% within [20%, 80%] rather than a plainer, more even split.
-    // Every general sample point up to 66.67% clears it too. Past the
-    // failure point is the gradient's pure decorative tail, always covered
-    // by the two sections' opaque ink-fill/gold-edge cards
-    // (JourneysSection.tsx / ProjectsActive.tsx), never by raw text.
+    // Same real edges, but against the sRGB fallback curve (plain channel
+    // lerp, no oklab) — the version a browser without `in oklab` support
+    // actually renders. It must clear 4.5:1 too, not just the enhanced path.
+    function fallbackColorAt(pct: number): string {
+      const mix = (aHex: string, bHex: string, t: number) => {
+        const a = hexToRgb(aHex);
+        const b = hexToRgb(bHex);
+        const mixed = a.map((v, i) => v + (b[i] - v) * t);
+        return `#${mixed.map((v) => Math.round(v).toString(16).padStart(2, "0")).join("")}`;
+      };
+      if (pct <= P0) return ink;
+      if (pct >= P1) return gold;
+      if (pct <= MID) return mix(ink, oxblood, (pct - P0) / (MID - P0));
+      return mix(oxblood, gold, (pct - MID) / (P1 - MID));
+    }
+
+    it.each(REAL_TEXT_EDGES)(
+      "the sRGB fallback also clears 4.5:1 at its real measured edge ($label), for browsers without oklab gradient support",
+      ({ pct }) => {
+        const bg = fallbackColorAt(pct);
+        expect(passesAA(contrastRatio(paper, bg))).toBe(true);
+      },
+    );
+
+    // The curve doesn't fail 4.5:1 until past 75% — every general sample
+    // point up to 66.67% clears it too. Past the failure point is the
+    // gradient's pure decorative tail, always covered by the two sections'
+    // opaque ink-fill/gold-edge cards (JourneysSection.tsx /
+    // ProjectsActive.tsx), never by raw text.
     it("paper heading/lead text clears 4.5:1 at every sample point up to 66.67%", () => {
       for (const pct of SAMPLE_POINTS.filter((p) => p <= 66.67)) {
         expect(passesAA(contrastRatio(paper, gradientColorAt(pct)))).toBe(true);
@@ -230,7 +258,7 @@ describe("design tokens: color contrast", () => {
       expect(passesAA(contrastRatio(paper, gradientColorAt(100)))).toBe(false);
     });
 
-    it("Eyebrow's opacity-60 treatment clears 4.5:1 anywhere the eyebrow itself can render (it's a short, top-anchored line, always inside the flat 20% ink zone)", () => {
+    it("Eyebrow's opacity-60 treatment clears 4.5:1 anywhere the eyebrow itself can render (it's a short, top-anchored line, always inside the flat 12% ink zone)", () => {
       const bg = gradientColorAt(0);
       const muted = blendOverBackground(paper, 0.6, bg);
       expect(passesAA(contrastRatio(muted, bg))).toBe(true);
