@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import { NextIntlClientProvider } from "next-intl";
 import { requireLocale } from "@/i18n/requireLocale";
 import { routing } from "@/i18n/routing";
+import { siteUrl } from "@/lib/siteUrl";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -58,11 +59,32 @@ export function generateStaticParams() {
 }
 
 export const metadata: Metadata = {
+  // Gives every *other* absolute URL Metadata resolves (canonical, og:url,
+  // alternates) a real origin instead of Next's own localhost fallback.
+  //
+  // Doesn't reach opengraph-image.png specifically: Next resolves a static
+  // metadata-route-file image's own absolute URL through a separate path
+  // (node_modules/next/dist/.../resolve-opengraph.js) that ignores this
+  // metadataBase on purpose and instead prefers Vercel's own system env
+  // vars (VERCEL_PROJECT_PRODUCTION_URL / VERCEL_URL) when present, so a
+  // preview deployment's share card points at that preview's own URL, not
+  // whatever NEXT_PUBLIC_SITE_URL happens to be. On Vercel that resolves
+  // correctly with zero config. A local `next build` has neither Vercel var
+  // nor a confirmed production domain (see ASSETS-TODO.md's siteUrl.ts row)
+  // and prints a harmless "metadataBase ... not set" warning + a
+  // localhost-based image URL — expected there, not a sign this is broken.
+  metadataBase: new URL(siteUrl()),
   title: {
     default: "Enactus Mannheim",
     template: "%s, Enactus Mannheim",
   },
   description: "Enactus Mannheim e.V.",
+  // opengraph-image.png (this directory) covers Open Graph automatically;
+  // Twitter falls back to the same file but only renders it large with the
+  // card type declared explicitly.
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 // This is the app's one and only root layout — deliberately no src/app/layout.tsx.
