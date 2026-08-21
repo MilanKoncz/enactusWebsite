@@ -72,6 +72,27 @@
     "body": "Hier gibt's nichts zu erledigen, nur kurz durchatmen. Niemand erwartet dich hier, also mach's dir bequem.",
     "backHome": "Zurück zur Startseite"
   },
+  "ErinnerungStatus": {
+    "pageTitle": "Erinnerung",
+    "confirmed": {
+      "title": "Erinnerung bestätigt",
+      "lead": "Wir erinnern dich jetzt per E-Mail, sobald das nächste Bewerbungsfenster öffnet."
+    },
+    "already-confirmed": {
+      "title": "Bereits bestätigt",
+      "lead": "Dieser Link wurde schon verwendet. Deine Erinnerung ist weiterhin aktiv."
+    },
+    "unsubscribed": {
+      "title": "Abmeldung bestätigt",
+      "lead": "Du bekommst ab jetzt keine Erinnerungen mehr von uns."
+    },
+    "invalid": {
+      "title": "Link ungültig",
+      "lead": "Dieser Link ist ungültig oder abgelaufen. Melde dich erneut für die Erinnerung an, dann bekommst du einen neuen Bestätigungslink."
+    },
+    "unsubscribeHint": "Du kannst dich jederzeit wieder abmelden.",
+    "backHome": "Zurück zur Startseite"
+  },
   "Home": {
     "dividers": {
       "alumni": "Stimmen aus dem Netzwerk",

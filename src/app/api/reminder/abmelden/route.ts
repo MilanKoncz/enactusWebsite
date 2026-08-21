@@ -8,10 +8,12 @@ import { clientIp } from "@/lib/requestIp";
 
 /**
  * GET handles a human clicking the unsubscribe link in an email — it
- * redirects back to /mitmachen with a status flag, same pattern as
- * bestaetigen/route.ts. POST handles RFC 8058's one-click unsubscribe: a
- * compliant mail client (Gmail, Yahoo, …) reads List-Unsubscribe-Post on
- * the original email and POSTs here directly, with no page load — that
+ * redirects to /erinnerung-status?status=<state>, the same real
+ * confirmation page bestaetigen/route.ts sends its own clicks to, so an
+ * unsubscribe click gets visible feedback too, not a silent landing on
+ * /mitmachen. POST handles RFC 8058's one-click unsubscribe: a compliant
+ * mail client (Gmail, Yahoo, …) reads List-Unsubscribe-Post on the
+ * original email and POSTs here directly, with no page load — that
  * request expects a bare 2xx, not a redirect, so the two methods return
  * genuinely different response shapes rather than sharing one handler.
  *
@@ -22,14 +24,16 @@ import { clientIp } from "@/lib/requestIp";
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get("token");
   const base = siteUrl();
+  const statusUrl = (status: string, locale: "de" | "en" = "de") =>
+    new URL(`${localizedPath("/erinnerung-status", locale)}?status=${status}`, base);
 
   const rateLimit = await checkRateLimit("reminder-abmelden", clientIp(request));
   if (!rateLimit.allowed) {
-    return NextResponse.redirect(new URL(`${localizedPath("/mitmachen", "de")}?abgemeldet=fehler`, base));
+    return NextResponse.redirect(statusUrl("invalid"));
   }
 
   if (!token) {
-    return NextResponse.redirect(new URL(`${localizedPath("/mitmachen", "de")}?abgemeldet=fehler`, base));
+    return NextResponse.redirect(statusUrl("invalid"));
   }
 
   const result = await unsubscribeReminder(token).catch((error: unknown) => {
@@ -37,11 +41,10 @@ export async function GET(request: NextRequest) {
     return null;
   });
 
-  if (!result) {
-    return NextResponse.redirect(new URL(`${localizedPath("/mitmachen", "de")}?abgemeldet=fehler`, base));
+  if (!result || result.status === "invalid") {
+    return NextResponse.redirect(statusUrl("invalid"));
   }
-
-  return NextResponse.redirect(new URL(`${localizedPath("/mitmachen", result.locale)}?abgemeldet=1`, base));
+  return NextResponse.redirect(statusUrl(result.status, result.locale));
 }
 
 export async function POST(request: NextRequest) {
@@ -60,5 +63,6 @@ export async function POST(request: NextRequest) {
     return null;
   });
 
-  return NextResponse.json({ ok: Boolean(result) }, { status: result ? 200 : 404 });
+  const ok = result?.status === "unsubscribed";
+  return NextResponse.json({ ok }, { status: ok ? 200 : 404 });
 }

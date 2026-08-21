@@ -182,45 +182,45 @@ describe("GET /api/reminder/bestaetigen", () => {
     vi.resetAllMocks();
   });
 
-  it("confirms a valid token and redirects to the localized page with a success flag", async () => {
-    confirmReminderSignup.mockResolvedValue({ id: "1", email: "jane@example.com", locale: "en" });
+  it("confirms a valid token and redirects to the real confirmation page with a confirmed status", async () => {
+    confirmReminderSignup.mockResolvedValue({ status: "confirmed", id: "1", email: "jane@example.com", locale: "en" });
 
     const { GET } = await import("@/app/api/reminder/bestaetigen/route");
     const response = await GET(getConfirm("good-token"));
 
     expect(response.status).toBe(307);
-    expect(response.headers.get("location")).toContain("/en/mitmachen?bestaetigt=1");
+    expect(response.headers.get("location")).toContain("/en/erinnerung-status?status=confirmed");
   });
 
-  it("never confirms twice — the second click on the same token finds nothing to confirm", async () => {
-    confirmReminderSignup.mockResolvedValueOnce({ id: "1", email: "jane@example.com", locale: "de" });
-    confirmReminderSignup.mockResolvedValueOnce(null);
+  it("shows already-confirmed, not a generic error, when the same token is clicked a second time", async () => {
+    confirmReminderSignup.mockResolvedValueOnce({ status: "confirmed", id: "1", email: "jane@example.com", locale: "de" });
+    confirmReminderSignup.mockResolvedValueOnce({ status: "already-confirmed", locale: "de" });
 
     const { GET } = await import("@/app/api/reminder/bestaetigen/route");
     await GET(getConfirm("good-token"));
     const second = await GET(getConfirm("good-token"));
 
-    expect(second.headers.get("location")).toContain("bestaetigt=fehler");
+    expect(second.headers.get("location")).toContain("/erinnerung-status?status=already-confirmed");
   });
 
-  it("redirects with an error flag for a missing or unknown token", async () => {
+  it("redirects with an invalid status for a missing or unknown token", async () => {
     const { GET } = await import("@/app/api/reminder/bestaetigen/route");
 
     const missing = await GET(getConfirm(null));
-    expect(missing.headers.get("location")).toContain("bestaetigt=fehler");
+    expect(missing.headers.get("location")).toContain("status=invalid");
 
-    confirmReminderSignup.mockResolvedValue(null);
+    confirmReminderSignup.mockResolvedValue({ status: "invalid" });
     const unknown = await GET(getConfirm("bad-token"));
-    expect(unknown.headers.get("location")).toContain("bestaetigt=fehler");
+    expect(unknown.headers.get("location")).toContain("status=invalid");
   });
 
-  it("rejects a flood with an error redirect before touching the database", async () => {
+  it("rejects a flood with an invalid-status redirect before touching the database", async () => {
     checkRateLimit.mockResolvedValue({ allowed: false, remaining: 0 });
 
     const { GET } = await import("@/app/api/reminder/bestaetigen/route");
     const response = await GET(getConfirm("good-token"));
 
-    expect(response.headers.get("location")).toContain("bestaetigt=fehler");
+    expect(response.headers.get("location")).toContain("status=invalid");
     expect(confirmReminderSignup).not.toHaveBeenCalled();
   });
 });
@@ -234,38 +234,38 @@ describe("/api/reminder/abmelden", () => {
     vi.resetAllMocks();
   });
 
-  it("GET redirects to the localized page with a success flag on a valid token", async () => {
-    unsubscribeReminder.mockResolvedValue({ id: "1", locale: "de" });
+  it("GET redirects to the real confirmation page with an unsubscribed status on a valid token", async () => {
+    unsubscribeReminder.mockResolvedValue({ status: "unsubscribed", locale: "de" });
 
     const { GET } = await import("@/app/api/reminder/abmelden/route");
     const response = await GET(getUnsubscribe("good-token"));
 
-    expect(response.headers.get("location")).toContain("/mitmachen?abgemeldet=1");
+    expect(response.headers.get("location")).toContain("/erinnerung-status?status=unsubscribed");
   });
 
-  it("GET redirects with an error flag for a missing or unknown token", async () => {
+  it("GET redirects with an invalid status for a missing or unknown token", async () => {
     const { GET } = await import("@/app/api/reminder/abmelden/route");
 
     const missing = await GET(getUnsubscribe(null));
-    expect(missing.headers.get("location")).toContain("abgemeldet=fehler");
+    expect(missing.headers.get("location")).toContain("status=invalid");
 
-    unsubscribeReminder.mockResolvedValue(null);
+    unsubscribeReminder.mockResolvedValue({ status: "invalid" });
     const unknown = await GET(getUnsubscribe("bad-token"));
-    expect(unknown.headers.get("location")).toContain("abgemeldet=fehler");
+    expect(unknown.headers.get("location")).toContain("status=invalid");
   });
 
-  it("GET rejects a flood with an error redirect before touching the database", async () => {
+  it("GET rejects a flood with an invalid-status redirect before touching the database", async () => {
     checkRateLimit.mockResolvedValue({ allowed: false, remaining: 0 });
 
     const { GET } = await import("@/app/api/reminder/abmelden/route");
     const response = await GET(getUnsubscribe("good-token"));
 
-    expect(response.headers.get("location")).toContain("abgemeldet=fehler");
+    expect(response.headers.get("location")).toContain("status=invalid");
     expect(unsubscribeReminder).not.toHaveBeenCalled();
   });
 
   it("POST answers a bare 200 for a one-click unsubscribe, per RFC 8058", async () => {
-    unsubscribeReminder.mockResolvedValue({ id: "1", locale: "de" });
+    unsubscribeReminder.mockResolvedValue({ status: "unsubscribed", locale: "de" });
 
     const { POST } = await import("@/app/api/reminder/abmelden/route");
     const response = await POST(postUnsubscribe("good-token"));
@@ -275,7 +275,7 @@ describe("/api/reminder/abmelden", () => {
   });
 
   it("POST answers 404 for an unknown token without touching a redirect", async () => {
-    unsubscribeReminder.mockResolvedValue(null);
+    unsubscribeReminder.mockResolvedValue({ status: "invalid" });
 
     const { POST } = await import("@/app/api/reminder/abmelden/route");
     const response = await POST(postUnsubscribe("bad-token"));

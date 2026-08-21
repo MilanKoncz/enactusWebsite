@@ -72,6 +72,27 @@
     "body": "Nothing to get done here, just take a breath. Nobody's expecting you, so make yourself at home.",
     "backHome": "Back to the homepage"
   },
+  "ErinnerungStatus": {
+    "pageTitle": "Reminder",
+    "confirmed": {
+      "title": "Reminder confirmed",
+      "lead": "We'll now email you once the next application window opens."
+    },
+    "already-confirmed": {
+      "title": "Already confirmed",
+      "lead": "This link has already been used. Your reminder is still active."
+    },
+    "unsubscribed": {
+      "title": "Unsubscribe confirmed",
+      "lead": "You won't receive any more reminders from us."
+    },
+    "invalid": {
+      "title": "Link invalid",
+      "lead": "This link is invalid or has expired. Sign up again for the reminder to get a new confirmation link."
+    },
+    "unsubscribeHint": "You can unsubscribe again at any time.",
+    "backHome": "Back to the homepage"
+  },
   "Home": {
     "dividers": {
       "alumni": "Voices from the network",

@@ -11,6 +11,10 @@ import { isProductionDeployment } from "@/lib/productionDeployment";
 // endpoints. /secret is easter egg 7/7 (docs/eastereggs.md) — a hidden,
 // unlinked page that also carries its own noindex/nofollow metadata,
 // disallowed here on top of that for the same belt-and-braces reason.
+// /erinnerung-status is the reminder double-opt-in confirm/unsubscribe
+// landing page (erinnerung-status/page.tsx) — only ever reached via a
+// one-time emailed link, never a page anyone should find through search,
+// same belt-and-braces reasoning and also excluded from sitemap.ts.
 //
 // Only the confirmed production domain, on a real production deployment,
 // may be indexed — see productionDeployment.ts. Everything else (a preview
@@ -34,7 +38,17 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/api/", "/styleguide", "/en/styleguide", "/admin", "/en/admin", "/secret", "/en/secret"],
+      disallow: [
+        "/api/",
+        "/styleguide",
+        "/en/styleguide",
+        "/admin",
+        "/en/admin",
+        "/secret",
+        "/en/secret",
+        "/erinnerung-status",
+        "/en/erinnerung-status",
+      ],
     },
     sitemap: `${base}/sitemap.xml`,
   };

@@ -28,7 +28,7 @@ describe("robots", () => {
     expect(result.rules).toMatchObject({ userAgent: "*", allow: "/" });
   });
 
-  it("disallows /api/, /styleguide, /admin, and /secret in both locales when crawling is allowed", async () => {
+  it("disallows /api/, /styleguide, /admin, /secret, and /erinnerung-status in both locales when crawling is allowed", async () => {
     process.env.VERCEL_ENV = "production";
     mockHost = "enactus-mannheim.com";
     const result = await robots();
@@ -42,6 +42,8 @@ describe("robots", () => {
         "/en/admin",
         "/secret",
         "/en/secret",
+        "/erinnerung-status",
+        "/en/erinnerung-status",
       ]),
     );
   });

@@ -802,34 +802,67 @@ export async function findReminderSignupById(id: string): Promise<ReminderSignup
 // The WHERE clause is the entire race guard: a second click on the same
 // confirmation link (or two concurrent clicks) finds zero rows the second
 // time, because `confirmed` is already true — no read-then-write gap to
-// double-confirm through.
+// double-confirm through. The follow-up SELECT below (only reached when the
+// UPDATE itself affected nothing) doesn't need that same atomicity: it runs
+// purely to word the confirmation page correctly after the fact — "already
+// confirmed" versus "never existed" — and a race between the two reads is
+// harmless, worst case it shows the generic already-confirmed wording to
+// whichever request lost a photo-finish.
+export type ConfirmReminderResult =
+  | { status: "confirmed"; id: string; email: string; locale: Locale }
+  | { status: "already-confirmed"; locale: Locale }
+  | { status: "invalid" };
+
 export async function confirmReminderSignup(
   token: string,
   confirmationIp: string,
-): Promise<ConfirmedReminderSignup | null> {
+): Promise<ConfirmReminderResult> {
   const rows = await sql()`
     update reminder_signups
     set confirmed = true, confirmed_at = now(), confirmation_ip = ${confirmationIp}
     where confirm_token = ${token} and confirmed = false
     returning id, email, locale
   `;
-  if (rows.length === 0) return null;
-  const row = rows[0] as Record<string, unknown>;
-  return { id: row.id as string, email: row.email as string, locale: row.locale as Locale };
+  if (rows.length > 0) {
+    const row = rows[0] as Record<string, unknown>;
+    return { status: "confirmed", id: row.id as string, email: row.email as string, locale: row.locale as Locale };
+  }
+
+  const existing = await sql()`
+    select locale from reminder_signups where confirm_token = ${token} and confirmed = true
+  `;
+  if (existing.length > 0) {
+    return { status: "already-confirmed", locale: (existing[0] as Record<string, unknown>).locale as Locale };
+  }
+  return { status: "invalid" };
 }
 
-export type UnsubscribeResult = { id: string; locale: Locale } | null;
+// Same "the UPDATE is the race guard, the fallback SELECT is just for
+// wording" split as confirmReminderSignup above. Unlike confirmation,
+// re-unsubscribing an already-unsubscribed token isn't an error to report —
+// the visitor's actual goal ("stop emailing me") is already satisfied
+// either way, so both cases resolve to the same "unsubscribed" status.
+export type UnsubscribeReminderResult = { status: "unsubscribed"; locale: Locale } | { status: "invalid" };
 
-export async function unsubscribeReminder(token: string): Promise<UnsubscribeResult> {
+export async function unsubscribeReminder(token: string): Promise<UnsubscribeReminderResult> {
   const rows = await sql()`
     update reminder_signups
     set unsubscribed_at = now()
     where unsubscribe_token = ${token} and unsubscribed_at is null
     returning id, locale
   `;
-  if (rows.length === 0) return null;
-  const row = rows[0] as Record<string, unknown>;
-  return { id: row.id as string, locale: row.locale as Locale };
+  if (rows.length > 0) {
+    const row = rows[0] as Record<string, unknown>;
+    return { status: "unsubscribed", locale: row.locale as Locale };
+  }
+
+  const existing = await sql()`
+    select locale from reminder_signups where unsubscribe_token = ${token}
+  `;
+  if (existing.length > 0) {
+    return { status: "unsubscribed", locale: (existing[0] as Record<string, unknown>).locale as Locale };
+  }
+  return { status: "invalid" };
 }
 
 // The query the "unconfirmed rows are never mailed" guarantee rests on:
