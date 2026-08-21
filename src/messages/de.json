@@ -1453,6 +1453,13 @@
       "resend": "Mailversand (Resend)",
       "reachable": "erreichbar",
       "unreachable": "nicht erreichbar",
+      "resendStatus": {
+        "missingKey": "RESEND_API_KEY ist nicht gesetzt.",
+        "invalidKey": "RESEND_API_KEY hat nicht das erwartete Format.",
+        "noAttempts": "Noch kein Sendeversuch aufgezeichnet ({failed} fehlgeschlagen in den letzten 30 Tagen).",
+        "lastFailed": "Letzter Sendeversuch fehlgeschlagen am {when} ({failed} fehlgeschlagen in den letzten 30 Tagen).",
+        "lastSucceeded": "Letzter Sendeversuch erfolgreich am {when} ({failed} fehlgeschlagen in den letzten 30 Tagen)."
+      },
       "rowsHeading": "Zeilen je Tabelle",
       "rowsUnavailable": "Zeilenzahlen nicht abrufbar, weil die Datenbank nicht erreichbar ist.",
       "tables": {

@@ -1036,6 +1036,47 @@ export async function listFailedMails(): Promise<FailedMail[]> {
   }));
 }
 
+export type MailHealthSnapshot = {
+  lastAttempt: { source: FailedMailSource; status: MailStatus; at: Date } | null;
+  failedLast30Days: number;
+};
+
+/**
+ * The most recent real send attempt across every mail-tracking table, plus
+ * how many failed in the last 30 days — the only signal /admin/system's
+ * Resend card needs (lib/serviceHealth.ts). Answers "did the last real send
+ * work," not "is this key allowed to do something it never does here,"
+ * which is what a domain-list or key-scope check would actually be asking.
+ */
+export async function mailHealthSnapshot(): Promise<MailHealthSnapshot> {
+  const rows = await sql()`
+    with attempts as (
+      select 'applications' as source, mail_status, created_at
+      from applications where mail_status <> 'pending'
+      union all
+      select 'contact_messages' as source, mail_status, created_at
+      from contact_messages where mail_status <> 'pending'
+      union all
+      select 'reminder_signups' as source, mail_status, created_at
+      from reminder_signups where mail_status <> 'pending'
+    )
+    select
+      (select source from attempts order by created_at desc limit 1) as last_source,
+      (select mail_status from attempts order by created_at desc limit 1) as last_status,
+      (select created_at from attempts order by created_at desc limit 1) as last_at,
+      (select count(*)::int from attempts
+        where mail_status = 'failed' and created_at >= now() - interval '30 days') as failed_last_30_days
+  `;
+  const row = (rows as Record<string, unknown>[])[0];
+  const lastSource = (row.last_source as FailedMailSource | null) ?? null;
+  return {
+    lastAttempt: lastSource
+      ? { source: lastSource, status: row.last_status as MailStatus, at: row.last_at as Date }
+      : null,
+    failedLast30Days: row.failed_last_30_days as number,
+  };
+}
+
 /**
  * The cron audit trail (migrations/0005). Written by /api/cron/cleanup and
  * read by /admin/system, which is the only reason it exists: Vercel keeps

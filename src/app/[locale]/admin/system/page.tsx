@@ -156,8 +156,11 @@ export default async function AdminSystemPage({ params }: PageProps) {
             <Card className="flex flex-col gap-1">
               <span className="text-body-m">{t("system.resend")}</span>
               <StatusIndicator
-                level={resend.reachable ? "ok" : "error"}
-                label={resend.reachable ? t("system.reachable") : (resend.detail ?? t("system.unreachable"))}
+                level={resend.level}
+                label={t(`system.resendStatus.${resend.reason}`, {
+                  when: resend.lastAttemptAt ? dateFormatter.format(resend.lastAttemptAt) : "",
+                  failed: resend.failedLast30Days,
+                })}
               />
             </Card>
           </li>

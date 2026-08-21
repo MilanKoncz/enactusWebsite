@@ -1,6 +1,7 @@
+import { mailHealthSnapshot } from "./db";
+
 /**
- * Reachability checks for /admin/system. Both answer one question — "is
- * this dependency answering right now?" — and neither throws: a health
+ * Reachability/health checks for /admin/system. Neither throws: a health
  * panel that crashes because a dependency is down is the opposite of
  * useful.
  *
@@ -8,31 +9,54 @@
  * answering, so a separate ping would be a second round trip to learn
  * something the page has just been told.
  */
-export type ServiceStatus = { reachable: boolean; detail: string | null };
+export type ServiceHealthLevel = "ok" | "warning" | "error";
+
+// `reason` names which sentence explains the level; the page (via
+// messages/*.json) owns the actual copy, this only says which template
+// applies and what data it needs — keeps a diagnostic sentence shown to the
+// board out of lib code, per the "user-facing strings live in messages/"
+// rule.
+export type ServiceStatus = {
+  level: ServiceHealthLevel;
+  reason: "missingKey" | "invalidKey" | "noAttempts" | "lastFailed" | "lastSucceeded";
+  lastAttemptAt: Date | null;
+  failedLast30Days: number;
+};
 
 /**
- * Checks Resend by listing domains, not by sending anything: the board
- * opening this page must never cost a real email. A 200 means the API is up
- * *and* the key is accepted, which is the pair that actually matters — an
- * expired key looks exactly like an outage from the send path's point of
- * view, and this distinguishes them.
+ * Resend's API has no endpoint a send-only-scoped key can call to prove
+ * itself — GET /domains 401s for such a key even though POST /emails (the
+ * real send path, lib/mail.ts) works fine, which used to make an expired
+ * key and a merely-restricted one look identical here. Instead of a second,
+ * more-privileged key just for this page, this reads what actually
+ * happened: the most recent real send attempt, from mail_status across the
+ * three mail-tracking tables (lib/db.ts's mailHealthSnapshot).
+ *
+ * Green requires both a plausible key AND that the most recent attempt
+ * succeeded — older failures that have since been resolved don't hold the
+ * status red forever, but the 30-day failure count still rides along in
+ * the detail so a recovered outage isn't invisible either.
  */
 export async function checkResend(): Promise<ServiceStatus> {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return { reachable: false, detail: "RESEND_API_KEY is not set" };
-
-  try {
-    const response = await fetch("https://api.resend.com/domains", {
-      headers: { Authorization: `Bearer ${apiKey}` },
-      // Without a bound, an unreachable provider would hang this page for
-      // as long as the platform's function timeout allows.
-      signal: AbortSignal.timeout(5000),
-      cache: "no-store",
-    });
-
-    if (response.ok) return { reachable: true, detail: null };
-    return { reachable: false, detail: `HTTP ${response.status}` };
-  } catch (error) {
-    return { reachable: false, detail: error instanceof Error ? error.message : String(error) };
+  if (!apiKey) {
+    return { level: "error", reason: "missingKey", lastAttemptAt: null, failedLast30Days: 0 };
   }
+  if (!apiKey.startsWith("re_")) {
+    return { level: "error", reason: "invalidKey", lastAttemptAt: null, failedLast30Days: 0 };
+  }
+
+  const snapshot = await mailHealthSnapshot();
+
+  if (!snapshot.lastAttempt) {
+    return { level: "warning", reason: "noAttempts", lastAttemptAt: null, failedLast30Days: snapshot.failedLast30Days };
+  }
+
+  const failed = snapshot.lastAttempt.status === "failed";
+  return {
+    level: failed ? "error" : "ok",
+    reason: failed ? "lastFailed" : "lastSucceeded",
+    lastAttemptAt: snapshot.lastAttempt.at,
+    failedLast30Days: snapshot.failedLast30Days,
+  };
 }

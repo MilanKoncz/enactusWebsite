@@ -1453,6 +1453,13 @@
       "resend": "Mail delivery (Resend)",
       "reachable": "reachable",
       "unreachable": "unreachable",
+      "resendStatus": {
+        "missingKey": "RESEND_API_KEY is not set.",
+        "invalidKey": "RESEND_API_KEY does not look like the expected format.",
+        "noAttempts": "No send attempt recorded yet ({failed} failed in the last 30 days).",
+        "lastFailed": "Last send attempt failed on {when} ({failed} failed in the last 30 days).",
+        "lastSucceeded": "Last send attempt succeeded on {when} ({failed} failed in the last 30 days)."
+      },
       "rowsHeading": "Rows per table",
       "rowsUnavailable": "Row counts unavailable because the database is unreachable.",
       "tables": {
