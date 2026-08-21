@@ -140,6 +140,25 @@ describe("content/projects", () => {
     ]);
   });
 
+  it("gives Mealyo three app-screenshot photos and Justin Prodan a portrait", () => {
+    const mealyo = projects.find((p) => p.slug === "mealyo")!;
+    expect(mealyo.images).toEqual([
+      "/projects/mealyo-expiry-reminder.jpg",
+      "/projects/mealyo-inventar.jpg",
+      "/projects/mealyo-scan.jpg",
+    ]);
+    expect(mealyo.leads[0].photo).toBe("/projects/leads/justin-prodan.jpg");
+  });
+
+  it("gives ImpactWithUs three photos, not just the original workshop one", () => {
+    const impactwithus = projects.find((p) => p.slug === "impactwithus")!;
+    expect(impactwithus.images).toEqual([
+      "/projects/impactwithus-workshop.jpg",
+      "/projects/impactwithus-projecttrip.jpg",
+      "/projects/impactwithus-garango.jpg",
+    ]);
+  });
+
   it("links Mealyo's own site and SmileGreen's LinkedIn page, nothing invented", () => {
     const bySlug = Object.fromEntries(projects.map((p) => [p.slug, p]));
     expect(bySlug.mealyo.externalUrl).toBe("https://mealyo.de");
@@ -176,22 +195,34 @@ describe("content/projects", () => {
     for (const p of projects) {
       expect(p.year).toBeNull();
     }
-    // afya and moufense are the two archive exceptions: their real logo
-    // files were matched by name from a board media handover, unlike every
-    // other archive project. moufense's logo is the same file as the
-    // STAR_2 entry in content/stars.ts — the same historical project shown
-    // in two different sections of the site.
-    const logoExceptions = ["afya", "moufense"];
-    for (const p of projects.filter((p) => p.status !== "active" && !logoExceptions.includes(p.slug))) {
-      expect(p.logo).toBeNull();
-      expect(p.images).toEqual([]);
+    // The archive exceptions with a real logo, matched by name from board
+    // media handovers rather than every other archive project's null.
+    // moufense's logo is the same file as the STAR_2 entry in
+    // content/stars.ts — the same historical project shown in two
+    // different sections of the site. differgy's is likewise the same file
+    // as its own STAR_6 entry.
+    const logoExceptions = ["afya", "differgy", "safesteps", "vela", "green-heat", "moufense"];
+    // afya and impactwithus (active, checked separately elsewhere) are the
+    // only archive/active projects with real photos beyond the four active
+    // projects already covered by their own dedicated tests.
+    const imageExceptions = ["afya"];
+    for (const p of projects.filter((p) => p.status !== "active")) {
+      if (!logoExceptions.includes(p.slug)) expect(p.logo).toBeNull();
+      if (!imageExceptions.includes(p.slug)) expect(p.images).toEqual([]);
       expect(p.sdgs).toEqual([]);
       expect(p.leads).toEqual([]);
     }
     const afya = projects.find((p) => p.slug === "afya")!;
     expect(afya.logo).toBe("/projects/afya-logo.png");
+    expect(afya.images).toEqual([
+      "/projects/afya-ernte.jpg",
+      "/projects/afya-produktfoto.jpg",
+      "/projects/afya-team.jpg",
+    ]);
     const moufense = projects.find((p) => p.slug === "moufense")!;
     expect(moufense.logo).toBe("/stars/moufense-logo.png");
+    const differgy = projects.find((p) => p.slug === "differgy")!;
+    expect(differgy.logo).toBe("/projects/differgy-logo.png");
   });
 
   it("validates every exported project against the schema", () => {

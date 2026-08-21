@@ -149,18 +149,30 @@ export const projects: Project[] = [
       { name: "Franka Zanolli" },
     ],
   }),
+  // Screenshots and Justin's portrait added 2026-08-21 from the board's
+  // Webflow-assets handover — see ASSETS-TODO.md's row on both. The three
+  // screenshots are marketing mockups (a tall 739x1600 graphic each, headline
+  // text baked in as an image, German only), not photography like every
+  // other project's images — top-cropped to the shared 4:3 frame rather than
+  // center-cropped, so the headline stays legible instead of being cut off.
   project({
     slug: "mealyo",
     name: "Mealyo",
     status: "active",
     externalUrl: "https://mealyo.de",
     logo: "/projects/mealyo-logo.png",
+    images: [
+      "/projects/mealyo-expiry-reminder.jpg",
+      "/projects/mealyo-inventar.jpg",
+      "/projects/mealyo-scan.jpg",
+    ],
     sdgs: [12, 13],
     leads: [
       {
         name: "Justin Prodan",
         email: "justin.prodan@unimannheim.enactus.team",
         linkedinUrl: "https://www.linkedin.com/in/justin-prodan",
+        photo: "/projects/leads/justin-prodan.jpg",
       },
     ],
   }),
@@ -200,12 +212,19 @@ export const projects: Project[] = [
       },
     ],
   }),
+  // Second and third photos added 2026-08-21 from the board's Webflow-assets
+  // handover (ASSETS-TODO.md) — a field-trip and a partner-community photo,
+  // rounding the single workshop photo out to the shared three-photo grid.
   project({
     slug: "impactwithus",
     name: "ImpactWithUs",
     status: "active",
     logo: "/projects/impactwithus-logo.png",
-    images: ["/projects/impactwithus-workshop.jpg"],
+    images: [
+      "/projects/impactwithus-workshop.jpg",
+      "/projects/impactwithus-projecttrip.jpg",
+      "/projects/impactwithus-garango.jpg",
+    ],
     sdgs: [17],
     leads: [
       {
@@ -216,14 +235,32 @@ export const projects: Project[] = [
       },
     ],
   }),
-  // Archive.
-  project({ slug: "differgy", name: "Differgy", status: "spinoff" }),
-  project({ slug: "safesteps", name: "Safesteps", status: "paused" }),
-  project({ slug: "vela", name: "Vela", status: "paused" }),
+  // Archive. Four of these gained a real logo 2026-08-21 (differgy,
+  // safesteps, vela, green-heat) from the same Webflow-assets handover —
+  // safesteps and green-heat were delivered as flat-white JPEGs, keyed to
+  // transparent PNG to match the transparent-logo convention every other
+  // logo on the site follows (ASSETS-TODO.md).
+  project({ slug: "differgy", name: "Differgy", status: "spinoff", logo: "/projects/differgy-logo.png" }),
+  project({ slug: "safesteps", name: "Safesteps", status: "paused", logo: "/projects/safesteps-logo.png" }),
+  project({ slug: "vela", name: "Vela", status: "paused", logo: "/projects/vela-logo.png" }),
   project({ slug: "sun-n-soil", name: "Sun n' Soil", status: "cancelled" }),
-  project({ slug: "green-heat", name: "Green Heat", status: "cancelled" }),
+  project({
+    slug: "green-heat",
+    name: "Green Heat",
+    status: "cancelled",
+    logo: "/projects/green-heat-logo.png",
+  }),
   project({ slug: "reverze", name: "ReverZe", status: "cancelled" }),
-  project({ slug: "afya", name: "Afya", status: "cancelled", logo: "/projects/afya-logo.png" }),
+  // Two more photos added 2026-08-21 (production/harvest, finished
+  // product) alongside the existing logo — see ASSETS-TODO.md for the
+  // status/achievement contradiction the board flagged for this project.
+  project({
+    slug: "afya",
+    name: "Afya",
+    status: "cancelled",
+    logo: "/projects/afya-logo.png",
+    images: ["/projects/afya-ernte.jpg", "/projects/afya-produktfoto.jpg", "/projects/afya-team.jpg"],
+  }),
   project({ slug: "mushroom", name: "mushROOM", status: "cancelled" }),
   project({ slug: "moufense", name: "Moufense", status: "cancelled", logo: "/stars/moufense-logo.png" }),
   project({ slug: "greenscape", name: "Greenscape", status: "cancelled" }),

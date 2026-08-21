@@ -34,12 +34,13 @@ describe("content/stars", () => {
     }
   });
 
-  it("has real logos for Blauherz, Moufense, and Afya, null for the rest", () => {
+  it("has real logos for Blauherz, Moufense, Afya, and Differgy, null for the rest", () => {
     const byKey = Object.fromEntries(stars.map((s) => [s.key, s.logo]));
     expect(byKey.STAR_1).toBe("/stars/blauherz-logo.png");
     expect(byKey.STAR_2).toBe("/stars/moufense-logo.png");
     expect(byKey.STAR_5).toBe("/projects/afya-logo.png");
-    for (const key of ["STAR_3", "STAR_4", "STAR_6", "STAR_8"]) {
+    expect(byKey.STAR_6).toBe("/projects/differgy-logo.png");
+    for (const key of ["STAR_3", "STAR_4", "STAR_8"]) {
       expect(byKey[key]).toBeNull();
     }
   });

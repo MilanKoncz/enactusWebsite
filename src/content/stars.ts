@@ -95,7 +95,13 @@ export const stars: Star[] = [
   // reads in tension with "cancelled" — see ASSETS-TODO.md rather than
   // silently resolving the contradiction in either direction.
   star({ key: "STAR_5", name: "Afya", status: "cancelled", verified: true, logo: "/projects/afya-logo.png" }),
-  star({ key: "STAR_6", name: "Differgy", status: "spinoff", verified: true }),
+  star({
+    key: "STAR_6",
+    name: "Differgy",
+    status: "spinoff",
+    verified: true,
+    logo: "/projects/differgy-logo.png",
+  }),
   // STAR_7 intentionally unassigned — see the file comment. The grid shows
   // a visible empty eighth slot instead (ProjectsStars.tsx), not an
   // invented project.
