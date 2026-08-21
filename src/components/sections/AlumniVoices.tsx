@@ -86,7 +86,17 @@ export function AlumniVoices() {
     <Section className="relative isolate">
       <ThreadSegment stop="alumni-voices" />
       <Container className="relative flex flex-col gap-10">
-        <div className="inline-flex flex-col gap-10 self-start bg-paper p-6 md:p-8">
+        {/* Same fix as AlumniEmployers.tsx's identical heading box, applied
+            here too even though this section is currently flag-disabled
+            (content/alumni.ts's ALUMNI_STATEMENTS_ENABLED): the structure —
+            a self-start, flat-bg-paper heading directly after ThreadSegment
+            — is the exact same bug, and would clip the thread's bow the
+            moment the flag turns on. See that component's comment for the
+            full reasoning. */}
+        <div
+          className="inline-flex flex-col gap-10 self-start p-8 md:p-12"
+          style={{ background: "radial-gradient(ellipse at center, var(--color-paper) 40%, transparent 75%)" }}
+        >
           <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
         </div>
       </Container>

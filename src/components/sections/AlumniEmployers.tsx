@@ -150,7 +150,21 @@ export function AlumniEmployers() {
           painting on top. */}
       <ThreadSegment stop="alumni-employers" className="z-0" />
       <Container className="relative flex flex-col gap-10">
-        <div className="inline-flex flex-col gap-4 self-start bg-paper p-6 md:p-8">
+        {/* A soft radial fade, not a flat bg-paper panel: the golden thread
+            (ThreadSegment above) bows through this exact top-left region on
+            its way from the top of the section back toward centre, and a
+            hard-edged opaque box here cut it clean off. The gradient is
+            opaque only where the text itself sits and fades to fully
+            transparent well before the box's own edge, so the thread reads
+            as continuous everywhere except directly behind the words —
+            extra padding (vs. the old p-6/p-8) gives that fade room to
+            happen without ever touching the text. Same element, same DOM
+            position as before — no z-index change needed, it already paints
+            above the thread exactly as the flat box did. */}
+        <div
+          className="inline-flex flex-col gap-4 self-start p-8 md:p-12"
+          style={{ background: "radial-gradient(ellipse at center, var(--color-paper) 40%, transparent 75%)" }}
+        >
           <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
         </div>
         <div className="md:hidden">
