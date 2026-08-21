@@ -75,6 +75,11 @@ describe("Benefits", () => {
     expect(orbitWrapper!.querySelectorAll("img")).toHaveLength(5);
   });
 
+  it("labels the centre of both orbit instances with the same real text", () => {
+    renderWithIntl(<Benefits />);
+    expect(screen.getAllByText("Unsere Lizenzen")).toHaveLength(2);
+  });
+
   it("has no accessibility violations", async () => {
     const { container } = renderWithIntl(<Benefits />);
     expect(await axe(container)).toHaveNoViolations();

@@ -29,6 +29,12 @@ export type ToolOrbitProps = {
       does. Defaults to 1 (the original desktop size); Benefits.tsx's mobile
       instance passes a smaller value. */
   scale?: number;
+  /** The static caption in the centre of the circle ("Unsere Lizenzen" /
+      "Our Licenses") — real text, not decorative, so it's the one part of
+      this component that isn't aria-hidden. Translated by the caller
+      (Benefits.tsx), same as every other section's copy; ToolOrbit stays
+      content-agnostic about everything else. */
+  label: string;
 };
 
 function angleFor(index: number, count: number): number {
@@ -79,7 +85,7 @@ function positionFor(
 // rotate(0deg) — so the assembly lands exactly on its unrotated resting
 // state: the circle motionless, every logo exactly where positionFor placed
 // it, evenly spaced and upright.
-export function ToolOrbit({ scale = 1 }: ToolOrbitProps) {
+export function ToolOrbit({ scale = 1, label }: ToolOrbitProps) {
   const LOGO_WIDTH = BASE_LOGO_WIDTH * scale;
   const LOGO_HEIGHT = BASE_LOGO_HEIGHT * scale;
   const RADIUS = BASE_RADIUS * scale;
@@ -94,9 +100,22 @@ export function ToolOrbit({ scale = 1 }: ToolOrbitProps) {
   const CENTRE_X = WIDTH / 2;
   const CENTRE_Y = HEIGHT / 2;
 
+  // The widest a label can be before a passing logo could touch it: the
+  // clearance from centre to the nearest edge of any logo, at any point on
+  // the orbit, is RADIUS - LOGO_WIDTH / 2 (a logo stays landscape-oriented
+  // throughout, so its own half-width is what matters, not its half-height).
+  // The 0.85 factor leaves a visible gap rather than letting the label's
+  // own box touch that boundary exactly.
+  const LABEL_MAX_WIDTH = Math.max(0, (RADIUS - LOGO_WIDTH / 2) * 2 * 0.85);
+
   return (
-    <div aria-hidden="true" className="relative" style={{ width: WIDTH, height: HEIGHT }}>
+    <div className="relative" style={{ width: WIDTH, height: HEIGHT }}>
+      {/* Only the logos are decorative — positionFor's translation math and
+          the two counter-rotating animations exist purely to keep five
+          brand marks upright while they orbit, nothing here is content a
+          screen reader should announce. */}
       <div
+        aria-hidden="true"
         className="absolute inset-0 animate-orbit-spin"
         style={{ transformOrigin: `${CENTRE_X}px ${CENTRE_Y}px` }}
       >
@@ -124,6 +143,15 @@ export function ToolOrbit({ scale = 1 }: ToolOrbitProps) {
           );
         })}
       </div>
+      {/* A sibling of the rotating stage, not a child of it — animate-orbit-spin
+          never touches this element, so it stays upright and stationary at
+          every point in the loop, reduced motion or not. */}
+      <span
+        className="absolute -translate-x-1/2 -translate-y-1/2 text-center font-mono text-mono-xs leading-tight uppercase text-ink"
+        style={{ left: CENTRE_X, top: CENTRE_Y, width: LABEL_MAX_WIDTH }}
+      >
+        {label}
+      </span>
     </div>
   );
 }

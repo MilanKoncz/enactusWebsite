@@ -31,7 +31,7 @@ export function Benefits() {
       <Container className="relative flex flex-col gap-12">
         <SectionHeading eyebrow={t("eyebrow")} title={t("title")} />
         <div className="flex justify-center md:hidden">
-          <ToolOrbit scale={0.6} />
+          <ToolOrbit scale={0.6} label={t("toolOrbitLabel")} />
         </div>
         {/* The orbit is a sibling of the grid, not of the whole column: it
             centres against the cards themselves, so it reads as belonging to
@@ -47,7 +47,7 @@ export function Benefits() {
             ))}
           </div>
           <div className="hidden shrink-0 md:block">
-            <ToolOrbit />
+            <ToolOrbit label={t("toolOrbitLabel")} />
           </div>
         </div>
       </Container>
