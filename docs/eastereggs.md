@@ -55,11 +55,14 @@ duplicated or modified to build the look itself.
 
 Exits: 60s auto-timeout, Escape, or a visible on-screen off-switch (a
 normal, fully tabbable button — unlike the peek button, this one is meant
-to be found). Never survives a pathname change (an immediate reset, no
-transition) and never activates at all on `/impressum`, `/datenschutz`,
-or anywhere under `/admin`. The ~1s entry/exit transition is a blur/
-brightness flicker (`@keyframes eight-bit-flicker`), reachable only via
-the peek button, which itself never renders under
+to be found; px-3/py-1.5 below `sm` rather than the normal px-4/py-2 —
+Press Start 2P already reads visually heavier than the same button in
+Geist, and a phone screen has the least room to spare for it, board
+feedback 2026-08-21). Never survives a pathname change (an immediate
+reset, no transition) and never activates at all on `/impressum`,
+`/datenschutz`, or anywhere under `/admin`. The ~1s entry/exit transition
+is a blur/brightness flicker (`@keyframes eight-bit-flicker`), reachable
+only via the peek button, which itself never renders under
 `prefers-reduced-motion`.
 
 The whole second palette is contrast-checked in
@@ -67,6 +70,26 @@ The whole second palette is contrast-checked in
 the brand palette relies on (paper-on-ink, ink-on-gold, sand-on-ink,
 paper-on-moss, amber/oxblood-on-paper, both 60%-opacity muted-text cases)
 — all clear 4.5:1.
+
+A real bug this once had, mobile only (board feedback, 2026-08-21):
+Press Start 2P's wider glyphs pushed a hand-tuned `white-space: nowrap`
+string (`HomeKpis.tsx`'s `worldRankingDetail` span, measured against
+Geist Mono's own width) past its container, and — because nothing clipped
+that overflow — the mobile browser's own layout viewport widened to fit
+it and stayed that way for as long as the mode was active, not a one-frame
+flash. A visitor could pinch/pan into the resulting blank strip on the
+right. Fixed in `globals.css`'s `html[data-eight-bit]` block two ways:
+`white-space: normal !important` on the same blanket `*` selector that
+already swaps the font (the actual fix — this specific span was the
+confirmed cause, and the override can't reach any other page since it's
+scoped to exactly the two states that swap the font), plus
+`overflow-x: hidden` on `html` itself as defense in depth against
+anything else this font swap might someday widen. Verified with a real
+touch-drag simulation, not just `scrollX`: `window.visualViewport` — the
+area a visitor can actually pan to — never moves or grows, even though
+`window.innerWidth` itself can still read a stale, wider value (an
+internal browser layout metric with no reachable, visible consequence).
+`tests/e2e/eightbit.spec.ts` covers this on a real mobile viewport.
 
 ## 4. Contact form success → confetti
 
@@ -90,36 +113,51 @@ step, not a moment for particles.
 construction rather than a plain error page: a handful of real, unmodified
 UN SDG icons (`public/sdg/`, via `sdgIconSrc()` — the same source every SDG
 reference on the site uses, never recolored or cropped, per the UN's own
-usage terms) float gently at the section's edges, a minimal gold-line crane
-(`ConstructionCrane`, same 150×190px pixel geometry regardless of viewport
-— the three bars have to line up exactly, which a set of Tailwind spacing
-utilities would only approximate) hoists one of them by a dashed cable,
-gold/ink hazard-stripe tape (`globals.css`'s `.hazard-stripes` utility, a
-`repeating-linear-gradient` — the same two brand tokens conventional hazard
-tape already uses, yellow/black) runs along the section's bottom edge, and
-two `GateMarker`s (the site's one signature motif — a gold rule plus a mono
-label) stand in as a barrier too, labelled "Baustelle" / "InnoLab".
-Everything decorative sits in a single `aria-hidden`, `pointer-events-none`
-layer, pinned to the corners and edges and well clear of the centered
-heading, note, and link list, so the joke can never get between a visitor
-and the way back — the heading itself stays the real, meaningful text
-(`t("title")`, "404. Diese Seite wird gerade noch im InnoLab entwickelt."),
-not a replacement for it. Below the note, the existing "back to homepage"
-link is joined by the full main-nav link list (same `content/navigation.ts`
-`mainNav` Header and Footer already read from), so a visitor who lands here
-from a dead link can reach any main section directly, not just the
-homepage.
+usage terms) float gently at the section's edges, a gold-line lattice tower
+crane (`ConstructionCrane`, inline SVG — real vector geometry, the same
+move `GermanyMap.tsx` already made for a shape no CSS utility approximates
+well) hoists one of them by a dashed cable, an `AlertTriangle`
+(lucide-react, the same icon `FormStatusMessage.tsx`'s own error state
+already uses — a real hazard cue, not a new pictogram) sits tilted near the
+tiles, gold/ink hazard-stripe tape (`globals.css`'s `.hazard-stripes`
+utility, a `repeating-linear-gradient` — the same two brand tokens
+conventional hazard tape already uses, yellow/black) runs along the
+section's bottom edge, and two `GateMarker`s (the site's one signature
+motif — a gold rule plus a mono label) stand in as a barrier too, labelled
+"Baustelle" / "InnoLab". Everything decorative sits in a single
+`aria-hidden`, `pointer-events-none` layer, pinned to the corners and edges
+and well clear of the centered heading, note, and link list, so the joke
+can never get between a visitor and the way back — the heading itself
+stays the real, meaningful text (`t("title")`, "404. Diese Seite wird
+gerade noch im InnoLab entwickelt."), not a replacement for it. Below the
+note, the existing "back to homepage" link is joined by the full main-nav
+link list (same `content/navigation.ts` `mainNav` Header and Footer
+already read from), so a visitor who lands here from a dead link can
+reach any main section directly, not just the homepage.
 
-The cable reuses the site's existing dashed-gold-border vocabulary (the
-calendar's "tentative" event treatment, docs/design-system.md) rather than
-inventing a new line style — a tile still "in progress" reads the same way
-here as it does on an unconfirmed calendar event. The tiles' float
-(`animate-construction-float`, `globals.css`) is a plain transform-only CSS
-loop, no JavaScript — like every other looping animation on this site, it
-collapses to a single near-instant frame under `prefers-reduced-motion` via
-the blanket override already in `globals.css`, rather than carrying its own
-reduced-motion guard. The route's status code and Next's own `not-found.tsx`
-behavior are untouched — this only changes what renders inside it.
+The crane went through a second pass (board feedback, 2026-08-21: the
+first version — one mast, one jib, one dashed cable — read as too abstract
+to register as a crane at all). This one is real SVG geometry: a lattice
+mast (two rails plus zigzag cross-bracing, not a single flagpole line), a
+counter-jib with a solid counterweight block, and the A-frame apex bracing
+both arms — the detail that actually makes a tower-crane silhouette
+legible at a glance. The cable itself stays a plain CSS div reusing the
+site's existing dashed-gold-border vocabulary (the calendar's "tentative"
+event treatment, docs/design-system.md) rather than inventing a second
+dashed-line style — a tile still "in progress" reads the same way here as
+it does on an unconfirmed calendar event. The AlertTriangle and the crane
+are both `hidden` below `md` — the same threshold the two GateMarkers
+already used, established there for the same reason: at a narrow width the
+"oder weiter zu:" link list wraps onto more lines and reaches further down
+the section, and a fixed-offset decoration low in the layout collides with
+it below that width (confirmed by hand at 390px before adding the guard).
+The tiles' float (`animate-construction-float`, `globals.css`) is a plain
+transform-only CSS loop, no JavaScript — like every other looping
+animation on this site, it collapses to a single near-instant frame under
+`prefers-reduced-motion` via the blanket override already in `globals.css`,
+rather than carrying its own reduced-motion guard. The route's status code
+and Next's own `not-found.tsx` behavior are untouched — this only changes
+what renders inside it.
 
 ## 6. Header logo → night mode zzZ
 
@@ -149,7 +187,11 @@ they can never affect the logo's own box, size, or the surrounding
 layout — nothing shifts when they appear after mount. Never rendered under
 `prefers-reduced-motion`. The logo itself and its size are completely
 unchanged; the zzZ are a sibling overlay, not a modification to the logo
-or the link's own dimensions.
+or the link's own dimensions. Sized `text-mono-s`/`text-mono-m` rather
+than the smaller `text-mono-xs`/`text-mono-s` the first pass used (board
+feedback, 2026-08-21: too easy to miss on a phone) — the header logo
+itself doesn't change size between mobile and desktop, so one size
+already works everywhere rather than needing a separate mobile bump.
 
 ## 7. `/secret` — the party
 

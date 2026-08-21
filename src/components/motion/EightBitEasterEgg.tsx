@@ -207,10 +207,16 @@ export function EightBitEasterEgg() {
       </button>
 
       {(phase === "active" || phase === "entering") && (
+        // px-3/py-1.5 below sm, the normal px-4/py-2 from sm up: Press Start
+        // 2P's own wider glyphs (globals.css's html[data-eight-bit] block)
+        // already make this read as visually heavier than the same button
+        // in Geist would, and a mobile viewport has the least room to
+        // spare for it — board feedback, 2026-08-21. Still comfortably
+        // above a real touch target at either size.
         <button
           type="button"
           onClick={exitMode}
-          className="fixed bottom-4 right-4 z-50 rounded-md border border-gold bg-ink px-4 py-2 font-mono text-mono-xs uppercase text-paper shadow-lg transition-transform duration-[var(--duration-fast)] ease-signature hover:-translate-y-px focus-visible:-translate-y-px"
+          className="fixed bottom-4 right-4 z-50 rounded-md border border-gold bg-ink px-3 py-1.5 font-mono text-mono-xs uppercase text-paper shadow-lg transition-transform duration-[var(--duration-fast)] ease-signature hover:-translate-y-px focus-visible:-translate-y-px sm:px-4 sm:py-2"
         >
           {t("offSwitchLabel")}
         </button>

@@ -1034,16 +1034,46 @@ body {
   }
 
   /* !important, not layer ordering, is what actually wins here: these
-     three properties are set directly by utility classes all over the
-     codebase (rounded-md, shadow-lg, font-mono/font-display/...), not
-     indirected through a custom property the way color is above — @layer
-     base alone would still lose to those unlayered utilities, the same
-     trap the file-level comment on the h1-h6 block above describes. */
+     properties are set directly by utility classes all over the codebase
+     (rounded-md, shadow-lg, font-mono/font-display/..., whitespace-nowrap),
+     not indirected through a custom property the way color is above —
+     @layer base alone would still lose to those unlayered utilities, the
+     same trap the file-level comment on the h1-h6 block above describes.
+
+     white-space: normal is load-bearing, not a stylistic add-on. Press
+     Start 2P runs measurably wider than Geist Mono per character (the
+     comment above this block already accounts for that in the type
+     scale), but a handful of `white-space: nowrap` strings elsewhere on
+     the site are hand-measured against Geist Mono's own specific width at
+     a specific breakpoint — HomeKpis.tsx's worldRankingDetail span is the
+     confirmed case, 176.8px, tuned for the normal font, board-approved on
+     2026-08-21. Under Press Start 2P that same string measures 235px,
+     wider than its own grid cell, and — because nothing upstream of it
+     clips overflow-x — that alone widens the *entire mobile browser's
+     layout viewport* to fit it (not just the document's own scrollable
+     range), confirmed by hand on a 390px device: window.innerWidth reads
+     442 for as long as 8-bit mode stays active, not a one-frame flash.
+     That's a real, user-reachable "can pinch/pan into blank space on the
+     right" bug (board feedback, 2026-08-21), and it's a native mobile
+     viewport behavior — CSS overflow-x: hidden on the document (still set
+     below, kept as defense in depth against anything else this blanket
+     font swap might someday widen) does not undo it once the browser has
+     already decided the content requires that vs the initial
+     device-width. The only fix that actually prevents it is stopping the
+     nowrap string from ever growing past its container in the first
+     place, and since this override is scoped to exactly the two states
+     that swap the font, it can't affect anything on any other page. */
   html[data-eight-bit="exiting"] *,
   html[data-eight-bit="active"] * {
     font-family: var(--font-press-start-2p), ui-monospace, monospace !important;
     border-radius: 0 !important;
     box-shadow: none !important;
+    white-space: normal !important;
+  }
+
+  html[data-eight-bit="exiting"],
+  html[data-eight-bit="active"] {
+    overflow-x: hidden;
   }
 
   html[data-eight-bit="exiting"] img,
