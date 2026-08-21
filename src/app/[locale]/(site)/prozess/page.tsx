@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { requireLocale, resolveLocale } from "@/i18n/requireLocale";
+import { pageAlternates } from "@/lib/seo";
 import { ProcessIntro } from "@/components/sections/ProcessIntro";
 import { ProcessTimeline } from "@/components/sections/ProcessTimeline";
 import { ProjectGuideDownload } from "@/components/sections/ProjectGuideDownload";
@@ -17,7 +18,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale: rawLocale } = await params;
   const locale = resolveLocale(rawLocale);
   const t = await getTranslations({ locale, namespace: "Routes" });
-  return { title: t("prozess") };
+  const tSeo = await getTranslations({ locale, namespace: "Seo" });
+  return {
+    title: t("prozess"),
+    description: tSeo("prozess"),
+    alternates: pageAlternates("/prozess", locale),
+  };
 }
 
 // Rhythm: paper -> paper -> paper -> ink, one dark moment at the very end

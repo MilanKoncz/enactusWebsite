@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { requireLocale, resolveLocale } from "@/i18n/requireLocale";
+import { pageAlternates } from "@/lib/seo";
 import { JobsSection } from "@/components/sections/JobsSection";
 import { getJobPostings } from "@/lib/jobPostings";
 
@@ -12,7 +13,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale: rawLocale } = await params;
   const locale = resolveLocale(rawLocale);
   const t = await getTranslations({ locale, namespace: "Routes" });
-  return { title: t("jobs") };
+  const tSeo = await getTranslations({ locale, namespace: "Seo" });
+  return {
+    title: t("jobs"),
+    description: tSeo("jobs"),
+    alternates: pageAlternates("/jobs", locale),
+  };
 }
 
 // Always reachable and in the sitemap, even with zero postings — the brief:

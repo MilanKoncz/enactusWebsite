@@ -17,6 +17,21 @@
     "impressum": "Impressum",
     "datenschutz": "Datenschutz"
   },
+  "Seo": {
+    "home": "Enactus Mannheim ist eine Studierendeninitiative der Universität Mannheim, die unternehmerische Lösungen für die UN-Nachhaltigkeitsziele entwickelt.",
+    "prozess": "Acht Stationen führen ein Projekt bei Enactus Mannheim vom ersten Pitch bis zur Ausgründung als eigenständiges Unternehmen.",
+    "projekte": "Die aktuellen Projekte von Enactus Mannheim und unsere Stars, ehemalige Vorzeigeprojekte, die bei nationalen Enactus-Wettbewerben überzeugt haben.",
+    "projekteArchiv": "Alle Projekte, die Enactus Mannheim seit der Gründung durchlaufen hat, inklusive der Ausgründungen.",
+    "projektFallback": "Ein früheres Projekt von Enactus Mannheim.",
+    "events": "Neben unserer Arbeit in den Projekten und den Ressorts veranstalten wir ebenfalls Events zum Netzwerken, Lernen und Spaß haben.",
+    "termine": "Der Semesterplan auf einen Blick, von der Bewerbung bis zum nächsten Pitchcontest.",
+    "partner": "Mit unserem Netzwerk aus Partnern, Business Advisors, Fördermitgliedern und Alumni schaffen wir das Ökosystem für unsere nachhaltigen Projekte.",
+    "kontakt": "Fragen zu einer Bewerbung, einem Projekt oder einer Partnerschaft? Schau zuerst in die FAQ, oder schreib uns direkt.",
+    "mitmachen": "Werde Teil von Enactus Mannheim: was wir erwarten, was du bekommst, und wie die Bewerbung abläuft.",
+    "jobs": "Praktika, Werkstudierendenstellen und Berufseinstiege, die uns Partnerunternehmen direkt gemeldet haben.",
+    "impressum": "Impressum und rechtliche Angaben zu Enactus Mannheim e.V.",
+    "datenschutz": "Datenschutzerklärung von Enactus Mannheim e.V. gemäß DSGVO."
+  },
   "SkipLink": {
     "label": "Zum Inhalt springen"
   },

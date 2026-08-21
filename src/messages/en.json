@@ -17,6 +17,21 @@
     "impressum": "Legal notice",
     "datenschutz": "Privacy policy"
   },
+  "Seo": {
+    "home": "Enactus Mannheim is a University of Mannheim student initiative building entrepreneurial solutions for the UN Sustainable Development Goals.",
+    "prozess": "Eight stations take a project at Enactus Mannheim from its first pitch to spinning off as an independent company.",
+    "projekte": "The current projects at Enactus Mannheim, and our Stars, former flagship projects that impressed at national Enactus competitions.",
+    "projekteArchiv": "Every project Enactus Mannheim has run since its founding, including the spin-offs.",
+    "projektFallback": "A former Enactus Mannheim project.",
+    "events": "Beyond our work in the projects and internal teams, we also run events for networking, learning, and having fun together.",
+    "termine": "The semester plan at a glance, from applications to the next pitch contest.",
+    "partner": "With our network of partners, business advisors, supporting members, and alumni, we build the ecosystem our sustainable projects need.",
+    "kontakt": "Questions about applying, a project, or a partnership? Check the FAQ first, or write to us directly.",
+    "mitmachen": "Join Enactus Mannheim: what we expect, what you get, and how the application works.",
+    "jobs": "Internships, working-student roles, and entry-level positions our partner companies have listed with us directly.",
+    "impressum": "Legal notice and company details for Enactus Mannheim e.V.",
+    "datenschutz": "Privacy policy for Enactus Mannheim e.V. under the GDPR."
+  },
   "SkipLink": {
     "label": "Skip to content"
   },

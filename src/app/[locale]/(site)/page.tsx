@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { requireLocale, resolveLocale } from "@/i18n/requireLocale";
+import { pageAlternates } from "@/lib/seo";
+import { OrganizationJsonLd } from "@/components/OrganizationJsonLd";
 import { HomeHero } from "@/components/sections/HomeHero";
 import { PartnerMarquee } from "@/components/sections/PartnerMarquee";
 import { HomeKpis } from "@/components/sections/HomeKpis";
@@ -20,8 +22,17 @@ type PageProps = {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale: rawLocale } = await params;
   const locale = resolveLocale(rawLocale);
-  const t = await getTranslations({ locale, namespace: "Site" });
-  return { title: t("name") };
+  const tSeo = await getTranslations({ locale, namespace: "Seo" });
+  // No `title` here on purpose: the root layout's title.template ("%s,
+  // Enactus Mannheim") applies to *any* string a page sets, even one that's
+  // already just "Enactus Mannheim" — setting it here rendered the
+  // homepage's own <title> as "Enactus Mannheim, Enactus Mannheim". Omitting
+  // it lets the layout's untemplated `default` ("Enactus Mannheim") stand
+  // as-is, which is also the correct title for this one page.
+  return {
+    description: tSeo("home"),
+    alternates: pageAlternates("/", locale),
+  };
 }
 
 // Rhythm: ink -> [paper paper] -> ink -> [paper paper paper] -> ink. Three
@@ -41,9 +52,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function HomePage({ params }: PageProps) {
   const locale = await requireLocale(params);
   const t = await getTranslations({ locale, namespace: "Home" });
+  const tSeo = await getTranslations({ locale, namespace: "Seo" });
 
   return (
     <>
+      <OrganizationJsonLd description={tSeo("home")} />
       <HomeHero />
       <PartnerMarquee />
       {/* No label here: the figures below name themselves, and a
