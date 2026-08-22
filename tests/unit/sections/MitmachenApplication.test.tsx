@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { screen, waitFor } from "@testing-library/react";
 import { axe } from "jest-axe";
 import { renderWithIntl } from "../../fixtures/intl";
+import { mockMatchMedia } from "../../fixtures/matchMedia";
 import { MitmachenApplication } from "@/components/sections/MitmachenApplication";
 import type { RecruitingWindow } from "@/content/recruiting";
 
@@ -25,6 +26,10 @@ describe("MitmachenApplication", () => {
     // before this fetch existed. The one test that cares about a
     // successful refresh overrides this itself.
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("no network in tests")));
+    // jsdom has no matchMedia; ApplicationForm (rendered here once the
+    // window is open) reads prefers-reduced-motion for its confetti burst,
+    // so every test needs some stub in place.
+    mockMatchMedia(false);
   });
 
   afterEach(() => {
