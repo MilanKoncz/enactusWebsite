@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -83,6 +83,7 @@ export function ApplicationForm({ projectAreas: initialProjectAreas }: { project
   const desiredAreaOptions = projectAreas.map((area) => (locale === "de" ? area.labelDe : area.labelEn));
   const {
     register,
+    control,
     handleSubmit,
     reset,
     formState: { errors },
@@ -207,29 +208,55 @@ export function ApplicationForm({ projectAreas: initialProjectAreas }: { project
         {...register("motivation")}
       />
 
-      <fieldset className="flex flex-col gap-3">
-        <legend className="text-body-s font-medium text-ink">{t("desiredAreasLabel")}</legend>
-        <p className="text-body-s opacity-60">{t("desiredAreasHint")}</p>
-        <div className="flex flex-wrap gap-x-6 gap-y-3">
-          {desiredAreaOptions.map((area) => (
-            <label key={area} className="flex items-center gap-2 text-body-s">
-              <input
-                type="checkbox"
-                value={area}
-                className="size-4 shrink-0 rounded border-ink/20 focus-visible:outline-2 focus-visible:outline-offset-2"
-                {...register("desiredAreas")}
-              />
-              {area}
-            </label>
-          ))}
-        </div>
-        {errors.desiredAreas && (
-          <p className="flex items-center gap-2 text-body-s text-oxblood">
-            <AlertCircle aria-hidden="true" className="size-4 shrink-0" />
-            {t("desiredAreasError")}
-          </p>
-        )}
-      </fieldset>
+      {/* A controlled field (Controller), not plain register() on each
+          checkbox: desiredAreaOptions can change after mount now (the live
+          /api/project-areas refetch above), and plain register() ties a
+          checkbox's value to react-hook-form purely through DOM refs —
+          reliable for a fixed list, but a list that gains or loses options
+          post-mount can leave the DOM's own checked state and RHF's
+          internal field value disagreeing with each other (confirmed in
+          CI: a checkbox rendered visibly checked while validation still
+          reported the field empty). Driving `checked` from field.value
+          directly removes the DOM-ref race entirely — the field's value is
+          the single source of truth, never inferred from what the browser
+          currently shows. */}
+      <Controller
+        control={control}
+        name="desiredAreas"
+        defaultValue={[]}
+        render={({ field }) => {
+          const selected = field.value ?? [];
+          function toggle(area: string, checked: boolean) {
+            field.onChange(checked ? [...selected, area] : selected.filter((value) => value !== area));
+          }
+          return (
+            <fieldset className="flex flex-col gap-3">
+              <legend className="text-body-s font-medium text-ink">{t("desiredAreasLabel")}</legend>
+              <p className="text-body-s opacity-60">{t("desiredAreasHint")}</p>
+              <div className="flex flex-wrap gap-x-6 gap-y-3">
+                {desiredAreaOptions.map((area) => (
+                  <label key={area} className="flex items-center gap-2 text-body-s">
+                    <input
+                      type="checkbox"
+                      checked={selected.includes(area)}
+                      onChange={(event) => toggle(area, event.target.checked)}
+                      onBlur={field.onBlur}
+                      className="size-4 shrink-0 rounded border-ink/20 focus-visible:outline-2 focus-visible:outline-offset-2"
+                    />
+                    {area}
+                  </label>
+                ))}
+              </div>
+              {errors.desiredAreas && (
+                <p className="flex items-center gap-2 text-body-s text-oxblood">
+                  <AlertCircle aria-hidden="true" className="size-4 shrink-0" />
+                  {t("desiredAreasError")}
+                </p>
+              )}
+            </fieldset>
+          );
+        }}
+      />
 
       <Field
         label={t("availabilityLabel")}

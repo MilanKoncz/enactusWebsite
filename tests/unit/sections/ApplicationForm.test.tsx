@@ -128,6 +128,34 @@ describe("ApplicationForm", () => {
     expect(screen.queryByRole("checkbox", { name: "SmileGreen" })).not.toBeInTheDocument();
   });
 
+  // Regression test for a bug found in real CI (not reproducible locally,
+  // only under GitHub Actions' timing): with an empty initial prop (the
+  // exact production shape when the build has no DATABASE_URL) and a
+  // checkbox that only comes into existence once the live
+  // /api/project-areas fetch resolves, plain register() on that checkbox
+  // could show it visibly checked while react-hook-form's own validation
+  // still reported the field empty — a genuine DOM-ref/field-value
+  // desync, not a test artifact. desiredAreas is now driven by a
+  // Controller (field.value as the single source of truth), which this
+  // guards against regressing.
+  it("submits successfully after checking an area that only appeared once the live fetch resolved", async () => {
+    let now = TOKEN_ISSUED_AT;
+    vi.spyOn(Date, "now").mockImplementation(() => now);
+    stubFetch(() => new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    const user = userEvent.setup();
+    renderForm([]);
+
+    await screen.findByRole("checkbox", { name: "SmileGreen" });
+    await fillRequiredFields(user);
+    now += MIN_FILL_MS + 500;
+    await user.click(screen.getByRole("button", { name: "Bewerbung absenden" }));
+
+    const notice = await screen.findByRole("status");
+    expect(notice).toHaveTextContent("Danke für deine Bewerbung");
+    expect(screen.queryByText("Bitte wähle mindestens einen Bereich aus.")).not.toBeInTheDocument();
+    expect(postCallBody()).toMatchObject({ desiredAreas: ["SmileGreen"] });
+  });
+
   it("blocks submission and shows errors when required fields are empty", async () => {
     const user = userEvent.setup();
     renderForm();
