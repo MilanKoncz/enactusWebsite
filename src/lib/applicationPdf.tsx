@@ -1,4 +1,6 @@
-import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { colorTokens } from "./design-tokens";
 import type { Application } from "./db";
 
@@ -15,6 +17,16 @@ import type { Application } from "./db";
  * governs their confirmation email instead (see lib/mail.ts), which does
  * go through messages/{locale}.json like every other user-facing string.
  *
+ * The logo is read from the local filesystem, not fetched over the network
+ * at render time — same reasoning as the no-custom-font decision below: a
+ * runtime fetch would be exactly the tracking-request problem CLAUDE.md
+ * rules out for the site itself, and this is server code, not a browser
+ * request Next can route through its own image optimizer. The mark
+ * (public/brand/enactus-mannheim-logo-mark.png, 600×600, transparent,
+ * ~13KB) is the square, surface-agnostic variant — right choice for a
+ * plain-white PDF page, and small enough that embedding the file as-is
+ * doesn't need a resized copy the way a multi-megabyte source would.
+ *
  * No custom font registered: the site self-hosts Geist via next/font/google
  * at build time and ships no Geist file in the repo (unlike the display
  * font, Lilita One, which does live under src/fonts/ since it's loaded via
@@ -25,11 +37,18 @@ import type { Application } from "./db";
  * stands in until a real Geist font file is added — see ASSETS-TODO.md.
  */
 
+const LOGO_MARK_PATH = join(process.cwd(), "public/brand/enactus-mannheim-logo-mark.png");
+
 const styles = StyleSheet.create({
   page: {
     padding: 40,
     fontSize: 10,
     color: colorTokens.ink,
+  },
+  logo: {
+    width: 28,
+    height: 28,
+    marginBottom: 12,
   },
   eyebrow: {
     fontSize: 9,
@@ -102,6 +121,10 @@ export function ApplicationPdfDocument({ application }: { application: Applicati
   return (
     <Document title={`Bewerbung ${application.firstName} ${application.lastName}`}>
       <Page size="A4" style={styles.page}>
+        {/* eslint-disable-next-line jsx-a11y/alt-text -- @react-pdf/renderer's
+            Image is a PDF-drawing primitive, not an HTML <img>; it has no
+            alt prop and no accessibility tree to attach one to. */}
+        <Image style={styles.logo} src={readFileSync(LOGO_MARK_PATH)} />
         <Text style={styles.eyebrow}>Enactus Mannheim e.V. — Bewerbung</Text>
         <Text style={styles.title}>
           {application.firstName} {application.lastName}
