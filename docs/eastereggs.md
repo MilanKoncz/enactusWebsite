@@ -91,21 +91,22 @@ area a visitor can actually pan to — never moves or grows, even though
 internal browser layout metric with no reachable, visible consequence).
 `tests/e2e/eightbit.spec.ts` covers this on a real mobile viewport.
 
-## 4. Contact form success → confetti
+## 4. Form success → confetti
 
-Submitting the contact form (`/kontakt`) successfully triggers the same
-confetti burst as the hero logo click (`ConfettiBurst`, see egg 2) —
-`ContactForm.tsx` reads the success message's own rendered position
-(`getBoundingClientRect()` on a ref around it, right after mount) and bursts
-from there. Only on a real, confirmed success — never on validation
-failure, never while pending, and never on the network/mail-provider error
-path, which still shows the plain error message with the mailto fallback,
-unchanged. The announced confirmation text (`FormStatusMessage`, `role=
+Submitting the contact form (`/kontakt`) or the application form
+(`/mitmachen`) successfully triggers the same confetti burst as the hero
+logo click (`ConfettiBurst`, see egg 2) — `ContactForm.tsx` and
+`ApplicationForm.tsx` each read their own success message's rendered
+position (`getBoundingClientRect()` on a ref around it, right after mount)
+and burst from there. Only on a real, confirmed success — never on
+validation failure, never while pending, and never on the network/mail-
+provider error path, which still shows the plain error message unchanged
+(the contact form's mailto fallback, the application form's board-email
+fallback). The announced confirmation text (`FormStatusMessage`, `role=
 "status"`) is identical to before and unaffected either way; the burst
 itself is `aria-hidden` and purely decorative. Inert entirely under
-`prefers-reduced-motion`, same as egg 2. The application form
-(`/mitmachen`) deliberately gets none of this — a Bewerbung is a serious
-step, not a moment for particles.
+`prefers-reduced-motion`, same as egg 2. Standard behavior on both forms
+now, board decision 2026-08-22 — not a secret to stumble on.
 
 ## 5. The 404 page is a small building site
 

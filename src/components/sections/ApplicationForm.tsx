@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,6 +9,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { FormStatusMessage } from "@/components/ui/FormStatusMessage";
+import { ConfettiBurst } from "@/components/motion/ConfettiBurst";
 import { Link } from "@/lib/navigation";
 import {
   applicationFormSchema,
@@ -17,6 +18,7 @@ import {
 } from "@/lib/applicationFormSchema";
 import { MIN_FILL_MS } from "@/lib/antiSpam";
 import { postJson } from "@/lib/submitForm";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { org } from "@/content/org";
 import type { PublicProjectArea } from "@/lib/projectAreas";
 
@@ -37,8 +39,11 @@ type SubmitState = "idle" | "pending" | "success" | "error";
 export function ApplicationForm({ projectAreas: initialProjectAreas }: { projectAreas: PublicProjectArea[] }) {
   const t = useTranslations("MitmachenPage.application.form");
   const locale = useLocale();
+  const reducedMotion = usePrefersReducedMotion();
   const [state, setState] = useState<SubmitState>("idle");
   const [submitError, setSubmitError] = useState<string | undefined>(undefined);
+  const successRef = useRef<HTMLDivElement>(null);
+  const [burst, setBurst] = useState<{ x: number; y: number } | null>(null);
   // Fetched in an effect, not read during render: it's a network call, and
   // the token only needs to exist by the time a real applicant (who still
   // has to fill in several required fields first) reaches the submit
@@ -85,6 +90,21 @@ export function ApplicationForm({ projectAreas: initialProjectAreas }: { project
     resolver: zodResolver(applicationFormSchema),
   });
 
+  // Same confetti burst as ContactForm.tsx (ConfettiBurst), reused rather
+  // than a second effect — origin is the success message's own rendered
+  // position, read right after it mounts. Only on a genuine successful
+  // submit — never on error, never while pending, and never under reduced
+  // motion — and the announced confirmation text (FormStatusMessage below)
+  // is unaffected either way; the burst is purely decorative and
+  // aria-hidden.
+  useEffect(() => {
+    if (state !== "success" || reducedMotion) return;
+    const rect = successRef.current?.getBoundingClientRect();
+    if (rect) setBurst({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+  }, [state, reducedMotion]);
+
+  const handleBurstDone = useCallback(() => setBurst(null), []);
+
   // Honeypot enforcement lives entirely in applicationFormSchema (`website`
   // must be empty) — handleSubmit simply won't call this for a filled one.
   // The timing check reads the token's own plaintext issue time (the part
@@ -120,7 +140,12 @@ export function ApplicationForm({ projectAreas: initialProjectAreas }: { project
   }
 
   if (state === "success") {
-    return <FormStatusMessage variant="success">{t("submitSuccess")}</FormStatusMessage>;
+    return (
+      <div ref={successRef}>
+        <FormStatusMessage variant="success">{t("submitSuccess")}</FormStatusMessage>
+        {burst && <ConfettiBurst originX={burst.x} originY={burst.y} onDone={handleBurstDone} />}
+      </div>
+    );
   }
 
   return (

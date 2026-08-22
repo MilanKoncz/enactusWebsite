@@ -3,6 +3,7 @@ import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "jest-axe";
 import { renderWithIntl } from "../../fixtures/intl";
+import { mockMatchMedia } from "../../fixtures/matchMedia";
 import { ApplicationForm, MIN_FILL_MS } from "@/components/sections/ApplicationForm";
 import type { PublicProjectArea } from "@/lib/projectAreas";
 
@@ -77,6 +78,11 @@ describe("ApplicationForm", () => {
     // have a token to fetch on mount — overridden by mockFetch* where a
     // test needs specific POST behavior.
     mockFetchOk();
+    // jsdom has no matchMedia; ApplicationForm now reads
+    // prefers-reduced-motion for the confetti burst below, so every test
+    // needs some stub in place — the reduced-motion test overrides this
+    // itself.
+    mockMatchMedia(false);
   });
 
   afterEach(() => {
@@ -196,6 +202,57 @@ describe("ApplicationForm", () => {
     const alert = await screen.findByRole("alert");
     expect(alert).toHaveTextContent("Das Bewerbungsfenster wurde gerade eben geschlossen");
     expect(alert).not.toHaveTextContent("teamvorstand@unimannheim.enactus.team");
+  });
+
+  /**
+   * Easter egg 4/7 (docs/eastereggs.md) — standard behavior on both forms
+   * as of 2026-08-22, not exclusive to the contact form. jsdom has no real
+   * Canvas 2D context, so this stops at "does the burst mount", same limit
+   * ContactForm.test.tsx documents for the same reason — the actual
+   * particle animation was verified by hand in a real browser.
+   */
+  it("bursts confetti on a real success submit", async () => {
+    let now = TOKEN_ISSUED_AT;
+    vi.spyOn(Date, "now").mockImplementation(() => now);
+    const user = userEvent.setup();
+    const { container } = renderForm();
+
+    await fillRequiredFields(user);
+    now += MIN_FILL_MS + 500;
+    await user.click(screen.getByRole("button", { name: "Bewerbung absenden" }));
+    await screen.findByRole("status");
+
+    expect(container.querySelector("canvas")).toBeInTheDocument();
+  });
+
+  it("never bursts confetti on a failed submit", async () => {
+    let now = TOKEN_ISSUED_AT;
+    vi.spyOn(Date, "now").mockImplementation(() => now);
+    mockFetchFailure();
+    const user = userEvent.setup();
+    const { container } = renderForm();
+
+    await fillRequiredFields(user);
+    now += MIN_FILL_MS + 500;
+    await user.click(screen.getByRole("button", { name: "Bewerbung absenden" }));
+    await screen.findByRole("alert");
+
+    expect(container.querySelector("canvas")).not.toBeInTheDocument();
+  });
+
+  it("never bursts confetti on success under prefers-reduced-motion", async () => {
+    mockMatchMedia(true);
+    let now = TOKEN_ISSUED_AT;
+    vi.spyOn(Date, "now").mockImplementation(() => now);
+    const user = userEvent.setup();
+    const { container } = renderForm();
+
+    await fillRequiredFields(user);
+    now += MIN_FILL_MS + 500;
+    await user.click(screen.getByRole("button", { name: "Bewerbung absenden" }));
+    await screen.findByRole("status");
+
+    expect(container.querySelector("canvas")).not.toBeInTheDocument();
   });
 
   it("has no accessibility violations", async () => {
