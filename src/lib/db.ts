@@ -138,10 +138,12 @@ export async function findApplicationById(id: string): Promise<Application | nul
   return rows.length > 0 ? toApplication(rows[0] as Record<string, unknown>) : null;
 }
 
-// Powers /admin/bewerbungen. Every field the admin list and CSV export need
-// and nothing else the board doesn't ask to see there (motivation, desired
-// areas, etc. stay out of both) — data minimisation applies to internal
-// tooling too, not just what's collected from a visitor.
+// Powers /admin/bewerbungen and its CSV export. Every field either one
+// needs. desiredAreas was deliberately left out of both until the board
+// pointed out the CSV export is how applications actually get sorted onto
+// projects — without it, the export doesn't serve the one thing it's
+// exported for. motivation and the free-text fields stay out; those were
+// never asked for.
 export type ApplicationSummary = {
   id: string;
   createdAt: Date;
@@ -149,6 +151,7 @@ export type ApplicationSummary = {
   lastName: string;
   email: string;
   studyProgram: string;
+  desiredAreas: string[];
   mailStatus: MailStatus;
   recruitingSemester: string;
 };
@@ -161,6 +164,7 @@ function toApplicationSummary(row: Record<string, unknown>): ApplicationSummary 
     lastName: row.last_name as string,
     email: row.email as string,
     studyProgram: row.study_program as string,
+    desiredAreas: row.desired_areas as string[],
     mailStatus: row.mail_status as MailStatus,
     recruitingSemester: row.recruiting_semester as string,
   };
@@ -168,7 +172,8 @@ function toApplicationSummary(row: Record<string, unknown>): ApplicationSummary 
 
 export async function listApplications(): Promise<ApplicationSummary[]> {
   const rows = await sql()`
-    select id, created_at, first_name, last_name, email, study_program, mail_status, recruiting_semester
+    select id, created_at, first_name, last_name, email, study_program, desired_areas,
+           mail_status, recruiting_semester
     from applications
     order by created_at desc
   `;
@@ -177,7 +182,8 @@ export async function listApplications(): Promise<ApplicationSummary[]> {
 
 export async function listApplicationsBySemester(recruitingSemester: string): Promise<ApplicationSummary[]> {
   const rows = await sql()`
-    select id, created_at, first_name, last_name, email, study_program, mail_status, recruiting_semester
+    select id, created_at, first_name, last_name, email, study_program, desired_areas,
+           mail_status, recruiting_semester
     from applications
     where recruiting_semester = ${recruitingSemester}
     order by created_at desc
@@ -559,6 +565,88 @@ export async function deleteCalendarEvent(id: string): Promise<boolean> {
   const rows = await sql()`
     delete from calendar_events where id = ${id} returning id
   `;
+  return rows.length > 0;
+}
+
+/**
+ * The "Wunschbereich" checkbox list on the /mitmachen application form
+ * (/admin/wunschbereiche), migrations/0010. Unlike calendar_events this
+ * table has both `active` and `sort_order` — new to this codebase, needed
+ * because the list changes every semester and the board has to be able to
+ * retire an area without touching the applications that already reference
+ * it. applications.desired_areas stores the chosen labels as plain
+ * strings, not a foreign key to this table, so nothing here can ever break
+ * a historic application.
+ */
+export type ProjectAreaRow = {
+  id: string;
+  labelDe: string;
+  labelEn: string;
+  sortOrder: number;
+  active: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type ProjectAreaInput = {
+  labelDe: string;
+  labelEn: string;
+  sortOrder: number;
+  active: boolean;
+};
+
+const PROJECT_AREA_COLUMNS = "id, label_de, label_en, sort_order, active, created_at, updated_at";
+
+function toProjectAreaRow(row: Record<string, unknown>): ProjectAreaRow {
+  return {
+    id: row.id as string,
+    labelDe: row.label_de as string,
+    labelEn: row.label_en as string,
+    sortOrder: row.sort_order as number,
+    active: row.active as boolean,
+    createdAt: row.created_at as Date,
+    updatedAt: row.updated_at as Date,
+  };
+}
+
+// Powers /admin/wunschbereiche — every area, active or not, in the board's
+// own order.
+export async function listProjectAreas(): Promise<ProjectAreaRow[]> {
+  const rows = await sql().query(`select ${PROJECT_AREA_COLUMNS} from project_areas order by sort_order asc`);
+  return (rows as Record<string, unknown>[]).map(toProjectAreaRow);
+}
+
+// Powers /mitmachen's checkbox list — only what the board has switched on,
+// in their chosen order. The one query that actually reaches an applicant.
+export async function listActiveProjectAreas(): Promise<ProjectAreaRow[]> {
+  const rows = await sql().query(
+    `select ${PROJECT_AREA_COLUMNS} from project_areas where active = true order by sort_order asc`,
+  );
+  return (rows as Record<string, unknown>[]).map(toProjectAreaRow);
+}
+
+export async function insertProjectArea(input: ProjectAreaInput): Promise<ProjectAreaRow> {
+  const rows = await sql()`
+    insert into project_areas (label_de, label_en, sort_order, active)
+    values (${input.labelDe}, ${input.labelEn}, ${input.sortOrder}, ${input.active})
+    returning id, label_de, label_en, sort_order, active, created_at, updated_at
+  `;
+  return toProjectAreaRow(rows[0] as Record<string, unknown>);
+}
+
+export async function updateProjectArea(id: string, input: ProjectAreaInput): Promise<ProjectAreaRow | null> {
+  const rows = await sql()`
+    update project_areas
+    set label_de = ${input.labelDe}, label_en = ${input.labelEn}, sort_order = ${input.sortOrder},
+        active = ${input.active}, updated_at = now()
+    where id = ${id}
+    returning id, label_de, label_en, sort_order, active, created_at, updated_at
+  `;
+  return rows.length > 0 ? toProjectAreaRow(rows[0] as Record<string, unknown>) : null;
+}
+
+export async function deleteProjectArea(id: string): Promise<boolean> {
+  const rows = await sql()`delete from project_areas where id = ${id} returning id`;
   return rows.length > 0;
 }
 

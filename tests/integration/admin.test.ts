@@ -114,6 +114,7 @@ describe("GET /api/admin/bewerbungen/csv", () => {
         lastName: "Döe",
         email: "jane@example.com",
         studyProgram: "BWL",
+        desiredAreas: ["SmileGreen", "Finance-Lead"],
         mailStatus: "sent",
         recruitingSemester: "HWS26",
       },
@@ -137,6 +138,7 @@ describe("GET /api/admin/bewerbungen/csv", () => {
 
     const body = new TextDecoder("utf-8", { ignoreBOM: true }).decode(bytes);
     expect(body).toContain("Jäne Döe");
+    expect(body).toContain("SmileGreen; Finance-Lead");
     expect(listApplicationsBySemester).toHaveBeenCalledWith("HWS26");
   });
 });

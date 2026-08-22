@@ -5,7 +5,13 @@ import { listApplicationsBySemester } from "@/lib/db";
 import { csvDocument } from "@/lib/csv";
 import { filenameSegment } from "@/lib/filenameSegment";
 
-const CSV_COLUMNS = ["Name", "E-Mail", "Studiengang", "Eingangsdatum", "Mailstatus"];
+// Wunschbereich is how the board actually sorts applications onto
+// projects, not an incidental field — it belongs in the export the same
+// way Studiengang does. Multiple selections join with "; ", not the CSV
+// delimiter (","): csvCell (lib/csv.ts) already quotes a comma-containing
+// cell safely for any CSV-aware tool, but "; " also reads cleanly for
+// someone who pastes the raw text somewhere that isn't.
+const CSV_COLUMNS = ["Name", "E-Mail", "Studiengang", "Wunschbereich", "Eingangsdatum", "Mailstatus"];
 
 const MAIL_STATUS_LABEL: Record<string, string> = {
   pending: "ausstehend",
@@ -41,6 +47,7 @@ export async function GET(request: NextRequest) {
       `${application.firstName} ${application.lastName}`,
       application.email,
       application.studyProgram,
+      application.desiredAreas.join("; "),
       dateFormatter.format(application.createdAt),
       MAIL_STATUS_LABEL[application.mailStatus] ?? application.mailStatus,
     ]),

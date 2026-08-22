@@ -10,6 +10,7 @@ function application(overrides: Partial<ApplicationSummary>): ApplicationSummary
     lastName: "Doe",
     email: "jane@example.com",
     studyProgram: "BWL",
+    desiredAreas: ["SmileGreen"],
     mailStatus: "sent",
     recruitingSemester: "HWS26",
     ...overrides,

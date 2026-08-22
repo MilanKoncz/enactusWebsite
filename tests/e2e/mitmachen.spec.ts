@@ -36,6 +36,20 @@ function mockOpenRecruitingWindow(page: Page) {
   );
 }
 
+// Same reasoning as mockOpenRecruitingWindow: CI's build has no database
+// (docs/deployment.md), so /api/project-areas would otherwise return an
+// empty list and the "SmileGreen" checkbox these tests check for would
+// never exist.
+function mockProjectAreas(page: Page) {
+  return page.route("**/api/project-areas", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ areas: [{ id: "e2e-area-1", labelDe: "SmileGreen", labelEn: "SmileGreen" }] }),
+    }),
+  );
+}
+
 // Issued 10s in the past, so ApplicationForm's minimum-fill-time gate
 // (lib/antiSpam.ts's MIN_FILL_MS, 3s) is already satisfied the moment the
 // form is filled in — no fake clock and no real waiting needed. The
@@ -131,6 +145,7 @@ test.describe("/mitmachen", () => {
     page,
   }) => {
     await mockOpenRecruitingWindow(page);
+    await mockProjectAreas(page);
     await mockFormToken(page);
     // /api/bewerbung itself is exercised by the Vitest integration suite
     // against a mocked db/mail/PDF layer — this only proves the form calls

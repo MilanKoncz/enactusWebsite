@@ -34,7 +34,7 @@ describe("MitmachenApplication", () => {
 
   it("shows the countdown and reminder sign-up before the window opens", () => {
     freezeNowAt(opensMs - 10_000);
-    renderWithIntl(<MitmachenApplication recruitingWindows={[hws26]} />);
+    renderWithIntl(<MitmachenApplication projectAreas={[]} recruitingWindows={[hws26]} />);
 
     expect(screen.getByText("Das Bewerbungsfenster ist noch geschlossen")).toBeInTheDocument();
     expect(screen.getByText("Per E-Mail erinnern lassen")).toBeInTheDocument();
@@ -43,7 +43,7 @@ describe("MitmachenApplication", () => {
 
   it("shows the real application form once the window is open", () => {
     freezeNowAt((opensMs + closesMs) / 2);
-    renderWithIntl(<MitmachenApplication recruitingWindows={[hws26]} />);
+    renderWithIntl(<MitmachenApplication projectAreas={[]} recruitingWindows={[hws26]} />);
 
     expect(screen.getByRole("button", { name: "Bewerbung absenden" })).toBeInTheDocument();
     expect(screen.queryByText("Das Bewerbungsfenster ist noch geschlossen")).not.toBeInTheDocument();
@@ -51,7 +51,7 @@ describe("MitmachenApplication", () => {
 
   it("shows a closed message without a countdown once the window has passed", () => {
     freezeNowAt(closesMs + 10_000);
-    renderWithIntl(<MitmachenApplication recruitingWindows={[hws26]} />);
+    renderWithIntl(<MitmachenApplication projectAreas={[]} recruitingWindows={[hws26]} />);
 
     expect(screen.getByText("Das Bewerbungsfenster ist für diesen Zyklus geschlossen")).toBeInTheDocument();
     expect(screen.getByText("Per E-Mail erinnern lassen")).toBeInTheDocument();
@@ -60,7 +60,7 @@ describe("MitmachenApplication", () => {
 
   it("shows a closed message without a countdown when no window is scheduled at all", () => {
     freezeNowAt(opensMs);
-    renderWithIntl(<MitmachenApplication recruitingWindows={[]} />);
+    renderWithIntl(<MitmachenApplication projectAreas={[]} recruitingWindows={[]} />);
 
     expect(screen.getByText("Das Bewerbungsfenster ist noch geschlossen")).toBeInTheDocument();
     expect(screen.getByText("Per E-Mail erinnern lassen")).toBeInTheDocument();
@@ -69,13 +69,13 @@ describe("MitmachenApplication", () => {
 
   it("has no accessibility violations while closed", async () => {
     freezeNowAt(opensMs - 10_000);
-    const { container } = renderWithIntl(<MitmachenApplication recruitingWindows={[hws26]} />);
+    const { container } = renderWithIntl(<MitmachenApplication projectAreas={[]} recruitingWindows={[hws26]} />);
     expect(await axe(container)).toHaveNoViolations();
   });
 
   it("has no accessibility violations while open", async () => {
     freezeNowAt((opensMs + closesMs) / 2);
-    const { container } = renderWithIntl(<MitmachenApplication recruitingWindows={[hws26]} />);
+    const { container } = renderWithIntl(<MitmachenApplication projectAreas={[]} recruitingWindows={[hws26]} />);
     expect(await axe(container)).toHaveNoViolations();
   });
 
@@ -87,7 +87,7 @@ describe("MitmachenApplication", () => {
     );
     // Starts closed (empty prop) — the open state only appears once the
     // mocked fetch resolves and the component adopts its result.
-    renderWithIntl(<MitmachenApplication recruitingWindows={[]} />);
+    renderWithIntl(<MitmachenApplication projectAreas={[]} recruitingWindows={[]} />);
 
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Bewerbung absenden" })).toBeInTheDocument();

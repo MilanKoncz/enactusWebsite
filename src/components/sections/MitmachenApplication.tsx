@@ -10,6 +10,7 @@ import { ReminderSignupForm } from "./ReminderSignupForm";
 import { useNow } from "@/lib/useNow";
 import { recruitingPhaseAt, currentOrNextRecruitingWindow } from "@/lib/recruitingStatus";
 import type { RecruitingWindow } from "@/content/recruiting";
+import type { PublicProjectArea } from "@/lib/projectAreas";
 
 function remainingParts(targetMs: number, nowMs: number) {
   const totalSeconds = Math.floor(Math.max(0, targetMs - nowMs) / 1000);
@@ -51,8 +52,10 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
 // regeneration.
 export function MitmachenApplication({
   recruitingWindows: initialRecruitingWindows,
+  projectAreas,
 }: {
   recruitingWindows: RecruitingWindow[];
+  projectAreas: PublicProjectArea[];
 }) {
   const t = useTranslations("MitmachenPage.application");
   const locale = useLocale();
@@ -86,7 +89,7 @@ export function MitmachenApplication({
         <SectionHeading eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
 
         {phase === "open" ? (
-          <ApplicationForm />
+          <ApplicationForm projectAreas={projectAreas} />
         ) : (
           <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-4">

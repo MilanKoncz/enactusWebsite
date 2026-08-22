@@ -5,6 +5,7 @@ import {
   CalendarDays,
   CalendarRange,
   FileText,
+  ListChecks,
   MailWarning,
   MessageSquare,
   Trash2,
@@ -41,6 +42,7 @@ export type AdminGroup = (typeof ADMIN_GROUPS)[number];
 export const ADMIN_SECTIONS = [
   { href: "/admin/bewerbungen", messageKey: "applications", icon: FileText, group: "application" },
   { href: "/admin/bewerbungsfenster", messageKey: "recruitingWindows", icon: CalendarRange, group: "application" },
+  { href: "/admin/wunschbereiche", messageKey: "projectAreas", icon: ListChecks, group: "application" },
   { href: "/admin/erinnerungen", messageKey: "reminders", icon: BellRing, group: "application" },
   { href: "/admin/kontakt", messageKey: "contactMessages", icon: MessageSquare, group: "communication" },
   { href: "/admin/mails", messageKey: "failedMails", icon: MailWarning, group: "communication" },

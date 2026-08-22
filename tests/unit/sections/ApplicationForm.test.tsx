@@ -4,9 +4,19 @@ import userEvent from "@testing-library/user-event";
 import { axe } from "jest-axe";
 import { renderWithIntl } from "../../fixtures/intl";
 import { ApplicationForm, MIN_FILL_MS } from "@/components/sections/ApplicationForm";
+import type { PublicProjectArea } from "@/lib/projectAreas";
 
 const TOKEN_ISSUED_AT = 1_700_000_000_000;
 const TOKEN = `${TOKEN_ISSUED_AT}.test-signature`;
+
+const PROJECT_AREAS: PublicProjectArea[] = [
+  { id: "area-1", labelDe: "SmileGreen", labelEn: "SmileGreen" },
+  { id: "area-2", labelDe: "Finance-Lead", labelEn: "Finance-Lead" },
+];
+
+function renderForm(projectAreas: PublicProjectArea[] = PROJECT_AREAS) {
+  return renderWithIntl(<ApplicationForm projectAreas={projectAreas} />);
+}
 
 async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("Vorname"), "Jane");
@@ -24,16 +34,20 @@ async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole("checkbox", { name: /Datenschutzerklärung/ }));
 }
 
-// Every render of ApplicationForm now fetches a timing token on mount
-// (GET /api/bewerbung/token), so every test needs *some* fetch stub in
-// place — this branches on URL, so tests that only care about the eventual
-// POST don't have to know or care that a GET happens first.
-function stubFetch(handlePost: () => Response | Promise<Response>) {
+// Every render of ApplicationForm now fetches a timing token AND the
+// project-areas list on mount (GET /api/bewerbung/token,
+// GET /api/project-areas), so every test needs *some* fetch stub in place
+// — this branches on URL, so tests that only care about the eventual POST
+// don't have to know or care that two GETs happen first.
+function stubFetch(handlePost: () => Response | Promise<Response>, projectAreas: PublicProjectArea[] = PROJECT_AREAS) {
   vi.stubGlobal(
     "fetch",
     vi.fn((url: string) => {
       if (typeof url === "string" && url.endsWith("/api/bewerbung/token")) {
         return Promise.resolve(new Response(JSON.stringify({ token: TOKEN }), { status: 200 }));
+      }
+      if (typeof url === "string" && url.endsWith("/api/project-areas")) {
+        return Promise.resolve(new Response(JSON.stringify({ areas: projectAreas }), { status: 200 }));
       }
       return Promise.resolve(handlePost());
     }),
@@ -71,7 +85,7 @@ describe("ApplicationForm", () => {
   });
 
   it("renders every field named in the /mitmachen brief", () => {
-    renderWithIntl(<ApplicationForm />);
+    renderForm();
     expect(screen.getByLabelText("Vorname")).toBeInTheDocument();
     expect(screen.getByLabelText("Nachname")).toBeInTheDocument();
     expect(screen.getByLabelText("E-Mail")).toBeInTheDocument();
@@ -87,19 +101,30 @@ describe("ApplicationForm", () => {
   });
 
   it("has no file upload input anywhere in the form", () => {
-    renderWithIntl(<ApplicationForm />);
+    renderForm();
     expect(document.querySelector('input[type="file"]')).not.toBeInTheDocument();
   });
 
-  it("lists active projects and board departments as desired-area options", () => {
-    renderWithIntl(<ApplicationForm />);
+  it("lists the desired-area options passed in via projectAreas", () => {
+    renderForm();
     expect(screen.getByRole("checkbox", { name: "SmileGreen" })).toBeInTheDocument();
     expect(screen.getByRole("checkbox", { name: "Finance-Lead" })).toBeInTheDocument();
   });
 
+  it("prefers a fresher project-areas list from GET /api/project-areas over the initial prop", async () => {
+    stubFetch(
+      () => new Response(JSON.stringify({ ok: true }), { status: 200 }),
+      [{ id: "area-3", labelDe: "ReSoap", labelEn: "ReSoap" }],
+    );
+    renderForm([{ id: "area-1", labelDe: "SmileGreen", labelEn: "SmileGreen" }]);
+
+    expect(await screen.findByRole("checkbox", { name: "ReSoap" })).toBeInTheDocument();
+    expect(screen.queryByRole("checkbox", { name: "SmileGreen" })).not.toBeInTheDocument();
+  });
+
   it("blocks submission and shows errors when required fields are empty", async () => {
     const user = userEvent.setup();
-    renderWithIntl(<ApplicationForm />);
+    renderForm();
 
     await user.click(screen.getByRole("button", { name: "Bewerbung absenden" }));
 
@@ -114,7 +139,7 @@ describe("ApplicationForm", () => {
     let now = TOKEN_ISSUED_AT;
     vi.spyOn(Date, "now").mockImplementation(() => now);
     const user = userEvent.setup();
-    renderWithIntl(<ApplicationForm />);
+    renderForm();
 
     await fillRequiredFields(user);
     // Time barely moves — well under MIN_FILL_MS since the token was issued.
@@ -130,7 +155,7 @@ describe("ApplicationForm", () => {
     let now = TOKEN_ISSUED_AT;
     vi.spyOn(Date, "now").mockImplementation(() => now);
     const user = userEvent.setup();
-    renderWithIntl(<ApplicationForm />);
+    renderForm();
 
     await fillRequiredFields(user);
     now += MIN_FILL_MS + 500;
@@ -147,7 +172,7 @@ describe("ApplicationForm", () => {
     vi.spyOn(Date, "now").mockImplementation(() => now);
     mockFetchFailure();
     const user = userEvent.setup();
-    renderWithIntl(<ApplicationForm />);
+    renderForm();
 
     await fillRequiredFields(user);
     now += MIN_FILL_MS + 500;
@@ -162,7 +187,7 @@ describe("ApplicationForm", () => {
     vi.spyOn(Date, "now").mockImplementation(() => now);
     mockFetchWindowClosed();
     const user = userEvent.setup();
-    renderWithIntl(<ApplicationForm />);
+    renderForm();
 
     await fillRequiredFields(user);
     now += MIN_FILL_MS + 500;
@@ -174,7 +199,7 @@ describe("ApplicationForm", () => {
   });
 
   it("has no accessibility violations", async () => {
-    const { container } = renderWithIntl(<ApplicationForm />);
+    const { container } = renderForm();
     expect(await axe(container)).toHaveNoViolations();
   });
 });

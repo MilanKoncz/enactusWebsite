@@ -17,16 +17,10 @@ import {
 } from "@/lib/applicationFormSchema";
 import { MIN_FILL_MS } from "@/lib/antiSpam";
 import { postJson } from "@/lib/submitForm";
-import { board } from "@/content/board";
-import { projects } from "@/content/projects";
 import { org } from "@/content/org";
+import type { PublicProjectArea } from "@/lib/projectAreas";
 
 export { MIN_FILL_MS };
-
-const desiredAreaOptions = [
-  ...projects.filter((project) => project.status === "active").map((project) => project.name),
-  ...Array.from(new Set(board.map((member) => member.role))),
-];
 
 type SubmitState = "idle" | "pending" | "success" | "error";
 
@@ -40,7 +34,7 @@ type SubmitState = "idle" | "pending" | "success" | "error";
 // attached at submit time, so /api/bewerbung can verify the real elapsed
 // fill time itself (lib/formToken.ts) instead of trusting a client-supplied
 // number, which is trivial to fake by calling the route directly.
-export function ApplicationForm() {
+export function ApplicationForm({ projectAreas: initialProjectAreas }: { projectAreas: PublicProjectArea[] }) {
   const t = useTranslations("MitmachenPage.application.form");
   const locale = useLocale();
   const [state, setState] = useState<SubmitState>("idle");
@@ -64,6 +58,24 @@ export function ApplicationForm() {
         // the same way regardless.
       });
   }, []);
+  // Same "prefer the fresh fetch, fall back to the build-time prop" shape
+  // as MitmachenApplication's own recruitingWindows handling — GET
+  // /api/project-areas is the seam e2e tests can intercept with
+  // page.route(), which a value baked into the static page at build time
+  // can't be.
+  const [projectAreas, setProjectAreas] = useState(initialProjectAreas);
+  useEffect(() => {
+    fetch("/api/project-areas")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((body: { areas?: PublicProjectArea[] } | null) => {
+        if (body?.areas) setProjectAreas(body.areas);
+      })
+      .catch(() => {
+        // Left as the build-time prop — same reasoning as the recruiting-
+        // windows fetch above.
+      });
+  }, []);
+  const desiredAreaOptions = projectAreas.map((area) => (locale === "de" ? area.labelDe : area.labelEn));
   const {
     register,
     handleSubmit,
