@@ -12,20 +12,6 @@ import { SDG_GOALS_URL } from "@/content/sdg";
 import { stats } from "@/content/ideathon";
 import type { CalendarEvent } from "@/content/calendar";
 
-// Translated, not copied, from idea.html's own hero background (a radial
-// gold glow at the upper right over a navy base, plus two faint accent
-// glows) — same rgba positions/stops/alpha values, its gold
-// (rgba(224,162,0,…)) swapped for ours (rgba(255,195,33,…) = --color-gold).
-// An inline style, not a new globals.css @utility: docs/design-system.md
-// names `.signature-gradient` as a single, contained exception and this
-// is a different visual (a corner glow, not a navy-to-gold plateau) scoped
-// to one page's hero, the same way HomeHero.tsx's own video scrim is a
-// plain overlay div rather than a shared utility.
-const HERO_GRADIENT =
-  "radial-gradient(120% 90% at 80% 0%, rgba(255,195,33,0.18), transparent 55%), " +
-  "radial-gradient(circle at 20% 80%, rgba(255,255,255,0.04), transparent 40%), " +
-  "radial-gradient(circle at 90% 30%, rgba(255,195,33,0.08), transparent 35%)";
-
 /**
  * The page's one h1, on ink rather than the plain-paper SectionHeading
  * intro every other subpage opens with (EventsIntro.tsx and siblings) — a
@@ -44,9 +30,7 @@ export function IdeathonHero({ nextEvent }: { nextEvent: CalendarEvent | null })
   const format = useFormatter();
 
   return (
-    <Section surface="ink" className="relative isolate overflow-hidden">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ backgroundImage: HERO_GRADIENT }} />
-
+    <Section surface="ink" className="relative isolate overflow-hidden corner-glow">
       <Container className="relative flex flex-col gap-10">
         <div className="flex flex-col gap-6">
           <Eyebrow>{t("eyebrow")}</Eyebrow>

@@ -123,8 +123,10 @@ describe("design tokens: color contrast", () => {
     expect(passesAA(contrastRatio("#ffeb3b", paper))).toBe(false);
   });
 
-  // .signature-gradient (globals.css) — the shared navy-to-gold background
-  // on /events' Journeys section and /projekte's active-projects section.
+  // .signature-gradient (globals.css) — the shared navy-to-gold background,
+  // originally on both /events' Journeys section and /projekte's
+  // active-projects section, now (2026-08-25) only the latter — Journeys
+  // moved to .corner-glow instead, tested in its own describe block below.
   // Redone a fifth time 2026-08-21: every sRGB-interpolated version (see git
   // history) crossed a desaturated olive belt partway through, because a
   // straight sRGB line between a dark blue and a gold always does — widening
@@ -199,14 +201,16 @@ describe("design tokens: color contrast", () => {
     // quote directly — one shared curve now, so one sweep covers both axes.
     const SAMPLE_POINTS = [0, 16.67, 33.33, 50, 66.67, 83.33, 100];
 
-    // Real measured text edges — box positions are unchanged from the
+    // Real measured text edge — box position is unchanged from the
     // previous version (no layout moved, only the color function did), so
-    // the same Playwright-measured percentages still describe where each
-    // text block actually sits.
+    // the same Playwright-measured percentage still describes where this
+    // text block actually sits. The three JourneysSection-specific edges
+    // that used to live here (768px/1280px heading+lead right edge, and the
+    // below-md heading+lead block bottom) were removed 2026-08-25 along
+    // with Journeys' own move to .corner-glow — they no longer describe
+    // any real text sitting on this gradient. ProjectsActive is the only
+    // remaining consumer.
     const REAL_TEXT_EDGES: Array<{ label: string; pct: number }> = [
-      { label: "768px heading/lead right edge", pct: 69.8 },
-      { label: "1280px heading/lead right edge", pct: 43.1 },
-      { label: "JourneysSection heading+lead block bottom (below md)", pct: 41.2 },
       { label: "ProjectsActive label bottom (below md)", pct: 8.7 },
     ];
 
@@ -280,6 +284,55 @@ describe("design tokens: color contrast", () => {
         expect(headingBodyRatio).toBeGreaterThan(1);
         expect(eyebrowRatio).toBeGreaterThan(1);
       }
+    });
+  });
+
+  // .corner-glow (globals.css) — the radial gold-over-ink glow on
+  // /ideathon's hero and (2026-08-25) /events' Journeys section, in place
+  // of .signature-gradient there. Unlike that gradient, this one has no
+  // stop curve to sweep: it's a translucent color composited once, at its
+  // one worst-case (highest-alpha) point, over the section's own solid ink
+  // background — see the utility's own comment in globals.css for why that
+  // single peak is the only point that needs checking.
+  describe(".corner-glow: a translucent gold glow over solid ink, peak alpha checked directly", () => {
+    const css = readFileSync(resolve(process.cwd(), "src/app/globals.css"), "utf-8");
+    const declaration = css.match(/@utility corner-glow \{[\s\S]*?\n\}/)?.[0] ?? "";
+
+    it("declares three radial layers at the documented alpha values, no color-mix()", () => {
+      expect(declaration).toContain("radial-gradient(120% 90% at 80% 0%, rgba(255, 195, 33, 0.38)");
+      expect(declaration).toContain("radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.06)");
+      expect(declaration).toContain("radial-gradient(circle at 90% 30%, rgba(255, 195, 33, 0.18)");
+      expect(declaration).not.toContain("color-mix");
+    });
+
+    it("paper text clears 4.5:1 against the primary glow's exact peak, composited over --color-ink", () => {
+      const peak = blendOverBackground(gold, 0.38, ink);
+      const ratio = contrastRatio(paper, peak);
+      expect(passesAA(ratio)).toBe(true);
+      expect(ratio).toBeGreaterThan(WCAG_AA_NORMAL_TEXT + 2);
+    });
+
+    it("paper text clears 4.5:1 against the two accent glows' peaks too", () => {
+      const whiteFleckPeak = blendOverBackground("#ffffff", 0.06, ink);
+      const goldFleckPeak = blendOverBackground(gold, 0.18, ink);
+      expect(passesAA(contrastRatio(paper, whiteFleckPeak))).toBe(true);
+      expect(passesAA(contrastRatio(paper, goldFleckPeak))).toBe(true);
+    });
+
+    // Full-opacity text clears the peak with real margin (previous test),
+    // but muted/Eyebrow-weight text (60% opacity) does not — the same
+    // "flat zone only" constraint .signature-gradient's own eyebrow test
+    // documents, just drawn around a small radial peak instead of a wide
+    // flat zone. Every current Eyebrow on a .corner-glow section
+    // (IdeathonHero.tsx's own eyebrow and its countdown/stats labels,
+    // JourneysSection.tsx's) renders top-left, centered, or well below the
+    // glow's small upper-right extent, never inside it — a future
+    // placement has to keep that true rather than assume this glow is safe
+    // for muted text the way the flat ink base elsewhere on the section is.
+    it("documents that muted (60%-opacity) text does NOT clear 4.5:1 at the peak — so no consumer may place one there", () => {
+      const peak = blendOverBackground(gold, 0.38, ink);
+      const muted = blendOverBackground(paper, 0.6, peak);
+      expect(passesAA(contrastRatio(muted, peak))).toBe(false);
     });
   });
 

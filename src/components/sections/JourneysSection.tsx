@@ -22,28 +22,19 @@ export function JourneysSection() {
   const t = useTranslations("JourneysSection");
 
   return (
-    <Section surface="ink" className="relative isolate signature-gradient">
+    <Section surface="ink" className="relative isolate corner-glow">
       <Container className="relative flex flex-col gap-10">
-        {/* max-w-lg: the heading sits directly on the gradient now (no
-            opaque card, per the board's 2026-08-19 follow-up), in paper —
-            see .signature-gradient's comment in globals.css for the stop
-            weighting this width is bounded to stay inside. surface="ink"
-            above gives the section (and this currentColor-based heading)
-            paper as its base text color, and Eyebrow's own opacity-60 is
-            already verified against a flat ink background in
-            tests/unit/contrast.test.ts.
-
-            Box-width arithmetic .signature-gradient's comment refers to:
-            below `sm` the lead paragraph doesn't fit on one line, and a
-            wrapped block's shrink-to-fit width fills essentially the whole
-            available column regardless of max-w-lg (512px never binds
-            below ~600px of available space) — measured with Playwright,
-            the heading block's right edge lands at 95.6% of the section
-            width at a 360px viewport and 95.9% at 390px. From `md` up
-            (768px container, 1280px container) max-w-lg actually binds,
-            and the block's right edge falls back to 69.8% / 43.1%. All
-            four are asserted against the gradient's real stops in
-            tests/unit/contrast.test.ts. */}
+        {/* max-w-lg: kept for plain layout tidiness (an unconstrained lead
+            paragraph reads too wide on a big screen), not for gradient
+            contrast the way it was under .signature-gradient (moved off
+            2026-08-25 to .corner-glow — see that utility's own comment in
+            globals.css). .corner-glow's base is solid ink everywhere; the
+            glow itself never gets bright enough to threaten text contrast,
+            so nothing here needs to be bounded to stay inside a safe zone
+            the way it did before. surface="ink" above gives the section
+            (and this currentColor-based heading) paper as its base text
+            color, and Eyebrow's own opacity-60 is already verified against
+            a flat ink background in tests/unit/contrast.test.ts. */}
         <SectionHeading
           eyebrow={t("eyebrow")}
           title={t("title")}
@@ -57,8 +48,8 @@ export function JourneysSection() {
             // the old opaque bg-paper block. Opaque on purpose: unlike the
             // heading above, these cards aren't width-bounded (the grid
             // fills the full row from `sm` up), so they can land anywhere
-            // across the gradient, including the gold end, without ever
-            // needing to justify their own contrast against it.
+            // across the section without ever needing to justify their own
+            // contrast against whatever's behind them.
             <li key={trip.key} className="border-l-2 border-gold bg-ink px-4 py-3">
               <p className="font-mono text-mono-xs uppercase opacity-60">
                 {seasonLabel(trip.key)} {trip.year}

@@ -105,13 +105,17 @@ Playwright · Vercel (`fra1`) · Vercel Analytics
 
 Light editorial body (`--color-paper`), punctuated by full-bleed dark sections
 (`--color-ink`). Gold is the signature, used sparingly and precisely — never a
-background wash, never a gradient blob, with one deliberate, named exception:
+background wash, never a gradient blob, with two deliberate, named exceptions:
 `.signature-gradient` (`globals.css`), a weighted navy-to-gold background
-requested directly by the board for /events' Journeys section and
+originally requested by the board for /events' Journeys section and
 /projekte's active-projects section (2026-08-19) — real, unmixed tokens at
 both ends, not a muted wash; a wide flat navy plateau carries the text and
-gold only ramps in near the right edge. Contained to that single token, not
-a precedent for a second one. Lilita One for headlines only, Geist for
+gold only ramps in near the right edge — and, since 2026-08-25,
+`.corner-glow` (`globals.css`), a soft radial gold glow over solid ink,
+translated from the board's own idea.html draft, used on /ideathon's hero
+and, replacing `.signature-gradient` there, /events' Journeys section.
+Contained to these two named tokens, not a precedent for a third one without
+the same kind of direct request. Lilita One for headlines only, Geist for
 everything else, Geist Mono for eyebrows and figures. The recurring motif is
 the **gate marker**: a thin vertical gold rule with a mono label, drawn from the
 organisation's own stage-gate process. One motif, carried consistently.
