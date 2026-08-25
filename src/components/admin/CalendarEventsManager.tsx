@@ -26,6 +26,7 @@ export type ManagedCalendarEvent = {
   description: string | null;
   descriptionEn: string | null;
   tentative: boolean;
+  internalLink: string | null;
 };
 
 type Draft = {
@@ -40,6 +41,7 @@ type Draft = {
   description: string;
   descriptionEn: string;
   tentative: boolean;
+  internalLink: string;
 };
 
 const EMPTY_DRAFT: Draft = {
@@ -54,6 +56,7 @@ const EMPTY_DRAFT: Draft = {
   description: "",
   descriptionEn: "",
   tentative: false,
+  internalLink: "",
 };
 
 function toDraft(event: ManagedCalendarEvent): Draft {
@@ -69,6 +72,7 @@ function toDraft(event: ManagedCalendarEvent): Draft {
     description: event.description ?? "",
     descriptionEn: event.descriptionEn ?? "",
     tentative: event.tentative,
+    internalLink: event.internalLink ?? "",
   };
 }
 
@@ -123,6 +127,7 @@ export function CalendarEventsManager({ events }: { events: ManagedCalendarEvent
         if (key === "startDate") next.startDate = t("errorStartDateRequired");
         if (key === "endDate") next.endDate = t("errorEndBeforeStart");
         if (key === "endTime") next.endTime = t("errorEndTimeInvalid");
+        if (key === "internalLink") next.internalLink = t("errorInternalLinkInvalid");
       }
       setFieldErrors(next);
       return;
@@ -284,6 +289,15 @@ export function CalendarEventsManager({ events }: { events: ManagedCalendarEvent
           label={t("locationLabel")}
           value={draft.location}
           onChange={(event) => setDraft({ ...draft, location: event.target.value })}
+        />
+
+        <Field
+          label={t("internalLinkLabel")}
+          hint={t("internalLinkHint")}
+          placeholder="/ideathon"
+          value={draft.internalLink}
+          onChange={(event) => setDraft({ ...draft, internalLink: event.target.value })}
+          error={fieldErrors.internalLink}
         />
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">

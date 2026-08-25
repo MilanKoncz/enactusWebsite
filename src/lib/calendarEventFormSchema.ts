@@ -40,6 +40,17 @@ function optionalTime() {
   );
 }
 
+// Same "" -> undefined -> null-in-the-DB arrangement as the other optional
+// fields above. startsWith("/") matches content/calendar.ts's schema and
+// content/navigation.ts's hrefSchema — a path on this site, not an external
+// URL (an external link belongs in the event's description text, not here).
+function optionalInternalLink() {
+  return z.preprocess(
+    (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+    z.string().trim().startsWith("/").max(200).optional(),
+  );
+}
+
 export const calendarEventFormSchema = z
   .object({
     title: z.string().trim().min(1).max(200),
@@ -53,6 +64,7 @@ export const calendarEventFormSchema = z
     description: optionalTrimmedString(600),
     descriptionEn: optionalTrimmedString(600),
     tentative: z.boolean(),
+    internalLink: optionalInternalLink(),
   })
   .refine((event) => event.endDate === undefined || event.endDate >= event.startDate, {
     message: "end date must not be before the start date",

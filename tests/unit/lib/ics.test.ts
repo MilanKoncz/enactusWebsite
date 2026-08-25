@@ -18,6 +18,7 @@ function event(overrides: Partial<CalendarEvent>): CalendarEvent {
     description: null,
     descriptionEn: null,
     tentative: false,
+    internalLink: null,
     ...overrides,
   };
 }

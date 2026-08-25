@@ -190,6 +190,7 @@
     "emptyFiltered": "No events match this selection.",
     "tentativeLabel": "Date not yet confirmed",
     "addToCalendar": "Add to calendar",
+    "eventPageLink": "Go to event page",
     "highlight": {
       "eyebrow": "Next up",
       "today": "today",
@@ -1361,6 +1362,8 @@
       "startTimeLabel": "Start time",
       "endTimeLabel": "End time",
       "locationLabel": "Location",
+      "internalLinkLabel": "Internal link (optional)",
+      "internalLinkHint": "A path on this site, e.g. /ideathon — links the event to its own page.",
       "descriptionLabel": "Description",
       "descriptionEnLabel": "Description (English)",
       "tentativeLabel": "Date not yet confirmed",
@@ -1375,6 +1378,7 @@
       "errorStartDateRequired": "Please give a start date.",
       "errorEndBeforeStart": "The end date must not be before the start date.",
       "errorEndTimeInvalid": "The end time must be after the start time (or on a later end date).",
+      "errorInternalLinkInvalid": "The internal link must start with /, e.g. /ideathon.",
       "columns": {
         "date": "Date",
         "title": "Title",

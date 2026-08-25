@@ -451,6 +451,7 @@ export type CalendarEventRow = {
   description: string | null;
   descriptionEn: string | null;
   tentative: boolean;
+  internalLink: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -467,6 +468,7 @@ export type CalendarEventInput = {
   description?: string;
   descriptionEn?: string;
   tentative: boolean;
+  internalLink?: string;
 };
 
 // date/time columns are cast to text in every select below rather than left
@@ -478,7 +480,7 @@ export type CalendarEventInput = {
 const CALENDAR_EVENT_COLUMNS = `
   id, title, title_en, category, start_date::text as start_date,
   end_date::text as end_date, start_time::text as start_time, end_time::text as end_time,
-  location, description, description_en, tentative, created_at, updated_at
+  location, description, description_en, tentative, internal_link, created_at, updated_at
 `;
 
 function toCalendarEventRow(row: Record<string, unknown>): CalendarEventRow {
@@ -497,6 +499,7 @@ function toCalendarEventRow(row: Record<string, unknown>): CalendarEventRow {
     description: (row.description as string | null) ?? null,
     descriptionEn: (row.description_en as string | null) ?? null,
     tentative: row.tentative as boolean,
+    internalLink: (row.internal_link as string | null) ?? null,
     createdAt: row.created_at as Date,
     updatedAt: row.updated_at as Date,
   };
@@ -518,12 +521,12 @@ export async function insertCalendarEvent(input: CalendarEventInput): Promise<Ca
   const rows = await sql()`
     insert into calendar_events (
       title, title_en, category, start_date, end_date, start_time, end_time,
-      location, description, description_en, tentative
+      location, description, description_en, tentative, internal_link
     ) values (
       ${input.title}, ${input.titleEn ?? null}, ${input.category}, ${input.startDate},
       ${input.endDate ?? null}, ${input.startTime ?? null}, ${input.endTime ?? null},
       ${input.location ?? null}, ${input.description ?? null}, ${input.descriptionEn ?? null},
-      ${input.tentative}
+      ${input.tentative}, ${input.internalLink ?? null}
     )
     returning id
   `;
@@ -553,6 +556,7 @@ export async function updateCalendarEvent(
       description = ${input.description ?? null},
       description_en = ${input.descriptionEn ?? null},
       tentative = ${input.tentative},
+      internal_link = ${input.internalLink ?? null},
       updated_at = now()
     where id = ${id}
     returning id

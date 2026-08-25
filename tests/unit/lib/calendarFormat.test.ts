@@ -21,6 +21,7 @@ function event(overrides: Partial<CalendarEvent> & Pick<CalendarEvent, "startDat
     description: null,
     descriptionEn: null,
     tentative: false,
+    internalLink: null,
     ...overrides,
   };
 }

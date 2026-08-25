@@ -190,6 +190,7 @@
     "emptyFiltered": "Keine Termine für diese Auswahl.",
     "tentativeLabel": "Termin steht noch nicht fest",
     "addToCalendar": "Zum Kalender hinzufügen",
+    "eventPageLink": "Zur Veranstaltungsseite",
     "highlight": {
       "eyebrow": "Nächster Termin",
       "today": "heute",
@@ -1361,6 +1362,8 @@
       "startTimeLabel": "Startzeit",
       "endTimeLabel": "Endzeit",
       "locationLabel": "Ort",
+      "internalLinkLabel": "Interner Link (optional)",
+      "internalLinkHint": "Pfad auf dieser Website, z. B. /ideathon — verknüpft den Termin mit seiner eigenen Seite.",
       "descriptionLabel": "Beschreibung",
       "descriptionEnLabel": "Beschreibung (Englisch)",
       "tentativeLabel": "Termin steht noch nicht fest",
@@ -1375,6 +1378,7 @@
       "errorStartDateRequired": "Bitte gib ein Startdatum an.",
       "errorEndBeforeStart": "Das Enddatum darf nicht vor dem Startdatum liegen.",
       "errorEndTimeInvalid": "Die Endzeit muss nach der Startzeit liegen (oder erst am Enddatum).",
+      "errorInternalLinkInvalid": "Der interne Link muss mit / beginnen, z. B. /ideathon.",
       "columns": {
         "date": "Datum",
         "title": "Titel",

@@ -1,6 +1,8 @@
-import { CalendarPlus, MapPin } from "lucide-react";
+import type { ComponentProps } from "react";
+import { ArrowRight, CalendarPlus, MapPin } from "lucide-react";
 import { buttonClasses } from "@/components/ui/Button";
 import { CategoryBadge } from "@/components/ui/CategoryBadge";
+import { Link } from "@/lib/navigation";
 import { cn } from "@/lib/cn";
 import { formatEventDate, formatEventTime } from "@/lib/calendarFormat";
 import type { CalendarEvent } from "@/content/calendar";
@@ -30,6 +32,21 @@ export function EventMeta({ event }: { event: CalendarEvent }) {
 
 export function TentativeNote({ label }: { label: string }) {
   return <p className="text-body-s opacity-60">{label}</p>;
+}
+
+// A board-entered path (calendar_events.internal_link, validated only as
+// "starts with /") rather than one of routing.ts's statically known
+// pathnames keys, so next-intl's Link can't verify it at compile time the
+// way every other Link callsite on this site can — cast, not a type hole:
+// an admin typo just produces a link that isn't locale-prefixed correctly,
+// never a crash, and the field only exists to link to pages on this site.
+export function EventPageLink({ href, label, size }: { href: string; label: string; size: "sm" | "md" }) {
+  return (
+    <Link href={href as ComponentProps<typeof Link>["href"]} className={buttonClasses("secondary", size, "self-start")}>
+      {label}
+      <ArrowRight aria-hidden="true" className="size-4 shrink-0" />
+    </Link>
+  );
 }
 
 // A real <a href download>, not Button's href branch — Button routes an
@@ -70,12 +87,14 @@ export function EventRow({
   locale,
   tentativeLabel,
   addToCalendarLabel,
+  eventPageLabel,
 }: {
   event: CalendarEvent;
   past: boolean;
   locale: string;
   tentativeLabel: string;
   addToCalendarLabel: string;
+  eventPageLabel: string;
 }) {
   return (
     <li
@@ -95,9 +114,12 @@ export function EventRow({
         <EventMeta event={event} />
       </div>
       {event.tentative && <TentativeNote label={tentativeLabel} />}
-      {/* Adding a past event to a calendar app has no use — the button
-          only appears once a row is still ahead of "today". */}
-      {!past && <AddToCalendarLink eventId={event.id} label={addToCalendarLabel} size="sm" />}
+      <div className="flex flex-wrap gap-2">
+        {/* Adding a past event to a calendar app has no use — the button
+            only appears once a row is still ahead of "today". */}
+        {!past && <AddToCalendarLink eventId={event.id} label={addToCalendarLabel} size="sm" />}
+        {event.internalLink && <EventPageLink href={event.internalLink} label={eventPageLabel} size="sm" />}
+      </div>
     </li>
   );
 }

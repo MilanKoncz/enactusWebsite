@@ -38,6 +38,7 @@ async function loadCalendarEvents(): Promise<CalendarEvent[]> {
       description: row.description,
       descriptionEn: row.descriptionEn,
       tentative: row.tentative,
+      internalLink: row.internalLink,
     }));
   } catch (error) {
     console.error("Failed to load calendar events", error);

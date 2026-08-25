@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { CATEGORY_BAR_CLASS, CategoryBadge } from "@/components/ui/CategoryBadge";
-import { AddToCalendarLink, EventMeta, TentativeNote } from "@/components/ui/EventDetails";
+import { AddToCalendarLink, EventMeta, EventPageLink, TentativeNote } from "@/components/ui/EventDetails";
 import { cn } from "@/lib/cn";
 import { useNow } from "@/lib/useNow";
 import { formatEventDate, formatMonthHeading, parseDateOnly } from "@/lib/calendarFormat";
@@ -98,9 +98,12 @@ function AgendaRow({
             <EventMeta event={event} />
           </div>
           {event.tentative && <TentativeNote label={t("tentativeLabel")} />}
-          {/* Adding a past event to a calendar app has no use — the button
-              only appears once a row is still ahead of "today". */}
-          {!past && <AddToCalendarLink eventId={event.id} label={t("addToCalendar")} size="sm" />}
+          <div className="flex flex-wrap gap-2">
+            {/* Adding a past event to a calendar app has no use — the button
+                only appears once a row is still ahead of "today". */}
+            {!past && <AddToCalendarLink eventId={event.id} label={t("addToCalendar")} size="sm" />}
+            {event.internalLink && <EventPageLink href={event.internalLink} label={t("eventPageLink")} size="sm" />}
+          </div>
         </div>
       )}
     </li>

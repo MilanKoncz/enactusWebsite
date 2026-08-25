@@ -80,4 +80,21 @@ describe("calendarEventFormSchema", () => {
   it("rejects an unknown category", () => {
     expect(calendarEventFormSchema.safeParse({ ...BASE, category: "sponsoring" }).success).toBe(false);
   });
+
+  it("treats an empty internal link as absent", () => {
+    const result = calendarEventFormSchema.safeParse({ ...BASE, internalLink: "" });
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.internalLink).toBeUndefined();
+  });
+
+  it("accepts an internal link starting with /", () => {
+    const result = calendarEventFormSchema.safeParse({ ...BASE, internalLink: "/ideathon" });
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.internalLink).toBe("/ideathon");
+  });
+
+  it("rejects an internal link that isn't a site-relative path", () => {
+    const result = calendarEventFormSchema.safeParse({ ...BASE, internalLink: "https://example.com" });
+    expect(result.success).toBe(false);
+  });
 });

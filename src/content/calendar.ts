@@ -53,6 +53,12 @@ export const calendarEventSchema = z
     description: z.string().min(1).nullable(),
     descriptionEn: z.string().min(1).nullable(),
     tentative: z.boolean(),
+    // General-purpose, board-settable pointer to a page on this site (e.g.
+    // the Ideathon event links to /ideathon) — see migrations/0012's
+    // comment. Same shape as content/navigation.ts's hrefSchema, on purpose:
+    // it's the same kind of value, just optional and stored per row instead
+    // of in the fixed route table.
+    internalLink: z.string().startsWith("/").nullable(),
   })
   .refine((event) => event.endDate === null || event.endDate >= event.startDate, {
     message: "end date must not be before the start date",

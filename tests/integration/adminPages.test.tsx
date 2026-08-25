@@ -166,6 +166,7 @@ const CALENDAR_EVENT = {
   description: null,
   descriptionEn: null,
   tentative: false,
+  internalLink: null,
   createdAt: new Date("2026-08-01T10:00:00Z"),
   updatedAt: new Date("2026-08-01T10:00:00Z"),
 };

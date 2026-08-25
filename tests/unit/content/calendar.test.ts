@@ -14,6 +14,7 @@ const BASE_EVENT = {
   description: null,
   descriptionEn: null,
   tentative: false,
+  internalLink: null,
 };
 
 describe("content/calendar", () => {
@@ -78,5 +79,17 @@ describe("content/calendar", () => {
 
   it("rejects a malformed date", () => {
     expect(() => calendarEventSchema.parse({ ...BASE_EVENT, startDate: "01.09.2026" })).toThrow();
+  });
+
+  it("accepts a null internal link", () => {
+    expect(() => calendarEventSchema.parse({ ...BASE_EVENT, internalLink: null })).not.toThrow();
+  });
+
+  it("accepts an internal link starting with /", () => {
+    expect(() => calendarEventSchema.parse({ ...BASE_EVENT, internalLink: "/ideathon" })).not.toThrow();
+  });
+
+  it("rejects an internal link that isn't a site-relative path", () => {
+    expect(() => calendarEventSchema.parse({ ...BASE_EVENT, internalLink: "https://example.com" })).toThrow();
   });
 });

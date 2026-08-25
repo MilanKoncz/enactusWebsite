@@ -21,6 +21,7 @@ const EVENT = {
   description: null,
   descriptionEn: null,
   tentative: false,
+  internalLink: null,
 };
 
 function request(url: string) {

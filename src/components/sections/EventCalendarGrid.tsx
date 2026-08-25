@@ -451,6 +451,7 @@ export function EventCalendarGrid({ events, initialNowMs }: EventCalendarGridPro
                   locale={locale}
                   tentativeLabel={t("tentativeLabel")}
                   addToCalendarLabel={t("addToCalendar")}
+                  eventPageLabel={t("eventPageLink")}
                 />
               ))}
             </ul>
