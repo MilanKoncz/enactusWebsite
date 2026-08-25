@@ -28,10 +28,10 @@ export function IdeathonSteps({ nextEvent }: { nextEvent: CalendarEvent | null }
             </li>
           ))}
         </ol>
-        <p className="max-w-2xl rounded-md border border-gold/40 bg-gold/10 px-6 py-4 text-body-s">
+        <p className="mx-auto max-w-2xl rounded-md border border-gold/40 bg-gold/10 px-6 py-4 text-center text-body-s">
           {t("commitmentNote")}
         </p>
-        <div className="max-w-2xl">
+        <div className="mx-auto w-full max-w-2xl">
           {nextEvent ? (
             <IdeathonSignupForm />
           ) : (

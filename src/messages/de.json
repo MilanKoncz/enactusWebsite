@@ -518,7 +518,8 @@
       "eyebrow": "Enactus Mannheim · Ideathon 2026",
       "title": "Von der Idee zum <em>Pitch</em>.",
       "lead": "Vier Tage. Ein Team. Deine Idee, die etwas bewegt. Der Ideathon ist dein Fast-Track ins unternehmerische Machen, offen für alle Studierenden, ganz ohne Vorerfahrung.",
-      "sdgNote": "Eure Ideen drehen sich um die drei Säulen der UN-Nachhaltigkeitsziele: People, Planet, Prosperity. Mehr dazu bei den <sdgLink>UN-Nachhaltigkeitszielen</sdgLink>.",
+      "sdgEyebrow": "People · Planet · Prosperity",
+      "sdgNote": "Eure Ideen drehen sich um die drei Säulen der UN-Nachhaltigkeitsziele. Mehr dazu bei den <sdgLink>UN-Nachhaltigkeitszielen</sdgLink>.",
       "whenLabel": "Wann",
       "whereLabel": "Wo",
       "prizeLabel": "Preisgeld",
@@ -532,7 +533,7 @@
       "hours": "Std",
       "minutes": "Min",
       "seconds": "Sek",
-      "daysOnly": "noch {days, plural, one {# Tag} other {# Tage}}",
+      "daysOnly": "{days, plural, one {# Tag} other {# Tage}}",
       "quietEyebrow": "Ideathon 2026",
       "quietTitle": "Der nächste Termin steht noch nicht fest",
       "quietBody": "Sobald der Vorstand einen neuen Termin im Kalender einträgt, erscheint hier der Countdown."

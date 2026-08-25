@@ -518,7 +518,8 @@
       "eyebrow": "Enactus Mannheim · Ideathon 2026",
       "title": "From idea to <em>pitch</em>.",
       "lead": "Four days. One team. Your idea, making a real difference. The Ideathon is your fast track into entrepreneurial doing, open to every student, no prior experience needed.",
-      "sdgNote": "Your ideas revolve around the three pillars of the UN Sustainable Development Goals: People, Planet, Prosperity. More at the <sdgLink>UN Sustainable Development Goals</sdgLink>.",
+      "sdgEyebrow": "People · Planet · Prosperity",
+      "sdgNote": "Your ideas revolve around the three pillars of the UN Sustainable Development Goals. More at the <sdgLink>UN Sustainable Development Goals</sdgLink>.",
       "whenLabel": "When",
       "whereLabel": "Where",
       "prizeLabel": "Prize money",
@@ -532,7 +533,7 @@
       "hours": "Hrs",
       "minutes": "Min",
       "seconds": "Sec",
-      "daysOnly": "{days, plural, one {# day} other {# days}} to go",
+      "daysOnly": "{days, plural, one {# day} other {# days}}",
       "quietEyebrow": "Ideathon 2026",
       "quietTitle": "The next date isn't set yet",
       "quietBody": "Once the board adds a new date to the calendar, the countdown will appear here."

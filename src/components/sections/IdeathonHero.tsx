@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Image from "next/image";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { buttonClasses } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
@@ -8,9 +9,11 @@ import { IdeathonCountdown } from "@/components/sections/IdeathonCountdown";
 import { AnimatedFigure, useSeenOnce } from "@/components/motion/AnimatedFigure";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { formatEventDate } from "@/lib/calendarFormat";
-import { SDG_GOALS_URL } from "@/content/sdg";
+import { SDG_GOAL_COUNT, SDG_GOALS_URL, sdgIconSrc } from "@/content/sdg";
 import { stats } from "@/content/ideathon";
 import type { CalendarEvent } from "@/content/calendar";
+
+const SDG_GOAL_NUMBERS = Array.from({ length: SDG_GOAL_COUNT }, (_, i) => i + 1);
 
 /**
  * The page's one h1, on ink rather than the plain-paper SectionHeading
@@ -31,14 +34,28 @@ export function IdeathonHero({ nextEvent }: { nextEvent: CalendarEvent | null })
 
   return (
     <Section surface="ink" className="relative isolate overflow-hidden corner-glow">
-      <Container className="relative flex flex-col gap-10">
+      <Container className="relative flex flex-col gap-10 pb-10 md:pb-16">
         <div className="flex flex-col gap-6">
           <Eyebrow>{t("eyebrow")}</Eyebrow>
           <h1 className="max-w-3xl text-display-2 font-display break-words">
             {t.rich("title", { em: (chunks) => <span className="text-gold">{chunks}</span> })}
           </h1>
           <p className="max-w-2xl text-body-l opacity-80">{t("lead")}</p>
-          <p className="max-w-2xl text-body-s opacity-70">
+          {locale === "en" && <p className="max-w-2xl text-body-s opacity-70">{t("languageNote")}</p>}
+        </div>
+
+        {/* Its own block, not a trailing muted line: the board asked this to
+            read as a real theme, not an afterthought, so it gets an Eyebrow
+            label plus the full set of official SDG icons (unmodified, per
+            the UN's own usage guidelines — same convention as
+            ProjectDetailContent.tsx). Decorative (empty alt) and not
+            individually linked: unlike a project's sdgFocus, these 17 don't
+            each represent a fact specific to this event, only the UN's
+            three-pillar framing named in sdgNote, which carries the one real
+            link (SDG_GOALS_URL) that matters here. */}
+        <div className="flex max-w-2xl flex-col gap-3 border-t border-paper/10 pt-6">
+          <Eyebrow>{t("sdgEyebrow")}</Eyebrow>
+          <p className="text-body-s opacity-80">
             {t.rich("sdgNote", {
               sdgLink: (chunks) => (
                 <a
@@ -52,7 +69,18 @@ export function IdeathonHero({ nextEvent }: { nextEvent: CalendarEvent | null })
               ),
             })}
           </p>
-          {locale === "en" && <p className="max-w-2xl text-body-s opacity-70">{t("languageNote")}</p>}
+          <div className="flex flex-wrap gap-2">
+            {SDG_GOAL_NUMBERS.map((goal) => (
+              <Image
+                key={goal}
+                src={sdgIconSrc(goal)}
+                alt=""
+                width={32}
+                height={32}
+                className="rounded-sm opacity-90"
+              />
+            ))}
+          </div>
         </div>
 
         <div className="flex flex-wrap gap-10">
