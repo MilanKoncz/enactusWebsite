@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { findNextIdeathonEvent, ideathonStartInstant, isIdeathonEvent } from "@/lib/ideathonEvent";
+import {
+  findCurrentIdeathonEvent,
+  findNextIdeathonEvent,
+  ideathonStartInstant,
+  isIdeathonEvent,
+} from "@/lib/ideathonEvent";
 import type { CalendarEvent } from "@/content/calendar";
 
 // Midday in Berlin (CEST, +02:00) — well clear of any midnight boundary.
@@ -66,5 +71,40 @@ describe("findNextIdeathonEvent", () => {
 
   it("returns null when nothing is upcoming", () => {
     expect(findNextIdeathonEvent([], NOW)).toBeNull();
+  });
+});
+
+describe("findCurrentIdeathonEvent", () => {
+  it("returns a multi-day row that today falls inside", () => {
+    // NOW is 2026-09-05; the event runs 09-01 through 09-10.
+    const running = event({ startDate: "2026-09-01", endDate: "2026-09-10" });
+    expect(findCurrentIdeathonEvent([running], NOW)).toBe(running);
+  });
+
+  it("returns null for a row that hasn't started yet", () => {
+    const upcoming = event({ startDate: "2026-09-24" });
+    expect(findCurrentIdeathonEvent([upcoming], NOW)).toBeNull();
+  });
+
+  it("returns null for a row that has already ended", () => {
+    const past = event({ startDate: "2026-08-01", endDate: "2026-08-04" });
+    expect(findCurrentIdeathonEvent([past], NOW)).toBeNull();
+  });
+
+  it("treats a single-day row (no endDate) as running only on its start date", () => {
+    const today = event({ startDate: "2026-09-05" });
+    expect(findCurrentIdeathonEvent([today], NOW)).toBe(today);
+
+    const yesterday = event({ startDate: "2026-09-04" });
+    expect(findCurrentIdeathonEvent([yesterday], NOW)).toBeNull();
+  });
+
+  it("ignores rows not linked to /ideathon", () => {
+    const other = event({ startDate: "2026-09-01", endDate: "2026-09-10", internalLink: "/events" });
+    expect(findCurrentIdeathonEvent([other], NOW)).toBeNull();
+  });
+
+  it("returns null when nothing is running", () => {
+    expect(findCurrentIdeathonEvent([], NOW)).toBeNull();
   });
 });

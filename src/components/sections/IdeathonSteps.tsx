@@ -8,7 +8,13 @@ import type { CalendarEvent } from "@/content/calendar";
 
 type StepCopyKey = Parameters<ReturnType<typeof useTranslations<"IdeathonPage.steps">>>[0];
 
-export function IdeathonSteps({ nextEvent }: { nextEvent: CalendarEvent | null }) {
+export function IdeathonSteps({
+  nextEvent,
+  currentEvent,
+}: {
+  nextEvent: CalendarEvent | null;
+  currentEvent: CalendarEvent | null;
+}) {
   const t = useTranslations("IdeathonPage.steps");
 
   return (
@@ -36,7 +42,7 @@ export function IdeathonSteps({ nextEvent }: { nextEvent: CalendarEvent | null }
             <IdeathonSignupForm />
           ) : (
             <p className="rounded-md border border-dashed border-ink/20 p-6 text-body-m opacity-70">
-              {t("closedNote")}
+              {currentEvent ? t("closedNoteLive") : t("closedNote")}
             </p>
           )}
         </div>

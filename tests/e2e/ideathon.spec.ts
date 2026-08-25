@@ -33,6 +33,13 @@ const UPCOMING_IDEATHON = {
   internalLink: "/ideathon",
 };
 
+const ONGOING_IDEATHON = {
+  ...UPCOMING_IDEATHON,
+  id: "22222222-2222-2222-2222-222222222222",
+  startDate: isoDate(-1),
+  endDate: isoDate(2),
+};
+
 function mockCalendarEvents(page: Page, events: unknown[]) {
   return page.route("**/api/calendar-events", (route) =>
     route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ events }) }),
@@ -84,6 +91,16 @@ test.describe("/ideathon", () => {
     await page.goto("/ideathon");
     await expect(page.getByText("Ideathon 2026 startet in")).toBeVisible();
     await expect(page.getByRole("button", { name: "Anmeldung absenden" })).toBeVisible();
+  });
+
+  test("shows a live state instead of the countdown while the Ideathon is running", async ({ page }) => {
+    await mockCalendarEvents(page, [ONGOING_IDEATHON]);
+    await page.goto("/ideathon");
+    await expect(page.getByText("Der Ideathon läuft gerade", { exact: true })).toBeVisible();
+    await expect(page.getByText("Ideathon 2026 startet in")).not.toBeVisible();
+    // The signup form stays closed for the date that's already running, but
+    // the closed-note wording reflects "running now", not "not scheduled".
+    await expect(page.getByText(/Der Ideathon läuft gerade, die Anmeldung/)).toBeVisible();
   });
 
   test("mentions the UN Sustainable Development Goals and their three pillars", async ({ page }) => {

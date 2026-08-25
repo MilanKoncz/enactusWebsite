@@ -27,10 +27,20 @@ const SDG_GOAL_NUMBERS = Array.from({ length: SDG_GOAL_COUNT }, (_, i) => i + 1)
  * elsewhere on the site, just as the page's first section instead of its
  * last.
  */
-export function IdeathonHero({ nextEvent }: { nextEvent: CalendarEvent | null }) {
+export function IdeathonHero({
+  nextEvent,
+  currentEvent,
+}: {
+  nextEvent: CalendarEvent | null;
+  currentEvent: CalendarEvent | null;
+}) {
   const t = useTranslations("IdeathonPage.hero");
   const locale = useLocale();
   const format = useFormatter();
+  // Once the Ideathon has started, findNextIdeathonEvent stops returning it
+  // (it must, for the signup gate) — but the dates are still real and worth
+  // showing for the days the event is actually running.
+  const displayEvent = currentEvent ?? nextEvent;
 
   return (
     <Section surface="ink" className="relative isolate overflow-hidden corner-glow">
@@ -84,10 +94,10 @@ export function IdeathonHero({ nextEvent }: { nextEvent: CalendarEvent | null })
         </div>
 
         <div className="flex flex-wrap gap-10">
-          {nextEvent && (
+          {displayEvent && (
             <>
-              <Fact label={t("whenLabel")} value={formatEventDate(nextEvent, locale)} />
-              {nextEvent.location && <Fact label={t("whereLabel")} value={nextEvent.location} />}
+              <Fact label={t("whenLabel")} value={formatEventDate(displayEvent, locale)} />
+              {displayEvent.location && <Fact label={t("whereLabel")} value={displayEvent.location} />}
             </>
           )}
           <Fact
@@ -106,7 +116,7 @@ export function IdeathonHero({ nextEvent }: { nextEvent: CalendarEvent | null })
         </div>
       </Container>
 
-      <IdeathonCountdown event={nextEvent} />
+      <IdeathonCountdown event={nextEvent} currentEvent={currentEvent} />
       <IdeathonStats />
     </Section>
   );

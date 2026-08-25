@@ -536,7 +536,10 @@
       "daysOnly": "{days, plural, one {# day} other {# days}}",
       "quietEyebrow": "Ideathon 2026",
       "quietTitle": "The next date isn't set yet",
-      "quietBody": "Once the board adds a new date to the calendar, the countdown will appear here."
+      "quietBody": "Once the board adds a new date to the calendar, the countdown will appear here.",
+      "liveEyebrow": "Ideathon 2026",
+      "liveTitle": "The Ideathon is happening right now",
+      "liveBody": "Check the date and place above. The next countdown will appear here once a new date is set."
     },
     "stats": {
       "eyebrow": "At a glance",
@@ -619,7 +622,8 @@
         "description": "Things really get going on 25 September. Three workshops, a pitch, and a great time together!"
       },
       "commitmentNote": "Please only sign up if you can make it all four days. We organise food, rooms, and workshops around you. Your spot is valuable.",
-      "closedNote": "The next Ideathon isn't set yet. Sign-up opens once a date is added to the calendar."
+      "closedNote": "The next Ideathon isn't set yet. Sign-up opens once a date is added to the calendar.",
+      "closedNoteLive": "The Ideathon is happening right now, sign-up for this date is closed. Sign-up for the next Ideathon opens once a new date is added to the calendar."
     },
     "form": {
       "heading": "Sign up",

@@ -33,6 +33,13 @@ export function ideathonStartInstant(event: CalendarEvent): Date {
  * The soonest calendar_events row linked to /ideathon that hasn't started
  * yet. Null once nothing is upcoming — the page renders its quiet state,
  * the signup route rejects with 409; neither invents a fallback date.
+ *
+ * Deliberately excludes an event that has already started, even mid-run:
+ * this is the one signal the signup form's open/closed gate reads (via
+ * app/api/ideathon/route.ts), and reopening it during the live event would
+ * be wrong. Anything that wants to keep showing dates *during* the event
+ * (the hero's facts row, the countdown, the timeline's day labels) reads
+ * findCurrentIdeathonEvent below instead, not this one.
  */
 export function findNextIdeathonEvent(events: CalendarEvent[], nowMs: number): CalendarEvent | null {
   const upcoming = events
@@ -40,4 +47,22 @@ export function findNextIdeathonEvent(events: CalendarEvent[], nowMs: number): C
     .filter((event) => ideathonStartInstant(event).getTime() > nowMs)
     .sort((a, b) => ideathonStartInstant(a).getTime() - ideathonStartInstant(b).getTime());
   return upcoming[0] ?? null;
+}
+
+/**
+ * The linked Ideathon event that is running right now, i.e. today falls
+ * between its start and end date (inclusive, whole days in SITE_TIMEZONE).
+ * Exists so the countdown can tell "the date isn't set yet" apart from
+ * "it's happening this very moment" once findNextIdeathonEvent above has
+ * already stopped returning the event — the countdown reaching zero isn't
+ * the same fact as no Ideathon being scheduled.
+ */
+export function findCurrentIdeathonEvent(events: CalendarEvent[], nowMs: number): CalendarEvent | null {
+  const current = events.filter(isIdeathonEvent).find((event) => {
+    const startMs = wallClockToInstant(`${event.startDate}T00:00`, SITE_TIMEZONE).getTime();
+    const endDate = event.endDate ?? event.startDate;
+    const endMs = wallClockToInstant(`${endDate}T23:59`, SITE_TIMEZONE).getTime();
+    return nowMs >= startMs && nowMs <= endMs;
+  });
+  return current ?? null;
 }

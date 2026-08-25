@@ -533,10 +533,13 @@
       "hours": "Std",
       "minutes": "Min",
       "seconds": "Sek",
-      "daysOnly": "{days, plural, one {# Tag} other {# Tage}}",
+      "daysOnly": "{days, plural, one {# Tag} other {# Tagen}}",
       "quietEyebrow": "Ideathon 2026",
       "quietTitle": "Der nächste Termin steht noch nicht fest",
-      "quietBody": "Sobald der Vorstand einen neuen Termin im Kalender einträgt, erscheint hier der Countdown."
+      "quietBody": "Sobald der Vorstand einen neuen Termin im Kalender einträgt, erscheint hier der Countdown.",
+      "liveEyebrow": "Ideathon 2026",
+      "liveTitle": "Der Ideathon läuft gerade",
+      "liveBody": "Schau oben nach Ort und Datum. Der nächste Countdown erscheint hier, sobald ein neuer Termin feststeht."
     },
     "stats": {
       "eyebrow": "Auf einen Blick",
@@ -619,7 +622,8 @@
         "description": "Am 25. September geht es richtig los. Drei Workshops, ein Pitch und eine lustige gemeinsame Zeit!"
       },
       "commitmentNote": "Bitte melde dich nur an, wenn du an allen vier Tagen dabei sein kannst. Wir organisieren Verpflegung, Räume und Workshops für dich, dein Platz ist wertvoll.",
-      "closedNote": "Der nächste Ideathon steht noch nicht fest. Die Anmeldung öffnet, sobald ein Termin im Kalender eingetragen ist."
+      "closedNote": "Der nächste Ideathon steht noch nicht fest. Die Anmeldung öffnet, sobald ein Termin im Kalender eingetragen ist.",
+      "closedNoteLive": "Der Ideathon läuft gerade, die Anmeldung ist für diesen Termin geschlossen. Die Anmeldung für den nächsten Ideathon öffnet, sobald ein neuer Termin im Kalender eingetragen ist."
     },
     "form": {
       "heading": "Anmeldung",

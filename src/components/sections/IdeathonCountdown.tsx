@@ -19,10 +19,32 @@ import type { CalendarEvent } from "@/content/calendar";
  * so nothing date-related is missing before the client takes over here —
  * only the live tick is deferred.
  */
-export function IdeathonCountdown({ event }: { event: CalendarEvent | null }) {
+export function IdeathonCountdown({
+  event,
+  currentEvent,
+}: {
+  event: CalendarEvent | null;
+  currentEvent: CalendarEvent | null;
+}) {
   const t = useTranslations("IdeathonPage.countdown");
   const now = useNow(1000);
   const mounted = now > 0;
+
+  // The Ideathon is running right now: findNextIdeathonEvent (event's
+  // source) has already stopped returning it by this point, so "no event"
+  // and "no longer upcoming because it's happening today" have to be told
+  // apart here, not folded into one quiet state.
+  if (currentEvent) {
+    return (
+      <div className="border-t border-paper/10 py-10">
+        <Container className="flex flex-col items-center gap-1 text-center">
+          <Eyebrow>{t("liveEyebrow")}</Eyebrow>
+          <p className="text-body-l font-medium">{t("liveTitle")}</p>
+          <p className="text-body-s opacity-70">{t("liveBody")}</p>
+        </Container>
+      </div>
+    );
+  }
 
   if (!event) {
     return (

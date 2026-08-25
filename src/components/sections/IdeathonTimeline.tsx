@@ -23,9 +23,19 @@ function formatStopDay(dateStr: string, locale: string): string {
   return `${weekday} · ${day}`;
 }
 
-export function IdeathonTimeline({ nextEvent }: { nextEvent: CalendarEvent | null }) {
+export function IdeathonTimeline({
+  nextEvent,
+  currentEvent,
+}: {
+  nextEvent: CalendarEvent | null;
+  currentEvent: CalendarEvent | null;
+}) {
   const t = useTranslations("IdeathonPage.timeline");
   const locale = useLocale();
+  // Same reasoning as IdeathonHero's displayEvent: nextEvent alone goes null
+  // the moment the Ideathon starts, but the real per-day dates should keep
+  // showing for the days it's actually running.
+  const displayEvent = currentEvent ?? nextEvent;
 
   return (
     <Section id="ablauf">
@@ -38,8 +48,8 @@ export function IdeathonTimeline({ nextEvent }: { nextEvent: CalendarEvent | nul
           {timelineSteps.map((step) => (
             <li key={step.key} className="flex flex-col gap-2">
               <span className="font-mono text-mono-s uppercase opacity-60">
-                {nextEvent
-                  ? formatStopDay(addDays(nextEvent.startDate, step.order - 1), locale)
+                {displayEvent
+                  ? formatStopDay(addDays(displayEvent.startDate, step.order - 1), locale)
                   : t("dayFallback", { day: step.order })}
               </span>
               <GateMarker as="h3" label={t(`${step.key}.title` as TimelineCopyKey)} />

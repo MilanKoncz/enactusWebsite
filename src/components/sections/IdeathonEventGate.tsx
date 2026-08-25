@@ -6,7 +6,7 @@ import { IdeathonTimeline } from "@/components/sections/IdeathonTimeline";
 import { IdeathonBenefits } from "@/components/sections/IdeathonBenefits";
 import { IdeathonSteps } from "@/components/sections/IdeathonSteps";
 import { useNow } from "@/lib/useNow";
-import { findNextIdeathonEvent } from "@/lib/ideathonEvent";
+import { findCurrentIdeathonEvent, findNextIdeathonEvent } from "@/lib/ideathonEvent";
 import type { CalendarEvent } from "@/content/calendar";
 
 export type IdeathonEventGateProps = {
@@ -53,14 +53,16 @@ export function IdeathonEventGate({ events: initialEvents, initialNowMs }: Ideat
       });
   }, []);
 
-  const nextEvent = findNextIdeathonEvent(events, mounted ? now : initialNowMs);
+  const referenceNowMs = mounted ? now : initialNowMs;
+  const nextEvent = findNextIdeathonEvent(events, referenceNowMs);
+  const currentEvent = findCurrentIdeathonEvent(events, referenceNowMs);
 
   return (
     <>
-      <IdeathonHero nextEvent={nextEvent} />
-      <IdeathonTimeline nextEvent={nextEvent} />
+      <IdeathonHero nextEvent={nextEvent} currentEvent={currentEvent} />
+      <IdeathonTimeline nextEvent={nextEvent} currentEvent={currentEvent} />
       <IdeathonBenefits />
-      <IdeathonSteps nextEvent={nextEvent} />
+      <IdeathonSteps nextEvent={nextEvent} currentEvent={currentEvent} />
     </>
   );
 }
