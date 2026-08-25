@@ -89,7 +89,7 @@ test.describe("/ideathon", () => {
   test("mentions the UN Sustainable Development Goals and their three pillars", async ({ page }) => {
     await mockCalendarEvents(page, [UPCOMING_IDEATHON]);
     await page.goto("/ideathon");
-    await expect(page.getByText(/People, Planet, Prosperity/)).toBeVisible();
+    await expect(page.getByText(/People\s*·\s*Planet\s*·\s*Prosperity/)).toBeVisible();
     await expect(page.getByRole("link", { name: "UN-Nachhaltigkeitszielen" })).toHaveAttribute(
       "href",
       "https://sdgs.un.org/goals",
