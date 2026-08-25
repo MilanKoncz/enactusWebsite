@@ -25,6 +25,7 @@ export const routing = defineRouting({
     "/projekte/archiv": "/projekte/archiv",
     "/projekte/[slug]": "/projekte/[slug]",
     "/events": "/events",
+    "/ideathon": "/ideathon",
     "/termine": {
       de: "/termine",
       en: "/calendar",

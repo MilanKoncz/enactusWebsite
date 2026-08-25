@@ -13,8 +13,6 @@ vi.mock("@/lib/db", () => ({
 const ORIGINAL_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET;
 const EMAIL = "jane@example.com";
 
-const EMPTY = { applications: [], contactMessages: [], reminderSignups: [] };
-
 beforeEach(() => {
   process.env.ADMIN_SESSION_SECRET = "a-signing-secret-for-deletion-tests";
 });
@@ -55,11 +53,12 @@ describe("POST /api/admin/loeschanfragen (search)", () => {
     expect(findPersonalDataByEmail).not.toHaveBeenCalled();
   });
 
-  it("returns matches across all three tables", async () => {
+  it("returns matches across all four tables", async () => {
     findPersonalDataByEmail.mockResolvedValue({
       applications: [{ id: "a1" }],
       contactMessages: [{ id: "c1" }, { id: "c2" }],
       reminderSignups: [],
+      ideathonSignups: [{ id: "i1" }],
     });
 
     const { POST } = await import("@/app/api/admin/loeschanfragen/route");
@@ -70,6 +69,7 @@ describe("POST /api/admin/loeschanfragen (search)", () => {
     expect(body.matches.applications).toHaveLength(1);
     expect(body.matches.contactMessages).toHaveLength(2);
     expect(body.matches.reminderSignups).toHaveLength(0);
+    expect(body.matches.ideathonSignups).toHaveLength(1);
   });
 
   it("reports a database failure rather than crashing", async () => {
@@ -125,7 +125,12 @@ describe("DELETE /api/admin/loeschanfragen", () => {
   });
 
   it("reports how much was deleted per table", async () => {
-    deletePersonalDataByEmail.mockResolvedValue({ applications: 2, contactMessages: 1, reminderSignups: 1 });
+    deletePersonalDataByEmail.mockResolvedValue({
+      applications: 2,
+      contactMessages: 1,
+      reminderSignups: 1,
+      ideathonSignups: 3,
+    });
 
     const { DELETE } = await import("@/app/api/admin/loeschanfragen/route");
     const response = await DELETE(await req("DELETE", { email: EMAIL, confirmEmail: EMAIL }));
@@ -133,7 +138,7 @@ describe("DELETE /api/admin/loeschanfragen", () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({
       ok: true,
-      deleted: { applications: 2, contactMessages: 1, reminderSignups: 1 },
+      deleted: { applications: 2, contactMessages: 1, reminderSignups: 1, ideathonSignups: 3 },
     });
   });
 

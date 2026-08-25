@@ -13,10 +13,10 @@ describe("Datenschutz", () => {
     expect(headings[0]).toHaveTextContent("Datenschutzerklärung");
   });
 
-  it("renders all 18 sections as h2 headings", () => {
+  it("renders all 19 sections as h2 headings", () => {
     renderWithIntl(<Datenschutz />);
     const headings = screen.getAllByRole("heading", { level: 2 });
-    expect(headings).toHaveLength(18);
+    expect(headings).toHaveLength(19);
   });
 
   it("shows the effective date but not a review-confirmation notice", () => {
@@ -80,10 +80,22 @@ describe("Datenschutz", () => {
 
   it("lists every application field named in the /mitmachen brief", () => {
     renderWithIntl(<Datenschutz />);
-    expect(screen.getByText(/Vorname, Nachname, E-Mail-Adresse/)).toBeInTheDocument();
+    expect(screen.getAllByText(/Vorname, Nachname, E-Mail-Adresse/).length).toBeGreaterThan(0);
     expect(screen.getByText("gewünschter Einsatzbereich")).toBeInTheDocument();
     expect(screen.getByText(/Verfügbarkeit in Stunden pro Woche/)).toBeInTheDocument();
     expect(screen.getByText(/Zeitpunkt deiner Einwilligung/)).toBeInTheDocument();
+  });
+
+  it("lists the Ideathon signup section with its field list and purpose", () => {
+    renderWithIntl(<Datenschutz />);
+    expect(screen.getByRole("heading", { level: 2, name: "Ideathon-Anmeldung" })).toBeInTheDocument();
+    expect(screen.getByText(/Angabe, ob bereits eine Idee vorhanden ist/)).toBeInTheDocument();
+    expect(screen.getByText(/Organisation und Durchführung des Ideathons/)).toBeInTheDocument();
+  });
+
+  it("states the Ideathon signup retention period in the Speicherdauer table", () => {
+    renderWithIntl(<Datenschutz />);
+    expect(screen.getAllByText(/6 Monate nach Anmeldung/).length).toBeGreaterThan(0);
   });
 
   it("describes the reminder list's double opt-in proof of consent", () => {
@@ -94,7 +106,7 @@ describe("Datenschutz", () => {
 
   it("names the real application recipient, not the outdated it@ address", () => {
     renderWithIntl(<Datenschutz />);
-    expect(screen.getByText(/info@unimannheim\.enactus\.team/)).toBeInTheDocument();
+    expect(screen.getAllByText(/info@unimannheim\.enactus\.team/).length).toBeGreaterThan(0);
     expect(screen.queryByText(/it@unimannheim\.enactus\.team/)).not.toBeInTheDocument();
   });
 

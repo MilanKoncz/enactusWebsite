@@ -32,6 +32,7 @@ const TABLE_KEYS = [
   "jobPostings",
   "rateLimitHits",
   "cronRuns",
+  "ideathonSignups",
 ] as const;
 
 export default async function AdminSystemPage({ params }: PageProps) {

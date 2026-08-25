@@ -49,6 +49,10 @@ const retentionSchema = z.object({
   // board's own instruction, not a guess awaiting sign-off.
   jobPostings: retentionPeriodSchema.extend({ months: z.number().int().positive() }),
   rateLimitHits: retentionPeriodSchema.extend({ days: z.number().int().positive() }),
+  // Confirmed directly by the person requesting this feature (2026-08-25),
+  // not a guess awaiting board sign-off — same reasoning as jobPostings'
+  // `confirmedByBoard: true` above.
+  ideathonSignups: retentionPeriodSchema.extend({ months: z.number().int().positive() }),
 });
 export type Retention = z.infer<typeof retentionSchema>;
 
@@ -63,6 +67,7 @@ export const retention: Retention = retentionSchema.parse({
   // Not a privacy period, a housekeeping one — always been 1 day, moved
   // here from a hardcoded value in the cleanup route.
   rateLimitHits: { days: 1, confirmedByBoard: true },
+  ideathonSignups: { months: 6, confirmedByBoard: true },
 });
 
 export { retentionSchema };

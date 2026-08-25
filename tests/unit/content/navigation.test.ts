@@ -6,11 +6,12 @@ describe("content/navigation", () => {
     expect(mainNav.some((item) => item.key === "home")).toBe(false);
   });
 
-  it("lists exactly the six header nav items in order", () => {
+  it("lists exactly the seven header nav items in order, ideathon right after events", () => {
     expect(mainNav.map((item) => item.key)).toEqual([
       "prozess",
       "projekte",
       "events",
+      "ideathon",
       "termine",
       "partner",
       "kontakt",

@@ -4,6 +4,7 @@ import type { NextRequest } from "next/server";
 import {
   deleteExpiredApplications,
   deleteExpiredContactMessages,
+  deleteExpiredIdeathonSignups,
   deleteExpiredJobPostings,
   deleteExpiredReminderSignups,
   finishCronRun,
@@ -14,6 +15,7 @@ import {
 import {
   applicationRetentionCutoff,
   contactMessageRetentionCutoff,
+  ideathonSignupRetentionCutoff,
   jobPostingRetentionCutoff,
   reminderSignupRetentionCutoff,
   rateLimitHitRetentionCutoff,
@@ -66,20 +68,21 @@ async function runCleanupJob(now: Date) {
     return null;
   });
 
-  const [applications, contactMessages, reminderSignups, jobPostings, rateLimitHits] = await Promise.allSettled([
-    deleteExpiredApplications(applicationRetentionCutoff(now)),
-    deleteExpiredContactMessages(contactMessageRetentionCutoff(now)),
-    deleteExpiredReminderSignups(reminderSignupRetentionCutoff(now)),
-    deleteExpiredJobPostings(jobPostingRetentionCutoff(now)),
-    pruneRateLimitHits(rateLimitHitRetentionCutoff(now)),
-  ]);
+  const [applications, contactMessages, reminderSignups, jobPostings, rateLimitHits, ideathonSignups] =
+    await Promise.allSettled([
+      deleteExpiredApplications(applicationRetentionCutoff(now)),
+      deleteExpiredContactMessages(contactMessageRetentionCutoff(now)),
+      deleteExpiredReminderSignups(reminderSignupRetentionCutoff(now)),
+      deleteExpiredJobPostings(jobPostingRetentionCutoff(now)),
+      pruneRateLimitHits(rateLimitHitRetentionCutoff(now)),
+      deleteExpiredIdeathonSignups(ideathonSignupRetentionCutoff(now)),
+    ]);
 
-  // jobPostings isn't part of the counts object below: cron_runs
-  // (migrations/0005_cron_runs.sql) has no deleted_job_postings column, and
-  // job_postings is purely additive (the brief: "bestehende Tabellen
-  // bleiben unverändert") — so this deletion runs and is reported in the
-  // response body, but doesn't get a persisted per-run count the way the
-  // other four do.
+  // jobPostings and ideathonSignups aren't part of the counts object below:
+  // cron_runs (migrations/0005_cron_runs.sql) has no deleted_job_postings or
+  // deleted_ideathon_signups column, and both tables are purely additive —
+  // so these deletions run and are reported in the response body, but don't
+  // get a persisted per-run count the way the other four do.
   const summary = {
     applications: applications.status === "fulfilled" ? applications.value : null,
     contactMessages: contactMessages.status === "fulfilled" ? contactMessages.value : null,
@@ -87,6 +90,7 @@ async function runCleanupJob(now: Date) {
     rateLimitHits: rateLimitHits.status === "fulfilled" ? rateLimitHits.value : null,
   };
   const jobPostingsDeleted = jobPostings.status === "fulfilled" ? jobPostings.value : null;
+  const ideathonSignupsDeleted = ideathonSignups.status === "fulfilled" ? ideathonSignups.value : null;
 
   const failures: string[] = [];
   for (const [name, result] of Object.entries({
@@ -95,6 +99,7 @@ async function runCleanupJob(now: Date) {
     reminderSignups,
     jobPostings,
     rateLimitHits,
+    ideathonSignups,
   })) {
     if (result.status === "rejected") {
       console.error(`Cleanup step "${name}" failed`, result.reason);
@@ -111,7 +116,7 @@ async function runCleanupJob(now: Date) {
     );
   }
 
-  return { ...summary, jobPostings: jobPostingsDeleted };
+  return { ...summary, jobPostings: jobPostingsDeleted, ideathonSignups: ideathonSignupsDeleted };
 }
 
 async function runReminderWindowJob(now: Date) {

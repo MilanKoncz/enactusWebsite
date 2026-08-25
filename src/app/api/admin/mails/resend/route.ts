@@ -5,12 +5,15 @@ import { isAuthenticatedRequest } from "@/lib/adminSession";
 import {
   findApplicationById,
   findContactMessageById,
+  findIdeathonSignupById,
   findReminderSignupById,
   findReminderWindowMailById,
   markApplicationMailed,
   markApplicationMailFailed,
   markContactMessageMailed,
   markContactMessageMailFailed,
+  markIdeathonSignupMailed,
+  markIdeathonSignupMailFailed,
   markReminderMailed,
   markReminderMailFailed,
   markReminderWindowMailFailed,
@@ -19,6 +22,7 @@ import {
 import {
   dispatchApplicationMails,
   dispatchContactNotification,
+  dispatchIdeathonSignupMails,
   dispatchReminderConfirmation,
   dispatchReminderWindowOpen,
 } from "@/lib/mailDispatch";
@@ -42,7 +46,13 @@ import {
 // rejecting an id the database would happily have found would be a bug in
 // the validator rather than a caught attack.
 const requestSchema = z.object({
-  source: z.enum(["applications", "contact_messages", "reminder_signups", "reminder_window_mails"]),
+  source: z.enum([
+    "applications",
+    "contact_messages",
+    "reminder_signups",
+    "reminder_window_mails",
+    "ideathon_signups",
+  ]),
   id: z.guid(),
 });
 
@@ -109,6 +119,14 @@ async function resend(source: string, id: string): Promise<boolean> {
     return true;
   }
 
+  if (source === "ideathon_signups") {
+    const signup = await findIdeathonSignupById(id);
+    if (!signup) return false;
+    await dispatchIdeathonSignupMails(signup);
+    await markIdeathonSignupMailed(id);
+    return true;
+  }
+
   // reminder_window_mails: rebuilds the exact mail from the row's own
   // stored semester/windowEndsAt (no join to recruiting_windows — the row
   // outlives a since-deleted window, same reasoning as the other sources
@@ -127,5 +145,6 @@ async function recordFailure(source: string, id: string, message: string): Promi
   if (source === "applications") return markApplicationMailFailed(id, message);
   if (source === "contact_messages") return markContactMessageMailFailed(id, message);
   if (source === "reminder_signups") return markReminderMailFailed(id, message);
+  if (source === "ideathon_signups") return markIdeathonSignupMailFailed(id, message);
   return markReminderWindowMailFailed(id, message);
 }

@@ -194,6 +194,18 @@ export function Datenschutz() {
             <Fact label={t("application.necessityLabel")}>{t("application.necessity")}</Fact>
           </LegalSection>
 
+          <LegalSection title={t("ideathonSignup.title")}>
+            <p>{t("ideathonSignup.intro")}</p>
+            <div className="flex flex-col gap-2">
+              <p className="text-mono-s font-mono uppercase opacity-60">{t("ideathonSignup.fieldsHeading")}</p>
+              <BulletList items={t.raw("ideathonSignup.fields") as string[]} />
+            </div>
+            <Fact label={t("ideathonSignup.purposeLabel")}>{t("ideathonSignup.purpose")}</Fact>
+            <Fact label={t("ideathonSignup.legalBasisLabel")}>{t("ideathonSignup.legalBasis")}</Fact>
+            <Fact label={t("ideathonSignup.accessLabel")}>{t("ideathonSignup.access")}</Fact>
+            <Fact label={t("ideathonSignup.necessityLabel")}>{t("ideathonSignup.necessity")}</Fact>
+          </LegalSection>
+
           <LegalSection title={t("reminder.title")}>
             {(t.raw("reminder.body") as string[]).map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>
@@ -232,6 +244,7 @@ export function Datenschutz() {
                   t("retention.reminderUnconfirmedValue", { days: retention.reminderSignupsUnconfirmed.days }),
                 ],
                 [t("retention.rateLimitLabel"), t("retention.rateLimitValue")],
+                [t("retention.ideathonLabel"), t("retention.ideathonValue", { months: retention.ideathonSignups.months })],
                 [t("retention.serverLogsLabel"), t("retention.serverLogsValue")],
               ]}
             />

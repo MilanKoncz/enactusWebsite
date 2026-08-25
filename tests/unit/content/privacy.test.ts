@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 import { privacyReviewStatus, privacyReviewStatusSchema } from "@/content/privacy";
 
 describe("content/privacy", () => {
-  it("is reviewed, with a review date", () => {
-    expect(privacyReviewStatus).toEqual({ reviewed: true, reviewedAt: "2026-08-19" });
+  // Flipped back to draft on 2026-08-25 pending Datenschutzberater sign-off
+  // on the new Ideathon signup section (content/privacy.ts's own comment).
+  it("is currently a draft, awaiting sign-off on the Ideathon section", () => {
+    expect(privacyReviewStatus).toEqual({ reviewed: false, reviewedAt: null });
   });
 
   it("validates the exported status", () => {

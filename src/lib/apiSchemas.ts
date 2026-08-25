@@ -2,6 +2,7 @@ import { z } from "zod";
 import { applicationFormSchema } from "./applicationFormSchema";
 import { contactFormSchema } from "./contactFormSchema";
 import { reminderSignupSchema } from "./reminderSignupSchema";
+import { ideathonSignupFormSchema } from "./ideathonSignupFormSchema";
 
 /**
  * The three client form schemas extended with `locale` — the one field a
@@ -33,3 +34,9 @@ export type ReminderRequest = z.infer<typeof reminderRequestSchema>;
 
 export const contactRequestSchema = contactFormSchema.extend({ locale: localeSchema });
 export type ContactRequest = z.infer<typeof contactRequestSchema>;
+
+export const ideathonSignupRequestSchema = ideathonSignupFormSchema.extend({
+  locale: localeSchema,
+  formToken: z.string(),
+});
+export type IdeathonSignupRequest = z.infer<typeof ideathonSignupRequestSchema>;

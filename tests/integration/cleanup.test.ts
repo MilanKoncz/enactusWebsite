@@ -6,6 +6,7 @@ const deleteExpiredApplications = vi.fn();
 const deleteExpiredContactMessages = vi.fn();
 const deleteExpiredReminderSignups = vi.fn();
 const deleteExpiredJobPostings = vi.fn();
+const deleteExpiredIdeathonSignups = vi.fn();
 const pruneRateLimitHits = vi.fn();
 const startCronRun = vi.fn();
 const finishCronRun = vi.fn();
@@ -18,6 +19,7 @@ vi.mock("@/lib/db", () => ({
   deleteExpiredContactMessages: (...args: unknown[]) => deleteExpiredContactMessages(...args),
   deleteExpiredReminderSignups: (...args: unknown[]) => deleteExpiredReminderSignups(...args),
   deleteExpiredJobPostings: (...args: unknown[]) => deleteExpiredJobPostings(...args),
+  deleteExpiredIdeathonSignups: (...args: unknown[]) => deleteExpiredIdeathonSignups(...args),
   pruneRateLimitHits: (...args: unknown[]) => pruneRateLimitHits(...args),
   startCronRun: (...args: unknown[]) => startCronRun(...args),
   finishCronRun: (...args: unknown[]) => finishCronRun(...args),
@@ -97,6 +99,7 @@ describe("GET /api/cron/cleanup", () => {
     deleteExpiredReminderSignups.mockResolvedValue(3);
     deleteExpiredJobPostings.mockResolvedValue(4);
     pruneRateLimitHits.mockResolvedValue(10);
+    deleteExpiredIdeathonSignups.mockResolvedValue(5);
 
     const { GET } = await import("@/app/api/cron/cleanup/route");
     const response = await GET(request("Bearer test-secret"));
@@ -104,9 +107,33 @@ describe("GET /api/cron/cleanup", () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({
       ok: true,
-      deleted: { applications: 2, contactMessages: 1, reminderSignups: 3, jobPostings: 4, rateLimitHits: 10 },
+      deleted: {
+        applications: 2,
+        contactMessages: 1,
+        reminderSignups: 3,
+        jobPostings: 4,
+        rateLimitHits: 10,
+        ideathonSignups: 5,
+      },
       reminderWindowMails: { sent: 0, failed: 0, error: null },
     });
+  });
+
+  it("deletes expired ideathon signups alongside the other tables", async () => {
+    process.env.CRON_SECRET = "test-secret";
+    vi.resetModules();
+    deleteExpiredApplications.mockResolvedValue(0);
+    deleteExpiredContactMessages.mockResolvedValue(0);
+    deleteExpiredReminderSignups.mockResolvedValue(0);
+    pruneRateLimitHits.mockResolvedValue(0);
+    deleteExpiredIdeathonSignups.mockResolvedValue(7);
+
+    const { GET } = await import("@/app/api/cron/cleanup/route");
+    const response = await GET(request("Bearer test-secret"));
+
+    expect(deleteExpiredIdeathonSignups).toHaveBeenCalled();
+    const body = await response.json();
+    expect(body.deleted.ideathonSignups).toBe(7);
   });
 
   it("still reports the steps that succeeded when one cleanup step throws", async () => {

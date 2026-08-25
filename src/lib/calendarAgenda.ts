@@ -33,7 +33,10 @@ export function todayInSiteTimezone(nowMs: number): string {
 // UTC-anchored Date.UTC diff gives an exact whole-day count regardless of
 // which real-world DST offset either day happens to fall under — there is
 // no "wall clock" here to be confused about, only calendar days.
-function daysBetween(fromDate: string, toDate: string): number {
+// Exported for lib/ideathonCountdown.ts, which needs the identical
+// whole-calendar-day math for its days-only display resolution — not a
+// second copy of the same UTC-anchored diff.
+export function daysBetween(fromDate: string, toDate: string): number {
   const [fy, fm, fd] = fromDate.split("-").map(Number);
   const [ty, tm, td] = toDate.split("-").map(Number);
   const fromMs = Date.UTC(fy, fm - 1, fd);

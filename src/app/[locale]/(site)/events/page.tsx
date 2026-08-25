@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { requireLocale, resolveLocale } from "@/i18n/requireLocale";
 import { pageAlternates } from "@/lib/seo";
 import { EventsIntro } from "@/components/sections/EventsIntro";
+import { EventsIdeathonCallout } from "@/components/sections/EventsIdeathonCallout";
 import { EventFormats } from "@/components/sections/EventFormats";
 import { JourneysSection } from "@/components/sections/JourneysSection";
 import { EventsNetwork } from "@/components/sections/EventsNetwork";
@@ -29,6 +30,7 @@ export default async function EventsPage({ params }: PageProps) {
   return (
     <>
       <EventsIntro />
+      <EventsIdeathonCallout />
       <EventFormats />
       <JourneysSection />
       <EventsNetwork />

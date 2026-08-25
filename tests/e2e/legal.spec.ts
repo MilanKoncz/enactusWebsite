@@ -58,9 +58,9 @@ test.describe("/datenschutz", () => {
     await expect(page.getByText(/Es gibt keinen Datei-Upload/)).toBeVisible();
   });
 
-  test("renders all 18 sections, including the two retention and processor tables", async ({ page }) => {
+  test("renders all 19 sections, including the two retention and processor tables", async ({ page }) => {
     await page.goto("/datenschutz");
-    await expect(page.getByRole("main").getByRole("heading", { level: 2 })).toHaveCount(18);
+    await expect(page.getByRole("main").getByRole("heading", { level: 2 })).toHaveCount(19);
     await expect(page.getByRole("heading", { level: 2, name: "Speicherdauer" })).toBeVisible();
     await expect(page.getByRole("heading", { level: 2, name: "Auftragsverarbeiter und Empfänger" })).toBeVisible();
     await expect(page.getByRole("main")).toContainText("Vercel Inc., USA");

@@ -12,12 +12,23 @@ type Matches = {
   applications: Record<string, unknown>[];
   contactMessages: Record<string, unknown>[];
   reminderSignups: Record<string, unknown>[];
+  ideathonSignups: Record<string, unknown>[];
 };
 
-type Deleted = { applications: number; contactMessages: number; reminderSignups: number };
+type Deleted = {
+  applications: number;
+  contactMessages: number;
+  reminderSignups: number;
+  ideathonSignups: number;
+};
 
 function total(matches: Matches): number {
-  return matches.applications.length + matches.contactMessages.length + matches.reminderSignups.length;
+  return (
+    matches.applications.length +
+    matches.contactMessages.length +
+    matches.reminderSignups.length +
+    matches.ideathonSignups.length
+  );
 }
 
 // A client component throughout: the search result has to survive on screen
@@ -115,6 +126,7 @@ export function DeletionRequestTool() {
             applications: deleted.applications,
             contactMessages: deleted.contactMessages,
             reminderSignups: deleted.reminderSignups,
+            ideathonSignups: deleted.ideathonSignups,
           })}
         </FormStatusMessage>
       )}
@@ -127,12 +139,13 @@ export function DeletionRequestTool() {
             <p className="text-body-m opacity-60">{t("noMatches")}</p>
           ) : (
             <>
-              <ul className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {(
                   [
                     ["applications", matches.applications.length],
                     ["contactMessages", matches.contactMessages.length],
                     ["reminderSignups", matches.reminderSignups.length],
+                    ["ideathonSignups", matches.ideathonSignups.length],
                   ] as const
                 ).map(([key, count]) => (
                   <li key={key}>

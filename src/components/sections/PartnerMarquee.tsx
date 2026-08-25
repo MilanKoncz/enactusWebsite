@@ -27,7 +27,7 @@ import { cn } from "@/lib/cn";
 // edge of the viewport (board feedback: no side margins) — same reasoning
 // as AlumniVoices' track. Only the eyebrow above it stays inside a
 // Container, so it lines up with the rest of the page's content width.
-export function PartnerMarquee() {
+export function PartnerMarquee({ showThread = true }: { showThread?: boolean } = {}) {
   const t = useTranslations("PartnerMarquee");
   const tPlaceholder = useTranslations("Placeholder");
 
@@ -44,7 +44,12 @@ export function PartnerMarquee() {
     // that matters, stacking on top of the bare gate divider's own padding
     // and HomeKpis's own top padding for the page's next most visible gap.
     <Section className="relative isolate pt-16 pb-10 md:pt-16 md:pb-10">
-      <ThreadSegment stop="partners" />
+      {/* The golden thread is homepage-only (docs/architecture.md): its
+          waypoints (threadRoute.ts) are calculated to connect this section
+          to the specific neighbours it has on the homepage, so a subpage
+          reusing this component (e.g. /ideathon) opts out rather than
+          drawing a line to nowhere. */}
+      {showThread && <ThreadSegment stop="partners" />}
       <Container className="relative">
         <Eyebrow>{t("eyebrow")}</Eyebrow>
       </Container>

@@ -1,5 +1,5 @@
 import { Resend } from "resend";
-import type { Application } from "./db";
+import type { Application, IdeathonSignup } from "./db";
 
 /**
  * The only file that talks to Resend. Every send goes through here so the
@@ -113,6 +113,26 @@ export async function sendReminderWindowOpenEmail(params: {
       "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
     },
   });
+}
+
+// Same recipient as the membership application (APPLICATION_RECIPIENT_EMAIL,
+// info@unimannheim.enactus.team) — board decision, 2026-08-25: the Ideathon
+// notification doesn't need its own env var pointed at an identical address.
+export async function sendIdeathonSignupNotification(signup: IdeathonSignup): Promise<string> {
+  return send({
+    to: requireEnv("APPLICATION_RECIPIENT_EMAIL"),
+    subject: `Neue Ideathon-Anmeldung: ${signup.firstName} ${signup.lastName}`,
+    text: `Neue Ideathon-Anmeldung von ${signup.firstName} ${signup.lastName} (${signup.email}), ${signup.university}, ${signup.studyProgram} (${signup.semester}. Fachsemester).\n\nIdee vorhanden: ${signup.hasIdea ? "ja" : "nein"}${signup.ideaDescription ? `\nIdeenbeschreibung: ${signup.ideaDescription}` : ""}\nMeldet sich als Team an: ${signup.registeringAsTeam ? "ja" : "nein"}${signup.teamSize ? ` (${signup.teamSize} Personen)` : ""}${signup.heardAboutUs ? `\nAufmerksam geworden durch: ${signup.heardAboutUs}` : ""}`,
+  });
+}
+
+export async function sendIdeathonSignupConfirmation(params: {
+  email: string;
+  firstName: string;
+  subject: string;
+  text: string;
+}): Promise<string> {
+  return send({ to: params.email, subject: params.subject, text: params.text });
 }
 
 export async function sendContactMessageNotification(params: {

@@ -304,6 +304,7 @@ export type PersonalDataMatches = {
   applications: Application[];
   contactMessages: ContactMessage[];
   reminderSignups: ReminderSignupSummary[];
+  ideathonSignups: IdeathonSignup[];
 };
 
 export async function findPersonalDataByEmail(email: string): Promise<PersonalDataMatches> {
@@ -318,6 +319,7 @@ export async function findPersonalDataByEmail(email: string): Promise<PersonalDa
     select id, created_at, email, confirmed, confirmed_at, unsubscribed_at, mail_status
     from reminder_signups where lower(email) = ${needle}
   `;
+  const ideathonRows = await sql()`select * from ideathon_signups where lower(email) = ${needle}`;
 
   return {
     applications: (applicationRows as Record<string, unknown>[]).map(toApplication),
@@ -339,16 +341,22 @@ export async function findPersonalDataByEmail(email: string): Promise<PersonalDa
       unsubscribedAt: (row.unsubscribed_at as Date | null) ?? null,
       mailStatus: row.mail_status as MailStatus,
     })),
+    ideathonSignups: (ideathonRows as Record<string, unknown>[]).map(toIdeathonSignup),
   };
 }
 
-export type DeletedCounts = { applications: number; contactMessages: number; reminderSignups: number };
+export type DeletedCounts = {
+  applications: number;
+  contactMessages: number;
+  reminderSignups: number;
+  ideathonSignups: number;
+};
 
-// Three statements rather than one, because they're three tables — but note
-// there is no transaction: if the second fails, the first has already
-// happened. That's the right failure mode for a deletion request, where
-// having deleted *more* than the caller saw confirmed is the safe direction
-// and a partial delete can simply be repeated.
+// Four statements rather than one, because they're four tables — but note
+// there is no transaction: if a later one fails, the earlier ones have
+// already happened. That's the right failure mode for a deletion request,
+// where having deleted *more* than the caller saw confirmed is the safe
+// direction and a partial delete can simply be repeated.
 export async function deletePersonalDataByEmail(email: string): Promise<DeletedCounts> {
   const needle = email.trim().toLowerCase();
 
@@ -361,11 +369,15 @@ export async function deletePersonalDataByEmail(email: string): Promise<DeletedC
   const reminderSignups = await sql()`
     delete from reminder_signups where lower(email) = ${needle} returning id
   `;
+  const ideathonSignups = await sql()`
+    delete from ideathon_signups where lower(email) = ${needle} returning id
+  `;
 
   return {
     applications: applications.length,
     contactMessages: contactMessages.length,
     reminderSignups: reminderSignups.length,
+    ideathonSignups: ideathonSignups.length,
   };
 }
 
@@ -1113,6 +1125,144 @@ export async function findReminderWindowMailById(id: string): Promise<ReminderWi
   };
 }
 
+/**
+ * The Ideathon signup form (/ideathon), entirely separate from
+ * `applications` — same mail_status trio and DB-before-mail discipline, but
+ * its own table (migrations/0014) and its own field list. No PDF, no
+ * recruiting-semester-style bucket: a signup belongs to whichever
+ * calendar_events row was upcoming when it was submitted
+ * (lib/ideathonEvent.ts decides that at request time), not something stored
+ * redundantly on the row itself.
+ */
+export type IdeathonSignupInput = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  university: string;
+  studyProgram: string;
+  semester: number;
+  hasIdea: boolean;
+  ideaDescription?: string;
+  registeringAsTeam: boolean;
+  teamSize?: number;
+  heardAboutUs?: string;
+  locale: Locale;
+};
+
+export type IdeathonSignup = IdeathonSignupInput & {
+  id: string;
+  createdAt: Date;
+  consentAt: Date;
+  mailStatus: MailStatus;
+  mailError: string | null;
+  mailedAt: Date | null;
+};
+
+function toIdeathonSignup(row: Record<string, unknown>): IdeathonSignup {
+  return {
+    id: row.id as string,
+    createdAt: row.created_at as Date,
+    firstName: row.first_name as string,
+    lastName: row.last_name as string,
+    email: row.email as string,
+    university: row.university as string,
+    studyProgram: row.study_program as string,
+    semester: row.semester as number,
+    hasIdea: row.has_idea as boolean,
+    ideaDescription: (row.idea_description as string | null) ?? undefined,
+    registeringAsTeam: row.registering_as_team as boolean,
+    teamSize: (row.team_size as number | null) ?? undefined,
+    heardAboutUs: (row.heard_about_us as string | null) ?? undefined,
+    locale: row.locale as Locale,
+    consentAt: row.consent_at as Date,
+    mailStatus: row.mail_status as MailStatus,
+    mailError: (row.mail_error as string | null) ?? null,
+    mailedAt: (row.mailed_at as Date | null) ?? null,
+  };
+}
+
+// consent_at, same reasoning as insertApplication: the database's own
+// clock, never a client-supplied timestamp — it's the proof of consent.
+export async function insertIdeathonSignup(input: IdeathonSignupInput): Promise<IdeathonSignup> {
+  const rows = await sql()`
+    insert into ideathon_signups (
+      first_name, last_name, email, university, study_program, semester,
+      has_idea, idea_description, registering_as_team, team_size, heard_about_us, locale, consent_at
+    ) values (
+      ${input.firstName}, ${input.lastName}, ${input.email}, ${input.university},
+      ${input.studyProgram}, ${input.semester}, ${input.hasIdea}, ${input.ideaDescription ?? null},
+      ${input.registeringAsTeam}, ${input.teamSize ?? null}, ${input.heardAboutUs ?? null},
+      ${input.locale}, now()
+    )
+    returning *
+  `;
+  return toIdeathonSignup(rows[0] as Record<string, unknown>);
+}
+
+export async function markIdeathonSignupMailed(id: string): Promise<void> {
+  await sql()`
+    update ideathon_signups set mail_status = 'sent', mailed_at = now(), mail_error = null
+    where id = ${id}
+  `;
+}
+
+export async function markIdeathonSignupMailFailed(id: string, error: string): Promise<void> {
+  await sql()`
+    update ideathon_signups set mail_status = 'failed', mail_error = ${error}
+    where id = ${id}
+  `;
+}
+
+// Powers /admin/mails's resend, same reasoning as findApplicationById: the
+// only query allowed to return a signup in full.
+export async function findIdeathonSignupById(id: string): Promise<IdeathonSignup | null> {
+  const rows = await sql()`select * from ideathon_signups where id = ${id}`;
+  return rows.length > 0 ? toIdeathonSignup(rows[0] as Record<string, unknown>) : null;
+}
+
+export type IdeathonSignupSummary = {
+  id: string;
+  createdAt: Date;
+  firstName: string;
+  lastName: string;
+  email: string;
+  university: string;
+  studyProgram: string;
+  hasIdea: boolean;
+  registeringAsTeam: boolean;
+  teamSize: number | undefined;
+  mailStatus: MailStatus;
+};
+
+export async function listIdeathonSignups(): Promise<IdeathonSignupSummary[]> {
+  const rows = await sql()`
+    select id, created_at, first_name, last_name, email, university, study_program,
+           has_idea, registering_as_team, team_size, mail_status
+    from ideathon_signups
+    order by created_at desc
+  `;
+  return (rows as Record<string, unknown>[]).map((row) => ({
+    id: row.id as string,
+    createdAt: row.created_at as Date,
+    firstName: row.first_name as string,
+    lastName: row.last_name as string,
+    email: row.email as string,
+    university: row.university as string,
+    studyProgram: row.study_program as string,
+    hasIdea: row.has_idea as boolean,
+    registeringAsTeam: row.registering_as_team as boolean,
+    teamSize: (row.team_size as number | null) ?? undefined,
+    mailStatus: row.mail_status as MailStatus,
+  }));
+}
+
+export async function deleteExpiredIdeathonSignups(cutoff: Date): Promise<number> {
+  const rows = await sql()`
+    delete from ideathon_signups where created_at <= ${cutoff.toISOString()} returning id
+  `;
+  return rows.length;
+}
+
 export type ContactMessageInput = {
   name: string;
   email: string;
@@ -1223,7 +1373,8 @@ export type FailedMailSource =
   | "applications"
   | "contact_messages"
   | "reminder_signups"
-  | "reminder_window_mails";
+  | "reminder_window_mails"
+  | "ideathon_signups";
 
 export type FailedMail = {
   source: FailedMailSource;
@@ -1251,6 +1402,10 @@ export async function listFailedMails(): Promise<FailedMail[]> {
     select 'reminder_window_mails' as source, id, created_at, email,
            semester as label, mail_error
     from reminder_window_mails where mail_status = 'failed'
+    union all
+    select 'ideathon_signups' as source, id, created_at, email,
+           first_name || ' ' || last_name as label, mail_error
+    from ideathon_signups where mail_status = 'failed'
     order by created_at desc
   `;
   return (rows as Record<string, unknown>[]).map((row) => ({
@@ -1289,6 +1444,9 @@ export async function mailHealthSnapshot(): Promise<MailHealthSnapshot> {
       union all
       select 'reminder_window_mails' as source, mail_status, created_at
       from reminder_window_mails where mail_status <> 'pending'
+      union all
+      select 'ideathon_signups' as source, mail_status, created_at
+      from ideathon_signups where mail_status <> 'pending'
     )
     select
       (select source from attempts order by created_at desc limit 1) as last_source,
@@ -1414,6 +1572,7 @@ export type TableCounts = {
   jobPostings: number;
   rateLimitHits: number;
   cronRuns: number;
+  ideathonSignups: number;
 };
 
 export async function countRowsPerTable(): Promise<TableCounts> {
@@ -1426,7 +1585,8 @@ export async function countRowsPerTable(): Promise<TableCounts> {
       (select count(*)::int from calendar_events) as calendar_events,
       (select count(*)::int from job_postings) as job_postings,
       (select count(*)::int from rate_limit_hits) as rate_limit_hits,
-      (select count(*)::int from cron_runs) as cron_runs
+      (select count(*)::int from cron_runs) as cron_runs,
+      (select count(*)::int from ideathon_signups) as ideathon_signups
   `;
   const row = rows[0] as Record<string, unknown>;
   return {
@@ -1438,6 +1598,7 @@ export async function countRowsPerTable(): Promise<TableCounts> {
     jobPostings: row.job_postings as number,
     rateLimitHits: row.rate_limit_hits as number,
     cronRuns: row.cron_runs as number,
+    ideathonSignups: row.ideathon_signups as number,
   };
 }
 

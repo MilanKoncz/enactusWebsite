@@ -9,6 +9,7 @@
     "prozess": "Prozess",
     "projekte": "Projekte",
     "events": "Events",
+    "ideathon": "Ideathon",
     "termine": "Termine",
     "partner": "Partner",
     "kontakt": "Kontakt",
@@ -24,6 +25,7 @@
     "projekteArchiv": "Alle Projekte, die Enactus Mannheim seit der Gründung durchlaufen hat, inklusive der Ausgründungen.",
     "projektFallback": "Ein früheres Projekt von Enactus Mannheim.",
     "events": "Neben unserer Arbeit in den Projekten und den Ressorts veranstalten wir ebenfalls Events zum Netzwerken, Lernen und Spaß haben.",
+    "ideathon": "Vier Tage, ein Team, deine Idee: der Ideathon 2026 ist dein Fast-Track ins unternehmerische Machen, offen für alle Studierenden.",
     "termine": "Der Semesterplan auf einen Blick, von der Bewerbung bis zum nächsten Pitchcontest.",
     "partner": "Mit unserem Netzwerk aus Partnern, Business Advisors, Fördermitgliedern und Alumni schaffen wir das Ökosystem für unsere nachhaltigen Projekte.",
     "kontakt": "Fragen zu einer Bewerbung, einem Projekt oder einer Partnerschaft? Schau zuerst in die FAQ, oder schreib uns direkt.",
@@ -505,6 +507,195 @@
     "title": "Enactus Mannheim ist Teil von Enactus Germany und dem weltweiten Enactus-Netzwerk.",
     "lead": "Neben unserer Arbeit in den Projekten und den Ressorts veranstalten wir ebenfalls Events zum Netzwerken, Lernen und Spaß haben."
   },
+  "EventsIdeathonCallout": {
+    "eyebrow": "Ideathon 2026",
+    "title": "Vier Tage, eine Idee, dein Pitch",
+    "lead": "Unser größtes InnoLab-Format: ein viertägiger Ideathon für alle Studierenden, ganz ohne Vorerfahrung.",
+    "cta": "Zur Ideathon-Seite"
+  },
+  "IdeathonPage": {
+    "hero": {
+      "eyebrow": "Enactus Mannheim · Ideathon 2026",
+      "title": "Von der Idee zum <em>Pitch</em>.",
+      "lead": "Vier Tage. Ein Team. Deine Idee, die etwas bewegt. Der Ideathon ist dein Fast-Track ins unternehmerische Machen, offen für alle Studierenden, ganz ohne Vorerfahrung.",
+      "sdgNote": "Eure Ideen drehen sich um die drei Säulen der UN-Nachhaltigkeitsziele: People, Planet, Prosperity. Mehr dazu bei den <sdgLink>UN-Nachhaltigkeitszielen</sdgLink>.",
+      "whenLabel": "Wann",
+      "whereLabel": "Wo",
+      "prizeLabel": "Preisgeld",
+      "prizeValue": "1.000 €",
+      "registerCta": "Jetzt anmelden",
+      "scheduleCta": "So läuft's ab",
+      "languageNote": "The Ideathon's workshops, mentoring, and pitching take place in German. This page explains what to expect in English."
+    },
+    "countdown": {
+      "eyebrow": "Ideathon 2026 startet in",
+      "days": "Tage",
+      "hours": "Std",
+      "minutes": "Min",
+      "seconds": "Sek",
+      "daysOnly": "noch {days, plural, one {# Tag} other {# Tage}}",
+      "quietEyebrow": "Ideathon 2026",
+      "quietTitle": "Der nächste Termin steht noch nicht fest",
+      "quietBody": "Sobald der Vorstand einen neuen Termin im Kalender einträgt, erscheint hier der Countdown."
+    },
+    "stats": {
+      "eyebrow": "Auf einen Blick",
+      "daysValue": "4",
+      "daysLabel": "Tage voller Ideen",
+      "teamsValue": "~10",
+      "teamsLabel": "Teams",
+      "workshopsValue": "3",
+      "workshopsLabel": "Workshops",
+      "prizeValue": "1.000 €",
+      "prizeLabel": "Preisgeld"
+    },
+    "timeline": {
+      "eyebrow": "Der Ablauf",
+      "title": "Vier Tage, ein Weg",
+      "dayFallback": "Tag {day}",
+      "kickoff": {
+        "title": "Kickoff & Founder Talk",
+        "description": "Auftakt, Teameinteilung und Founder Talk, der euch inspiriert. Danach entspannt ankommen bei Essen und Getränken.",
+        "tags": "Teambuilding · Founder Talk"
+      },
+      "ideation": {
+        "title": "Ideation & Business Modelling",
+        "description": "Zwei Workshops geben dir das Handwerkszeug: erst die Idee schärfen, dann ein tragfähiges Business Modell bauen.",
+        "tags": "Ideation · Business Modelling"
+      },
+      "pitch": {
+        "title": "Pitch-Workshop & Feinschliff",
+        "description": "Lerne, deine Idee überzeugend zu erzählen und feile mit Mentor:innen so lange am Konzept, bis es wirklich sitzt.",
+        "tags": "Pitch-Workshop · Mentoring"
+      },
+      "finale": {
+        "title": "Finale & Pitching Contest",
+        "description": "Die große Bühne: Jedes Team pitcht vor der Jury. Die besten Ideen gewinnen und feiern gemeinsam den Abschluss.",
+        "tags": "Jury-Pitch · 1.000 € Preis"
+      }
+    },
+    "benefits": {
+      "eyebrow": "Warum mitmachen",
+      "title": "Was du mitnimmst",
+      "prizeMoney": {
+        "title": "Preisgeld für das Gewinnerteam",
+        "description": "Startkapital für die eigene Idee, vergeben von der Jury am Finaltag."
+      },
+      "ideaLivesOn": {
+        "title": "Deine Idee lebt weiter",
+        "description": "Auch ohne Sieg: Bring dein Projekt mit in den Verein und arbeite mit Struktur, Team und Support daran weiter. Nach einem erfolgreichen Pitch beim Ideathon bekommst du das Inno Gating und bist offiziell im MVP-Prozess angelangt. In diesem Prozess unterstützen wir dich monetär (500 €) sowie mit unseren Business Advisors. Siehe den Projektguide für mehr Infos."
+      },
+      "workshops": {
+        "title": "Drei Workshops",
+        "description": "Ideation, Business Modelling und Pitching, geleitet von Experten mit echter Erfahrung."
+      },
+      "network": {
+        "title": "Netzwerk",
+        "description": "Gründer:innen, Mentor:innen, Partnerunternehmen und motivierte Mitstreiter:innen an einem Ort."
+      },
+      "fromIdeaToExecution": {
+        "title": "Von der Idee zur Umsetzung",
+        "description": "Verwandle einen vagen Gedanken in ein Konzept, das du vor einer Jury vertreten kannst."
+      },
+      "takenCareOf": {
+        "title": "Rundum versorgt",
+        "description": "Verpflegung, Getränke und Snacks über alle vier Tage. Du kümmerst dich nur um deine Idee."
+      }
+    },
+    "steps": {
+      "eyebrow": "So bist du dabei",
+      "title": "Der Weg zur Anmeldung",
+      "lead": "Zwei Minuten Formular. Danach führen wir dich Schritt für Schritt zum Event.",
+      "form": {
+        "title": "Formular ausfüllen",
+        "description": "Ein paar kurze Fragen zu dir und deiner Motivation."
+      },
+      "confirmation": {
+        "title": "Bestätigung erhalten",
+        "description": "Innerhalb weniger Tage kommt deine Zusage per Mail, inklusive aller Infos, was dich erwartet und wie es weitergeht."
+      },
+      "meetTeam": {
+        "title": "Team kennenlernen",
+        "description": "Am ersten Abend wirst du, falls du dich ohne Team angemeldet hast, mit Hilfe von ein paar Kennenlernspielen dein Team auswählen."
+      },
+      "kickoff": {
+        "title": "Startschuss",
+        "description": "Am 25. September geht es richtig los. Drei Workshops, ein Pitch und eine lustige gemeinsame Zeit!"
+      },
+      "commitmentNote": "Bitte melde dich nur an, wenn du an allen vier Tagen dabei sein kannst. Wir organisieren Verpflegung, Räume und Workshops für dich, dein Platz ist wertvoll.",
+      "closedNote": "Der nächste Ideathon steht noch nicht fest. Die Anmeldung öffnet, sobald ein Termin im Kalender eingetragen ist."
+    },
+    "form": {
+      "heading": "Anmeldung",
+      "firstNameLabel": "Vorname",
+      "firstNameError": "Bitte gib deinen Vornamen an.",
+      "lastNameLabel": "Nachname",
+      "lastNameError": "Bitte gib deinen Nachnamen an.",
+      "emailLabel": "E-Mail-Adresse",
+      "emailError": "Bitte gib eine gültige E-Mail-Adresse ein.",
+      "universityLabel": "Hochschule",
+      "universityError": "Bitte gib deine Hochschule an.",
+      "semesterLabel": "Fachsemester",
+      "semesterError": "Bitte gib ein gültiges Fachsemester an.",
+      "studyProgramLabel": "Studiengang",
+      "studyProgramError": "Bitte gib deinen Studiengang an.",
+      "hasIdeaLabel": "Ich habe schon eine Idee.",
+      "ideaDescriptionLabel": "Kurze Ideenbeschreibung (optional)",
+      "ideaDescriptionHint": "Eine grobe Skizze reicht, Details besprechen wir persönlich beim Ideathon. Bitte keine ausformulierten Geschäftsgeheimnisse per Formular.",
+      "ideaDescriptionError": "Die Beschreibung darf höchstens 1000 Zeichen lang sein.",
+      "registeringAsTeamLabel": "Ich melde mich als Team an.",
+      "teamSizeLabel": "Teamgröße",
+      "teamSizeError": "Bitte gib eine gültige Teamgröße an.",
+      "heardAboutLabel": "Wie bist du auf uns aufmerksam geworden?",
+      "consentPrefix": "Ich habe die",
+      "consentLinkLabel": "Datenschutzhinweise zur Ideathon-Anmeldung",
+      "consentSuffix": "zur Kenntnis genommen.",
+      "consentError": "Bitte bestätige, dass du die Datenschutzhinweise zur Kenntnis genommen hast.",
+      "submitLabel": "Anmeldung absenden",
+      "submitPending": "Wird gesendet …",
+      "submitSuccess": "Deine Anmeldung ist da! Du bekommst in Kürze eine Bestätigung per Mail.",
+      "submitSignupClosed": "Die Anmeldung ist inzwischen geschlossen. Bitte lade die Seite neu.",
+      "submitFormExpired": "Das Formular ist abgelaufen. Bitte lade die Seite neu und versuch es erneut.",
+      "submitError": "Das hat nicht geklappt. Bitte versuch es noch einmal oder schreib uns an {email}."
+    },
+    "faq": {
+      "eyebrow": "Fragen",
+      "title": "Häufige Fragen",
+      "bringOwnIdea": {
+        "question": "Muss ich schon eine Idee mitbringen?",
+        "answer": "Nein. Viele kommen ohne Ideen oder nur mit einem groben Gedanken. Die Idee entwickelst du im Team während des Ideathons, der Ideation-Workshop hilft dir dabei."
+      },
+      "allFourDays": {
+        "question": "Muss ich alle vier Tage dabei sein?",
+        "answer": "Ja. Der Ablauf baut aufeinander auf und dein Team rechnet mit dir. Wenn du nicht alle vier Tage kannst, sind Ausnahmen möglich, melde dich per Kontakt."
+      },
+      "cost": {
+        "question": "Was kostet die Teilnahme?",
+        "answer": "Nichts. Teilnahme, Verpflegung, Getränke, Workshops und Materialien sind kostenlos, ermöglicht durch unsere Partner."
+      },
+      "overnight": {
+        "question": "Muss ich über Nacht bleiben?",
+        "answer": "Nein. Wir arbeiten tagsüber und abends, du gehst zwischendurch nach Hause und schläfst im eigenen Bett."
+      },
+      "afterIdeathon": {
+        "question": "Was passiert nach dem Ideathon?",
+        "answer": "Wenn du Lust hast, an deiner Idee weiterzuarbeiten, bist du bei uns im Verein willkommen, mit Struktur, Advisors und einem Team im Rücken. Die besten Teams bekommen beim Ideathon Pitch Day das Inno Gating und können dann im MVP-Prozess im Verein weiterarbeiten. Diese Teams bekommen dann Zugriff auf 500 €, unser Netzwerk und Business Advisors."
+      }
+    },
+    "contact": {
+      "eyebrow": "Direkter Kontakt",
+      "title": "Hast du eine Frage?",
+      "lead": "Wenn deine Frage oben nicht dabei ist, schreib mir einfach. Ich antworte persönlich, meist innerhalb eines Tages.",
+      "cta": "Nachricht schreiben"
+    },
+    "closing": {
+      "eyebrow": "Bereit?",
+      "title": "Sichere dir deinen <em>Platz</em>",
+      "lead": "Rund 50 Plätze in etwa zehn Teams, first come, first served.",
+      "registerCta": "Jetzt anmelden",
+      "footnote": "Offen für alle Studierenden · keine Vorerfahrung nötig · kostenlose Teilnahme"
+    }
+  },
   "EventFormats": {
     "eyebrow": "Wie wir zusammenkommen",
     "title": "Vier Formate",
@@ -894,6 +1085,28 @@
       "necessityLabel": "Erforderlichkeit",
       "necessity": "Die Bereitstellung der Daten ist weder gesetzlich noch vertraglich vorgeschrieben. Ohne die als Pflichtfelder gekennzeichneten Angaben können wir deine Bewerbung jedoch nicht bearbeiten."
     },
+    "ideathonSignup": {
+      "title": "Ideathon-Anmeldung",
+      "intro": "Über die Seite „Ideathon“ kannst du dich für den Ideathon anmelden. Erhoben werden:",
+      "fieldsHeading": "Erhobene Angaben",
+      "fields": [
+        "Vorname, Nachname, E-Mail-Adresse",
+        "Hochschule, Studiengang, Fachsemester",
+        "Angabe, ob bereits eine Idee vorhanden ist",
+        "Kurze Ideenbeschreibung (Freitext, optional, auf 1000 Zeichen begrenzt)",
+        "Angabe, ob du dich als Team anmeldest, und die Teamgröße (optional)",
+        "Angabe, wie du auf uns aufmerksam geworden bist",
+        "Zeitpunkt deiner Kenntnisnahme dieser Datenschutzhinweise"
+      ],
+      "purposeLabel": "Zweck",
+      "purpose": "Organisation und Durchführung des Ideathons, unter anderem Teamplanung, Verpflegung und Raumkapazität.",
+      "legalBasisLabel": "Rechtsgrundlage",
+      "legalBasis": "Art. 6 Abs. 1 lit. b DSGVO. Die Verarbeitung ist zur Durchführung der Veranstaltung erforderlich, für die du dich mit deiner Anmeldung registrierst.",
+      "accessLabel": "Empfänger",
+      "access": "Der Vorstand sowie die für die Ideathon-Organisation zuständigen Personen des Vereins. Deine Anmeldung wird zunächst in unserer Datenbank gespeichert und anschließend per E-Mail an info@unimannheim.enactus.team übermittelt.",
+      "necessityLabel": "Erforderlichkeit",
+      "necessity": "Die Bereitstellung der Daten ist weder gesetzlich noch vertraglich vorgeschrieben. Ohne die als Pflichtfelder gekennzeichneten Angaben können wir deine Anmeldung jedoch nicht bearbeiten."
+    },
     "reminder": {
       "title": "Erinnerungsliste",
       "body": [
@@ -944,6 +1157,8 @@
       "reminderUnconfirmedValue": "{days} Tage nach Anmeldung",
       "rateLimitLabel": "Hashwerte zur Missbrauchsabwehr",
       "rateLimitValue": "bis zum Ablauf des Zeitfensters",
+      "ideathonLabel": "Ideathon-Anmeldungen",
+      "ideathonValue": "{months} Monate nach Anmeldung",
       "serverLogsLabel": "Server-Protokolle",
       "serverLogsValue": "nach Vorgabe von Vercel, kurzfristig",
       "note": "Gesetzliche Aufbewahrungspflichten bleiben unberührt. Sofern solche Pflichten einer Löschung entgegenstehen, schränken wir die Verarbeitung stattdessen ein."
@@ -1156,6 +1371,10 @@
       "subject": "Deine Bewerbung ist bei uns angekommen",
       "body": "Hallo {firstName},\n\nvielen Dank für deine Bewerbung bei Enactus Mannheim! Wir haben sie erhalten und melden uns, sobald wir sie geprüft haben.\n\nDein Enactus-Mannheim-Team"
     },
+    "ideathonSignupConfirmation": {
+      "subject": "Deine Ideathon-Anmeldung ist bei uns angekommen",
+      "body": "Hallo {firstName},\n\nschön, dass du beim Ideathon 2026 dabei bist! Deine Anmeldung ist bei uns angekommen. Alle weiteren Infos bekommst du in den nächsten Tagen per Mail.\n\nDein Enactus-Mannheim-Team"
+    },
     "reminderConfirmation": {
       "subject": "Bitte bestätige deine Erinnerung",
       "body": "Hallo,\n\nbitte bestätige mit einem Klick, dass wir dich per E-Mail erinnern dürfen, sobald das Bewerbungsfenster öffnet:\n\n{confirmUrl}\n\nWenn du das nicht warst, kannst du diese E-Mail einfach ignorieren.\n\nJederzeit abmelden: {unsubscribeUrl}"
@@ -1192,6 +1411,7 @@
       "calendarEvents": "Termine",
       "jobPostings": "Jobs",
       "reminders": "Erinnerungsliste",
+      "ideathonSignups": "Ideathon-Anmeldungen",
       "contactMessages": "Kontaktanfragen",
       "deletionRequests": "Löschanfragen",
       "system": "Systemstatus",
@@ -1223,6 +1443,7 @@
         "calendarEvents": "Termine anlegen, bearbeiten und löschen.",
         "jobPostings": "Offene Stellen unserer Partner anlegen, bearbeiten und löschen.",
         "reminders": "Wer sich für die Erinnerung eingetragen hat, bestätigt und unbestätigt.",
+        "ideathonSignups": "Alle Anmeldungen zum Ideathon, mit CSV-Export.",
         "contactMessages": "Eingegangene Kontaktanfragen mit Versandstatus.",
         "deletionRequests": "Personenbezogene Daten zu einer Adresse suchen und löschen (Art. 15 und 17 DSGVO).",
         "system": "Letzte Cron-Ausführung, Erreichbarkeit von Datenbank und Resend, Zeilenzahlen."
@@ -1275,7 +1496,26 @@
         "applications": "Bewerbung",
         "contact_messages": "Kontaktanfrage",
         "reminder_signups": "Erinnerung",
-        "reminder_window_mails": "Fenster-Erinnerung"
+        "reminder_window_mails": "Fenster-Erinnerung",
+        "ideathon_signups": "Ideathon-Anmeldung"
+      }
+    },
+    "ideathonSignups": {
+      "title": "Ideathon-Anmeldungen",
+      "lead": "Alle Anmeldungen zum Ideathon.",
+      "downloadCsv": "Als CSV herunterladen",
+      "empty": "Noch keine Anmeldungen.",
+      "yes": "ja",
+      "no": "nein",
+      "teamOfSize": "ja ({size})",
+      "columns": {
+        "name": "Name",
+        "email": "E-Mail",
+        "university": "Hochschule",
+        "idea": "Idee vorhanden",
+        "team": "Team",
+        "createdAt": "Eingangsdatum",
+        "mailStatus": "Mailstatus"
       }
     },
     "recruitingWindows": {
@@ -1363,7 +1603,7 @@
       "endTimeLabel": "Endzeit",
       "locationLabel": "Ort",
       "internalLinkLabel": "Interner Link (optional)",
-      "internalLinkHint": "Pfad auf dieser Website, z. B. /ideathon — verknüpft den Termin mit seiner eigenen Seite.",
+      "internalLinkHint": "Pfad auf dieser Website, z. B. /ideathon. Verknüpft den Termin mit seiner eigenen Seite.",
       "descriptionLabel": "Beschreibung",
       "descriptionEnLabel": "Beschreibung (Englisch)",
       "tentativeLabel": "Termin steht noch nicht fest",
@@ -1456,7 +1696,7 @@
     },
     "deletionRequests": {
       "title": "Löschanfragen",
-      "lead": "Für Auskunfts- und Löschbegehren nach Art. 15 und 17 DSGVO. Suche nach einer E-Mail-Adresse über Bewerbungen, Kontaktanfragen und Erinnerungsliste.",
+      "lead": "Für Auskunfts- und Löschbegehren nach Art. 15 und 17 DSGVO. Suche nach einer E-Mail-Adresse über Bewerbungen, Kontaktanfragen, Erinnerungsliste und Ideathon-Anmeldungen.",
       "emailLabel": "E-Mail-Adresse",
       "emailHint": "Genau die Adresse aus dem Begehren.",
       "search": "Suchen",
@@ -1466,13 +1706,14 @@
       "tables": {
         "applications": "Bewerbungen",
         "contactMessages": "Kontaktanfragen",
-        "reminderSignups": "Erinnerungsliste"
+        "reminderSignups": "Erinnerungsliste",
+        "ideathonSignups": "Ideathon-Anmeldungen"
       },
       "deleteWarning": "Löschen ist endgültig und lässt sich nicht rückgängig machen. Es gibt kein Backup, aus dem diese Zeilen zurückkämen.",
       "confirmLabel": "Adresse zur Bestätigung erneut eingeben",
       "confirmHint": "Muss mit der gesuchten Adresse übereinstimmen.",
       "delete": "Endgültig löschen",
-      "deleted": "Gelöscht: {applications} Bewerbungen, {contactMessages} Kontaktanfragen, {reminderSignups} Einträge der Erinnerungsliste.",
+      "deleted": "Gelöscht: {applications} Bewerbungen, {contactMessages} Kontaktanfragen, {reminderSignups} Einträge der Erinnerungsliste, {ideathonSignups} Ideathon-Anmeldungen.",
       "errorSearch": "Die Suche hat nicht geklappt. Bitte versuch es noch einmal.",
       "errorDelete": "Das Löschen hat nicht geklappt. Bitte versuch es noch einmal.",
       "errorMismatch": "Die beiden Adressen stimmen nicht überein. Es wurde nichts gelöscht."
@@ -1524,7 +1765,8 @@
         "calendarEvents": "Termine",
         "jobPostings": "Jobs",
         "rateLimitHits": "Rate-Limit-Zähler",
-        "cronRuns": "Cron-Läufe"
+        "cronRuns": "Cron-Läufe",
+        "ideathonSignups": "Ideathon-Anmeldungen"
       }
     }
   },

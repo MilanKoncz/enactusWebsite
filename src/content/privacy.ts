@@ -27,9 +27,13 @@ const privacyReviewStatusSchema = z
   });
 export type PrivacyReviewStatus = z.infer<typeof privacyReviewStatusSchema>;
 
+// Flipped back to draft on 2026-08-25: the new Ideathon signup section
+// (Datenschutz.tsx, messages' "ideathonSignup" key) hasn't been reviewed by
+// the Enactus Germany data protection officer yet. Flip back to `true` with
+// a fresh `reviewedAt` once that sign-off happens — see ASSETS-TODO.md.
 export const privacyReviewStatus: PrivacyReviewStatus = privacyReviewStatusSchema.parse({
-  reviewed: true,
-  reviewedAt: "2026-08-19",
+  reviewed: false,
+  reviewedAt: null,
 });
 
 export { privacyReviewStatusSchema };

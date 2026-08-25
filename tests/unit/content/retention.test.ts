@@ -9,6 +9,7 @@ describe("content/retention", () => {
       reminderSignupsUnconfirmed: { days: 30, confirmedByBoard: false },
       jobPostings: { months: 12, confirmedByBoard: true },
       rateLimitHits: { days: 1, confirmedByBoard: true },
+      ideathonSignups: { months: 6, confirmedByBoard: true },
     });
   });
 
@@ -24,6 +25,7 @@ describe("content/retention", () => {
         reminderSignupsUnconfirmed: { days: 30, confirmedByBoard: false },
         jobPostings: { months: 12, confirmedByBoard: true },
         rateLimitHits: { days: 1, confirmedByBoard: true },
+        ideathonSignups: { months: 6, confirmedByBoard: true },
       }),
     ).toThrow();
   });
@@ -36,6 +38,7 @@ describe("content/retention", () => {
         reminderSignupsUnconfirmed: { days: 30, confirmedByBoard: false },
         jobPostings: { months: 12, confirmedByBoard: true },
         rateLimitHits: { days: 1, confirmedByBoard: true },
+        ideathonSignups: { months: 6, confirmedByBoard: true },
       }),
     ).toThrow();
   });

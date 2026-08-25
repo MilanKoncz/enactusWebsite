@@ -89,6 +89,16 @@
   --text-body-s--letter-spacing: 0em;
   --text-body-s--font-weight: 400;
 
+  /* The Ideathon countdown's big tabular-nums figures (IdeathonCountdown.tsx)
+     — the one place a mono figure needs to read at a glance across the page,
+     not as fine-print data. Weight 700 and tight tracking, unlike every
+     other mono step's uppercase-label duty: a large digit doesn't need the
+     wide letter-spacing that keeps a tiny all-caps label legible. */
+  --text-mono-l: 3rem;
+  --text-mono-l--line-height: 1;
+  --text-mono-l--letter-spacing: -0.01em;
+  --text-mono-l--font-weight: 700;
+
   /* The gate marker's own label size (GateMarker.tsx). One step above
      mono-s: the signature element's label was reading as fine print next to
      the rule it belongs to. */
@@ -1078,6 +1088,7 @@ body {
     --text-body-l: 0.85rem;
     --text-body-m: 0.75rem;
     --text-body-s: 0.7rem;
+    --text-mono-l: 2.4rem;
     --text-mono-m: 0.75rem;
     --text-mono-s: 0.68rem;
     --text-mono-xs: 0.58rem;

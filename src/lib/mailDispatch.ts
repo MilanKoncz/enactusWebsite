@@ -5,13 +5,15 @@ import {
   sendApplicationConfirmation,
   sendApplicationNotification,
   sendContactMessageNotification,
+  sendIdeathonSignupConfirmation,
+  sendIdeathonSignupNotification,
   sendReminderConfirmationEmail,
   sendReminderWindowOpenEmail,
 } from "@/lib/mail";
 import { localizedPath } from "@/lib/localizedPath";
 import { RECRUITING_TIMEZONE } from "@/content/recruiting";
 import { siteUrl } from "@/lib/siteUrl";
-import type { Application, ContactMessage, Locale } from "@/lib/db";
+import type { Application, ContactMessage, IdeathonSignup, Locale } from "@/lib/db";
 
 /**
  * What each form's notification actually *is* — composed once, called both
@@ -40,6 +42,18 @@ export async function dispatchApplicationMails(application: Application): Promis
     firstName: application.firstName,
     subject: t("subject"),
     text: t("body", { firstName: application.firstName }),
+  });
+}
+
+export async function dispatchIdeathonSignupMails(signup: IdeathonSignup): Promise<void> {
+  await sendIdeathonSignupNotification(signup);
+
+  const t = await getTranslations({ locale: signup.locale, namespace: "Mail.ideathonSignupConfirmation" });
+  await sendIdeathonSignupConfirmation({
+    email: signup.email,
+    firstName: signup.firstName,
+    subject: t("subject"),
+    text: t("body", { firstName: signup.firstName }),
   });
 }
 

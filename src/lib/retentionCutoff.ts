@@ -34,6 +34,10 @@ export function reminderSignupRetentionCutoff(now: Date): Date {
   return addDays(now, -retention.reminderSignupsUnconfirmed.days);
 }
 
+export function ideathonSignupRetentionCutoff(now: Date): Date {
+  return addMonths(now, -retention.ideathonSignups.months);
+}
+
 export function rateLimitHitRetentionCutoff(now: Date): Date {
   return addDays(now, -retention.rateLimitHits.days);
 }

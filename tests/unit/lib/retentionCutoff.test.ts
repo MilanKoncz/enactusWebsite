@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   applicationRetentionCutoff,
   contactMessageRetentionCutoff,
+  ideathonSignupRetentionCutoff,
   reminderSignupRetentionCutoff,
   rateLimitHitRetentionCutoff,
 } from "@/lib/retentionCutoff";
@@ -37,5 +38,12 @@ describe("rateLimitHitRetentionCutoff", () => {
   it("returns now minus 1 day", () => {
     const now = new Date("2027-03-14T00:00:00Z");
     expect(rateLimitHitRetentionCutoff(now)).toEqual(new Date("2027-03-13T00:00:00Z"));
+  });
+});
+
+describe("ideathonSignupRetentionCutoff", () => {
+  it("returns now minus 6 months", () => {
+    const now = new Date("2027-03-14T00:00:00Z");
+    expect(ideathonSignupRetentionCutoff(now)).toEqual(new Date("2026-09-14T00:00:00Z"));
   });
 });

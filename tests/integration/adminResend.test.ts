@@ -6,6 +6,7 @@ const findApplicationById = vi.fn();
 const findContactMessageById = vi.fn();
 const findReminderSignupById = vi.fn();
 const findReminderWindowMailById = vi.fn();
+const findIdeathonSignupById = vi.fn();
 const markApplicationMailed = vi.fn();
 const markApplicationMailFailed = vi.fn();
 const markContactMessageMailed = vi.fn();
@@ -14,17 +15,21 @@ const markReminderMailed = vi.fn();
 const markReminderMailFailed = vi.fn();
 const markReminderWindowMailSent = vi.fn();
 const markReminderWindowMailFailed = vi.fn();
+const markIdeathonSignupMailed = vi.fn();
+const markIdeathonSignupMailFailed = vi.fn();
 
 const dispatchApplicationMails = vi.fn();
 const dispatchContactNotification = vi.fn();
 const dispatchReminderConfirmation = vi.fn();
 const dispatchReminderWindowOpen = vi.fn();
+const dispatchIdeathonSignupMails = vi.fn();
 
 vi.mock("@/lib/db", () => ({
   findApplicationById: (...a: unknown[]) => findApplicationById(...a),
   findContactMessageById: (...a: unknown[]) => findContactMessageById(...a),
   findReminderSignupById: (...a: unknown[]) => findReminderSignupById(...a),
   findReminderWindowMailById: (...a: unknown[]) => findReminderWindowMailById(...a),
+  findIdeathonSignupById: (...a: unknown[]) => findIdeathonSignupById(...a),
   markApplicationMailed: (...a: unknown[]) => markApplicationMailed(...a),
   markApplicationMailFailed: (...a: unknown[]) => markApplicationMailFailed(...a),
   markContactMessageMailed: (...a: unknown[]) => markContactMessageMailed(...a),
@@ -33,6 +38,8 @@ vi.mock("@/lib/db", () => ({
   markReminderMailFailed: (...a: unknown[]) => markReminderMailFailed(...a),
   markReminderWindowMailSent: (...a: unknown[]) => markReminderWindowMailSent(...a),
   markReminderWindowMailFailed: (...a: unknown[]) => markReminderWindowMailFailed(...a),
+  markIdeathonSignupMailed: (...a: unknown[]) => markIdeathonSignupMailed(...a),
+  markIdeathonSignupMailFailed: (...a: unknown[]) => markIdeathonSignupMailFailed(...a),
 }));
 
 vi.mock("@/lib/mailDispatch", () => ({
@@ -40,6 +47,7 @@ vi.mock("@/lib/mailDispatch", () => ({
   dispatchContactNotification: (...a: unknown[]) => dispatchContactNotification(...a),
   dispatchReminderConfirmation: (...a: unknown[]) => dispatchReminderConfirmation(...a),
   dispatchReminderWindowOpen: (...a: unknown[]) => dispatchReminderWindowOpen(...a),
+  dispatchIdeathonSignupMails: (...a: unknown[]) => dispatchIdeathonSignupMails(...a),
 }));
 
 const ORIGINAL_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET;
@@ -78,7 +86,7 @@ describe("POST /api/admin/mails/resend", () => {
     expect(dispatchApplicationMails).not.toHaveBeenCalled();
   });
 
-  it("rejects an unknown source, so only the three real tables can be targeted", async () => {
+  it("rejects an unknown source, so only the real mail-tracking tables can be targeted", async () => {
     const { POST } = await import("@/app/api/admin/mails/resend/route");
     const response = await POST(await resendRequest({ source: "schema_migrations", id: ID }));
 
@@ -200,6 +208,21 @@ describe("POST /api/admin/mails/resend", () => {
 
     expect(response.status).toBe(502);
     expect(markReminderWindowMailFailed).toHaveBeenCalledWith(ID, "Resend is still down");
+  });
+
+  it("resends an Ideathon signup's mails and marks the row sent", async () => {
+    const signup = { id: ID, email: "jane@example.com", firstName: "Jane", locale: "de" };
+    findIdeathonSignupById.mockResolvedValue(signup);
+    dispatchIdeathonSignupMails.mockResolvedValue(undefined);
+    markIdeathonSignupMailed.mockResolvedValue(undefined);
+
+    const { POST } = await import("@/app/api/admin/mails/resend/route");
+    const response = await POST(await resendRequest({ source: "ideathon_signups", id: ID }));
+
+    expect(response.status).toBe(200);
+    expect(dispatchIdeathonSignupMails).toHaveBeenCalledWith(signup);
+    expect(markIdeathonSignupMailed).toHaveBeenCalledWith(ID);
+    expect(markIdeathonSignupMailFailed).not.toHaveBeenCalled();
   });
 
   it("answers 404 without sending when the row was deleted since the page rendered", async () => {
