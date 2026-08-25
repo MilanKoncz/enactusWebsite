@@ -15,6 +15,18 @@ import { z } from "zod";
  * different dates. See lib/ideathonEvent.ts.
  */
 
+// The hero/stat-band figures from the board's draft — real facts, not
+// configurable per-visit content, so they're numbers here (not
+// pre-formatted strings) and the component (IdeathonHero.tsx) does the
+// locale-aware formatting and count-up animation, the same split
+// content/kpis.ts and HomeKpis.tsx already use for the homepage's figures.
+export const stats = {
+  days: 4,
+  teams: 10,
+  workshops: 3,
+  prizeEuros: 1000,
+};
+
 const timelineStepKeySchema = z.enum(["kickoff", "ideation", "pitch", "finale"]);
 export type TimelineStepKey = z.infer<typeof timelineStepKeySchema>;
 

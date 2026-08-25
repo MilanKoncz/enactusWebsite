@@ -522,7 +522,6 @@
       "whenLabel": "Wann",
       "whereLabel": "Wo",
       "prizeLabel": "Preisgeld",
-      "prizeValue": "1.000 €",
       "registerCta": "Jetzt anmelden",
       "scheduleCta": "So läuft's ab",
       "languageNote": "The Ideathon's workshops, mentoring, and pitching take place in German. This page explains what to expect in English."
@@ -540,13 +539,9 @@
     },
     "stats": {
       "eyebrow": "Auf einen Blick",
-      "daysValue": "4",
       "daysLabel": "Tage voller Ideen",
-      "teamsValue": "~10",
       "teamsLabel": "Teams",
-      "workshopsValue": "3",
       "workshopsLabel": "Workshops",
-      "prizeValue": "1.000 €",
       "prizeLabel": "Preisgeld"
     },
     "timeline": {

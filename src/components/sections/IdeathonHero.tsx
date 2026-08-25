@@ -1,12 +1,30 @@
-import { useLocale, useTranslations } from "next-intl";
+import type { ReactNode } from "react";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { buttonClasses } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Section } from "@/components/ui/Section";
 import { IdeathonCountdown } from "@/components/sections/IdeathonCountdown";
+import { AnimatedFigure, useSeenOnce } from "@/components/motion/AnimatedFigure";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { formatEventDate } from "@/lib/calendarFormat";
 import { SDG_GOALS_URL } from "@/content/sdg";
+import { stats } from "@/content/ideathon";
 import type { CalendarEvent } from "@/content/calendar";
+
+// Translated, not copied, from idea.html's own hero background (a radial
+// gold glow at the upper right over a navy base, plus two faint accent
+// glows) — same rgba positions/stops/alpha values, its gold
+// (rgba(224,162,0,…)) swapped for ours (rgba(255,195,33,…) = --color-gold).
+// An inline style, not a new globals.css @utility: docs/design-system.md
+// names `.signature-gradient` as a single, contained exception and this
+// is a different visual (a corner glow, not a navy-to-gold plateau) scoped
+// to one page's hero, the same way HomeHero.tsx's own video scrim is a
+// plain overlay div rather than a shared utility.
+const HERO_GRADIENT =
+  "radial-gradient(120% 90% at 80% 0%, rgba(255,195,33,0.18), transparent 55%), " +
+  "radial-gradient(circle at 20% 80%, rgba(255,255,255,0.04), transparent 40%), " +
+  "radial-gradient(circle at 90% 30%, rgba(255,195,33,0.08), transparent 35%)";
 
 /**
  * The page's one h1, on ink rather than the plain-paper SectionHeading
@@ -23,10 +41,13 @@ import type { CalendarEvent } from "@/content/calendar";
 export function IdeathonHero({ nextEvent }: { nextEvent: CalendarEvent | null }) {
   const t = useTranslations("IdeathonPage.hero");
   const locale = useLocale();
+  const format = useFormatter();
 
   return (
-    <Section surface="ink">
-      <Container className="flex flex-col gap-10">
+    <Section surface="ink" className="relative isolate overflow-hidden">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ backgroundImage: HERO_GRADIENT }} />
+
+      <Container className="relative flex flex-col gap-10">
         <div className="flex flex-col gap-6">
           <Eyebrow>{t("eyebrow")}</Eyebrow>
           <h1 className="max-w-3xl text-display-2 font-display break-words">
@@ -57,7 +78,10 @@ export function IdeathonHero({ nextEvent }: { nextEvent: CalendarEvent | null })
               {nextEvent.location && <Fact label={t("whereLabel")} value={nextEvent.location} />}
             </>
           )}
-          <Fact label={t("prizeLabel")} value={t("prizeValue")} />
+          <Fact
+            label={t("prizeLabel")}
+            value={format.number(stats.prizeEuros, { style: "currency", currency: "EUR", maximumFractionDigits: 0 })}
+          />
         </div>
 
         <div className="flex flex-wrap items-center gap-4">
@@ -76,21 +100,57 @@ export function IdeathonHero({ nextEvent }: { nextEvent: CalendarEvent | null })
   );
 }
 
+// Counts up once scrolled into view, like HomeKpis' KPI row — board
+// feedback on the first pass was that these should tick the way every
+// other stat band on the site does, not sit static.
 function IdeathonStats() {
   const t = useTranslations("IdeathonPage.stats");
+  const format = useFormatter();
+  const reducedMotion = usePrefersReducedMotion();
+  const [rowRef, seen] = useSeenOnce<HTMLDivElement>();
+
   return (
-    <div className="border-t border-paper/10 py-10">
-      <Container className="flex flex-wrap justify-center gap-x-10 gap-y-6 text-center">
-        <Stat value={t("daysValue")} label={t("daysLabel")} />
-        <Stat value={t("teamsValue")} label={t("teamsLabel")} />
-        <Stat value={t("workshopsValue")} label={t("workshopsLabel")} />
-        <Stat value={t("prizeValue")} label={t("prizeLabel")} />
+    <div className="relative border-t border-paper/10 py-10">
+      <Container className="flex flex-col gap-6">
+        <Eyebrow className="text-center">{t("eyebrow")}</Eyebrow>
+        <div ref={rowRef} className="flex flex-wrap justify-center gap-x-10 gap-y-6 text-center">
+          <Stat
+            value={<AnimatedFigure target={stats.days} start={seen} reducedMotion={reducedMotion} format={(v) => format.number(v)} />}
+            label={t("daysLabel")}
+          />
+          <Stat
+            value={
+              <AnimatedFigure
+                target={stats.teams}
+                start={seen}
+                reducedMotion={reducedMotion}
+                format={(v) => `~${format.number(v)}`}
+              />
+            }
+            label={t("teamsLabel")}
+          />
+          <Stat
+            value={<AnimatedFigure target={stats.workshops} start={seen} reducedMotion={reducedMotion} format={(v) => format.number(v)} />}
+            label={t("workshopsLabel")}
+          />
+          <Stat
+            value={
+              <AnimatedFigure
+                target={stats.prizeEuros}
+                start={seen}
+                reducedMotion={reducedMotion}
+                format={(v) => format.number(v, { style: "currency", currency: "EUR", maximumFractionDigits: 0 })}
+              />
+            }
+            label={t("prizeLabel")}
+          />
+        </div>
       </Container>
     </div>
   );
 }
 
-function Stat({ value, label }: { value: string; label: string }) {
+function Stat({ value, label }: { value: ReactNode; label: string }) {
   return (
     <div className="flex flex-col gap-1">
       <p className="text-display-4 font-display">{value}</p>
