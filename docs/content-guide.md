@@ -167,6 +167,20 @@ semester, newest first, with a "Als CSV herunterladen" button per group.
 If a row says its mail failed, `/admin/mails` shows why and offers a
 resend. `/admin` links every section; `docs/deployment.md` describes them.
 
+## Check or export Ideathon signups
+
+`/admin/ideathon-anmeldungen` lists every signup to the Ideathon (`/ideathon`),
+newest first, with a "Als CSV herunterladen" button — same shape as the
+applications page above, just without the semester grouping (the Ideathon has
+no recruiting-cycle concept). A failed confirmation mail shows up in
+`/admin/mails` with a resend, same as every other form on the site.
+
+The Ideathon page itself reads its date, location, and open/closed state from
+the `calendar_events` row whose "Interner Link" field (`/admin/termine`)
+points at `/ideathon` — see "Update the event calendar" above. Point a future
+year's row at `/ideathon` the same way to move the whole page forward; there
+is nothing else to update in code.
+
 ## Update KPIs, network stats, or "since 2003"
 
 - Homepage KPI tiles: `src/content/kpis.ts`.

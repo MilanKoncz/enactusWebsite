@@ -25,6 +25,33 @@ Open/closed state comes from the `recruiting_windows` table (see
 Neon on every visit. Closed → countdown plus reminder signup. Open → the
 form.
 
+## Ideathon signup form (`/ideathon`)
+
+A second, independent form using the exact same plumbing as `/mitmachen`'s
+application form (shared Zod schema, honeypot, signed timing token, rate
+limit, DB-before-mail, `mail_status` trio) but its own table
+(`ideathon_signups`, migration `0014`), route (`/api/ideathon`), and
+dispatch functions — the two forms are deliberately not variants of one
+another and can change independently.
+
+1. The route rejects with 409 when no upcoming `calendar_events` row has its
+   "Interner Link" field pointed at `/ideathon` (`lib/ideathonEvent.ts`) —
+   the same row the page's own countdown and facts read from, so both can
+   never disagree about whether signup is still open.
+2. No PDF: the board notification is a plain-text email to
+   `APPLICATION_RECIPIENT_EMAIL`, the same recipient the membership
+   application uses.
+3. The countdown (`IdeathonCountdown.tsx`) shows whole days only when the
+   matched row has no `start_time`, and the full days/hours/minutes/seconds
+   ticker once one is set — never more precision than the board has actually
+   entered.
+4. `idea_description` is capped at 1000 characters, in the Zod schema and
+   again as a DB `check` constraint: the field can hold a visitor's
+   unpublished business idea over a public form and mail pipeline.
+5. Retention is 6 months from each row's own `created_at` (same rolling-window
+   shape as `applications`), enforced by the same daily `/api/cron/cleanup`
+   route as everything else in `content/retention.ts`.
+
 ## Reminder list
 
 Notifying people when applications open is marketing email under German law and
