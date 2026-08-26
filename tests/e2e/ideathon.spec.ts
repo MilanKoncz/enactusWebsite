@@ -127,9 +127,9 @@ test.describe("/ideathon", () => {
     await page.getByLabel("Vorname").fill("Jane");
     await page.getByLabel("Nachname").fill("Doe");
     await page.getByLabel("E-Mail-Adresse").fill("jane@example.com");
-    await page.getByLabel("Hochschule").fill("Universität Mannheim");
-    await page.getByLabel("Fachsemester").fill("3");
     await page.getByLabel("Studiengang").fill("BWL");
+    await page.getByLabel("Fachsemester").fill("3");
+    await page.getByLabel("Essenspräferenz").selectOption("omnivore");
     await page.getByRole("checkbox", { name: "Ich habe die Datenschutzhinweise" }).check();
 
     await page.getByRole("button", { name: "Anmeldung absenden" }).click();
@@ -143,9 +143,9 @@ test.describe("/ideathon", () => {
     await page.getByLabel("Vorname").fill("Jane");
     await page.getByLabel("Nachname").fill("Doe");
     await page.getByLabel("E-Mail-Adresse").fill("jane@example.com");
-    await page.getByLabel("Hochschule").fill("Universität Mannheim");
-    await page.getByLabel("Fachsemester").fill("3");
     await page.getByLabel("Studiengang").fill("BWL");
+    await page.getByLabel("Fachsemester").fill("3");
+    await page.getByLabel("Essenspräferenz").selectOption("omnivore");
     await page.getByRole("button", { name: "Anmeldung absenden" }).click();
     await expect(page.getByText("Bitte bestätige, dass du die Datenschutzhinweise")).toBeVisible();
   });

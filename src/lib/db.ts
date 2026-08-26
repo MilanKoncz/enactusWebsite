@@ -1,5 +1,6 @@
 import { neon } from "@neondatabase/serverless";
 import type { NeonQueryFunction } from "@neondatabase/serverless";
+import type { DietaryPreference } from "./ideathonSignupFormSchema";
 
 /**
  * The only file in this codebase that writes SQL. Every route in app/api/
@@ -1138,13 +1139,15 @@ export type IdeathonSignupInput = {
   firstName: string;
   lastName: string;
   email: string;
-  university: string;
   studyProgram: string;
   semester: number;
   hasIdea: boolean;
   ideaDescription?: string;
+  motivationExperience?: string;
   registeringAsTeam: boolean;
   teamSize?: number;
+  teamMembers?: string;
+  dietaryPreference: DietaryPreference;
   heardAboutUs?: string;
   locale: Locale;
 };
@@ -1165,13 +1168,15 @@ function toIdeathonSignup(row: Record<string, unknown>): IdeathonSignup {
     firstName: row.first_name as string,
     lastName: row.last_name as string,
     email: row.email as string,
-    university: row.university as string,
     studyProgram: row.study_program as string,
     semester: row.semester as number,
     hasIdea: row.has_idea as boolean,
     ideaDescription: (row.idea_description as string | null) ?? undefined,
+    motivationExperience: (row.motivation_experience as string | null) ?? undefined,
     registeringAsTeam: row.registering_as_team as boolean,
     teamSize: (row.team_size as number | null) ?? undefined,
+    teamMembers: (row.team_members as string | null) ?? undefined,
+    dietaryPreference: row.dietary_preference as DietaryPreference,
     heardAboutUs: (row.heard_about_us as string | null) ?? undefined,
     locale: row.locale as Locale,
     consentAt: row.consent_at as Date,
@@ -1186,12 +1191,14 @@ function toIdeathonSignup(row: Record<string, unknown>): IdeathonSignup {
 export async function insertIdeathonSignup(input: IdeathonSignupInput): Promise<IdeathonSignup> {
   const rows = await sql()`
     insert into ideathon_signups (
-      first_name, last_name, email, university, study_program, semester,
-      has_idea, idea_description, registering_as_team, team_size, heard_about_us, locale, consent_at
+      first_name, last_name, email, study_program, semester,
+      has_idea, idea_description, motivation_experience, registering_as_team, team_size,
+      team_members, dietary_preference, heard_about_us, locale, consent_at
     ) values (
-      ${input.firstName}, ${input.lastName}, ${input.email}, ${input.university},
+      ${input.firstName}, ${input.lastName}, ${input.email},
       ${input.studyProgram}, ${input.semester}, ${input.hasIdea}, ${input.ideaDescription ?? null},
-      ${input.registeringAsTeam}, ${input.teamSize ?? null}, ${input.heardAboutUs ?? null},
+      ${input.motivationExperience ?? null}, ${input.registeringAsTeam}, ${input.teamSize ?? null},
+      ${input.teamMembers ?? null}, ${input.dietaryPreference}, ${input.heardAboutUs ?? null},
       ${input.locale}, now()
     )
     returning *
@@ -1226,18 +1233,21 @@ export type IdeathonSignupSummary = {
   firstName: string;
   lastName: string;
   email: string;
-  university: string;
   studyProgram: string;
   hasIdea: boolean;
   registeringAsTeam: boolean;
   teamSize: number | undefined;
+  teamMembers: string | undefined;
+  motivationExperience: string | undefined;
+  dietaryPreference: DietaryPreference;
   mailStatus: MailStatus;
 };
 
 export async function listIdeathonSignups(): Promise<IdeathonSignupSummary[]> {
   const rows = await sql()`
-    select id, created_at, first_name, last_name, email, university, study_program,
-           has_idea, registering_as_team, team_size, mail_status
+    select id, created_at, first_name, last_name, email, study_program,
+           has_idea, registering_as_team, team_size, team_members,
+           motivation_experience, dietary_preference, mail_status
     from ideathon_signups
     order by created_at desc
   `;
@@ -1247,11 +1257,13 @@ export async function listIdeathonSignups(): Promise<IdeathonSignupSummary[]> {
     firstName: row.first_name as string,
     lastName: row.last_name as string,
     email: row.email as string,
-    university: row.university as string,
     studyProgram: row.study_program as string,
     hasIdea: row.has_idea as boolean,
     registeringAsTeam: row.registering_as_team as boolean,
     teamSize: (row.team_size as number | null) ?? undefined,
+    teamMembers: (row.team_members as string | null) ?? undefined,
+    motivationExperience: (row.motivation_experience as string | null) ?? undefined,
+    dietaryPreference: row.dietary_preference as DietaryPreference,
     mailStatus: row.mail_status as MailStatus,
   }));
 }

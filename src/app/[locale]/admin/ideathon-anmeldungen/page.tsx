@@ -45,13 +45,16 @@ export default async function AdminIdeathonSignupsPage({ params }: PageProps) {
       </div>
 
       <AdminTable
-        minWidthClassName="min-w-[820px]"
+        minWidthClassName="min-w-[1180px]"
         columns={[
           t("ideathonSignups.columns.name"),
           t("ideathonSignups.columns.email"),
-          t("ideathonSignups.columns.university"),
+          t("ideathonSignups.columns.studyProgram"),
           t("ideathonSignups.columns.idea"),
           t("ideathonSignups.columns.team"),
+          t("ideathonSignups.columns.teamMembers"),
+          t("ideathonSignups.columns.motivationExperience"),
+          t("ideathonSignups.columns.dietaryPreference"),
           t("ideathonSignups.columns.createdAt"),
           t("ideathonSignups.columns.mailStatus"),
         ]}
@@ -61,11 +64,30 @@ export default async function AdminIdeathonSignupsPage({ params }: PageProps) {
           cells: [
             `${signup.firstName} ${signup.lastName}`,
             signup.email,
-            signup.university,
+            signup.studyProgram,
             t(signup.hasIdea ? "ideathonSignups.yes" : "ideathonSignups.no"),
             signup.registeringAsTeam
               ? t("ideathonSignups.teamOfSize", { size: signup.teamSize ?? "?" })
               : t("ideathonSignups.no"),
+            signup.teamMembers ? (
+              <span key="teamMembers" className="block max-w-[16rem] truncate" title={signup.teamMembers}>
+                {signup.teamMembers}
+              </span>
+            ) : (
+              "–"
+            ),
+            signup.motivationExperience ? (
+              <span
+                key="motivationExperience"
+                className="block max-w-[16rem] truncate"
+                title={signup.motivationExperience}
+              >
+                {signup.motivationExperience}
+              </span>
+            ) : (
+              "–"
+            ),
+            t(`ideathonSignups.dietary.${signup.dietaryPreference}`),
             dateFormatter.format(signup.createdAt),
             <MailStatusIndicator
               key="mailStatus"

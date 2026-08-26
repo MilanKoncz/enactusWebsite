@@ -58,6 +58,11 @@ export function IdeathonSignupForm() {
     formState: { errors },
   } = useForm<IdeathonSignupFormInput, unknown, IdeathonSignupFormValues>({
     resolver: zodResolver(ideathonSignupFormSchema),
+    // dietaryPreference is left out here on purpose: the placeholder
+    // <option value=""> below is the field's only default, uncontrolled
+    // through the native select — it forces a visitor to actively pick one
+    // of the six choices (including "keine Angabe") rather than the form
+    // silently assuming "omnivor" for someone who skipped the field.
     defaultValues: { hasIdea: false, registeringAsTeam: false },
   });
   // useWatch, not the form instance's own watch() — the latter returns a
@@ -126,10 +131,10 @@ export function IdeathonSignupForm() {
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
         <Field
-          label={t("universityLabel")}
+          label={t("studyProgramLabel")}
           containerClassName="sm:col-span-2"
-          error={errors.university && t("universityError")}
-          {...register("university")}
+          error={errors.studyProgram && t("studyProgramError")}
+          {...register("studyProgram")}
         />
         <Field
           label={t("semesterLabel")}
@@ -140,7 +145,15 @@ export function IdeathonSignupForm() {
           {...register("semester")}
         />
       </div>
-      <Field label={t("studyProgramLabel")} error={errors.studyProgram && t("studyProgramError")} {...register("studyProgram")} />
+
+      <Field
+        as="textarea"
+        label={t("motivationExperienceLabel")}
+        hint={t("motivationExperienceHint")}
+        maxLength={1000}
+        error={errors.motivationExperience && t("motivationExperienceError")}
+        {...register("motivationExperience")}
+      />
 
       <div className="flex flex-col gap-3">
         <label className="flex items-start gap-3 text-body-s">
@@ -173,16 +186,44 @@ export function IdeathonSignupForm() {
           <span>{t("registeringAsTeamLabel")}</span>
         </label>
         {registeringAsTeam && (
-          <Field
-            label={t("teamSizeLabel")}
-            type="number"
-            min={1}
-            max={50}
-            error={errors.teamSize && t("teamSizeError")}
-            {...register("teamSize")}
-          />
+          <>
+            <Field
+              label={t("teamSizeLabel")}
+              type="number"
+              min={1}
+              max={50}
+              error={errors.teamSize && t("teamSizeError")}
+              {...register("teamSize")}
+            />
+            <Field
+              label={t("teamMembersLabel")}
+              hint={t("teamMembersHint")}
+              maxLength={300}
+              error={errors.teamMembers && t("teamMembersError")}
+              {...register("teamMembers")}
+            />
+          </>
         )}
       </div>
+
+      <Field
+        as="select"
+        label={t("dietaryPreferenceLabel")}
+        hint={t("dietaryPreferenceHint", { email: org.contactEmails.board })}
+        error={errors.dietaryPreference && t("dietaryPreferenceError")}
+        defaultValue=""
+        {...register("dietaryPreference")}
+      >
+        <option value="" disabled>
+          {t("dietaryPreferencePlaceholder")}
+        </option>
+        <option value="omnivore">{t("dietaryPreferenceOmnivore")}</option>
+        <option value="vegetarian">{t("dietaryPreferenceVegetarian")}</option>
+        <option value="vegan">{t("dietaryPreferenceVegan")}</option>
+        <option value="halal">{t("dietaryPreferenceHalal")}</option>
+        <option value="kosher">{t("dietaryPreferenceKosher")}</option>
+        <option value="noAnswer">{t("dietaryPreferenceNoAnswer")}</option>
+      </Field>
 
       <Field label={t("heardAboutLabel")} {...register("heardAboutUs")} />
 

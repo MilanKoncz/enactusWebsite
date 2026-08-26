@@ -7,10 +7,12 @@ import { csvDocument } from "@/lib/csv";
 const CSV_COLUMNS = [
   "Name",
   "E-Mail",
-  "Hochschule",
   "Studiengang",
   "Idee vorhanden",
   "Team",
+  "Teammitglieder",
+  "Motivation und bisherige Erfahrung",
+  "Essenspräferenz",
   "Eingangsdatum",
   "Mailstatus",
 ];
@@ -19,6 +21,15 @@ const MAIL_STATUS_LABEL: Record<string, string> = {
   pending: "ausstehend",
   sent: "gesendet",
   failed: "fehlgeschlagen",
+};
+
+const DIETARY_PREFERENCE_LABEL: Record<string, string> = {
+  omnivore: "omnivor",
+  vegetarian: "vegetarisch",
+  vegan: "vegan",
+  halal: "halal",
+  kosher: "koscher",
+  noAnswer: "keine Angabe",
 };
 
 export async function GET(request: NextRequest) {
@@ -40,10 +51,12 @@ export async function GET(request: NextRequest) {
     signups.map((signup) => [
       `${signup.firstName} ${signup.lastName}`,
       signup.email,
-      signup.university,
       signup.studyProgram,
       signup.hasIdea ? "ja" : "nein",
       signup.registeringAsTeam ? `ja (${signup.teamSize ?? "?"})` : "nein",
+      signup.teamMembers ?? "",
+      signup.motivationExperience ?? "",
+      DIETARY_PREFERENCE_LABEL[signup.dietaryPreference] ?? signup.dietaryPreference,
       dateFormatter.format(signup.createdAt),
       MAIL_STATUS_LABEL[signup.mailStatus] ?? signup.mailStatus,
     ]),

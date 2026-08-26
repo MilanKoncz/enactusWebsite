@@ -115,6 +115,18 @@ export async function sendReminderWindowOpenEmail(params: {
   });
 }
 
+// German labels for the board's own notification mail — this text is never
+// shown to the visitor, so it doesn't go through next-intl (same reasoning
+// as the CSV export routes' own hardcoded label maps).
+const DIETARY_PREFERENCE_LABEL: Record<IdeathonSignup["dietaryPreference"], string> = {
+  omnivore: "omnivor",
+  vegetarian: "vegetarisch",
+  vegan: "vegan",
+  halal: "halal",
+  kosher: "koscher",
+  noAnswer: "keine Angabe",
+};
+
 // Same recipient as the membership application (APPLICATION_RECIPIENT_EMAIL,
 // info@unimannheim.enactus.team) — board decision, 2026-08-25: the Ideathon
 // notification doesn't need its own env var pointed at an identical address.
@@ -122,7 +134,7 @@ export async function sendIdeathonSignupNotification(signup: IdeathonSignup): Pr
   return send({
     to: requireEnv("APPLICATION_RECIPIENT_EMAIL"),
     subject: `Neue Ideathon-Anmeldung: ${signup.firstName} ${signup.lastName}`,
-    text: `Neue Ideathon-Anmeldung von ${signup.firstName} ${signup.lastName} (${signup.email}), ${signup.university}, ${signup.studyProgram} (${signup.semester}. Fachsemester).\n\nIdee vorhanden: ${signup.hasIdea ? "ja" : "nein"}${signup.ideaDescription ? `\nIdeenbeschreibung: ${signup.ideaDescription}` : ""}\nMeldet sich als Team an: ${signup.registeringAsTeam ? "ja" : "nein"}${signup.teamSize ? ` (${signup.teamSize} Personen)` : ""}${signup.heardAboutUs ? `\nAufmerksam geworden durch: ${signup.heardAboutUs}` : ""}`,
+    text: `Neue Ideathon-Anmeldung von ${signup.firstName} ${signup.lastName} (${signup.email}), ${signup.studyProgram} (${signup.semester}. Fachsemester).\n\nEssenspräferenz: ${DIETARY_PREFERENCE_LABEL[signup.dietaryPreference]}${signup.motivationExperience ? `\nMotivation und bisherige Erfahrung: ${signup.motivationExperience}` : ""}\n\nIdee vorhanden: ${signup.hasIdea ? "ja" : "nein"}${signup.ideaDescription ? `\nIdeenbeschreibung: ${signup.ideaDescription}` : ""}\nMeldet sich als Team an: ${signup.registeringAsTeam ? "ja" : "nein"}${signup.teamSize ? ` (${signup.teamSize} Personen)` : ""}${signup.teamMembers ? `\nTeammitglieder: ${signup.teamMembers}` : ""}${signup.heardAboutUs ? `\nAufmerksam geworden durch: ${signup.heardAboutUs}` : ""}`,
   });
 }
 
