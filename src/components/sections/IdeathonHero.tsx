@@ -44,8 +44,8 @@ export function IdeathonHero({
 
   return (
     <Section surface="ink" className="relative isolate overflow-hidden corner-glow">
-      <Container className="relative flex flex-col gap-10 pb-10 md:pb-16">
-        <div className="flex flex-col gap-6">
+      <Container className="relative flex flex-col items-center gap-10 pb-10 text-center md:pb-16">
+        <div className="flex flex-col items-center gap-6">
           <Eyebrow>{t("eyebrow")}</Eyebrow>
           <h1 className="max-w-3xl text-display-2 font-display break-words">
             {t.rich("title", { em: (chunks) => <span className="text-gold">{chunks}</span> })}
@@ -63,7 +63,7 @@ export function IdeathonHero({
             each represent a fact specific to this event, only the UN's
             three-pillar framing named in sdgNote, which carries the one real
             link (SDG_GOALS_URL) that matters here. */}
-        <div className="flex max-w-2xl flex-col gap-3 border-t border-paper/10 pt-6">
+        <div className="flex w-full max-w-2xl flex-col items-center gap-3 border-t border-paper/10 pt-6">
           <Eyebrow>{t("sdgEyebrow")}</Eyebrow>
           <p className="text-body-s opacity-80">
             {t.rich("sdgNote", {
@@ -79,7 +79,7 @@ export function IdeathonHero({
               ),
             })}
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap justify-center gap-2">
             {SDG_GOAL_NUMBERS.map((goal) => (
               <Image
                 key={goal}
@@ -93,7 +93,7 @@ export function IdeathonHero({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-10">
+        <div className="flex flex-wrap justify-center gap-10">
           {displayEvent && (
             <>
               <Fact label={t("whenLabel")} value={formatEventDate(displayEvent, locale)} />
@@ -106,7 +106,7 @@ export function IdeathonHero({
           />
         </div>
 
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap items-center justify-center gap-4">
           <a href="#anmelden" className={buttonClasses("primary", "lg")}>
             {t("registerCta")}
           </a>
