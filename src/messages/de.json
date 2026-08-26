@@ -551,6 +551,7 @@
     "timeline": {
       "eyebrow": "Der Ablauf",
       "title": "Vier Tage, ein Weg",
+      "regionLabel": "Ablauf des Ideathons",
       "dayFallback": "Tag {day}",
       "kickoff": {
         "title": "Kickoff & Founder Talk",
@@ -571,7 +572,9 @@
         "title": "Finale & Pitching Contest",
         "description": "Die große Bühne: Jedes Team pitcht vor der Jury. Die besten Ideen gewinnen und feiern gemeinsam den Abschluss.",
         "tags": "Jury-Pitch · 1.000 € Preis"
-      }
+      },
+      "detailsCta": "Details ansehen",
+      "detailsFileInfo": "PDF · {size}"
     },
     "benefits": {
       "eyebrow": "Warum mitmachen",
@@ -633,12 +636,13 @@
       "lastNameError": "Bitte gib deinen Nachnamen an.",
       "emailLabel": "E-Mail-Adresse",
       "emailError": "Bitte gib eine gültige E-Mail-Adresse ein.",
-      "universityLabel": "Hochschule",
-      "universityError": "Bitte gib deine Hochschule an.",
       "semesterLabel": "Fachsemester",
       "semesterError": "Bitte gib ein gültiges Fachsemester an.",
       "studyProgramLabel": "Studiengang",
       "studyProgramError": "Bitte gib deinen Studiengang an.",
+      "motivationExperienceLabel": "Motivation und bisherige Erfahrung",
+      "motivationExperienceHint": "Was reizt dich am Ideathon, und was bringst du schon mit? Ein paar Sätze reichen.",
+      "motivationExperienceError": "Der Text darf höchstens 1000 Zeichen lang sein.",
       "hasIdeaLabel": "Ich habe schon eine Idee.",
       "ideaDescriptionLabel": "Kurze Ideenbeschreibung (optional)",
       "ideaDescriptionHint": "Eine grobe Skizze reicht, Details besprechen wir persönlich beim Ideathon. Bitte keine ausformulierten Geschäftsgeheimnisse per Formular.",
@@ -646,6 +650,19 @@
       "registeringAsTeamLabel": "Ich melde mich als Team an.",
       "teamSizeLabel": "Teamgröße",
       "teamSizeError": "Bitte gib eine gültige Teamgröße an.",
+      "teamMembersLabel": "Teammitglieder",
+      "teamMembersHint": "Namen deiner Teammitglieder, sofern schon bekannt. Höchstens 300 Zeichen.",
+      "teamMembersError": "Die Angabe darf höchstens 300 Zeichen lang sein.",
+      "dietaryPreferenceLabel": "Essenspräferenz",
+      "dietaryPreferencePlaceholder": "Bitte auswählen",
+      "dietaryPreferenceOmnivore": "Omnivor",
+      "dietaryPreferenceVegetarian": "Vegetarisch",
+      "dietaryPreferenceVegan": "Vegan",
+      "dietaryPreferenceHalal": "Halal",
+      "dietaryPreferenceKosher": "Koscher",
+      "dietaryPreferenceNoAnswer": "Keine Angabe",
+      "dietaryPreferenceHint": "Allergien oder Unverträglichkeiten trage bitte nicht hier ein, sondern schreib uns direkt an {email}.",
+      "dietaryPreferenceError": "Bitte wähle eine Essenspräferenz aus.",
       "heardAboutLabel": "Wie bist du auf uns aufmerksam geworden?",
       "consentPrefix": "Ich habe die",
       "consentLinkLabel": "Datenschutzhinweise zur Ideathon-Anmeldung",
@@ -1091,10 +1108,12 @@
       "fieldsHeading": "Erhobene Angaben",
       "fields": [
         "Vorname, Nachname, E-Mail-Adresse",
-        "Hochschule, Studiengang, Fachsemester",
+        "Studiengang, Fachsemester",
+        "Motivation und bisherige Erfahrung (Freitext, optional, auf 1000 Zeichen begrenzt)",
         "Angabe, ob bereits eine Idee vorhanden ist",
         "Kurze Ideenbeschreibung (Freitext, optional, auf 1000 Zeichen begrenzt)",
-        "Angabe, ob du dich als Team anmeldest, und die Teamgröße (optional)",
+        "Angabe, ob du dich als Team anmeldest, die Teamgröße sowie die Namen der Teammitglieder (jeweils optional, Teammitglieder auf 300 Zeichen begrenzt)",
+        "Essenspräferenz aus einer festen Auswahl (omnivor, vegetarisch, vegan, halal, koscher, keine Angabe)",
         "Angabe, wie du auf uns aufmerksam geworden bist",
         "Zeitpunkt deiner Kenntnisnahme dieser Datenschutzhinweise"
       ],
@@ -1511,11 +1530,22 @@
       "columns": {
         "name": "Name",
         "email": "E-Mail",
-        "university": "Hochschule",
+        "studyProgram": "Studiengang",
         "idea": "Idee vorhanden",
         "team": "Team",
+        "teamMembers": "Teammitglieder",
+        "motivationExperience": "Motivation & Erfahrung",
+        "dietaryPreference": "Essenspräferenz",
         "createdAt": "Eingangsdatum",
         "mailStatus": "Mailstatus"
+      },
+      "dietary": {
+        "omnivore": "Omnivor",
+        "vegetarian": "Vegetarisch",
+        "vegan": "Vegan",
+        "halal": "Halal",
+        "kosher": "Koscher",
+        "noAnswer": "Keine Angabe"
       }
     },
     "recruitingWindows": {

@@ -43,6 +43,41 @@ export const timelineSteps: TimelineStep[] = [
   { key: "finale", order: 4 },
 ];
 
+// Same shape as process.ts's projectGuide, for the same reason: a board
+// handover that leaves `available` false (or forgets `href`) fails the
+// build instead of shipping a dead download link. The PDF itself started
+// life as the repo-root `ablauf.pdf` the board dropped in directly — moved
+// to `public/downloads/` (the site's one static-download location) under a
+// name that matches the project guide's own convention.
+const scheduleGuideSchema = z
+  .object({
+    available: z.boolean(),
+    href: z.string().startsWith("/").nullable(),
+    fileSizeLabel: z.string().nullable(),
+    updatedAt: z.string().date().nullable(),
+  })
+  .superRefine((guide, ctx) => {
+    if (guide.available && !guide.href) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["href"],
+        message: "href is required once the schedule guide is available",
+      });
+    }
+  });
+export type ScheduleGuide = z.infer<typeof scheduleGuideSchema>;
+
+export const scheduleGuide: ScheduleGuide = scheduleGuideSchema.parse({
+  available: true,
+  href: "/downloads/enactus-mannheim-ideathon-ablauf.pdf",
+  // Measured, not estimated: 1,586,855 bytes, decimal MB rounded to one
+  // place — same convention as process.ts's projectGuide (1,9 MB is that
+  // file's 1,861,771 bytes rounded the same way). Under the 5MB board
+  // threshold, so shipped as delivered, no re-encoding needed.
+  fileSizeLabel: "1,6 MB",
+  updatedAt: "2026-08-26",
+});
+
 const benefitKeySchema = z.enum([
   "prizeMoney",
   "ideaLivesOn",
@@ -113,4 +148,4 @@ export const faqEntries: IdeathonFaqEntry[] = [
   { key: "afterIdeathon", order: 5 },
 ];
 
-export { timelineStepSchema, benefitSchema, signupStepSchema, faqEntrySchema };
+export { timelineStepSchema, benefitSchema, signupStepSchema, faqEntrySchema, scheduleGuideSchema };

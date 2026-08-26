@@ -551,6 +551,7 @@
     "timeline": {
       "eyebrow": "How it runs",
       "title": "Four days, one path",
+      "regionLabel": "The Ideathon's schedule",
       "dayFallback": "Day {day}",
       "kickoff": {
         "title": "Kickoff & founder talk",
@@ -571,7 +572,9 @@
         "title": "Finale & pitching contest",
         "description": "The big stage: every team pitches to the jury. The best ideas win, and everyone celebrates together.",
         "tags": "Jury pitch · €1,000 prize"
-      }
+      },
+      "detailsCta": "View details",
+      "detailsFileInfo": "PDF · {size}"
     },
     "benefits": {
       "eyebrow": "Why join",
@@ -633,12 +636,13 @@
       "lastNameError": "Please give your last name.",
       "emailLabel": "Email address",
       "emailError": "Please enter a valid email address.",
-      "universityLabel": "University",
-      "universityError": "Please give your university.",
       "semesterLabel": "Semester",
       "semesterError": "Please give a valid semester.",
       "studyProgramLabel": "Degree program",
       "studyProgramError": "Please give your degree program.",
+      "motivationExperienceLabel": "Motivation and prior experience",
+      "motivationExperienceHint": "What draws you to the Ideathon, and what do you already bring? A few sentences are enough.",
+      "motivationExperienceError": "The text must be at most 1000 characters.",
       "hasIdeaLabel": "I already have an idea.",
       "ideaDescriptionLabel": "Short idea description (optional)",
       "ideaDescriptionHint": "A rough sketch is enough. We'll discuss details in person at the Ideathon. Please don't send fully worked-out trade secrets through this form.",
@@ -646,6 +650,19 @@
       "registeringAsTeamLabel": "I'm signing up as a team.",
       "teamSizeLabel": "Team size",
       "teamSizeError": "Please give a valid team size.",
+      "teamMembersLabel": "Team members",
+      "teamMembersHint": "Names of your team members, if already known. At most 300 characters.",
+      "teamMembersError": "This must be at most 300 characters.",
+      "dietaryPreferenceLabel": "Dietary preference",
+      "dietaryPreferencePlaceholder": "Please choose",
+      "dietaryPreferenceOmnivore": "Omnivore",
+      "dietaryPreferenceVegetarian": "Vegetarian",
+      "dietaryPreferenceVegan": "Vegan",
+      "dietaryPreferenceHalal": "Halal",
+      "dietaryPreferenceKosher": "Kosher",
+      "dietaryPreferenceNoAnswer": "No answer",
+      "dietaryPreferenceHint": "Please don't note allergies or intolerances here. Write to us directly at {email} instead.",
+      "dietaryPreferenceError": "Please choose a dietary preference.",
       "heardAboutLabel": "How did you hear about us?",
       "consentPrefix": "I have read the",
       "consentLinkLabel": "privacy notice for the Ideathon signup",
@@ -1091,10 +1108,12 @@
       "fieldsHeading": "Information collected",
       "fields": [
         "first name, last name, email address",
-        "university, degree program, semester",
+        "degree program, semester",
+        "motivation and prior experience (free text, optional, capped at 1000 characters)",
         "whether you already have an idea",
         "a short idea description (free text, optional, capped at 1000 characters)",
-        "whether you're signing up as a team, and team size (optional)",
+        "whether you're signing up as a team, team size, and team member names (each optional, team member names capped at 300 characters)",
+        "dietary preference from a fixed list (omnivore, vegetarian, vegan, halal, kosher, no answer)",
         "how you heard about us",
         "the time you read this privacy notice"
       ],
@@ -1511,11 +1530,22 @@
       "columns": {
         "name": "Name",
         "email": "Email",
-        "university": "University",
+        "studyProgram": "Degree program",
         "idea": "Has an idea",
         "team": "Team",
+        "teamMembers": "Team members",
+        "motivationExperience": "Motivation & experience",
+        "dietaryPreference": "Dietary preference",
         "createdAt": "Received",
         "mailStatus": "Mail status"
+      },
+      "dietary": {
+        "omnivore": "Omnivore",
+        "vegetarian": "Vegetarian",
+        "vegan": "Vegan",
+        "halal": "Halal",
+        "kosher": "Kosher",
+        "noAnswer": "No answer"
       }
     },
     "recruitingWindows": {
