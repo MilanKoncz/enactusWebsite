@@ -1,0 +1,16 @@
+-- Field-audit decision (docs/engineering.md, the recruiting-release brief):
+-- university is dropped from the application form. Almost every applicant
+-- answers "Universität Mannheim" regardless, same reasoning that already
+-- removed it from the Ideathon signup form on 2026-08-27 — it carries no
+-- selection relevance.
+--
+-- This migration only relaxes the not-null constraint; it does not drop
+-- the column. The column still holds every existing application's answer
+-- (nothing here touches those rows), and dropping it outright the same
+-- day the form stops collecting it would leave no way to deploy the code
+-- change and the schema change in the wrong order without breaking an
+-- insert mid-cutover: the new application code no longer has a value to
+-- write, so the column has to stop demanding one before that code ships,
+-- not after. The actual drop is a later migration, once a deploy without
+-- any reference to university has gone out clean — see ASSETS-TODO.md.
+alter table applications alter column university drop not null;
