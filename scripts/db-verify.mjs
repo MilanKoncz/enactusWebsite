@@ -84,6 +84,93 @@ async function verifyApplications() {
   check("row is gone after delete", afterDelete.length, 0);
 }
 
+async function verifyApplicationAreaChoices() {
+  console.log("\napplication_area_choices");
+  const email = `${MARKER}-areas@example.invalid`;
+  const [application] = await sql`
+    insert into applications (
+      first_name, last_name, email, study_program, semester, university,
+      motivation, availability_hours, consent_at, locale, recruiting_semester, retain_until
+    ) values (
+      'Verify', 'Areas', ${email}, 'Testfach', 3, 'Testuniversität',
+      'Verification run, not a real application.', 5, now(), 'de', 'HWS26', now()
+    )
+    returning id
+  `;
+
+  const [firstChoice] = await sql`
+    insert into application_area_choices (application_id, priority, area_label, reason)
+    values (${application.id}, 1, 'SmileGreen', 'Weil ich dort am meisten bewirken kann.')
+    returning *
+  `;
+  check("insert returns an id", typeof firstChoice.id, "string");
+
+  let priorityOutOfRangeRejected = false;
+  try {
+    await sql`
+      insert into application_area_choices (application_id, priority, area_label, reason)
+      values (${application.id}, 4, 'Mealyo', 'Zu hohe Priorität.')
+    `;
+  } catch {
+    priorityOutOfRangeRejected = true;
+  }
+  check("priority range check rejects a value outside 1-3", priorityOutOfRangeRejected, true);
+
+  let reasonTooLongRejected = false;
+  try {
+    await sql`
+      insert into application_area_choices (application_id, priority, area_label, reason)
+      values (${application.id}, 2, 'Mealyo', ${"x".repeat(301)})
+    `;
+  } catch {
+    reasonTooLongRejected = true;
+  }
+  check("reason length check rejects more than 300 characters", reasonTooLongRejected, true);
+
+  let duplicatePriorityRejected = false;
+  try {
+    await sql`
+      insert into application_area_choices (application_id, priority, area_label, reason)
+      values (${application.id}, 1, 'Mealyo', 'Zweite Begründung für dieselbe Priorität.')
+    `;
+  } catch {
+    duplicatePriorityRejected = true;
+  }
+  check("unique constraint rejects a second choice with the same priority", duplicatePriorityRejected, true);
+
+  let duplicateAreaRejected = false;
+  try {
+    await sql`
+      insert into application_area_choices (application_id, priority, area_label, reason)
+      values (${application.id}, 2, 'SmileGreen', 'Zweite Begründung für denselben Bereich.')
+    `;
+  } catch {
+    duplicateAreaRejected = true;
+  }
+  check("unique constraint rejects the same area twice on one application", duplicateAreaRejected, true);
+
+  const [secondChoice] = await sql`
+    insert into application_area_choices (application_id, priority, area_label, reason)
+    values (${application.id}, 2, 'Mealyo', 'Zweitwahl, weil ich auch dort mitwirken möchte.')
+    returning *
+  `;
+  check("a second, distinct choice on the same application is accepted", typeof secondChoice.id, "string");
+
+  const ordered = await sql`
+    select priority, area_label from application_area_choices
+    where application_id = ${application.id} order by priority
+  `;
+  check("reads come back in priority order", ordered.map((row) => row.priority), [1, 2]);
+
+  const deletedApplication = await sql`delete from applications where id = ${application.id} returning id`;
+  check("deleting the application removes exactly one row", deletedApplication.length, 1);
+
+  const orphanedChoices = await sql`
+    select id from application_area_choices where application_id = ${application.id}
+  `;
+  check("on delete cascade removes the application's area choices too", orphanedChoices.length, 0);
+}
+
 async function verifyReminderSignups() {
   console.log("\nreminder_signups");
   const email = `${MARKER}-reminder@example.invalid`;
@@ -412,6 +499,7 @@ async function verifyRateLimitHits() {
 }
 
 await verifyApplications();
+await verifyApplicationAreaChoices();
 await verifyReminderSignups();
 await verifyReminderFiltering();
 await verifyRecruitingWindows();
