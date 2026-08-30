@@ -33,13 +33,17 @@ function check(label, actual, expected) {
 async function verifyApplications() {
   console.log("\napplications");
   const email = `${MARKER}@example.invalid`;
+  const retainUntil = new Date(Date.now() - 1000); // already due, for the cleanup-query check below
   const [inserted] = await sql`
     insert into applications (
       first_name, last_name, email, study_program, semester, university,
-      motivation, desired_areas, availability_hours, consent_at, locale, recruiting_semester
+      motivation, desired_areas, availability_hours, consent_at, locale, recruiting_semester,
+      cv_blob_url, cv_pathname, cv_original_filename, cv_size_bytes, cv_uploaded_at, retain_until
     ) values (
       'Verify', 'Script', ${email}, 'Testfach', 3, 'Testuniversität',
-      'Verification run, not a real application.', ${["SmileGreen", "Team-Lead"]}, 5, now(), 'de', 'HWS26'
+      'Verification run, not a real application.', ${["SmileGreen", "Team-Lead"]}, 5, now(), 'de', 'HWS26',
+      'https://example-store.public.blob.vercel-storage.com/bewerbungen/verify-abc123.pdf',
+      ${`bewerbungen/${MARKER}.pdf`}, 'lebenslauf.pdf', 12345, now(), ${retainUntil.toISOString()}
     )
     returning *
   `;
@@ -50,6 +54,25 @@ async function verifyApplications() {
   check("desired_areas round-trips as an array", read.desired_areas, ["SmileGreen", "Team-Lead"]);
   check("mail_status defaults to pending", read.mail_status, "pending");
   check("recruiting_semester round-trips", read.recruiting_semester, "HWS26");
+  check("cv_pathname round-trips", read.cv_pathname, `bewerbungen/${MARKER}.pdf`);
+  check("cv_original_filename round-trips", read.cv_original_filename, "lebenslauf.pdf");
+  check("cv_size_bytes round-trips", read.cv_size_bytes, 12345);
+
+  // The exact query the cron cleanup route's CV-blob pass runs (see
+  // app/api/cron/cleanup/route.ts) — this row must be a hit, since its
+  // retain_until is already in the past and it has a cv_pathname.
+  const dueForCleanup = await sql`
+    select id from applications where cv_pathname is not null and retain_until <= now() and id = ${inserted.id}
+  `;
+  check("a row past its retain_until with a CV is selected by the cleanup query", dueForCleanup.length, 1);
+
+  await sql`
+    update applications
+    set cv_blob_url = null, cv_pathname = null, cv_original_filename = null, cv_size_bytes = null, cv_uploaded_at = null
+    where id = ${inserted.id}
+  `;
+  const [afterCvCleared] = await sql`select cv_pathname from applications where id = ${inserted.id}`;
+  check("cv columns clear to null after the cleanup pass would run", afterCvCleared.cv_pathname, null);
 
   await sql`update applications set mail_status = 'sent', mailed_at = now() where id = ${inserted.id}`;
   const [afterUpdate] = await sql`select mail_status from applications where id = ${inserted.id}`;
