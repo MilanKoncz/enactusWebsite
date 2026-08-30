@@ -1,4 +1,5 @@
 import type { RecruitingWindow } from "@/content/recruiting";
+import { windowContaining } from "@/lib/recruitingStatus";
 
 /**
  * The recruiting-cycle label stored on every application (applications.
@@ -29,11 +30,6 @@ export function deriveSemesterLabel(date: Date): string {
 }
 
 export function resolveApplicationSemester(now: Date, windows: RecruitingWindow[]): string {
-  const nowMs = now.getTime();
-  const window = windows.find((candidate) => {
-    const startMs = new Date(candidate.start).getTime();
-    const endMs = new Date(candidate.end).getTime();
-    return nowMs >= startMs && nowMs <= endMs;
-  });
+  const window = windowContaining(now.getTime(), windows);
   return window ? window.semester : deriveSemesterLabel(now);
 }

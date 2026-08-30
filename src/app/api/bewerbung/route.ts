@@ -10,6 +10,7 @@ import { checkFormToken } from "@/lib/formToken";
 import { resolveApplicationSemester } from "@/lib/recruitingSemester";
 import { getRecruitingWindows } from "@/lib/recruitingWindows";
 import { recruitingPhaseAt } from "@/lib/recruitingStatus";
+import { applicationRetainUntil } from "@/lib/retentionCutoff";
 
 /**
  * The load-bearing ordering, per docs/engineering.md: validate, then write
@@ -69,6 +70,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "window_closed" }, { status: 409 });
   }
 
+  const now = new Date();
+
   let application;
   try {
     application = await insertApplication({
@@ -85,7 +88,10 @@ export async function POST(request: NextRequest) {
       availabilityHours: data.availabilityHours,
       heardAboutUs: data.heardAboutUs,
       locale: data.locale,
-      recruitingSemester: resolveApplicationSemester(new Date(), recruitingWindows),
+      recruitingSemester: resolveApplicationSemester(now, recruitingWindows),
+      // Fixed once, here, from whichever window is open right now — never
+      // recomputed later. See lib/retentionCutoff.ts's own comment.
+      retainUntil: applicationRetainUntil(now, recruitingWindows),
     });
   } catch (error) {
     console.error("Failed to persist application", error);

@@ -57,6 +57,11 @@ export type ApplicationInput = {
   // to — see lib/recruitingSemester.ts. Distinct from `semester` above,
   // which is the applicant's own semester of study.
   recruitingSemester: string;
+  // Computed once by the caller (lib/retentionCutoff.ts's
+  // applicationRetainUntil) and stored as-is — never recomputed after
+  // insert. See migrations/0016's own comment on why this is a fixed
+  // deadline, not a live calculation.
+  retainUntil: Date;
 };
 
 export type Application = ApplicationInput & {
@@ -90,6 +95,7 @@ function toApplication(row: Record<string, unknown>): Application {
     mailError: (row.mail_error as string | null) ?? null,
     mailedAt: (row.mailed_at as Date | null) ?? null,
     recruitingSemester: row.recruiting_semester as string,
+    retainUntil: row.retain_until as Date,
   };
 }
 
@@ -102,13 +108,14 @@ export async function insertApplication(input: ApplicationInput): Promise<Applic
     insert into applications (
       first_name, last_name, email, study_program, semester, university,
       prior_involvement, languages_skills, motivation, desired_areas,
-      availability_hours, heard_about_us, consent_at, locale, recruiting_semester
+      availability_hours, heard_about_us, consent_at, locale, recruiting_semester,
+      retain_until
     ) values (
       ${input.firstName}, ${input.lastName}, ${input.email}, ${input.studyProgram},
       ${input.semester}, ${input.university}, ${input.priorInvolvement ?? null},
       ${input.languagesSkills ?? null}, ${input.motivation}, ${input.desiredAreas},
       ${input.availabilityHours}, ${input.heardAboutUs ?? null}, now(), ${input.locale},
-      ${input.recruitingSemester}
+      ${input.recruitingSemester}, ${input.retainUntil.toISOString()}
     )
     returning *
   `;
@@ -192,9 +199,14 @@ export async function listApplicationsBySemester(recruitingSemester: string): Pr
   return (rows as Record<string, unknown>[]).map(toApplicationSummary);
 }
 
-export async function deleteExpiredApplications(cutoff: Date): Promise<number> {
+// Compared against each row's own retain_until (migrations/0016), not a
+// cutoff derived from created_at — that value was computed once, at
+// insert time, from whichever recruiting window was open then (see
+// lib/retentionCutoff.ts's applicationRetainUntil). The caller just passes
+// the current instant.
+export async function deleteExpiredApplications(now: Date): Promise<number> {
   const rows = await sql()`
-    delete from applications where created_at <= ${cutoff.toISOString()} returning id
+    delete from applications where retain_until <= ${now.toISOString()} returning id
   `;
   return rows.length;
 }

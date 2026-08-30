@@ -1,29 +1,40 @@
+import type { RecruitingWindow } from "@/content/recruiting";
 import { retention } from "@/content/retention";
+import { windowContaining } from "@/lib/recruitingStatus";
 
 /**
  * Pure calendar cutoffs for the daily cleanup route (app/api/cron/cleanup):
  * a row is deletable once it is older than its table's stated retention
- * period, counted from that row's own created_at — nothing else factors in.
+ * period — nothing else factors in.
  *
- * This used to anchor application retention to the latest *expired
- * recruiting window* instead of each row's own age, so a cycle's
- * applications expired together. That reads well, but it silently stops
- * working the moment nobody enters the next window: with no later window to
- * anchor to, the cutoff freezes at the last one ever added, and every
- * application submitted after that point becomes permanently undeletable —
- * a normal state for a board with yearly turnover, not an edge case. It also
- * quietly computed something different from what the Datenschutzerklärung
- * promises ("6 Monate"), which states a rolling period, not "6 months after
- * the cycle closes". Calendar-only logic can't drift from either problem: it
- * has no window to forget, and it matches the published text exactly.
+ * Applications are the one table here whose deadline isn't computed live.
+ * `applicationRetainUntil` runs exactly once, at insert time (lib/db.ts's
+ * insertApplication), and its result is stored on the row as
+ * `retain_until` (migrations/0016) — the cleanup route just compares that
+ * column to `now()` directly (lib/db.ts's deleteExpiredApplications) and
+ * never calls this function again for a row that already has one.
  *
- * The one thing this trades away: applications from the same recruiting
- * cycle no longer expire on the same day — a submission on day one of a
- * window and one on the last day now age out independently. That is an
- * acceptable cost for a cutoff that can't silently stop enforcing itself.
+ * This anchors to whatever recruiting window was open at submission time
+ * (window.end + the stated months), not to created_at — matching the
+ * Datenschutzerklärung's own wording ("Monate nach Ende des jeweiligen
+ * Bewerbungszeitraums"), which a rolling created_at-based period never did.
+ * An earlier version of this file anchored *live*, at cleanup time, to
+ * "the latest expired recruiting window" — and froze the moment nobody
+ * entered a new window, since every application submitted after that point
+ * had no later window to anchor to and so never became deletable. Fixing
+ * the freeze without going back to a pure created_at rule (which drops the
+ * Datenschutz wording) is exactly what computing this once, up front, and
+ * storing it buys: there's no live window list this can lose track of,
+ * because it never looks at one again after the row is written. A
+ * submission that arrives with no window currently open (a late arrival
+ * right after one closes, or before the board enters the next one) falls
+ * back to `now`, the same "no window" fallback resolveApplicationSemester
+ * uses in lib/recruitingSemester.ts.
  */
-export function applicationRetentionCutoff(now: Date): Date {
-  return addMonths(now, -retention.applications.months);
+export function applicationRetainUntil(now: Date, windows: RecruitingWindow[]): Date {
+  const window = windowContaining(now.getTime(), windows);
+  const anchor = window ? new Date(window.end) : now;
+  return addMonths(anchor, retention.applications.months);
 }
 
 export function contactMessageRetentionCutoff(now: Date): Date {

@@ -13,7 +13,6 @@ import {
   startCronRun,
 } from "@/lib/db";
 import {
-  applicationRetentionCutoff,
   contactMessageRetentionCutoff,
   ideathonSignupRetentionCutoff,
   jobPostingRetentionCutoff,
@@ -70,7 +69,7 @@ async function runCleanupJob(now: Date) {
 
   const [applications, contactMessages, reminderSignups, jobPostings, rateLimitHits, ideathonSignups] =
     await Promise.allSettled([
-      deleteExpiredApplications(applicationRetentionCutoff(now)),
+      deleteExpiredApplications(now),
       deleteExpiredContactMessages(contactMessageRetentionCutoff(now)),
       deleteExpiredReminderSignups(reminderSignupRetentionCutoff(now)),
       deleteExpiredJobPostings(jobPostingRetentionCutoff(now)),

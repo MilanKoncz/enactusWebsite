@@ -9,7 +9,11 @@ import type { RecruitingWindow } from "@/content/recruiting";
  */
 export type RecruitingPhase = "before" | "open" | "after" | "unscheduled";
 
-function windowContaining(nowMs: number, windows: RecruitingWindow[]): RecruitingWindow | null {
+// Exported for lib/recruitingSemester.ts (resolveApplicationSemester) and
+// lib/retentionCutoff.ts (applicationRetainUntil) — both need "the window a
+// given instant falls inside, if any" and previously duplicated this same
+// find() rather than share it.
+export function windowContaining(nowMs: number, windows: RecruitingWindow[]): RecruitingWindow | null {
   return (
     windows.find((window) => {
       const startMs = new Date(window.start).getTime();

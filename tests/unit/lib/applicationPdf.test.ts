@@ -25,6 +25,7 @@ const baseApplication: Application = {
   mailError: null,
   mailedAt: null,
   recruitingSemester: "HWS26",
+  retainUntil: new Date("2027-03-05T10:00:00Z"),
 };
 
 describe("ApplicationPdfDocument", () => {

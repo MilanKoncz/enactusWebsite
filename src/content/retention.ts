@@ -7,11 +7,22 @@ import { z } from "zod";
  * from — writing the same number in both a legal text and a SQL query
  * invites drift, so only one of them is allowed to be the source.
  *
- * Every period is a rolling window measured from each row's own created_at
- * (see lib/retentionCutoff.ts) — this matches the Datenschutzerklärung's
- * wording exactly ("6 Monate" means 6 months from submission, not from some
- * later, board-maintained event), and it can never silently stop enforcing
- * itself the way an anchor tied to a recruiting window's close date could.
+ * Every period except `applications` is a rolling window measured from
+ * each row's own created_at (see lib/retentionCutoff.ts) — this matches
+ * those tables' Datenschutzerklärung wording exactly ("12 Monate" means 12
+ * months from submission, not from some later, board-maintained event),
+ * and it can never silently stop enforcing itself the way an anchor tied
+ * to a recruiting window's close date could.
+ *
+ * `applications` is the deliberate exception: the Datenschutzerklärung's
+ * own wording for it is *not* "ab Eingang" but "nach Ende des jeweiligen
+ * Bewerbungszeitraums" — so its months figure is applied to a deadline
+ * fixed once, at insert time, from whichever recruiting window was open
+ * then (lib/retentionCutoff.ts's applicationRetainUntil, stored as
+ * applications.retain_until, migrations/0016). That value still can't
+ * freeze the way the earlier, live window-anchored version did — see that
+ * function's own comment — because nothing re-derives it after the row is
+ * written.
  *
  * Every period carries `confirmedByBoard: false`: the board hasn't signed
  * off on these numbers yet (same open item as content/privacy.ts's own
