@@ -176,6 +176,44 @@ test.describe("/termine event calendar", () => {
       timeZone: "UTC",
     }).format(new Date(`${isoDate(0).slice(0, 7)}-01T00:00:00Z`));
 
+    // The grid settles on the soonest month at or after today that
+    // actually has an event (lib/calendarMonth.ts's firstMonthWithEvents),
+    // which is GRID_EVENT's own month — not necessarily today's, since
+    // `isoDate(2)` can cross a month boundary on the last couple of days of
+    // any given month (this file's own comment on GRID_EVENT already flags
+    // that as an accepted residual risk). Asserting against
+    // `currentMonthLabel` here silently assumed the two always match; they
+    // stop matching for exactly the two or three days each month where this
+    // offset lands in the next one. Every "just after gotoWithCalendar"
+    // assertion below uses this instead — the one exception is the "Heute"
+    // button test, which navigates away and back to literally today, where
+    // `currentMonthLabel` is the correct, unrelated expectation.
+    const settledMonthLabel = new Intl.DateTimeFormat("de", {
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(new Date(`${GRID_EVENT.startDate.slice(0, 7)}-01T00:00:00Z`));
+
+    // The grid's initially-focused cell is `today` when the settled month
+    // is also today's month, or the 1st of the settled month otherwise
+    // (EventCalendarGrid.tsx's own defaultFocusedDate) — mirrored here, not
+    // imported, since the arrow-key test below is exercising that
+    // documented behavior end to end, not reaching into the component's
+    // internals. A fixed "press ArrowRight twice" used to stand in for
+    // this and assumed the first case always holds; it stops holding on
+    // the same last-few-days-of-the-month edge settledMonthLabel's own
+    // comment describes, since the initially-focused cell then jumps to
+    // the 1st of GRID_EVENT's month — which, for a `startDate` that's
+    // itself only two days out, can coincide with GRID_EVENT's own day.
+    const initialFocusDate =
+      isoDate(0).slice(0, 7) === GRID_EVENT.startDate.slice(0, 7)
+        ? isoDate(0)
+        : `${GRID_EVENT.startDate.slice(0, 7)}-01`;
+    const daysToGridEvent = Math.round(
+      (Date.parse(`${GRID_EVENT.startDate}T00:00:00Z`) - Date.parse(`${initialFocusDate}T00:00:00Z`)) /
+        86_400_000,
+    );
+
     // aria-live="polite" is unique to this heading on the page — a plain
     // level-3 heading query would also match several other section
     // headings (Pillars, Benefits) that happen to share the level.
@@ -185,7 +223,7 @@ test.describe("/termine event calendar", () => {
 
     test("opens a day's events below the grid on click", async ({ page }) => {
       await gotoWithCalendar(page, [GRID_EVENT]);
-      await expect(monthHeadingLocator(page)).toHaveText(currentMonthLabel);
+      await expect(monthHeadingLocator(page)).toHaveText(settledMonthLabel);
 
       await gridCellFor(page, GRID_EVENT.startDate).click();
       await expect(page.getByRole("heading", { name: /^Termine am/ })).toBeVisible();
@@ -194,12 +232,13 @@ test.describe("/termine event calendar", () => {
 
     test("moves the roving focus with arrow keys and opens the day list with Enter", async ({ page }) => {
       await gotoWithCalendar(page, [GRID_EVENT]);
-      await expect(monthHeadingLocator(page)).toHaveText(currentMonthLabel);
+      await expect(monthHeadingLocator(page)).toHaveText(settledMonthLabel);
 
       const start = page.locator('[role="gridcell"][tabindex="0"]');
       await start.focus();
-      await page.keyboard.press("ArrowRight");
-      await page.keyboard.press("ArrowRight");
+      for (let i = 0; i < daysToGridEvent; i++) {
+        await page.keyboard.press("ArrowRight");
+      }
       await page.keyboard.press("Enter");
 
       await expect(page.locator("p", { hasText: "Ideathon" })).toBeVisible();
@@ -209,12 +248,16 @@ test.describe("/termine event calendar", () => {
       await gotoWithCalendar(page, [GRID_EVENT]);
 
       const monthHeading = monthHeadingLocator(page);
-      await expect(monthHeading).toHaveText(currentMonthLabel);
+      await expect(monthHeading).toHaveText(settledMonthLabel);
 
       await page.getByRole("button", { name: "Nächster Monat" }).click();
       await page.getByRole("button", { name: "Nächster Monat" }).click();
-      await expect(monthHeading).not.toHaveText(currentMonthLabel);
+      await expect(monthHeading).not.toHaveText(settledMonthLabel);
 
+      // "Heute" always returns to literally today's month, regardless of
+      // which month the grid settled on for GRID_EVENT — this is the one
+      // assertion in this describe block that's genuinely about
+      // currentMonthLabel, not settledMonthLabel.
       await page.getByRole("button", { name: "Heute" }).click();
       await expect(monthHeading).toHaveText(currentMonthLabel);
       await expect(page.locator('[role="gridcell"][aria-selected="true"]')).toHaveCount(1);
