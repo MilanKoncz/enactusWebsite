@@ -26,14 +26,14 @@ describe("ReminderSignupForm", () => {
     renderWithIntl(<ReminderSignupForm />);
     expect(screen.getByLabelText("E-Mail")).toBeInTheDocument();
     expect(screen.getByRole("checkbox")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Erinnerung aktivieren" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Benachrichtigung aktivieren" })).toBeInTheDocument();
   });
 
   it("blocks submission and shows errors when email and consent are missing", async () => {
     const user = userEvent.setup();
     renderWithIntl(<ReminderSignupForm />);
 
-    await user.click(screen.getByRole("button", { name: "Erinnerung aktivieren" }));
+    await user.click(screen.getByRole("button", { name: "Benachrichtigung aktivieren" }));
 
     expect(await screen.findByText("Bitte gib eine gültige E-Mail-Adresse ein.")).toBeInTheDocument();
     expect(screen.getByText("Bitte bestätige die Einwilligung.")).toBeInTheDocument();
@@ -47,7 +47,7 @@ describe("ReminderSignupForm", () => {
 
     await user.type(screen.getByLabelText("E-Mail"), "jane@example.com");
     await user.click(screen.getByRole("checkbox"));
-    await user.click(screen.getByRole("button", { name: "Erinnerung aktivieren" }));
+    await user.click(screen.getByRole("button", { name: "Benachrichtigung aktivieren" }));
 
     expect(await screen.findByRole("status")).toHaveTextContent("bestätige die E-Mail");
     expect(fetch).toHaveBeenCalledWith("/api/reminder", expect.objectContaining({ method: "POST" }));
@@ -63,7 +63,7 @@ describe("ReminderSignupForm", () => {
 
     await user.type(screen.getByLabelText("E-Mail"), "jane@example.com");
     await user.click(screen.getByRole("checkbox"));
-    await user.click(screen.getByRole("button", { name: "Erinnerung aktivieren" }));
+    await user.click(screen.getByRole("button", { name: "Benachrichtigung aktivieren" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent("hat nicht geklappt");
     expect(screen.getByLabelText("E-Mail")).toHaveValue("jane@example.com");

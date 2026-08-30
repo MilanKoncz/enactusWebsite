@@ -7,7 +7,12 @@
 // Usage: `node --env-file=.env.local scripts/db-verify.mjs`
 // (`npm run db:verify` wires that up.) Run `npm run db:migrate` first.
 
+import { readdirSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { neon } from "@neondatabase/serverless";
+
+const migrationsDir = join(dirname(fileURLToPath(import.meta.url)), "..", "migrations");
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
@@ -294,6 +299,60 @@ async function verifyCalendarEvents() {
   check("delete removes exactly one row", deleted.length, 1);
 }
 
+// The exact table that broke silently from 2026-08-26 to 2026-08-30:
+// migration 0015 was committed and the application code was updated to
+// match it, but the migration itself was never run against the production
+// database — every insert here has failed since, and the admin list threw
+// on a missing column. This function inserts every post-0015 column so a
+// future column rename/drop against a database still missing it fails here
+// first, not in production.
+async function verifyIdeathonSignups() {
+  console.log("\nideathon_signups");
+  const email = `${MARKER}-ideathon@example.invalid`;
+  const [inserted] = await sql`
+    insert into ideathon_signups (
+      first_name, last_name, email, study_program, semester, has_idea,
+      idea_description, registering_as_team, team_size, team_members,
+      motivation_experience, dietary_preference, heard_about_us, locale, consent_at
+    ) values (
+      'Verify', 'Script', ${email}, 'Testfach', 3, true,
+      'Verification run, not a real idea.', true, 4, 'Verify One, Verify Two',
+      'Verification run, not real experience.', 'vegetarian', 'db-verify', 'de', now()
+    )
+    returning *
+  `;
+  check("insert returns an id", typeof inserted.id, "string");
+  check("dietary_preference round-trips", inserted.dietary_preference, "vegetarian");
+  check("team_members round-trips", inserted.team_members, "Verify One, Verify Two");
+  check(
+    "motivation_experience round-trips",
+    inserted.motivation_experience,
+    "Verification run, not real experience.",
+  );
+  check("mail_status defaults to pending", inserted.mail_status, "pending");
+  check("university column no longer exists (dropped in 0015)", "university" in inserted, false);
+
+  const deleted = await sql`delete from ideathon_signups where id = ${inserted.id} returning id`;
+  check("delete removes exactly one row", deleted.length, 1);
+}
+
+// The check that would have caught the 0015 gap directly, rather than via
+// one of its symptoms: every migration file on disk must have a matching
+// row in schema_migrations. Reads migrations/ from the filesystem, which is
+// safe here — this script runs under plain Node against a local checkout or
+// in CI, never bundled into the Vercel serverless build the way
+// lib/migrations.ts's LATEST_MIGRATION constant deliberately avoids doing.
+async function verifyMigrationsApplied() {
+  console.log("\nmigrations");
+  const files = readdirSync(migrationsDir)
+    .filter((name) => name.endsWith(".sql"))
+    .sort();
+  const appliedRows = await sql`select name from schema_migrations`;
+  const applied = new Set(appliedRows.map((row) => row.name));
+  const missing = files.filter((file) => !applied.has(file));
+  check("every migration file on disk has been applied to this database", missing, []);
+}
+
 async function verifyRateLimitHits() {
   console.log("\nrate_limit_hits");
   const bucket = MARKER;
@@ -336,6 +395,8 @@ await verifyRecruitingWindows();
 await verifyCalendarEvents();
 await verifyContactMessages();
 await verifyCronRuns();
+await verifyIdeathonSignups();
+await verifyMigrationsApplied();
 await verifyRateLimitHits();
 
 console.log(`\n${failures === 0 ? "All checks passed." : `${failures} check(s) failed.`}`);

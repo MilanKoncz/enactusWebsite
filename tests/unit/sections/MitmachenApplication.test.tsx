@@ -42,7 +42,7 @@ describe("MitmachenApplication", () => {
     renderWithIntl(<MitmachenApplication projectAreas={[]} recruitingWindows={[hws26]} />);
 
     expect(screen.getByText("Das Bewerbungsfenster ist noch geschlossen")).toBeInTheDocument();
-    expect(screen.getByText("Per E-Mail erinnern lassen")).toBeInTheDocument();
+    expect(screen.getByText("Benachrichtigung zum Bewerbungsstart")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Bewerbung absenden" })).not.toBeInTheDocument();
   });
 
@@ -59,7 +59,7 @@ describe("MitmachenApplication", () => {
     renderWithIntl(<MitmachenApplication projectAreas={[]} recruitingWindows={[hws26]} />);
 
     expect(screen.getByText("Das Bewerbungsfenster ist für diesen Zyklus geschlossen")).toBeInTheDocument();
-    expect(screen.getByText("Per E-Mail erinnern lassen")).toBeInTheDocument();
+    expect(screen.getByText("Benachrichtigung zum Bewerbungsstart")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Bewerbung absenden" })).not.toBeInTheDocument();
   });
 
@@ -68,7 +68,7 @@ describe("MitmachenApplication", () => {
     renderWithIntl(<MitmachenApplication projectAreas={[]} recruitingWindows={[]} />);
 
     expect(screen.getByText("Das Bewerbungsfenster ist noch geschlossen")).toBeInTheDocument();
-    expect(screen.getByText("Per E-Mail erinnern lassen")).toBeInTheDocument();
+    expect(screen.getByText("Benachrichtigung zum Bewerbungsstart")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Bewerbung absenden" })).not.toBeInTheDocument();
   });
 

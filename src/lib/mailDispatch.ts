@@ -7,6 +7,7 @@ import {
   sendContactMessageNotification,
   sendIdeathonSignupConfirmation,
   sendIdeathonSignupNotification,
+  sendReminderAlreadyRegisteredEmail,
   sendReminderConfirmationEmail,
   sendReminderWindowOpenEmail,
 } from "@/lib/mail";
@@ -93,6 +94,33 @@ export async function dispatchReminderConfirmation(signup: ReminderConfirmationT
       confirmUrl: `${base}/api/reminder/bestaetigen?token=${signup.confirmToken}`,
       unsubscribeUrl,
     }),
+    unsubscribeUrl,
+  });
+}
+
+// Sent from /api/reminder when the submitted address has already confirmed
+// — the UI response stays the same neutral "check your inbox" success
+// either way (no email-enumeration leak: see that route's own comment), but
+// the person still learns what actually happened, rather than the address
+// silently receiving nothing. Reuses the row's existing, never-rotated
+// unsubscribe token, same as dispatchReminderConfirmation's own comment on
+// why a resend must never reissue tokens.
+export type ReminderAlreadyRegisteredTarget = {
+  email: string;
+  locale: Locale;
+  unsubscribeToken: string;
+};
+
+export async function dispatchReminderAlreadyRegistered(
+  target: ReminderAlreadyRegisteredTarget,
+): Promise<void> {
+  const t = await getTranslations({ locale: target.locale, namespace: "Mail.reminderAlreadyRegistered" });
+  const base = siteUrl();
+  const unsubscribeUrl = `${base}/api/reminder/abmelden?token=${target.unsubscribeToken}`;
+  await sendReminderAlreadyRegisteredEmail({
+    email: target.email,
+    subject: t("subject"),
+    text: t("body", { unsubscribeUrl }),
     unsubscribeUrl,
   });
 }

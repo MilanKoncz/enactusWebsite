@@ -95,6 +95,29 @@ export async function sendReminderConfirmationEmail(params: {
   });
 }
 
+// Sent instead of sendReminderConfirmationEmail when /api/reminder is
+// called for an address that has already confirmed — see
+// mailDispatch.ts's dispatchReminderAlreadyRegistered for why this exists.
+// Same RFC 8058 one-click headers as its sibling: it reuses the
+// subscriber's existing, never-rotated unsubscribe token, so the same
+// /api/reminder/abmelden POST handler answers a click on either mail.
+export async function sendReminderAlreadyRegisteredEmail(params: {
+  email: string;
+  subject: string;
+  text: string;
+  unsubscribeUrl: string;
+}): Promise<string> {
+  return send({
+    to: params.email,
+    subject: params.subject,
+    text: params.text,
+    headers: {
+      "List-Unsubscribe": `<${params.unsubscribeUrl}>`,
+      "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+    },
+  });
+}
+
 export async function sendReminderWindowOpenEmail(params: {
   email: string;
   subject: string;
@@ -145,6 +168,18 @@ export async function sendIdeathonSignupConfirmation(params: {
   text: string;
 }): Promise<string> {
   return send({ to: params.email, subject: params.subject, text: params.text });
+}
+
+// Board-facing only, like DIETARY_PREFERENCE_LABEL above — never shown to a
+// visitor, so it doesn't go through next-intl. Sent by lib/insertFailureAlert.ts
+// when a form's database write fails, so a failure that a visitor already
+// saw a real error for doesn't also go unnoticed by the board.
+export async function sendInsertFailureAlert(route: string, errorMessage: string): Promise<string> {
+  return send({
+    to: requireEnv("APPLICATION_RECIPIENT_EMAIL"),
+    subject: `Achtung: ${route}-Formular speichert nicht`,
+    text: `Ein Absenden über ${route} konnte nicht in der Datenbank gespeichert werden.\n\nFehler: ${errorMessage}\n\nDie besuchende Person hat eine Fehlermeldung gesehen, aber wenn das öfter passiert, geht es sonst unbemerkt unter. Bitte /admin/system prüfen (Datenbankschema und Erreichbarkeit) und bei Bedarf technische Hilfe holen.`,
+  });
 }
 
 export async function sendContactMessageNotification(params: {

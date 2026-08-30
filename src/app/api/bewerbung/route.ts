@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { applicationRequestSchema } from "@/lib/apiSchemas";
 import { insertApplication, markApplicationMailed, markApplicationMailFailed } from "@/lib/db";
 import { dispatchApplicationMails } from "@/lib/mailDispatch";
+import { alertOnInsertFailure } from "@/lib/insertFailureAlert";
 import { checkRateLimit } from "@/lib/rateLimit";
 import { clientIp } from "@/lib/requestIp";
 import { checkFormToken } from "@/lib/formToken";
@@ -88,6 +89,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Failed to persist application", error);
+    await alertOnInsertFailure("bewerbung", error);
     return NextResponse.json({ ok: false, error: "server_error" }, { status: 500 });
   }
 

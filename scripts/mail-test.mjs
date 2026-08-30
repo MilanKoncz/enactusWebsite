@@ -47,6 +47,20 @@ function preflight() {
     );
   }
 
+  // Not required for this script's own test send (it mirrors /api/kontakt,
+  // which embeds no link) — reported here anyway, not silently, because the
+  // same lib/siteUrl.ts fallback this warns about is what put a real
+  // http://localhost:3000 unsubscribe link into a sent mail on 2026-08-30,
+  // and this is the one script whoever debugs "mail isn't arriving right"
+  // is likely to reach for.
+  if (!process.env.NEXT_PUBLIC_SITE_URL) {
+    console.log(
+      "\n  WARN  NEXT_PUBLIC_SITE_URL is not set. lib/siteUrl.ts falls back to" +
+        " http://localhost:3000, which would break every link (confirmation," +
+        " unsubscribe) in a mail sent from this process.",
+    );
+  }
+
   if (missing > 0) {
     console.error(
       `\n${missing} required variable(s) missing. Set them in .env.local for a local run,` +

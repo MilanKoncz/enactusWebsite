@@ -24,7 +24,10 @@ import { checkRateLimit } from "@/lib/rateLimit";
  * Rate-limited like every other form route: this is a public GET that
  * runs one UPDATE per call, and a link scanner or a script looping over
  * guessed tokens would otherwise have no bound at all on how many it can
- * try.
+ * try. A rate-limited request redirects to its own "rate-limited" status,
+ * not "invalid" — the link itself is perfectly valid, and telling a
+ * visitor behind a shared Uni-WLAN egress IP that it's "ungültig oder
+ * abgelaufen" would be false.
  */
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get("token");
@@ -34,7 +37,7 @@ export async function GET(request: NextRequest) {
 
   const rateLimit = await checkRateLimit("reminder-bestaetigen", clientIp(request));
   if (!rateLimit.allowed) {
-    return NextResponse.redirect(statusUrl("invalid"));
+    return NextResponse.redirect(statusUrl("rate-limited"));
   }
 
   if (!token) {

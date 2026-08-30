@@ -90,22 +90,26 @@
     "backHome": "Back to the homepage"
   },
   "ErinnerungStatus": {
-    "pageTitle": "Reminder",
+    "pageTitle": "Application-start notification",
     "confirmed": {
-      "title": "Reminder confirmed",
+      "title": "Notification confirmed",
       "lead": "We'll now email you once the next application window opens."
     },
     "already-confirmed": {
       "title": "Already confirmed",
-      "lead": "This link has already been used. Your reminder is still active."
+      "lead": "This link has already been used. Your notification is still active."
     },
     "unsubscribed": {
       "title": "Unsubscribe confirmed",
-      "lead": "You won't receive any more reminders from us."
+      "lead": "You won't receive any more notifications from us."
     },
     "invalid": {
       "title": "Link invalid",
-      "lead": "This link is invalid or has expired. Sign up again for the reminder to get a new confirmation link."
+      "lead": "This link is invalid or has expired. Sign up again for the notification to get a new confirmation link."
+    },
+    "rate-limited": {
+      "title": "Too many requests just now",
+      "lead": "Your link is fine. There were just too many requests at once, for example because many people are on the same network. Please try again in a few minutes."
     },
     "unsubscribeHint": "You can unsubscribe again at any time.",
     "backHome": "Back to the homepage"
@@ -1011,7 +1015,7 @@
       "title": "Scope",
       "body": [
         "This policy describes which personal data we process when you visit this website, for what purpose, on what legal basis, and for how long we keep it.",
-        "It applies to every page on this website, including the application form, the reminder list, and the contact form. Linked third-party websites, for instance our projects, partners, or Enactus Germany, have their own privacy policies."
+        "It applies to every page on this website, including the application form, the application-start notification, and the contact form. Linked third-party websites, for instance our projects, partners, or Enactus Germany, have their own privacy policies."
       ]
     },
     "responsible": {
@@ -1043,19 +1047,19 @@
     "database": {
       "title": "Database",
       "body": [
-        "We store applications, contact messages, and reminder-list sign-ups in a Postgres database from provider Neon Inc., USA. The database runs in the \"eu-central-1\" region (Frankfurt am Main), so the data stays within the European Union.",
+        "We store applications, contact messages, and application-start notification sign-ups in a Postgres database from provider Neon Inc., USA. The database runs in the \"eu-central-1\" region (Frankfurt am Main), so the data stays within the European Union.",
         "We collect only what a given purpose requires, and delete it once that purpose no longer applies (Art. 5(1)(c) and (e) GDPR). The specific periods are in the \"Retention\" section."
       ]
     },
     "email": {
       "title": "Email delivery",
       "body": [
-        "We use Resend (Plus Five Five, Inc., USA) to send automatically generated emails. These include the application confirmation, the forwarding of contact inquiries, and the reminder-list confirmation. Sending happens from the Ireland region (\"eu-west-1\"), within the European Union.",
+        "We use Resend (Plus Five Five, Inc., USA) to send automatically generated emails. These include the application confirmation, the forwarding of contact inquiries, and the application-start notification confirmation. Sending happens from the Ireland region (\"eu-west-1\"), within the European Union.",
         "We transmit the recipient's email address and the content of the respective message.",
         "Our emails carry no open tracking, no click tracking, and no tracking pixels. Those features are deliberately switched off on our account. Links in our emails go straight to their destination and are never redirected through an intermediary service."
       ],
       "legalBasisLabel": "Legal basis",
-      "legalBasis": "The same basis as the underlying request. See the application, reminder-list, and contact-form sections."
+      "legalBasis": "The same basis as the underlying request. See the application, application-start notification, and contact-form sections."
     },
     "analytics": {
       "title": "Analytics",
@@ -1127,7 +1131,7 @@
       "necessity": "Providing this data is neither legally nor contractually required. Without the fields marked as mandatory, however, we cannot process your signup."
     },
     "reminder": {
-      "title": "Reminder list",
+      "title": "Application-start notification",
       "body": [
         "While the application window is closed, you can sign up to be notified once it opens.",
         "We store your email address, the time you signed up, the time you confirmed, the IP address used for that confirmation, and two randomly generated tokens for confirmation and unsubscribing.",
@@ -1170,9 +1174,9 @@
       "applicationsValue": "{months} months after the respective application period ends",
       "contactLabel": "Contact inquiries",
       "contactValue": "{months} months after final processing",
-      "reminderConfirmedLabel": "Confirmed reminder-list sign-ups",
+      "reminderConfirmedLabel": "Confirmed notification sign-ups",
       "reminderConfirmedValue": "until withdrawn",
-      "reminderUnconfirmedLabel": "Unconfirmed reminder-list sign-ups",
+      "reminderUnconfirmedLabel": "Unconfirmed notification sign-ups",
       "reminderUnconfirmedValue": "{days} days after sign-up",
       "rateLimitLabel": "Hash values for abuse prevention",
       "rateLimitValue": "until the time window elapses",
@@ -1311,9 +1315,9 @@
       "lead": "Once the application window is open, you can apply right here.",
       "notOpen": {
         "beforeHeading": "The application window isn't open yet",
-        "beforeLead": "Applications are open from {opensDate} to {closesDate}. Get an email reminder for when it starts.",
+        "beforeLead": "Applications are open from {opensDate} to {closesDate}. Get an email notification for when it starts.",
         "afterHeading": "The application window is closed for this cycle",
-        "afterLead": "Sign up for a reminder to hear about the next application phase.",
+        "afterLead": "Sign up for the application-start notification to hear about the next application phase.",
         "countdown": {
           "days": "Days",
           "hours": "Hrs",
@@ -1323,15 +1327,15 @@
         }
       },
       "reminder": {
-        "heading": "Get an email reminder",
+        "heading": "Application-start notification",
         "lead": "We'll email you as soon as the application window opens.",
         "emailLabel": "Email",
         "emailError": "Please enter a valid email address.",
-        "consentPrefix": "I agree to be reminded by email once the application window opens. More in the",
+        "consentPrefix": "I agree to be notified by email once the application window opens. More in the",
         "consentLinkLabel": "privacy policy",
         "consentSuffix": ".",
         "consentError": "Please confirm your consent.",
-        "submitLabel": "Turn on reminder",
+        "submitLabel": "Turn on notifications",
         "submitPending": "Turning on …",
         "submitSuccess": "Almost there. Please confirm the email we just sent you.",
         "submitError": "The sign-up didn't go through. Please try again."
@@ -1395,8 +1399,12 @@
       "body": "Hi {firstName},\n\ngreat to have you at Ideathon 2026! Your signup has reached us. You'll get all the details by email over the next few days.\n\nYour Enactus Mannheim team"
     },
     "reminderConfirmation": {
-      "subject": "Please confirm your reminder",
+      "subject": "Please confirm your application-start notification",
       "body": "Hi,\n\nplease confirm with one click that we may email you once the application window opens:\n\n{confirmUrl}\n\nIf this wasn't you, you can simply ignore this email.\n\nUnsubscribe any time: {unsubscribeUrl}"
+    },
+    "reminderAlreadyRegistered": {
+      "subject": "You're already registered for the application-start notification",
+      "body": "Hi,\n\nthis email address is already registered and confirmed for the application-start notification. You'll automatically hear from us once the next application window opens, there's nothing further for you to do.\n\nIf this wasn't you, you can unsubscribe any time here: {unsubscribeUrl}"
     },
     "reminderWindowOpen": {
       "subject": "The application window is now open",
@@ -1415,6 +1423,8 @@
     "logout": "Log out",
     "backToSite": "Back to the site",
     "credit": "Designed and built by Milan Koncz",
+    "delete": "Delete",
+    "deleteFailed": "Deleting failed. Please try again.",
     "mailStatus": {
       "pending": "pending",
       "sent": "sent",
@@ -1429,7 +1439,7 @@
       "projectAreas": "Project areas",
       "calendarEvents": "Calendar events",
       "jobPostings": "Jobs",
-      "reminders": "Reminder list",
+      "reminders": "Notification list",
       "ideathonSignups": "Ideathon signups",
       "contactMessages": "Contact messages",
       "deletionRequests": "Deletion requests",
@@ -1461,7 +1471,7 @@
         "projectAreas": "Maintain the \"desired area\" choices on the application form.",
         "calendarEvents": "Create, edit, and delete calendar events.",
         "jobPostings": "Create, edit, and delete our partners' job postings.",
-        "reminders": "Who signed up for the reminder, confirmed and unconfirmed.",
+        "reminders": "Who signed up for the application-start notification, confirmed and unconfirmed.",
         "ideathonSignups": "Every Ideathon signup, with a CSV export.",
         "contactMessages": "Incoming contact messages with their delivery status.",
         "deletionRequests": "Find and delete personal data for an address (GDPR Art. 15 and 17).",
@@ -1488,12 +1498,14 @@
       "title": "Applications",
       "downloadCsv": "Download as CSV",
       "empty": "No applications yet.",
+      "confirmDelete": "Permanently delete the application from {name} ({email})?",
       "columns": {
         "name": "Name",
         "email": "Email",
         "studyProgram": "Field of study",
         "createdAt": "Received",
-        "mailStatus": "Mail status"
+        "mailStatus": "Mail status",
+        "actions": "Actions"
       }
     },
     "failedMails": {
@@ -1514,8 +1526,8 @@
       "sources": {
         "applications": "Application",
         "contact_messages": "Contact message",
-        "reminder_signups": "Reminder",
-        "reminder_window_mails": "Window reminder",
+        "reminder_signups": "Notification",
+        "reminder_window_mails": "Window notification",
         "ideathon_signups": "Ideathon signup"
       }
     },
@@ -1527,6 +1539,7 @@
       "yes": "yes",
       "no": "no",
       "teamOfSize": "yes ({size})",
+      "confirmDelete": "Permanently delete the Ideathon signup from {name} ({email})?",
       "columns": {
         "name": "Name",
         "email": "Email",
@@ -1537,7 +1550,8 @@
         "motivationExperience": "Motivation & experience",
         "dietaryPreference": "Dietary preference",
         "createdAt": "Received",
-        "mailStatus": "Mail status"
+        "mailStatus": "Mail status",
+        "actions": "Actions"
       },
       "dietary": {
         "omnivore": "Omnivore",
@@ -1566,8 +1580,8 @@
       "edit": "Edit",
       "delete": "Delete",
       "confirmDelete": "Really delete the {semester} application window?",
-      "sendReminder": "Send reminder mail",
-      "confirmSendReminder": "Send the reminder mail for {semester} now to everyone confirmed on the reminder list? Anyone already mailed won't be mailed twice.",
+      "sendReminder": "Send notification mail",
+      "confirmSendReminder": "Send the notification mail for {semester} now to everyone confirmed on the notification list? Anyone already mailed won't be mailed twice.",
       "reminderSentResult": "{sent} sent, {failed} failed.",
       "sendReminderFailed": "That didn't work. Please try again.",
       "errorGeneric": "That didn't work. Please try again.",
@@ -1697,10 +1711,11 @@
       }
     },
     "reminders": {
-      "title": "Reminder list",
+      "title": "Notification list",
       "lead": "Who wants to be notified when applications open. Only confirmed addresses may ever be mailed.",
       "empty": "No entries yet.",
       "downloadCsv": "Download as CSV",
+      "confirmDelete": "Permanently delete the entry {email}?",
       "states": {
         "confirmed": "confirmed",
         "unconfirmed": "unconfirmed",
@@ -1710,7 +1725,8 @@
         "email": "Email",
         "state": "Status",
         "createdAt": "Signed up",
-        "confirmedAt": "Confirmed"
+        "confirmedAt": "Confirmed",
+        "actions": "Actions"
       }
     },
     "contactMessages": {
@@ -1726,7 +1742,7 @@
     },
     "deletionRequests": {
       "title": "Deletion requests",
-      "lead": "For access and erasure requests under GDPR Art. 15 and 17. Search one email address across applications, contact messages, the reminder list, and Ideathon signups.",
+      "lead": "For access and erasure requests under GDPR Art. 15 and 17. Search one email address across applications, contact messages, the notification list, and Ideathon signups.",
       "emailLabel": "Email address",
       "emailHint": "Exactly the address from the request.",
       "search": "Search",
@@ -1736,14 +1752,14 @@
       "tables": {
         "applications": "Applications",
         "contactMessages": "Contact messages",
-        "reminderSignups": "Reminder list",
+        "reminderSignups": "Notification list",
         "ideathonSignups": "Ideathon signups"
       },
       "deleteWarning": "Deleting is final and cannot be undone. There is no backup these rows would come back from.",
       "confirmLabel": "Re-enter the address to confirm",
       "confirmHint": "Must match the address you searched for.",
       "delete": "Delete permanently",
-      "deleted": "Deleted: {applications} applications, {contactMessages} contact messages, {reminderSignups} reminder-list entries, {ideathonSignups} Ideathon signups.",
+      "deleted": "Deleted: {applications} applications, {contactMessages} contact messages, {reminderSignups} notification-list entries, {ideathonSignups} Ideathon signups.",
       "errorSearch": "The search didn't work. Please try again.",
       "errorDelete": "The deletion didn't work. Please try again.",
       "errorMismatch": "The two addresses don't match. Nothing was deleted."
@@ -1764,7 +1780,7 @@
       "reminderWindowCounts": "{sent} sent / {failed} failed",
       "jobs": {
         "cleanup": "Cleanup routine",
-        "reminderWindow": "Window reminder"
+        "reminderWindow": "Window notification"
       },
       "columns": {
         "startedAt": "Started",
@@ -1785,12 +1801,17 @@
         "lastFailed": "Last send attempt failed on {when} ({failed} failed in the last 30 days).",
         "lastSucceeded": "Last send attempt succeeded on {when} ({failed} failed in the last 30 days)."
       },
+      "migrations": "Database schema",
+      "migrationsStatus": {
+        "upToDate": "Up to date ({name}).",
+        "outdated": "Not applied: last {applied}, expected {expected}. The code assumes columns the database may not have yet. Run npm run db:migrate."
+      },
       "rowsHeading": "Rows per table",
       "rowsUnavailable": "Row counts unavailable because the database is unreachable.",
       "tables": {
         "applications": "Applications",
         "contactMessages": "Contact messages",
-        "reminderSignups": "Reminder list",
+        "reminderSignups": "Notification list",
         "recruitingWindows": "Application windows",
         "calendarEvents": "Calendar events",
         "jobPostings": "Jobs",

@@ -14,21 +14,21 @@ describe("checkRateLimit", () => {
     vi.resetAllMocks();
   });
 
-  it("allows a request within the shared limit", async () => {
+  it("allows a request within the default limit", async () => {
     peekRateLimit.mockResolvedValue(0);
     consumeRateLimit.mockResolvedValue(1);
     const { checkRateLimit } = await import("@/lib/rateLimit");
 
-    const result = await checkRateLimit("bewerbung", "203.0.113.1");
+    const result = await checkRateLimit("some-unlisted-route", "203.0.113.1");
 
     expect(result).toEqual({ allowed: true, remaining: 4 });
   });
 
-  it("rejects a flood once the shared limit is exceeded, without writing a row for the rejected request", async () => {
+  it("rejects a flood once the default limit is exceeded, without writing a row for the rejected request", async () => {
     peekRateLimit.mockResolvedValue(5);
     const { checkRateLimit } = await import("@/lib/rateLimit");
 
-    const result = await checkRateLimit("bewerbung", "203.0.113.1");
+    const result = await checkRateLimit("some-unlisted-route", "203.0.113.1");
 
     expect(result).toEqual({ allowed: false, remaining: 0 });
     expect(consumeRateLimit).not.toHaveBeenCalled();
@@ -39,7 +39,7 @@ describe("checkRateLimit", () => {
     consumeRateLimit.mockResolvedValue(4);
     const { checkRateLimit } = await import("@/lib/rateLimit");
 
-    const result = await checkRateLimit("bewerbung", "203.0.113.1");
+    const result = await checkRateLimit("some-unlisted-route", "203.0.113.1");
 
     expect(consumeRateLimit).toHaveBeenCalledTimes(1);
     expect(result).toEqual({ allowed: true, remaining: 1 });
@@ -81,5 +81,47 @@ describe("checkRateLimit", () => {
     const [bewerbungBucket] = peekRateLimit.mock.calls[0] as [string, Date];
     const [kontaktBucket] = peekRateLimit.mock.calls[1] as [string, Date];
     expect(bewerbungBucket).not.toBe(kontaktBucket);
+  });
+
+  /**
+   * The staggered limits added 2026-08-30 ahead of the HWS26 recruiting
+   * release: a flat 5-per-IP-per-10-minutes, applied to /api/bewerbung
+   * and /api/ideathon, would have meant "five applications campus-wide
+   * per ten minutes" for applicants sharing a university WLAN's egress
+   * IP. Each route's own ceiling is asserted directly rather than via a
+   * shared "the default applies everywhere" test, since the whole point
+   * is that it no longer does.
+   */
+  describe("per-route ceilings", () => {
+    it.each([
+      ["bewerbung", 20],
+      ["ideathon", 20],
+      ["kontakt", 10],
+      ["reminder", 10],
+      ["reminder-bestaetigen", 30],
+      ["reminder-abmelden", 30],
+      ["reminder-address", 3],
+      ["admin-login", 5],
+    ])("allows exactly %s requests for route %s before rejecting", async (route, limit) => {
+      peekRateLimit.mockResolvedValue(limit - 1);
+      consumeRateLimit.mockResolvedValue(limit);
+      const { checkRateLimit } = await import("@/lib/rateLimit");
+
+      const underLimit = await checkRateLimit(route, "203.0.113.1");
+      expect(underLimit).toEqual({ allowed: true, remaining: 0 });
+
+      peekRateLimit.mockResolvedValue(limit);
+      const overLimit = await checkRateLimit(route, "203.0.113.1");
+      expect(overLimit).toEqual({ allowed: false, remaining: 0 });
+    });
+
+    it("keeps admin-login at the original, tighter limit — the one route defending against a real brute-force attempt", async () => {
+      peekRateLimit.mockResolvedValue(5);
+      const { checkRateLimit } = await import("@/lib/rateLimit");
+
+      const result = await checkRateLimit("admin-login", "203.0.113.1");
+
+      expect(result).toEqual({ allowed: false, remaining: 0 });
+    });
   });
 });

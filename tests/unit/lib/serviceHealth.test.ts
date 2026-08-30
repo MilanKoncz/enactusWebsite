@@ -1,9 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const mailHealthSnapshot = vi.fn();
+const latestAppliedMigrationName = vi.fn();
 
 vi.mock("@/lib/db", () => ({
   mailHealthSnapshot: (...args: unknown[]) => mailHealthSnapshot(...args),
+  latestAppliedMigrationName: (...args: unknown[]) => latestAppliedMigrationName(...args),
 }));
 
 /**
@@ -68,5 +70,52 @@ describe("checkResend", () => {
     const { checkResend } = await import("@/lib/serviceHealth");
     const result = await checkResend();
     expect(result).toEqual({ level: "ok", reason: "lastSucceeded", lastAttemptAt: at, failedLast30Days: 2 });
+  });
+});
+
+/**
+ * checkMigrations() exists to catch exactly the failure mode that broke
+ * Ideathon signups from 2026-08-26 to 2026-08-30: a migration committed to
+ * migrations/ and relied on by the application code, but never run against
+ * the database. LATEST_MIGRATION (lib/migrations.ts) is a hand-maintained
+ * constant, not read from disk, so these tests mock the database side only.
+ */
+describe("checkMigrations", () => {
+  afterEach(() => {
+    latestAppliedMigrationName.mockReset();
+  });
+
+  it("is green when the database's latest migration matches what the code expects", async () => {
+    const { LATEST_MIGRATION } = await import("@/lib/migrations");
+    latestAppliedMigrationName.mockResolvedValue(LATEST_MIGRATION);
+    const { checkMigrations } = await import("@/lib/serviceHealth");
+
+    const result = await checkMigrations();
+
+    expect(result).toEqual({ level: "ok", latestApplied: LATEST_MIGRATION, latestExpected: LATEST_MIGRATION });
+  });
+
+  it("is red when the database is behind the code", async () => {
+    const { LATEST_MIGRATION } = await import("@/lib/migrations");
+    latestAppliedMigrationName.mockResolvedValue("0014_ideathon_signups.sql");
+    const { checkMigrations } = await import("@/lib/serviceHealth");
+
+    const result = await checkMigrations();
+
+    expect(result).toEqual({
+      level: "error",
+      latestApplied: "0014_ideathon_signups.sql",
+      latestExpected: LATEST_MIGRATION,
+    });
+  });
+
+  it("is red when schema_migrations has never been populated", async () => {
+    latestAppliedMigrationName.mockResolvedValue(null);
+    const { checkMigrations } = await import("@/lib/serviceHealth");
+
+    const result = await checkMigrations();
+
+    expect(result.level).toBe("error");
+    expect(result.latestApplied).toBeNull();
   });
 });

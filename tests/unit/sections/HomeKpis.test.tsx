@@ -121,6 +121,35 @@ describe("HomeKpis", () => {
     vi.useRealTimers();
   });
 
+  it("shows the final value while the row hasn't scrolled into view yet, even with an observer available", () => {
+    mockMatchMedia(false);
+    mockIntersectionObserver();
+    renderWithIntl(<HomeKpis />);
+    expect(screen.getByText("8")).toBeInTheDocument();
+  });
+
+  // Regression test for the reported bug: scrolling down from the very top
+  // showed the final value for a split second before the count-up visibly
+  // began, worst on a throttled CPU. The old implementation only reset the
+  // displayed number to 0 inside the first requestAnimationFrame callback —
+  // so between the row becoming visible and that first frame actually
+  // firing, the browser could paint a frame still showing the final value.
+  // This test uses real timers and advances nothing: it asserts the reset
+  // happens synchronously, in the same act() as the row becoming visible,
+  // which is exactly what closes that gap (AnimatedFigure's useLayoutEffect).
+  it("resets away from the final value the instant the row scrolls into view, before any animation frame has run", () => {
+    mockMatchMedia(false);
+    const io = mockIntersectionObserver();
+    renderWithIntl(<HomeKpis />);
+    expect(screen.getByText("8")).toBeInTheDocument();
+
+    act(() => {
+      io.intersect(true);
+    });
+
+    expect(screen.queryByText("8")).not.toBeInTheDocument();
+  });
+
   it("never counts under prefers-reduced-motion — the final value never moves", () => {
     mockMatchMedia(true);
     const io = mockIntersectionObserver();

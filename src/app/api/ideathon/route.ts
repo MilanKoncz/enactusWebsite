@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { ideathonSignupRequestSchema } from "@/lib/apiSchemas";
 import { insertIdeathonSignup, markIdeathonSignupMailed, markIdeathonSignupMailFailed } from "@/lib/db";
 import { dispatchIdeathonSignupMails } from "@/lib/mailDispatch";
+import { alertOnInsertFailure } from "@/lib/insertFailureAlert";
 import { checkRateLimit } from "@/lib/rateLimit";
 import { clientIp } from "@/lib/requestIp";
 import { checkFormToken } from "@/lib/formToken";
@@ -83,6 +84,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Failed to store Ideathon signup", error);
+    await alertOnInsertFailure("ideathon", error);
     return NextResponse.json({ ok: false, error: "server_error" }, { status: 500 });
   }
 

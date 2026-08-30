@@ -90,22 +90,26 @@
     "backHome": "Zurück zur Startseite"
   },
   "ErinnerungStatus": {
-    "pageTitle": "Erinnerung",
+    "pageTitle": "Benachrichtigung zum Bewerbungsstart",
     "confirmed": {
-      "title": "Erinnerung bestätigt",
-      "lead": "Wir erinnern dich jetzt per E-Mail, sobald das nächste Bewerbungsfenster öffnet."
+      "title": "Benachrichtigung bestätigt",
+      "lead": "Wir benachrichtigen dich jetzt per E-Mail, sobald das nächste Bewerbungsfenster öffnet."
     },
     "already-confirmed": {
       "title": "Bereits bestätigt",
-      "lead": "Dieser Link wurde schon verwendet. Deine Erinnerung ist weiterhin aktiv."
+      "lead": "Dieser Link wurde schon verwendet. Deine Benachrichtigung ist weiterhin aktiv."
     },
     "unsubscribed": {
       "title": "Abmeldung bestätigt",
-      "lead": "Du bekommst ab jetzt keine Erinnerungen mehr von uns."
+      "lead": "Du bekommst ab jetzt keine Benachrichtigungen mehr von uns."
     },
     "invalid": {
       "title": "Link ungültig",
-      "lead": "Dieser Link ist ungültig oder abgelaufen. Melde dich erneut für die Erinnerung an, dann bekommst du einen neuen Bestätigungslink."
+      "lead": "Dieser Link ist ungültig oder abgelaufen. Melde dich erneut für die Benachrichtigung an, dann bekommst du einen neuen Bestätigungslink."
+    },
+    "rate-limited": {
+      "title": "Kurz zu viele Anfragen",
+      "lead": "Dein Link ist in Ordnung. Gerade kamen nur zu viele Anfragen auf einmal an, zum Beispiel weil viele im selben WLAN unterwegs sind. Bitte versuch es in ein paar Minuten noch einmal."
     },
     "unsubscribeHint": "Du kannst dich jederzeit wieder abmelden.",
     "backHome": "Zurück zur Startseite"
@@ -1011,7 +1015,7 @@
       "title": "Geltungsbereich",
       "body": [
         "Diese Erklärung beschreibt, welche personenbezogenen Daten wir beim Besuch dieser Website verarbeiten, zu welchem Zweck, auf welcher Rechtsgrundlage und wie lange wir sie speichern.",
-        "Sie gilt für sämtliche Unterseiten dieser Website einschließlich des Bewerbungsformulars, der Erinnerungsliste und des Kontaktformulars. Für verlinkte Websites Dritter, etwa die Seiten unserer Projekte, Partner oder von Enactus Germany, gelten deren eigene Datenschutzerklärungen."
+        "Sie gilt für sämtliche Unterseiten dieser Website einschließlich des Bewerbungsformulars, der Benachrichtigung zum Bewerbungsstart und des Kontaktformulars. Für verlinkte Websites Dritter, etwa die Seiten unserer Projekte, Partner oder von Enactus Germany, gelten deren eigene Datenschutzerklärungen."
       ]
     },
     "responsible": {
@@ -1043,19 +1047,19 @@
     "database": {
       "title": "Datenbank",
       "body": [
-        "Bewerbungen, Kontaktanfragen und Anmeldungen zur Erinnerungsliste speichern wir in einer Postgres-Datenbank des Anbieters Neon Inc., USA. Die Datenbank wird in der Region „eu-central-1“ (Frankfurt am Main) betrieben; die Daten liegen damit innerhalb der Europäischen Union.",
+        "Bewerbungen, Kontaktanfragen und Anmeldungen zur Benachrichtigung zum Bewerbungsstart speichern wir in einer Postgres-Datenbank des Anbieters Neon Inc., USA. Die Datenbank wird in der Region „eu-central-1“ (Frankfurt am Main) betrieben; die Daten liegen damit innerhalb der Europäischen Union.",
         "Wir erheben ausschließlich Angaben, die für den jeweiligen Zweck erforderlich sind, und löschen sie, sobald dieser Zweck entfällt (Art. 5 Abs. 1 lit. c und e DSGVO). Die konkreten Fristen finden sich im Abschnitt „Speicherdauer“."
       ]
     },
     "email": {
       "title": "E-Mail-Versand",
       "body": [
-        "Für den Versand automatisch erzeugter E-Mails nutzen wir den Dienst Resend (Plus Five Five, Inc., USA). Dazu zählen die Bewerbungsbestätigung, die Weiterleitung von Kontaktanfragen und die Bestätigungsmail der Erinnerungsliste. Der Versand erfolgt über die Region Irland („eu-west-1“) und damit innerhalb der Europäischen Union.",
+        "Für den Versand automatisch erzeugter E-Mails nutzen wir den Dienst Resend (Plus Five Five, Inc., USA). Dazu zählen die Bewerbungsbestätigung, die Weiterleitung von Kontaktanfragen und die Bestätigungsmail der Benachrichtigung zum Bewerbungsstart. Der Versand erfolgt über die Region Irland („eu-west-1“) und damit innerhalb der Europäischen Union.",
         "Übermittelt werden die E-Mail-Adresse der empfangenden Person sowie der Inhalt der jeweiligen Nachricht.",
         "Unsere E-Mails enthalten kein Öffnungs-Tracking, kein Klick-Tracking und keine Zählpixel. Die entsprechenden Funktionen des Dienstes sind bewusst deaktiviert. Links in unseren E-Mails führen direkt zum Ziel und werden nicht über einen Zwischendienst umgeleitet."
       ],
       "legalBasisLabel": "Rechtsgrundlage",
-      "legalBasis": "Dieselbe wie für die jeweils zugrunde liegende Anfrage. Siehe die Abschnitte zum Bewerbungs-, Erinnerungs- und Kontaktformular."
+      "legalBasis": "Dieselbe wie für die jeweils zugrunde liegende Anfrage. Siehe die Abschnitte zum Bewerbungsformular, zur Benachrichtigung zum Bewerbungsstart und zum Kontaktformular."
     },
     "analytics": {
       "title": "Reichweitenmessung",
@@ -1127,7 +1131,7 @@
       "necessity": "Die Bereitstellung der Daten ist weder gesetzlich noch vertraglich vorgeschrieben. Ohne die als Pflichtfelder gekennzeichneten Angaben können wir deine Anmeldung jedoch nicht bearbeiten."
     },
     "reminder": {
-      "title": "Erinnerungsliste",
+      "title": "Benachrichtigung zum Bewerbungsstart",
       "body": [
         "Solange das Bewerbungsfenster geschlossen ist, kannst du dich benachrichtigen lassen, sobald es öffnet.",
         "Wir speichern deine E-Mail-Adresse, den Zeitpunkt der Anmeldung, den Zeitpunkt deiner Bestätigung, die dabei verwendete IP-Adresse sowie zwei zufällig erzeugte Kennungen für Bestätigung und Abmeldung.",
@@ -1170,9 +1174,9 @@
       "applicationsValue": "{months} Monate nach Ende des jeweiligen Bewerbungszeitraums",
       "contactLabel": "Kontaktanfragen",
       "contactValue": "{months} Monate nach abschließender Bearbeitung",
-      "reminderConfirmedLabel": "Bestätigte Anmeldungen zur Erinnerungsliste",
+      "reminderConfirmedLabel": "Bestätigte Anmeldungen zur Benachrichtigung",
       "reminderConfirmedValue": "bis zum Widerruf",
-      "reminderUnconfirmedLabel": "Unbestätigte Anmeldungen zur Erinnerungsliste",
+      "reminderUnconfirmedLabel": "Unbestätigte Anmeldungen zur Benachrichtigung",
       "reminderUnconfirmedValue": "{days} Tage nach Anmeldung",
       "rateLimitLabel": "Hashwerte zur Missbrauchsabwehr",
       "rateLimitValue": "bis zum Ablauf des Zeitfensters",
@@ -1311,9 +1315,9 @@
       "lead": "Sobald das Bewerbungsfenster offen ist, kannst du dich hier direkt bewerben.",
       "notOpen": {
         "beforeHeading": "Das Bewerbungsfenster ist noch geschlossen",
-        "beforeLead": "Bewerbungen sind vom {opensDate} bis {closesDate} möglich. Lass dich per E-Mail erinnern, sobald es losgeht.",
+        "beforeLead": "Bewerbungen sind vom {opensDate} bis {closesDate} möglich. Lass dich per E-Mail benachrichtigen, sobald es losgeht.",
         "afterHeading": "Das Bewerbungsfenster ist für diesen Zyklus geschlossen",
-        "afterLead": "Melde dich für die Erinnerung an, um von der nächsten Bewerbungsphase zu erfahren.",
+        "afterLead": "Melde dich für die Benachrichtigung zum Bewerbungsstart an, um von der nächsten Bewerbungsphase zu erfahren.",
         "countdown": {
           "days": "Tage",
           "hours": "Std",
@@ -1323,15 +1327,15 @@
         }
       },
       "reminder": {
-        "heading": "Per E-Mail erinnern lassen",
+        "heading": "Benachrichtigung zum Bewerbungsstart",
         "lead": "Wir schicken dir eine E-Mail, sobald das Bewerbungsfenster öffnet.",
         "emailLabel": "E-Mail",
         "emailError": "Bitte gib eine gültige E-Mail-Adresse ein.",
-        "consentPrefix": "Ich bin damit einverstanden, per E-Mail erinnert zu werden, sobald das Bewerbungsfenster öffnet. Mehr dazu in der",
+        "consentPrefix": "Ich bin damit einverstanden, per E-Mail benachrichtigt zu werden, sobald das Bewerbungsfenster öffnet. Mehr dazu in der",
         "consentLinkLabel": "Datenschutzerklärung",
         "consentSuffix": ".",
         "consentError": "Bitte bestätige die Einwilligung.",
-        "submitLabel": "Erinnerung aktivieren",
+        "submitLabel": "Benachrichtigung aktivieren",
         "submitPending": "Wird aktiviert …",
         "submitSuccess": "Fast geschafft. Bitte bestätige die E-Mail, die wir dir gerade geschickt haben.",
         "submitError": "Die Anmeldung hat nicht geklappt. Bitte versuch es noch einmal."
@@ -1395,8 +1399,12 @@
       "body": "Hallo {firstName},\n\nschön, dass du beim Ideathon 2026 dabei bist! Deine Anmeldung ist bei uns angekommen. Alle weiteren Infos bekommst du in den nächsten Tagen per Mail.\n\nDein Enactus-Mannheim-Team"
     },
     "reminderConfirmation": {
-      "subject": "Bitte bestätige deine Erinnerung",
-      "body": "Hallo,\n\nbitte bestätige mit einem Klick, dass wir dich per E-Mail erinnern dürfen, sobald das Bewerbungsfenster öffnet:\n\n{confirmUrl}\n\nWenn du das nicht warst, kannst du diese E-Mail einfach ignorieren.\n\nJederzeit abmelden: {unsubscribeUrl}"
+      "subject": "Bitte bestätige deine Benachrichtigung zum Bewerbungsstart",
+      "body": "Hallo,\n\nbitte bestätige mit einem Klick, dass wir dich per E-Mail benachrichtigen dürfen, sobald das Bewerbungsfenster öffnet:\n\n{confirmUrl}\n\nWenn du das nicht warst, kannst du diese E-Mail einfach ignorieren.\n\nJederzeit abmelden: {unsubscribeUrl}"
+    },
+    "reminderAlreadyRegistered": {
+      "subject": "Du bist schon für die Benachrichtigung zum Bewerbungsstart registriert",
+      "body": "Hallo,\n\ndiese E-Mail-Adresse ist bereits für die Benachrichtigung zum Bewerbungsstart registriert und bestätigt. Du bekommst automatisch Bescheid, sobald das nächste Bewerbungsfenster öffnet, du musst nichts weiter tun.\n\nWenn du das nicht warst, kannst du dich über den folgenden Link jederzeit abmelden: {unsubscribeUrl}"
     },
     "reminderWindowOpen": {
       "subject": "Das Bewerbungsfenster ist jetzt offen",
@@ -1415,6 +1423,8 @@
     "logout": "Abmelden",
     "backToSite": "Zur Website",
     "credit": "Designed and built by Milan Koncz",
+    "delete": "Löschen",
+    "deleteFailed": "Löschen ist fehlgeschlagen. Bitte versuch es noch einmal.",
     "mailStatus": {
       "pending": "ausstehend",
       "sent": "gesendet",
@@ -1429,7 +1439,7 @@
       "projectAreas": "Wunschbereiche",
       "calendarEvents": "Termine",
       "jobPostings": "Jobs",
-      "reminders": "Erinnerungsliste",
+      "reminders": "Benachrichtigungsliste",
       "ideathonSignups": "Ideathon-Anmeldungen",
       "contactMessages": "Kontaktanfragen",
       "deletionRequests": "Löschanfragen",
@@ -1461,7 +1471,7 @@
         "projectAreas": "Die Wunschbereich-Auswahl im Bewerbungsformular pflegen.",
         "calendarEvents": "Termine anlegen, bearbeiten und löschen.",
         "jobPostings": "Offene Stellen unserer Partner anlegen, bearbeiten und löschen.",
-        "reminders": "Wer sich für die Erinnerung eingetragen hat, bestätigt und unbestätigt.",
+        "reminders": "Wer sich für die Benachrichtigung zum Bewerbungsstart eingetragen hat, bestätigt und unbestätigt.",
         "ideathonSignups": "Alle Anmeldungen zum Ideathon, mit CSV-Export.",
         "contactMessages": "Eingegangene Kontaktanfragen mit Versandstatus.",
         "deletionRequests": "Personenbezogene Daten zu einer Adresse suchen und löschen (Art. 15 und 17 DSGVO).",
@@ -1488,12 +1498,14 @@
       "title": "Bewerbungen",
       "downloadCsv": "Als CSV herunterladen",
       "empty": "Noch keine Bewerbungen.",
+      "confirmDelete": "Bewerbung von {name} ({email}) wirklich endgültig löschen?",
       "columns": {
         "name": "Name",
         "email": "E-Mail",
         "studyProgram": "Studiengang",
         "createdAt": "Eingangsdatum",
-        "mailStatus": "Mailstatus"
+        "mailStatus": "Mailstatus",
+        "actions": "Aktionen"
       }
     },
     "failedMails": {
@@ -1514,8 +1526,8 @@
       "sources": {
         "applications": "Bewerbung",
         "contact_messages": "Kontaktanfrage",
-        "reminder_signups": "Erinnerung",
-        "reminder_window_mails": "Fenster-Erinnerung",
+        "reminder_signups": "Benachrichtigung",
+        "reminder_window_mails": "Fenster-Benachrichtigung",
         "ideathon_signups": "Ideathon-Anmeldung"
       }
     },
@@ -1527,6 +1539,7 @@
       "yes": "ja",
       "no": "nein",
       "teamOfSize": "ja ({size})",
+      "confirmDelete": "Ideathon-Anmeldung von {name} ({email}) wirklich endgültig löschen?",
       "columns": {
         "name": "Name",
         "email": "E-Mail",
@@ -1537,7 +1550,8 @@
         "motivationExperience": "Motivation & Erfahrung",
         "dietaryPreference": "Essenspräferenz",
         "createdAt": "Eingangsdatum",
-        "mailStatus": "Mailstatus"
+        "mailStatus": "Mailstatus",
+        "actions": "Aktionen"
       },
       "dietary": {
         "omnivore": "Omnivor",
@@ -1566,8 +1580,8 @@
       "edit": "Bearbeiten",
       "delete": "Löschen",
       "confirmDelete": "Bewerbungsfenster {semester} wirklich löschen?",
-      "sendReminder": "Erinnerungsmail senden",
-      "confirmSendReminder": "Erinnerungsmail für {semester} jetzt an alle bestätigten Einträge der Erinnerungsliste senden? Bereits gemailte Einträge werden nicht doppelt angeschrieben.",
+      "sendReminder": "Benachrichtigungsmail senden",
+      "confirmSendReminder": "Benachrichtigungsmail für {semester} jetzt an alle bestätigten Einträge der Benachrichtigungsliste senden? Bereits gemailte Einträge werden nicht doppelt angeschrieben.",
       "reminderSentResult": "{sent} gesendet, {failed} fehlgeschlagen.",
       "sendReminderFailed": "Das hat nicht geklappt. Bitte versuch es noch einmal.",
       "errorGeneric": "Das hat nicht geklappt. Bitte versuch es noch einmal.",
@@ -1697,10 +1711,11 @@
       }
     },
     "reminders": {
-      "title": "Erinnerungsliste",
+      "title": "Benachrichtigungsliste",
       "lead": "Wer benachrichtigt werden möchte, sobald die Bewerbung öffnet. Nur bestätigte Adressen dürfen angeschrieben werden.",
       "empty": "Noch keine Einträge.",
       "downloadCsv": "Als CSV herunterladen",
+      "confirmDelete": "Eintrag {email} wirklich endgültig löschen?",
       "states": {
         "confirmed": "bestätigt",
         "unconfirmed": "unbestätigt",
@@ -1710,7 +1725,8 @@
         "email": "E-Mail",
         "state": "Status",
         "createdAt": "Eingetragen",
-        "confirmedAt": "Bestätigt"
+        "confirmedAt": "Bestätigt",
+        "actions": "Aktionen"
       }
     },
     "contactMessages": {
@@ -1726,7 +1742,7 @@
     },
     "deletionRequests": {
       "title": "Löschanfragen",
-      "lead": "Für Auskunfts- und Löschbegehren nach Art. 15 und 17 DSGVO. Suche nach einer E-Mail-Adresse über Bewerbungen, Kontaktanfragen, Erinnerungsliste und Ideathon-Anmeldungen.",
+      "lead": "Für Auskunfts- und Löschbegehren nach Art. 15 und 17 DSGVO. Suche nach einer E-Mail-Adresse über Bewerbungen, Kontaktanfragen, Benachrichtigungsliste und Ideathon-Anmeldungen.",
       "emailLabel": "E-Mail-Adresse",
       "emailHint": "Genau die Adresse aus dem Begehren.",
       "search": "Suchen",
@@ -1736,14 +1752,14 @@
       "tables": {
         "applications": "Bewerbungen",
         "contactMessages": "Kontaktanfragen",
-        "reminderSignups": "Erinnerungsliste",
+        "reminderSignups": "Benachrichtigungsliste",
         "ideathonSignups": "Ideathon-Anmeldungen"
       },
       "deleteWarning": "Löschen ist endgültig und lässt sich nicht rückgängig machen. Es gibt kein Backup, aus dem diese Zeilen zurückkämen.",
       "confirmLabel": "Adresse zur Bestätigung erneut eingeben",
       "confirmHint": "Muss mit der gesuchten Adresse übereinstimmen.",
       "delete": "Endgültig löschen",
-      "deleted": "Gelöscht: {applications} Bewerbungen, {contactMessages} Kontaktanfragen, {reminderSignups} Einträge der Erinnerungsliste, {ideathonSignups} Ideathon-Anmeldungen.",
+      "deleted": "Gelöscht: {applications} Bewerbungen, {contactMessages} Kontaktanfragen, {reminderSignups} Einträge der Benachrichtigungsliste, {ideathonSignups} Ideathon-Anmeldungen.",
       "errorSearch": "Die Suche hat nicht geklappt. Bitte versuch es noch einmal.",
       "errorDelete": "Das Löschen hat nicht geklappt. Bitte versuch es noch einmal.",
       "errorMismatch": "Die beiden Adressen stimmen nicht überein. Es wurde nichts gelöscht."
@@ -1764,7 +1780,7 @@
       "reminderWindowCounts": "{sent} gesendet / {failed} fehlgeschlagen",
       "jobs": {
         "cleanup": "Löschroutine",
-        "reminderWindow": "Fenster-Erinnerung"
+        "reminderWindow": "Fenster-Benachrichtigung"
       },
       "columns": {
         "startedAt": "Gestartet",
@@ -1785,12 +1801,17 @@
         "lastFailed": "Letzter Sendeversuch fehlgeschlagen am {when} ({failed} fehlgeschlagen in den letzten 30 Tagen).",
         "lastSucceeded": "Letzter Sendeversuch erfolgreich am {when} ({failed} fehlgeschlagen in den letzten 30 Tagen)."
       },
+      "migrations": "Datenbankschema",
+      "migrationsStatus": {
+        "upToDate": "Auf dem neuesten Stand ({name}).",
+        "outdated": "Nicht angewendet: zuletzt {applied}, erwartet {expected}. Der Code geht von Spalten aus, die in der Datenbank noch fehlen können. npm run db:migrate ausführen."
+      },
       "rowsHeading": "Zeilen je Tabelle",
       "rowsUnavailable": "Zeilenzahlen nicht abrufbar, weil die Datenbank nicht erreichbar ist.",
       "tables": {
         "applications": "Bewerbungen",
         "contactMessages": "Kontaktanfragen",
-        "reminderSignups": "Erinnerungsliste",
+        "reminderSignups": "Benachrichtigungsliste",
         "recruitingWindows": "Bewerbungsfenster",
         "calendarEvents": "Termine",
         "jobPostings": "Jobs",

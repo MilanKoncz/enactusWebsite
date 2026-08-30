@@ -4,6 +4,7 @@ import { requireLocale, resolveLocale } from "@/i18n/requireLocale";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { RawLink } from "@/lib/navigation";
+import { AdminDeleteButton } from "@/components/admin/AdminDeleteButton";
 import { AdminLogin } from "@/components/admin/AdminLogin";
 import { AdminTable } from "@/components/admin/AdminTable";
 import { MailStatusIndicator } from "@/components/admin/StatusIndicator";
@@ -43,6 +44,7 @@ export default async function AdminBewerbungenPage({ params }: PageProps) {
     t("applications.columns.studyProgram"),
     t("applications.columns.createdAt"),
     t("applications.columns.mailStatus"),
+    t("applications.columns.actions"),
   ];
 
   return (
@@ -77,6 +79,15 @@ export default async function AdminBewerbungenPage({ params }: PageProps) {
                   key="mailStatus"
                   status={application.mailStatus}
                   label={t(`mailStatus.${application.mailStatus}`)}
+                />,
+                <AdminDeleteButton
+                  key="actions"
+                  endpoint="/api/admin/bewerbungen"
+                  id={application.id}
+                  confirmLabel={t("applications.confirmDelete", {
+                    name: `${application.firstName} ${application.lastName}`,
+                    email: application.email,
+                  })}
                 />,
               ],
             }))}

@@ -51,30 +51,73 @@ another and can change independently.
 5. Retention is 6 months from each row's own `created_at` (same rolling-window
    shape as `applications`), enforced by the same daily `/api/cron/cleanup`
    route as everything else in `content/retention.ts`.
+6. `/admin/ideathon-anmeldungen` can delete a single signup, same pattern as
+   `/admin/bewerbungen` and `/admin/erinnerungen` (2026-08-30).
 
-## Reminder list
+Migration `0015_ideathon_signup_fields.sql` (`university` dropped,
+`team_members`/`motivation_experience`/`dietary_preference` added) shipped
+2026-08-26 but wasn't applied to production until 2026-08-30 — the code and
+the schema drifted apart for four days, breaking the admin view and every
+new signup silently (the insert failed, the visitor saw a real error, but
+nobody who could fix it ever found out). `npm run db:verify` now includes a
+check that every file in `migrations/` has a matching row in
+`schema_migrations`, and `/admin/system` shows the same comparison as a
+live status indicator (`lib/migrations.ts`'s `LATEST_MIGRATION`,
+`lib/serviceHealth.ts`'s `checkMigrations`) — both catch this exact failure
+mode directly rather than waiting for one of its symptoms. A failed insert
+on `/api/bewerbung` or `/api/ideathon` also now emails
+`APPLICATION_RECIPIENT_EMAIL` a rate-limited alert
+(`lib/insertFailureAlert.ts`), so the board hears about a broken form even
+if nobody happens to be looking at `/admin/system`.
+
+## Application-start notification ("reminder list" in code and routes)
+
+User-facing copy calls this the "Benachrichtigung zum Bewerbungsstart" /
+"application-start notification" (sharpened from the generic "reminder"
+wording, 2026-08-30) — but the code, the table (`reminder_signups`), the
+routes (`/api/reminder/*`), and the status page (`/erinnerung-status`) all
+keep their original names, deliberately: renaming those would break the
+confirm and unsubscribe links already sitting in mail inboxes.
 
 Notifying people when applications open is marketing email under German law and
 requires **double opt-in**. This is also explicitly on the Enactus Germany data
 protection checklist.
 
-1. Submission writes a row with `confirmed: false` and a random token.
+1. Submission writes a row with `confirmed: false` and a random token. The
+   email is trimmed and lowercased before the uniqueness check
+   (`lib/reminderSignupSchema.ts`) — `reminder_signups.email` has a unique
+   constraint on the raw column, so without normalizing, two different
+   capitalizations of the same address used to create two rows.
 2. Confirmation email links to `/api/reminder/bestaetigen?token=...`.
-3. Only confirmed rows are ever mailed.
+3. Only confirmed rows are ever mailed the "window just opened" notice. An
+   address that submits again after already confirming gets a distinct
+   "you're already registered" mail instead (`dispatchReminderAlreadyRegistered`,
+   added 2026-08-30) — the UI's own response stays the same neutral success
+   either way, so this can't be used to probe who's signed up.
 4. Store confirmation timestamp and IP as proof of consent.
 5. Every mail carries a working one-click unsubscribe.
-6. Whether that confirmation mail actually went out is recorded on the row
-   (`mail_status`, `mail_error`), same as the other two forms — otherwise a
-   subscriber whose link never arrived is indistinguishable from one who
-   chose not to click. `/admin/mails` lists the failures and can resend.
+6. Whether a mail actually went out is recorded on the row (`mail_status`,
+   `mail_error`), same as the other forms — otherwise a subscriber whose
+   link never arrived is indistinguishable from one who chose not to click.
+   `/admin/mails` lists the failures and can resend either mail, depending
+   on whether the row has since confirmed.
 7. Both the confirm and unsubscribe links land on `/erinnerung-status`, a
-   real confirmation page with four states (confirmed, already confirmed,
-   unsubscribed, invalid/expired) — noindex and excluded from the sitemap,
-   same as `/secret`.
+   real confirmation page with five states (confirmed, already confirmed,
+   unsubscribed, invalid/expired, rate-limited) — noindex and excluded from
+   the sitemap, same as `/secret`. The rate-limited state is its own,
+   distinct from invalid (added 2026-08-30): a request arriving while its
+   route's own rate limit was exceeded redirected to "invalid" before,
+   telling a visitor with a perfectly working link that it was broken — a
+   real scenario when many applicants share one Uni-WLAN egress IP.
+8. Rate-limited per IP (`lib/rateLimit.ts`'s per-route ceilings) **and** per
+   address (`reminder-address` bucket, keyed on the normalized email) — the
+   per-IP limit alone doesn't stop a flood of requests naming the same
+   victim address from many different IPs.
 
 `/admin/erinnerungen` shows the list with confirmed, unconfirmed, and
 unsubscribed counted separately; only the confirmed figure is the number of
-people who may be mailed. Its CSV export deliberately carries no tokens.
+people who may be mailed. Its CSV export deliberately carries no tokens. A
+board member can delete a single entry directly from this page.
 
 ## Data protection
 

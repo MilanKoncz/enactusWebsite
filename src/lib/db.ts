@@ -199,6 +199,15 @@ export async function deleteExpiredApplications(cutoff: Date): Promise<number> {
   return rows.length;
 }
 
+// The board's own manual delete, from /admin/bewerbungen — distinct from
+// deleteExpiredApplications above (retention, cron-driven, by cutoff date)
+// and from /api/admin/loeschanfragen (GDPR erasure, by email address across
+// every table at once). Same one-row-by-id shape as deleteProjectArea.
+export async function deleteApplication(id: string): Promise<boolean> {
+  const rows = await sql()`delete from applications where id = ${id} returning id`;
+  return rows.length > 0;
+}
+
 export type RecruitingWindowRow = {
   id: string;
   semester: string;
@@ -1045,6 +1054,16 @@ export async function deleteExpiredReminderSignups(unconfirmedCutoff: Date): Pro
   return rows.length;
 }
 
+// The board's own manual delete, from /admin/erinnerungen — distinct from
+// deleteExpiredReminderSignups above (retention, cron-driven). Deleting the
+// row here also removes any reminder_window_mails referencing it, via that
+// table's own `on delete cascade` foreign key (migrations/0009) — no
+// separate cleanup needed.
+export async function deleteReminderSignup(id: string): Promise<boolean> {
+  const rows = await sql()`delete from reminder_signups where id = ${id} returning id`;
+  return rows.length > 0;
+}
+
 /**
  * The "an application window just opened" mail (reminderWindowMail.ts),
  * migrations/0009. Sending is claim-then-send: this insert is the entire
@@ -1273,6 +1292,13 @@ export async function deleteExpiredIdeathonSignups(cutoff: Date): Promise<number
     delete from ideathon_signups where created_at <= ${cutoff.toISOString()} returning id
   `;
   return rows.length;
+}
+
+// The board's own manual delete, from /admin/ideathon-anmeldungen —
+// distinct from deleteExpiredIdeathonSignups above (retention, cron-driven).
+export async function deleteIdeathonSignup(id: string): Promise<boolean> {
+  const rows = await sql()`delete from ideathon_signups where id = ${id} returning id`;
+  return rows.length > 0;
 }
 
 export type ContactMessageInput = {
@@ -1612,6 +1638,16 @@ export async function countRowsPerTable(): Promise<TableCounts> {
     cronRuns: row.cron_runs as number,
     ideathonSignups: row.ideathon_signups as number,
   };
+}
+
+// The one read against schema_migrations from application code — every
+// other touch of that table belongs to scripts/migrate.mjs, which uses its
+// own neon() handle rather than this file's. Ordering by name works because
+// every migration filename is a zero-padded four-digit prefix, so
+// lexicographic order matches numeric order up to 9999 files.
+export async function latestAppliedMigrationName(): Promise<string | null> {
+  const rows = await sql()`select name from schema_migrations order by name desc limit 1`;
+  return (rows[0] as { name: string } | undefined)?.name ?? null;
 }
 
 // A plain read, no write — checkRateLimit (rateLimit.ts) calls this first

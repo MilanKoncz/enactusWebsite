@@ -11,8 +11,8 @@ import { expect, test } from "@playwright/test";
 test.describe("/erinnerung-status", () => {
   test("shows a real confirmed message, not a silent redirect", async ({ page }) => {
     await page.goto("/erinnerung-status?status=confirmed");
-    await expect(page.getByRole("heading", { level: 1, name: "Erinnerung bestätigt" })).toBeVisible();
-    await expect(page.getByText(/erinnern dich jetzt per E-Mail/)).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Benachrichtigung bestätigt" })).toBeVisible();
+    await expect(page.getByText(/benachrichtigen dich jetzt per E-Mail/)).toBeVisible();
     await expect(page.getByText("Du kannst dich jederzeit wieder abmelden.")).toBeVisible();
   });
 
@@ -35,6 +35,19 @@ test.describe("/erinnerung-status", () => {
     }
   });
 
+  // Added 2026-08-30: a rate-limited request used to redirect here as
+  // "invalid", telling a visitor with a perfectly working link that it was
+  // broken — a real scenario when many applicants share one Uni-WLAN
+  // egress IP. This status must read as "try again shortly", not "your
+  // link doesn't work", and must not be confused with an actually invalid
+  // link (a distinct heading, not folded into the invalid case above).
+  test("shows a rate-limited message distinct from an invalid link", async ({ page }) => {
+    await page.goto("/erinnerung-status?status=rate-limited");
+    await expect(page.getByRole("heading", { level: 1, name: "Kurz zu viele Anfragen" })).toBeVisible();
+    await expect(page.getByText(/versuch es in ein paar Minuten noch einmal/)).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "Link ungültig" })).not.toBeVisible();
+  });
+
   test("always links back to the homepage", async ({ page }) => {
     await page.goto("/erinnerung-status?status=confirmed");
     await expect(page.getByRole("link", { name: "Zurück zur Startseite" })).toHaveAttribute("href", "/");
@@ -53,7 +66,7 @@ test.describe("/erinnerung-status", () => {
   });
 
   test("has no automatically detectable accessibility violations, for each state", async ({ page }) => {
-    for (const status of ["confirmed", "already-confirmed", "unsubscribed", "invalid"]) {
+    for (const status of ["confirmed", "already-confirmed", "unsubscribed", "invalid", "rate-limited"]) {
       await page.goto(`/erinnerung-status?status=${status}`);
       const results = await new AxeBuilder({ page }).analyze();
       expect(results.violations, status).toEqual([]);

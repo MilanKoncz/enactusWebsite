@@ -11,7 +11,7 @@ import { StatusIndicator } from "@/components/admin/StatusIndicator";
 import { isAdminAuthenticated } from "@/lib/adminSession";
 import { countRowsPerTable, listCronRuns } from "@/lib/db";
 import type { CronRun, TableCounts } from "@/lib/db";
-import { checkResend } from "@/lib/serviceHealth";
+import { checkResend, checkMigrations } from "@/lib/serviceHealth";
 import { isCleanupStale, nextCleanupRun } from "@/lib/cronSchedule";
 
 type PageProps = { params: Promise<{ locale: string }> };
@@ -44,7 +44,7 @@ export default async function AdminSystemPage({ params }: PageProps) {
   // Each dependency is settled independently: one being down must not stop
   // the page from reporting on the others, which is precisely when someone
   // is looking at it.
-  const [runsResult, countsResult, resend] = await Promise.all([
+  const [runsResult, countsResult, resend, migrations] = await Promise.all([
     // 20, not 10: cron_runs now interleaves two job types (cleanup,
     // reminder-window) on the same daily trigger, so 10 rows would often
     // show only one of them.
@@ -57,6 +57,7 @@ export default async function AdminSystemPage({ params }: PageProps) {
       (error: unknown) => ({ ok: false as const, error }),
     ),
     checkResend(),
+    checkMigrations(),
   ]);
 
   const runs: CronRun[] = runsResult.ok ? runsResult.runs : [];
@@ -177,6 +178,22 @@ export default async function AdminSystemPage({ params }: PageProps) {
                   when: resend.lastAttemptAt ? dateFormatter.format(resend.lastAttemptAt) : "",
                   failed: resend.failedLast30Days,
                 })}
+              />
+            </Card>
+          </li>
+          <li>
+            <Card className="flex flex-col gap-1">
+              <span className="text-body-m">{t("system.migrations")}</span>
+              <StatusIndicator
+                level={migrations.level}
+                label={
+                  migrations.level === "ok"
+                    ? t("system.migrationsStatus.upToDate", { name: migrations.latestApplied ?? "" })
+                    : t("system.migrationsStatus.outdated", {
+                        applied: migrations.latestApplied ?? t("system.never"),
+                        expected: migrations.latestExpected,
+                      })
+                }
               />
             </Card>
           </li>

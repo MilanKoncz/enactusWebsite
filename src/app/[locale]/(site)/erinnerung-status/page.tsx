@@ -12,7 +12,7 @@ type PageProps = {
   searchParams: Promise<{ status?: string }>;
 };
 
-// The four states the two reminder API routes (bestaetigen/route.ts,
+// The five states the two reminder API routes (bestaetigen/route.ts,
 // abmelden/route.ts) redirect here with, as ?status=<key>. Anything else —
 // no query at all, a stale/forged value — reads as "invalid", the same
 // generic "this link doesn't work" wording a bad or already-spent token
@@ -20,7 +20,23 @@ type PageProps = {
 // (FormStatusMessage's success variant, moss): the visitor's actual goal,
 // being on the list, is true either way, even though only one of them
 // just happened.
-const STATUS_KEYS = ["confirmed", "already-confirmed", "unsubscribed", "invalid"] as const;
+//
+// "rate-limited" is its own state, not folded into "invalid" (added
+// 2026-08-30): a link that's perfectly valid but arrived while its route's
+// rate limit (lib/rateLimit.ts) was exceeded — shared Uni-WLAN egress IPs
+// make this a real scenario during the recruiting window, not an edge
+// case — used to redirect to "invalid" and tell a visitor with a completely
+// working link that it was "ungültig oder abgelaufen". It still renders
+// with the error variant (no dedicated warning treatment exists in
+// FormStatusMessage, and adding one for a single rare state isn't
+// warranted), but its own copy says to simply try again shortly.
+const STATUS_KEYS = [
+  "confirmed",
+  "already-confirmed",
+  "unsubscribed",
+  "invalid",
+  "rate-limited",
+] as const;
 type StatusKey = (typeof STATUS_KEYS)[number];
 
 function resolveStatus(raw: string | undefined): StatusKey {
@@ -32,16 +48,19 @@ const VARIANT_BY_STATUS: Record<StatusKey, "success" | "error"> = {
   "already-confirmed": "success",
   unsubscribed: "success",
   invalid: "error",
+  "rate-limited": "error",
 };
 
 // Only the two "you're on the list" states get the "you can unsubscribe
 // any time" reminder — showing it right after a just-completed unsubscribe
-// would read as a non sequitur, and it has no relevance on an invalid link.
+// would read as a non sequitur, and it has no relevance on an invalid or
+// rate-limited link.
 const SHOWS_UNSUBSCRIBE_HINT: Record<StatusKey, boolean> = {
   confirmed: true,
   "already-confirmed": true,
   unsubscribed: false,
   invalid: false,
+  "rate-limited": false,
 };
 
 // A dedicated landing page for both double-opt-in email links (confirm and

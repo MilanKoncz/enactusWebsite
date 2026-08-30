@@ -21,6 +21,7 @@ const markIdeathonSignupMailFailed = vi.fn();
 const dispatchApplicationMails = vi.fn();
 const dispatchContactNotification = vi.fn();
 const dispatchReminderConfirmation = vi.fn();
+const dispatchReminderAlreadyRegistered = vi.fn();
 const dispatchReminderWindowOpen = vi.fn();
 const dispatchIdeathonSignupMails = vi.fn();
 
@@ -46,6 +47,7 @@ vi.mock("@/lib/mailDispatch", () => ({
   dispatchApplicationMails: (...a: unknown[]) => dispatchApplicationMails(...a),
   dispatchContactNotification: (...a: unknown[]) => dispatchContactNotification(...a),
   dispatchReminderConfirmation: (...a: unknown[]) => dispatchReminderConfirmation(...a),
+  dispatchReminderAlreadyRegistered: (...a: unknown[]) => dispatchReminderAlreadyRegistered(...a),
   dispatchReminderWindowOpen: (...a: unknown[]) => dispatchReminderWindowOpen(...a),
   dispatchIdeathonSignupMails: (...a: unknown[]) => dispatchIdeathonSignupMails(...a),
 }));
@@ -152,21 +154,29 @@ describe("POST /api/admin/mails/resend", () => {
     expect(markReminderMailed).toHaveBeenCalledWith(ID);
   });
 
-  it("never re-sends a double opt-in request to an address that already confirmed", async () => {
-    findReminderSignupById.mockResolvedValue({
+  // Since 2026-08-30, /api/reminder sends an "already registered" mail
+  // (not the double opt-in confirmation) to a confirmed address — this is
+  // that mail's own resend path, distinct from the unconfirmed case above.
+  it("resends the already-registered mail, not a double opt-in request, to an address that already confirmed", async () => {
+    const signup = {
       id: ID,
       email: "jane@example.com",
       locale: "de",
       confirmed: true,
       confirmToken: "confirm-token",
       unsubscribeToken: "unsub-token",
-    });
+    };
+    findReminderSignupById.mockResolvedValue(signup);
+    dispatchReminderAlreadyRegistered.mockResolvedValue(undefined);
+    markReminderMailed.mockResolvedValue(undefined);
 
     const { POST } = await import("@/app/api/admin/mails/resend/route");
     const response = await POST(await resendRequest({ source: "reminder_signups", id: ID }));
 
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(200);
     expect(dispatchReminderConfirmation).not.toHaveBeenCalled();
+    expect(dispatchReminderAlreadyRegistered).toHaveBeenCalledWith(signup);
+    expect(markReminderMailed).toHaveBeenCalledWith(ID);
   });
 
   it("resends a reminder-window mail and marks the row sent", async () => {

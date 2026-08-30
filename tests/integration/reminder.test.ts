@@ -9,6 +9,7 @@ const findConfirmedReminderSignups = vi.fn();
 const markReminderMailed = vi.fn();
 const markReminderMailFailed = vi.fn();
 const sendReminderConfirmationEmail = vi.fn();
+const sendReminderAlreadyRegisteredEmail = vi.fn();
 const checkRateLimit = vi.fn();
 const generateToken = vi.fn();
 
@@ -23,6 +24,7 @@ vi.mock("@/lib/db", () => ({
 
 vi.mock("@/lib/mail", () => ({
   sendReminderConfirmationEmail: (...args: unknown[]) => sendReminderConfirmationEmail(...args),
+  sendReminderAlreadyRegisteredEmail: (...args: unknown[]) => sendReminderAlreadyRegisteredEmail(...args),
 }));
 
 vi.mock("@/lib/rateLimit", () => ({
@@ -93,7 +95,7 @@ describe("POST /api/reminder", () => {
     );
   });
 
-  it("sends no second confirmation email for an address that's already confirmed", async () => {
+  it("sends the already-registered mail, not a second confirmation, for an address that's already confirmed", async () => {
     checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
     generateToken.mockReturnValue("ignored-token");
     upsertReminderSignup.mockResolvedValue({
@@ -102,12 +104,57 @@ describe("POST /api/reminder", () => {
       confirmToken: "old-token",
       unsubscribeToken: "old-unsub-token",
     });
+    sendReminderAlreadyRegisteredEmail.mockResolvedValue("email-id");
 
     const { POST } = await import("@/app/api/reminder/route");
     const response = await POST(postSignup({ email: "jane@example.com", consent: true, locale: "de" }));
 
     expect(response.status).toBe(200);
     expect(sendReminderConfirmationEmail).not.toHaveBeenCalled();
+    // Reuses the row's existing unsubscribe token — the whole point of
+    // never rotating it for a confirmed row (upsertReminderSignup's own
+    // comment) is that a link like this one still works.
+    expect(sendReminderAlreadyRegisteredEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: "jane@example.com",
+        unsubscribeUrl: expect.stringContaining("token=old-unsub-token"),
+      }),
+    );
+    expect(markReminderMailed).toHaveBeenCalledWith("signup-1");
+  });
+
+  it("records a failed already-registered send on the row, same as a failed confirmation send", async () => {
+    checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
+    upsertReminderSignup.mockResolvedValue({
+      id: "signup-1",
+      confirmed: true,
+      confirmToken: "old-token",
+      unsubscribeToken: "old-unsub-token",
+    });
+    sendReminderAlreadyRegisteredEmail.mockRejectedValue(new Error("Resend is down"));
+    markReminderMailFailed.mockResolvedValue(undefined);
+
+    const { POST } = await import("@/app/api/reminder/route");
+    const response = await POST(postSignup({ email: "jane@example.com", consent: true, locale: "de" }));
+
+    expect(response.status).toBe(200);
+    expect(markReminderMailFailed).toHaveBeenCalledWith("signup-1", "Resend is down");
+  });
+
+  // A per-IP flood and a hundred requests naming the same victim address
+  // from a hundred different IPs are different attacks; the route needs a
+  // bound on both, not just the shared per-IP one.
+  it("rejects a flood of requests naming the same address, distinctly from the per-IP limit", async () => {
+    checkRateLimit.mockImplementation(async (route: string) =>
+      route === "reminder-address" ? { allowed: false, remaining: 0 } : { allowed: true, remaining: 4 },
+    );
+
+    const { POST } = await import("@/app/api/reminder/route");
+    const response = await POST(postSignup({ email: "jane@example.com", consent: true, locale: "de" }));
+
+    expect(response.status).toBe(429);
+    expect(upsertReminderSignup).not.toHaveBeenCalled();
+    expect(checkRateLimit).toHaveBeenCalledWith("reminder-address", "jane@example.com");
   });
 
   it("still reports success when the write succeeds but the confirmation email fails to send", async () => {
@@ -214,13 +261,17 @@ describe("GET /api/reminder/bestaetigen", () => {
     expect(unknown.headers.get("location")).toContain("status=invalid");
   });
 
-  it("rejects a flood with an invalid-status redirect before touching the database", async () => {
+  // Redirects to "rate-limited", not "invalid" — the link itself is fine,
+  // only its route's own limit was exceeded, and telling a visitor behind
+  // a shared Uni-WLAN egress IP that a working link is invalid would be
+  // false. See erinnerung-status/page.tsx's own comment.
+  it("rejects a flood with a rate-limited-status redirect before touching the database", async () => {
     checkRateLimit.mockResolvedValue({ allowed: false, remaining: 0 });
 
     const { GET } = await import("@/app/api/reminder/bestaetigen/route");
     const response = await GET(getConfirm("good-token"));
 
-    expect(response.headers.get("location")).toContain("status=invalid");
+    expect(response.headers.get("location")).toContain("status=rate-limited");
     expect(confirmReminderSignup).not.toHaveBeenCalled();
   });
 });
@@ -254,13 +305,15 @@ describe("/api/reminder/abmelden", () => {
     expect(unknown.headers.get("location")).toContain("status=invalid");
   });
 
-  it("GET rejects a flood with an invalid-status redirect before touching the database", async () => {
+  // Same reasoning as bestaetigen/route.ts's equivalent test: a rate-limited
+  // request redirects to "rate-limited", not "invalid".
+  it("GET rejects a flood with a rate-limited-status redirect before touching the database", async () => {
     checkRateLimit.mockResolvedValue({ allowed: false, remaining: 0 });
 
     const { GET } = await import("@/app/api/reminder/abmelden/route");
     const response = await GET(getUnsubscribe("good-token"));
 
-    expect(response.headers.get("location")).toContain("status=invalid");
+    expect(response.headers.get("location")).toContain("status=rate-limited");
     expect(unsubscribeReminder).not.toHaveBeenCalled();
   });
 

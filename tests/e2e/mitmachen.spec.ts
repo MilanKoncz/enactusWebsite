@@ -92,7 +92,7 @@ test.describe("/mitmachen", () => {
   }) => {
     await page.goto("/mitmachen");
     await expect(page.getByText("Das Bewerbungsfenster ist noch geschlossen")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Per E-Mail erinnern lassen" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Benachrichtigung zum Bewerbungsstart" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Bewerbung absenden" })).toHaveCount(0);
   });
 
@@ -107,7 +107,7 @@ test.describe("/mitmachen", () => {
     await page.goto("/mitmachen");
     await page.getByLabel("E-Mail", { exact: true }).fill("jane@example.com");
     await page.getByRole("checkbox").check();
-    await page.getByRole("button", { name: "Erinnerung aktivieren" }).click();
+    await page.getByRole("button", { name: "Benachrichtigung aktivieren" }).click();
     await expect(page.getByRole("status")).toContainText("bestätige die E-Mail");
   });
 
@@ -135,7 +135,7 @@ test.describe("/mitmachen", () => {
 
   test("the reminder sign-up is part of that application section", async ({ page }) => {
     await page.goto("/mitmachen");
-    const heading = page.getByRole("heading", { name: "Per E-Mail erinnern lassen" });
+    const heading = page.getByRole("heading", { name: "Benachrichtigung zum Bewerbungsstart" });
     await expect(heading).toBeAttached();
     await heading.scrollIntoViewIfNeeded();
     await expect(heading).toBeInViewport();

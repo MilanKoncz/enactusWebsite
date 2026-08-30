@@ -4,6 +4,7 @@ import { requireLocale, resolveLocale } from "@/i18n/requireLocale";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { RawLink } from "@/lib/navigation";
+import { AdminDeleteButton } from "@/components/admin/AdminDeleteButton";
 import { AdminLogin } from "@/components/admin/AdminLogin";
 import { AdminTable } from "@/components/admin/AdminTable";
 import { MailStatusIndicator } from "@/components/admin/StatusIndicator";
@@ -57,6 +58,7 @@ export default async function AdminIdeathonSignupsPage({ params }: PageProps) {
           t("ideathonSignups.columns.dietaryPreference"),
           t("ideathonSignups.columns.createdAt"),
           t("ideathonSignups.columns.mailStatus"),
+          t("ideathonSignups.columns.actions"),
         ]}
         empty={t("ideathonSignups.empty")}
         rows={signups.map((signup) => ({
@@ -93,6 +95,15 @@ export default async function AdminIdeathonSignupsPage({ params }: PageProps) {
               key="mailStatus"
               status={signup.mailStatus}
               label={t(`mailStatus.${signup.mailStatus}`)}
+            />,
+            <AdminDeleteButton
+              key="actions"
+              endpoint="/api/admin/ideathon-anmeldungen"
+              id={signup.id}
+              confirmLabel={t("ideathonSignups.confirmDelete", {
+                name: `${signup.firstName} ${signup.lastName}`,
+                email: signup.email,
+              })}
             />,
           ],
         }))}

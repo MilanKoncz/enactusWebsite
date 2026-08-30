@@ -16,6 +16,8 @@ const listFailedMails = vi.fn();
 const listCronRuns = vi.fn();
 const listRecruitingWindows = vi.fn();
 const countFutureRecruitingWindows = vi.fn();
+const listIdeathonSignups = vi.fn();
+const listReminderSignups = vi.fn();
 const cookieGet = vi.fn();
 
 vi.mock("@/lib/db", () => ({
@@ -26,6 +28,8 @@ vi.mock("@/lib/db", () => ({
   listCronRuns: (...args: unknown[]) => listCronRuns(...args),
   listRecruitingWindows: (...args: unknown[]) => listRecruitingWindows(...args),
   countFutureRecruitingWindows: (...args: unknown[]) => countFutureRecruitingWindows(...args),
+  listIdeathonSignups: (...args: unknown[]) => listIdeathonSignups(...args),
+  listReminderSignups: (...args: unknown[]) => listReminderSignups(...args),
 }));
 
 vi.mock("next/headers", () => ({
@@ -72,6 +76,8 @@ beforeEach(() => {
   listCronRuns.mockResolvedValue([]);
   listRecruitingWindows.mockResolvedValue([]);
   countFutureRecruitingWindows.mockResolvedValue(0);
+  listIdeathonSignups.mockResolvedValue([]);
+  listReminderSignups.mockResolvedValue([]);
 });
 
 afterEach(() => {
@@ -133,7 +139,11 @@ describe("/admin/bewerbungen (page)", () => {
     listApplications.mockResolvedValue([APPLICATION]);
 
     const { default: Page } = await import("@/app/[locale]/admin/bewerbungen/page");
-    render(await Page({ params: params() }));
+    // renderWithIntl, not render: the row now carries an AdminDeleteButton,
+    // a "use client" component that calls useTranslations and throws
+    // without a provider — the same reason /admin/termine and /admin/jobs
+    // below already need it for their own client components.
+    renderWithIntl(await Page({ params: params() }));
 
     expect(listApplications).toHaveBeenCalledTimes(1);
     expect(screen.getByText("Jäne Döe")).toBeInTheDocument();
@@ -146,10 +156,20 @@ describe("/admin/bewerbungen (page)", () => {
     listApplications.mockResolvedValue([APPLICATION]);
 
     const { default: Page } = await import("@/app/[locale]/admin/bewerbungen/page");
-    render(await Page({ params: params() }));
+    renderWithIntl(await Page({ params: params() }));
 
     const link = screen.getByRole("link", { name: "Als CSV herunterladen" });
     expect(link).toHaveAttribute("href", "/api/admin/bewerbungen/csv?semester=HWS26");
+  });
+
+  it("offers a delete action per application once authenticated", async () => {
+    cookieGet.mockReturnValue({ value: await validSessionCookie() });
+    listApplications.mockResolvedValue([APPLICATION]);
+
+    const { default: Page } = await import("@/app/[locale]/admin/bewerbungen/page");
+    renderWithIntl(await Page({ params: params() }));
+
+    expect(screen.getByRole("button", { name: "Löschen" })).toBeInTheDocument();
   });
 });
 
@@ -252,6 +272,145 @@ describe("/admin/jobs (page)", () => {
 
     expect(listJobPostings).toHaveBeenCalledTimes(1);
     expect(screen.getByText("Werkstudent Consulting")).toBeInTheDocument();
+  });
+});
+
+const IDEATHON_SIGNUP = {
+  id: "44444444-4444-4444-4444-444444444444",
+  createdAt: new Date("2026-08-25T16:05:52Z"),
+  firstName: "Jäne",
+  lastName: "Döe",
+  email: "jane@example.com",
+  studyProgram: "Social Entrepreneurship",
+  hasIdea: true,
+  registeringAsTeam: false,
+  teamSize: undefined,
+  teamMembers: undefined,
+  motivationExperience: undefined,
+  dietaryPreference: "vegan" as const,
+  mailStatus: "sent" as const,
+};
+
+// The gap Phase 1 of the recruiting-release audit found: /admin/bewerbungen,
+// /admin/termine, and /admin/jobs each had a page test above, but
+// /admin/ideathon-anmeldungen — added in the same commit as those siblings'
+// CSV routes — never got one, for either the page or the CSV route (the CSV
+// route's own gap is closed in adminIdeathonCsv.test.ts). Also the page most
+// likely to regress silently: it's the one this recruiting-release pass
+// found broken by a migration that had never been applied to production.
+describe("/admin/ideathon-anmeldungen (page)", () => {
+  it("never reads signups from the database without a session cookie", async () => {
+    cookieGet.mockReturnValue(undefined);
+
+    const { default: Page } = await import("@/app/[locale]/admin/ideathon-anmeldungen/page");
+    await Page({ params: params() });
+
+    expect(listIdeathonSignups).not.toHaveBeenCalled();
+  });
+
+  it("renders the password prompt, not signup data, without a session", async () => {
+    cookieGet.mockReturnValue(undefined);
+    listIdeathonSignups.mockResolvedValue([IDEATHON_SIGNUP]);
+
+    const { default: Page } = await import("@/app/[locale]/admin/ideathon-anmeldungen/page");
+    const tree = await Page({ params: params() });
+
+    expect(JSON.stringify(tree)).not.toContain("jane@example.com");
+  });
+
+  it("reads and renders signup data with a valid session, including the post-0015 fields", async () => {
+    cookieGet.mockReturnValue({ value: await validSessionCookie() });
+    listIdeathonSignups.mockResolvedValue([IDEATHON_SIGNUP]);
+
+    const { default: Page } = await import("@/app/[locale]/admin/ideathon-anmeldungen/page");
+    // renderWithIntl, not render: the row now carries an AdminDeleteButton,
+    // a "use client" component that needs a NextIntlClientProvider.
+    renderWithIntl(await Page({ params: params() }));
+
+    expect(listIdeathonSignups).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("Jäne Döe")).toBeInTheDocument();
+    expect(screen.getByText("jane@example.com")).toBeInTheDocument();
+    expect(screen.getByText("Social Entrepreneurship")).toBeInTheDocument();
+  });
+
+  it("offers the CSV download link only once authenticated", async () => {
+    cookieGet.mockReturnValue({ value: await validSessionCookie() });
+    listIdeathonSignups.mockResolvedValue([IDEATHON_SIGNUP]);
+
+    const { default: Page } = await import("@/app/[locale]/admin/ideathon-anmeldungen/page");
+    renderWithIntl(await Page({ params: params() }));
+
+    const link = screen.getByRole("link", { name: "Als CSV herunterladen" });
+    expect(link).toHaveAttribute("href", "/api/admin/ideathon-anmeldungen/csv");
+  });
+
+  it("offers a delete action per signup once authenticated", async () => {
+    cookieGet.mockReturnValue({ value: await validSessionCookie() });
+    listIdeathonSignups.mockResolvedValue([IDEATHON_SIGNUP]);
+
+    const { default: Page } = await import("@/app/[locale]/admin/ideathon-anmeldungen/page");
+    renderWithIntl(await Page({ params: params() }));
+
+    expect(screen.getByRole("button", { name: "Löschen" })).toBeInTheDocument();
+  });
+});
+
+const REMINDER_SIGNUP = {
+  id: "55555555-5555-5555-5555-555555555555",
+  createdAt: new Date("2026-08-20T12:00:00Z"),
+  email: "jane@example.com",
+  confirmed: true,
+  confirmedAt: new Date("2026-08-20T12:05:00Z"),
+  unsubscribedAt: null,
+  mailStatus: "sent" as const,
+};
+
+// Another gap Phase 1 of the recruiting-release audit found: unlike
+// /admin/bewerbungen, /admin/termine, and /admin/jobs, this page never had
+// a page-level test at all — only its CSV route did
+// (adminReminderCsv.test.ts). It gained its first mutation (delete) in the
+// same pass that added this test.
+describe("/admin/erinnerungen (page)", () => {
+  it("never reads signups from the database without a session cookie", async () => {
+    cookieGet.mockReturnValue(undefined);
+
+    const { default: Page } = await import("@/app/[locale]/admin/erinnerungen/page");
+    await Page({ params: params() });
+
+    expect(listReminderSignups).not.toHaveBeenCalled();
+  });
+
+  it("renders the password prompt, not signup data, without a session", async () => {
+    cookieGet.mockReturnValue(undefined);
+    listReminderSignups.mockResolvedValue([REMINDER_SIGNUP]);
+
+    const { default: Page } = await import("@/app/[locale]/admin/erinnerungen/page");
+    const tree = await Page({ params: params() });
+
+    expect(JSON.stringify(tree)).not.toContain("jane@example.com");
+  });
+
+  it("reads and renders signup data with a valid session", async () => {
+    cookieGet.mockReturnValue({ value: await validSessionCookie() });
+    listReminderSignups.mockResolvedValue([REMINDER_SIGNUP]);
+
+    const { default: Page } = await import("@/app/[locale]/admin/erinnerungen/page");
+    renderWithIntl(await Page({ params: params() }));
+
+    expect(listReminderSignups).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("jane@example.com")).toBeInTheDocument();
+  });
+
+  it("offers the CSV download link and a delete action once authenticated", async () => {
+    cookieGet.mockReturnValue({ value: await validSessionCookie() });
+    listReminderSignups.mockResolvedValue([REMINDER_SIGNUP]);
+
+    const { default: Page } = await import("@/app/[locale]/admin/erinnerungen/page");
+    renderWithIntl(await Page({ params: params() }));
+
+    const link = screen.getByRole("link", { name: "Als CSV herunterladen" });
+    expect(link).toHaveAttribute("href", "/api/admin/erinnerungen/csv");
+    expect(screen.getByRole("button", { name: "Löschen" })).toBeInTheDocument();
   });
 });
 

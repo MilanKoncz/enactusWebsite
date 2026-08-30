@@ -5,6 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Card } from "@/components/ui/Card";
 import { RawLink } from "@/lib/navigation";
+import { AdminDeleteButton } from "@/components/admin/AdminDeleteButton";
 import { AdminLogin } from "@/components/admin/AdminLogin";
 import { AdminTable } from "@/components/admin/AdminTable";
 import { isAdminAuthenticated } from "@/lib/adminSession";
@@ -66,6 +67,7 @@ export default async function AdminRemindersPage({ params }: PageProps) {
           t("reminders.columns.state"),
           t("reminders.columns.createdAt"),
           t("reminders.columns.confirmedAt"),
+          t("reminders.columns.actions"),
         ]}
         empty={t("reminders.empty")}
         rows={signups.map((signup) => ({
@@ -75,6 +77,12 @@ export default async function AdminRemindersPage({ params }: PageProps) {
             t(`reminders.states.${reminderState(signup)}`),
             dateFormatter.format(signup.createdAt),
             signup.confirmedAt ? dateFormatter.format(signup.confirmedAt) : "—",
+            <AdminDeleteButton
+              key="actions"
+              endpoint="/api/admin/erinnerungen"
+              id={signup.id}
+              confirmLabel={t("reminders.confirmDelete", { email: signup.email })}
+            />,
           ],
         }))}
       />

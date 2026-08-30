@@ -9,12 +9,38 @@ real decision, ask in chat and wait — see `CLAUDE.md`.
 
 Deadline context: the application window opens **1 September 2026**.
 
-## Status as of 2026-08-16
+## Status as of 2026-08-16 (see the 2026-08-30 update below for what changed since)
 
 **Phases 0–4 (the full critical path) are done.** Remaining work is Phases
 5–8, all of which the brief already allows to slip past the deadline.
 Board-pending facts and assets — the actual "what's still missing" list —
 live entirely in `ASSETS-TODO.md`, not duplicated here.
+
+### Update 2026-08-30 — recruiting-release fixes
+
+This table's Phase 5 row is stale (predates the Ideathon page, 2026-08-25,
+and several board-photo/asset landings since — `ASSETS-TODO.md` is the
+current source of truth, not this table). Five fixes shipped the day before
+the HWS26 application window opens:
+
+- Migration `0015_ideathon_signup_fields.sql` had never been applied to
+  production, silently breaking every Ideathon signup since 2026-08-26 and
+  the admin view along with it — applied, and `scripts/db-verify.mjs` /
+  `/admin/system` now both catch a future migration gap directly, not just
+  its symptoms.
+- The reminder confirmation mail could embed a `localhost:3000` link when
+  sent from a local dev server missing `NEXT_PUBLIC_SITE_URL` — fixed, with
+  a warning if it happens again.
+- Rate limits were a flat 5-per-IP-per-10-minutes across every public form,
+  including `/api/bewerbung` — staggered per route so a shared Uni-WLAN
+  egress IP can't lock out real applicants on launch day.
+- The reminder list ("Benachrichtigung zum Bewerbungsstart", the copy fix
+  is also part of this pass) now mails an address that signs up twice,
+  rate-limits per address, and normalizes email case before the
+  uniqueness check.
+- `/admin/bewerbungen`, `/admin/erinnerungen`, and
+  `/admin/ideathon-anmeldungen` gained a per-row delete action, the first
+  mutation any of the three ever had.
 
 | Phase | Status |
 | --- | --- |

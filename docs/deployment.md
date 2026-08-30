@@ -37,13 +37,19 @@ Copy `.env.example` to `.env.local` for local development. See that file for
 the full list and current values.
 
 - `NEXT_PUBLIC_SITE_URL` — absolute origin used by `sitemap.ts`, `robots.ts`,
-  OG images, and hreflang alternates. Local/example value is
-  `https://www.enactus-mannheim.com` — the old Webflow site's domain, carried
-  over as the working assumption until the board confirms whether the new
-  site keeps it. Not yet set in Vercel's project settings (see
-  `ASSETS-TODO.md`); `src/lib/siteUrl.ts` falls back to Vercel's own
-  deployment URL, then to `localhost`, rather than guessing a domain at
-  runtime.
+  OG images, hreflang alternates, and every mail that embeds a link
+  (confirmation, unsubscribe). **Confirmed set in Vercel Production**
+  (verified 2026-08-30 via a real request: `sitemap.xml` and the
+  `/api/reminder/abmelden` redirect both resolve to
+  `https://www.enactus-mannheim.com`, not a `*.vercel.app` URL). It must
+  also be present in `.env.local` for local development — it is **not**
+  part of the Neon integration's `vercel env pull` that generates the rest
+  of that file, so a fresh checkout can miss it entirely. When it's missing,
+  `src/lib/siteUrl.ts` falls back to Vercel's own deployment URL, then to
+  `http://localhost:3000` — and does so silently except for a one-per-process
+  `console.warn`. This has already happened once: a `localhost` link went
+  out in a real, already-sent reminder confirmation mail on 2026-08-30.
+  `npm run mail:test` also warns if this variable is missing.
 - `DATABASE_URL` — Neon connection string, `eu-central-1` (Frankfurt).
   Required at runtime by every route in `app/api/`, but never read at
   module scope (`lib/db.ts` builds its client lazily) — `next build` stays
@@ -114,11 +120,10 @@ the full list and current values.
 
 ## Domain
 
-No production domain is set in Vercel yet. Once the board confirms one,
-set `NEXT_PUBLIC_SITE_URL` in the Vercel project's environment variables —
-the code itself needs no change. If the confirmed domain ends up being
-something other than `enactus-mannheim.com` / `www.enactus-mannheim.com`,
-also update `PRODUCTION_HOSTS` in `lib/productionDeployment.ts` — that's a
+`www.enactus-mannheim.com` is the confirmed production domain — see
+`NEXT_PUBLIC_SITE_URL` above. If it ever changes, set the new value in the
+Vercel project's environment variables — the code itself needs no change —
+and also update `PRODUCTION_HOSTS` in `lib/productionDeployment.ts`, a
 separate, deliberately hardcoded list (not derived from
 `NEXT_PUBLIC_SITE_URL`), so an unset or misconfigured site URL can never
 accidentally widen which hosts are allowed to be indexed.
@@ -192,20 +197,30 @@ nothing for the deployed site.
 
 `/admin` (German URLs only — `proxy.ts` returns 404 for the `/en`-prefixed
 variants, since board tooling has no translated UI worth a second URL).
-Ten sections, all behind the same gate:
+Eleven sections, all behind the same gate:
 
 | Path | What it's for |
 | --- | --- |
 | `/admin` | Overview linking every section, plus a compact status bar (applications in the running window, failed mails, whether a future application window is scheduled, last cron run, next calendar event) |
-| `/admin/bewerbungen` | Applications by recruiting semester, CSV per group |
-| `/admin/mails` | Every failed send across all three tables, with a resend |
+| `/admin/bewerbungen` | Applications by recruiting semester, CSV per group, delete a single application |
+| `/admin/mails` | Every failed send across all five tables, with a resend |
 | `/admin/bewerbungsfenster` | Create, edit, delete application windows |
 | `/admin/termine` | Create, edit, delete the homepage's calendar events |
 | `/admin/jobs` | Create, edit, delete partner job postings shown on `/jobs` |
-| `/admin/erinnerungen` | Reminder list, confirmed/unconfirmed/unsubscribed, CSV |
+| `/admin/erinnerungen` | Application-start notification list, confirmed/unconfirmed/unsubscribed, CSV, delete a single entry |
+| `/admin/ideathon-anmeldungen` | Every Ideathon signup, CSV, delete a single signup |
 | `/admin/kontakt` | Contact messages and their delivery status |
 | `/admin/loeschanfragen` | GDPR Art. 15 and 17 for one address |
-| `/admin/system` | Cron history, dependency reachability, row counts |
+| `/admin/system` | Cron history, dependency reachability, database-schema drift, row counts |
+
+`/admin/bewerbungen`, `/admin/erinnerungen`, and `/admin/ideathon-anmeldungen`
+each have a per-row delete (`AdminDeleteButton`, `components/admin/`), added
+2026-08-30 — a confirm dialog naming the affected row, a `DELETE` to that
+resource's own `/api/admin/<resource>/[id]` route (session-gated like every
+other admin route), and `router.refresh()` on success rather than an
+optimistic local update. The other admin sections already had their own
+create/edit/delete flow (`*Manager.tsx` client components); these three had
+none until then.
 
 Status everywhere — the overview bar, `/admin/system`, and the mail-status
 column on `/admin/bewerbungen` and `/admin/kontakt` — goes through one shared

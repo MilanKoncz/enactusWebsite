@@ -19,7 +19,9 @@ import { clientIp } from "@/lib/requestIp";
  *
  * Both are rate-limited for the same reason as bestaetigen/route.ts: an
  * unauthenticated route that runs one UPDATE per call needs its own bound,
- * not just whatever a mail client's own retry behavior happens to be.
+ * not just whatever a mail client's own retry behavior happens to be. GET's
+ * rate-limited redirect uses its own "rate-limited" status, not "invalid" —
+ * see bestaetigen/route.ts's comment on why those must stay distinct.
  */
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get("token");
@@ -29,7 +31,7 @@ export async function GET(request: NextRequest) {
 
   const rateLimit = await checkRateLimit("reminder-abmelden", clientIp(request));
   if (!rateLimit.allowed) {
-    return NextResponse.redirect(statusUrl("invalid"));
+    return NextResponse.redirect(statusUrl("rate-limited"));
   }
 
   if (!token) {

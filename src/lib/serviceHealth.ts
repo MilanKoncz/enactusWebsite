@@ -1,4 +1,5 @@
-import { mailHealthSnapshot } from "./db";
+import { mailHealthSnapshot, latestAppliedMigrationName } from "./db";
+import { LATEST_MIGRATION } from "./migrations";
 
 /**
  * Reachability/health checks for /admin/system. Neither throws: a health
@@ -58,5 +59,24 @@ export async function checkResend(): Promise<ServiceStatus> {
     reason: failed ? "lastFailed" : "lastSucceeded",
     lastAttemptAt: snapshot.lastAttempt.at,
     failedLast30Days: snapshot.failedLast30Days,
+  };
+}
+
+// `latestApplied` is null only if scripts/migrate.mjs has literally never
+// run against this database (schema_migrations doesn't exist or is empty) —
+// distinct from "behind", which is any other mismatch against
+// LATEST_MIGRATION (lib/migrations.ts).
+export type MigrationStatus = {
+  level: ServiceHealthLevel;
+  latestApplied: string | null;
+  latestExpected: string;
+};
+
+export async function checkMigrations(): Promise<MigrationStatus> {
+  const latestApplied = await latestAppliedMigrationName();
+  return {
+    level: latestApplied === LATEST_MIGRATION ? "ok" : "error",
+    latestApplied,
+    latestExpected: LATEST_MIGRATION,
   };
 }
