@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "jest-axe";
 import { renderWithIntl } from "../../fixtures/intl";
@@ -15,8 +15,29 @@ const PROJECT_AREAS: PublicProjectArea[] = [
   { id: "area-2", labelDe: "Finance-Lead", labelEn: "Finance-Lead" },
 ];
 
+const UPLOADED_BLOB = {
+  url: "https://example-store.private.blob.vercel-storage.com/bewerbungen/lebenslauf-abc123.pdf",
+  pathname: "bewerbungen/lebenslauf-abc123.pdf",
+  contentType: "application/pdf",
+  contentDisposition: "attachment",
+};
+
+const uploadMock = vi.fn();
+vi.mock("@vercel/blob/client", () => ({
+  upload: (...args: unknown[]) => uploadMock(...args),
+}));
+
 function renderForm(projectAreas: PublicProjectArea[] = PROJECT_AREAS) {
   return renderWithIntl(<ApplicationForm projectAreas={projectAreas} />);
+}
+
+function pdfFile(name = "lebenslauf.pdf") {
+  return new File(["%PDF-1.4 test content"], name, { type: "application/pdf" });
+}
+
+async function uploadCv(user: ReturnType<typeof userEvent.setup>, file: File = pdfFile()) {
+  await user.upload(screen.getByLabelText("Lebenslauf"), file);
+  await screen.findByText(`${file.name} hochgeladen`);
 }
 
 async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
@@ -25,13 +46,14 @@ async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("E-Mail"), "jane@example.com");
   await user.type(screen.getByLabelText("Studiengang"), "BWL");
   await user.type(screen.getByLabelText("Fachsemester"), "3");
-  await user.type(screen.getByLabelText("Hochschule"), "Universität Mannheim");
+  await user.type(screen.getByLabelText("Verfügbarkeit in Stunden pro Woche"), "10");
+  await user.selectOptions(screen.getByLabelText("1. Wahl"), "SmileGreen");
+  await user.type(screen.getByLabelText("Warum dieser Bereich?"), "Weil ich dort am meisten bewirken kann.");
+  await uploadCv(user);
   await user.type(
     screen.getByLabelText("Motivation"),
     "Ich möchte gerne aktiv an einem Projekt mitarbeiten und Verantwortung übernehmen.",
   );
-  await user.click(screen.getByRole("checkbox", { name: "SmileGreen" }));
-  await user.type(screen.getByLabelText("Verfügbarkeit in Stunden pro Woche"), "10");
   await user.click(screen.getByRole("checkbox", { name: /Datenschutzerklärung/ }));
 }
 
@@ -51,6 +73,21 @@ function stubFetch(handlePost: () => Response | Promise<Response>, projectAreas:
         return Promise.resolve(new Response(JSON.stringify({ areas: projectAreas }), { status: 200 }));
       }
       return Promise.resolve(handlePost());
+    }),
+  );
+}
+
+function stubFetchTokenRateLimited(projectAreas: PublicProjectArea[] = PROJECT_AREAS) {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn((url: string) => {
+      if (typeof url === "string" && url.endsWith("/api/bewerbung/token")) {
+        return Promise.resolve(new Response(JSON.stringify({ error: "rate_limited" }), { status: 429 }));
+      }
+      if (typeof url === "string" && url.endsWith("/api/project-areas")) {
+        return Promise.resolve(new Response(JSON.stringify({ areas: projectAreas }), { status: 200 }));
+      }
+      return Promise.resolve(new Response(JSON.stringify({ ok: true }), { status: 200 }));
     }),
   );
 }
@@ -83,6 +120,14 @@ describe("ApplicationForm", () => {
     // needs some stub in place — the reduced-motion test overrides this
     // itself.
     mockMatchMedia(false);
+    // .mockReset(), not just a fresh resolved value: uploadMock is a plain
+    // vi.fn(), created once at module scope — afterEach's
+    // vi.restoreAllMocks() only restores vi.spyOn mocks to their original
+    // implementation, and is documented to leave a plain vi.fn()'s call
+    // history untouched. Without this, "not.toHaveBeenCalled()" assertions
+    // below see calls left over from earlier tests in the same file.
+    uploadMock.mockReset();
+    uploadMock.mockResolvedValue(UPLOADED_BLOB);
   });
 
   afterEach(() => {
@@ -97,24 +142,66 @@ describe("ApplicationForm", () => {
     expect(screen.getByLabelText("E-Mail")).toBeInTheDocument();
     expect(screen.getByLabelText("Studiengang")).toBeInTheDocument();
     expect(screen.getByLabelText("Fachsemester")).toBeInTheDocument();
-    expect(screen.getByLabelText("Hochschule")).toBeInTheDocument();
-    expect(screen.getByLabelText("Bisheriges Engagement / Berufserfahrung")).toBeInTheDocument();
-    expect(screen.getByLabelText("Sprachen und weitere Kenntnisse")).toBeInTheDocument();
-    expect(screen.getByLabelText("Motivation")).toBeInTheDocument();
-    expect(screen.getByText("Wunschbereich")).toBeInTheDocument();
     expect(screen.getByLabelText("Verfügbarkeit in Stunden pro Woche")).toBeInTheDocument();
+    expect(screen.getByLabelText("1. Wahl")).toBeInTheDocument();
+    expect(screen.getByLabelText("2. Wahl")).toBeInTheDocument();
+    expect(screen.getByLabelText("3. Wahl")).toBeInTheDocument();
+    expect(screen.getByLabelText("Lebenslauf")).toBeInTheDocument();
+    expect(screen.getByLabelText("Motivation")).toBeInTheDocument();
+    expect(screen.getByLabelText("Bisheriges Engagement")).toBeInTheDocument();
+    expect(screen.getByLabelText("Relevante Skills")).toBeInTheDocument();
+    expect(screen.getByLabelText("Was möchtest du aus deiner Zeit bei Enactus mitnehmen?")).toBeInTheDocument();
     expect(screen.getByLabelText("Wie bist du auf uns aufmerksam geworden?")).toBeInTheDocument();
+    expect(screen.queryByLabelText("Hochschule")).not.toBeInTheDocument();
   });
 
-  it("has no file upload input anywhere in the form", () => {
+  it("has exactly one file upload input, wired to the CV field", () => {
     renderForm();
-    expect(document.querySelector('input[type="file"]')).not.toBeInTheDocument();
+    const fileInputs = document.querySelectorAll('input[type="file"]');
+    expect(fileInputs).toHaveLength(1);
+    expect(fileInputs[0]).toHaveAttribute("accept", "application/pdf");
+    expect(screen.getByLabelText("Lebenslauf")).toBe(fileInputs[0]);
   });
 
-  it("lists the desired-area options passed in via projectAreas", () => {
+  it("lists the desired-area options passed in via projectAreas, in every dropdown", () => {
     renderForm();
-    expect(screen.getByRole("checkbox", { name: "SmileGreen" })).toBeInTheDocument();
-    expect(screen.getByRole("checkbox", { name: "Finance-Lead" })).toBeInTheDocument();
+    for (const label of ["1. Wahl", "2. Wahl", "3. Wahl"]) {
+      const select = screen.getByLabelText(label);
+      expect(within(select).getByRole("option", { name: "SmileGreen" })).toBeInTheDocument();
+      expect(within(select).getByRole("option", { name: "Finance-Lead" })).toBeInTheDocument();
+    }
+  });
+
+  it("hides an area already chosen in one dropdown from the other two", async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    await user.selectOptions(screen.getByLabelText("1. Wahl"), "SmileGreen");
+
+    const secondChoice = screen.getByLabelText("2. Wahl");
+    const thirdChoice = screen.getByLabelText("3. Wahl");
+    expect(within(secondChoice).queryByRole("option", { name: "SmileGreen" })).not.toBeInTheDocument();
+    expect(within(thirdChoice).queryByRole("option", { name: "SmileGreen" })).not.toBeInTheDocument();
+    expect(within(secondChoice).getByRole("option", { name: "Finance-Lead" })).toBeInTheDocument();
+  });
+
+  it("reveals the reason field only once its own dropdown has a value", async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    expect(screen.queryAllByLabelText("Warum dieser Bereich?")).toHaveLength(0);
+    await user.selectOptions(screen.getByLabelText("2. Wahl"), "Finance-Lead");
+    expect(screen.getAllByLabelText("Warum dieser Bereich?")).toHaveLength(1);
+  });
+
+  it("shows a live character count for the area reason", async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    await user.selectOptions(screen.getByLabelText("1. Wahl"), "SmileGreen");
+    expect(screen.getByText("0 / 300")).toBeInTheDocument();
+    await user.type(screen.getByLabelText("Warum dieser Bereich?"), "Hallo");
+    expect(screen.getByText("5 / 300")).toBeInTheDocument();
   });
 
   it("prefers a fresher project-areas list from GET /api/project-areas over the initial prop", async () => {
@@ -124,36 +211,40 @@ describe("ApplicationForm", () => {
     );
     renderForm([{ id: "area-1", labelDe: "SmileGreen", labelEn: "SmileGreen" }]);
 
-    expect(await screen.findByRole("checkbox", { name: "ReSoap" })).toBeInTheDocument();
-    expect(screen.queryByRole("checkbox", { name: "SmileGreen" })).not.toBeInTheDocument();
+    const firstChoice = screen.getByLabelText("1. Wahl");
+    expect(await within(firstChoice).findByRole("option", { name: "ReSoap" })).toBeInTheDocument();
+    expect(within(firstChoice).queryByRole("option", { name: "SmileGreen" })).not.toBeInTheDocument();
   });
 
-  // Regression test for a bug found in real CI (not reproducible locally,
-  // only under GitHub Actions' timing): with an empty initial prop (the
-  // exact production shape when the build has no DATABASE_URL) and a
-  // checkbox that only comes into existence once the live
-  // /api/project-areas fetch resolves, plain register() on that checkbox
-  // could show it visibly checked while react-hook-form's own validation
-  // still reported the field empty — a genuine DOM-ref/field-value
-  // desync, not a test artifact. desiredAreas is now driven by a
-  // Controller (field.value as the single source of truth), which this
-  // guards against regressing.
-  it("submits successfully after checking an area that only appeared once the live fetch resolved", async () => {
+  it("submits successfully after choosing an area that only appeared once the live fetch resolved", async () => {
     let now = TOKEN_ISSUED_AT;
     vi.spyOn(Date, "now").mockImplementation(() => now);
     stubFetch(() => new Response(JSON.stringify({ ok: true }), { status: 200 }));
     const user = userEvent.setup();
     renderForm([]);
 
-    await screen.findByRole("checkbox", { name: "SmileGreen" });
-    await fillRequiredFields(user);
+    const firstChoice = screen.getByLabelText("1. Wahl");
+    await within(firstChoice).findByRole("option", { name: "SmileGreen" });
+    await user.type(screen.getByLabelText("Vorname"), "Jane");
+    await user.type(screen.getByLabelText("Nachname"), "Doe");
+    await user.type(screen.getByLabelText("E-Mail"), "jane@example.com");
+    await user.type(screen.getByLabelText("Studiengang"), "BWL");
+    await user.type(screen.getByLabelText("Fachsemester"), "3");
+    await user.type(screen.getByLabelText("Verfügbarkeit in Stunden pro Woche"), "10");
+    await user.selectOptions(firstChoice, "SmileGreen");
+    await user.type(screen.getByLabelText("Warum dieser Bereich?"), "Weil ich dort am meisten bewirken kann.");
+    await uploadCv(user);
+    await user.type(
+      screen.getByLabelText("Motivation"),
+      "Ich möchte gerne aktiv an einem Projekt mitarbeiten und Verantwortung übernehmen.",
+    );
+    await user.click(screen.getByRole("checkbox", { name: /Datenschutzerklärung/ }));
     now += MIN_FILL_MS + 500;
     await user.click(screen.getByRole("button", { name: "Bewerbung absenden" }));
 
     const notice = await screen.findByRole("status");
     expect(notice).toHaveTextContent("Danke für deine Bewerbung");
-    expect(screen.queryByText("Bitte wähle mindestens einen Bereich aus.")).not.toBeInTheDocument();
-    expect(postCallBody()).toMatchObject({ desiredAreas: ["SmileGreen"] });
+    expect(postCallBody()).toMatchObject({ area1: "SmileGreen" });
   });
 
   it("blocks submission and shows errors when required fields are empty", async () => {
@@ -164,7 +255,8 @@ describe("ApplicationForm", () => {
 
     expect(await screen.findByText("Bitte gib deinen Vornamen ein.")).toBeInTheDocument();
     expect(screen.getByText("Bitte gib eine gültige E-Mail-Adresse ein.")).toBeInTheDocument();
-    expect(screen.getByText("Bitte wähle mindestens einen Bereich aus.")).toBeInTheDocument();
+    expect(screen.getByText("Bitte wähle deinen Wunschbereich.")).toBeInTheDocument();
+    expect(screen.getByText("Bitte lade deinen Lebenslauf als PDF-Datei hoch.")).toBeInTheDocument();
     expect(screen.getByText("Bitte bestätige die Einwilligung.")).toBeInTheDocument();
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
@@ -198,7 +290,75 @@ describe("ApplicationForm", () => {
     const notice = await screen.findByRole("status");
     expect(notice).toHaveTextContent("Danke für deine Bewerbung");
     const body = postCallBody();
-    expect(body).toMatchObject({ firstName: "Jane", locale: "de", formToken: TOKEN });
+    expect(body).toMatchObject({
+      firstName: "Jane",
+      locale: "de",
+      formToken: TOKEN,
+      area1: "SmileGreen",
+      cvPathname: UPLOADED_BLOB.pathname,
+      cvBlobUrl: UPLOADED_BLOB.url,
+      cvOriginalFilename: "lebenslauf.pdf",
+    });
+  });
+
+  it("uploads to a fixed, neutral pathname, never the applicant's own filename", async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    await uploadCv(user, pdfFile("Max Mustermann Lebenslauf.pdf"));
+
+    expect(uploadMock).toHaveBeenCalledWith(
+      "bewerbungen/lebenslauf.pdf",
+      expect.anything(),
+      expect.objectContaining({ access: "private", handleUploadUrl: "/api/bewerbung/cv-upload" }),
+    );
+  });
+
+  it("shows a dedicated error for a non-PDF file, without uploading it", async () => {
+    // applyAccept: false — user-event otherwise emulates the OS file
+    // picker's own accept="application/pdf" filtering and silently drops a
+    // non-matching file before it ever reaches our onChange handler, which
+    // would make this test pass for the wrong reason (nothing happening at
+    // all) instead of exercising the component's own type check.
+    const user = userEvent.setup({ applyAccept: false });
+    renderForm();
+
+    await user.upload(screen.getByLabelText("Lebenslauf"), new File(["x"], "lebenslauf.docx", { type: "application/msword" }));
+
+    expect(await screen.findByText("Bitte lade deinen Lebenslauf als PDF-Datei hoch.")).toBeInTheDocument();
+    expect(uploadMock).not.toHaveBeenCalled();
+  });
+
+  it("shows a dedicated error for a file over 4 MB, without uploading it", async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    const oversized = new File([new Uint8Array(4 * 1024 * 1024 + 1)], "lebenslauf.pdf", { type: "application/pdf" });
+    await user.upload(screen.getByLabelText("Lebenslauf"), oversized);
+
+    expect(await screen.findByText("Die Datei ist größer als 4 MB. Bitte wähle eine kleinere PDF-Datei.")).toBeInTheDocument();
+    expect(uploadMock).not.toHaveBeenCalled();
+  });
+
+  it("shows an upload-failed error when upload() itself rejects", async () => {
+    uploadMock.mockRejectedValue(new Error("network error"));
+    const user = userEvent.setup();
+    renderForm();
+
+    await user.upload(screen.getByLabelText("Lebenslauf"), pdfFile());
+
+    expect(await screen.findByText("Der Upload ist fehlgeschlagen. Bitte versuch es noch einmal.")).toBeInTheDocument();
+  });
+
+  it("lets the visitor remove an uploaded CV and see the required-field state return", async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    await uploadCv(user);
+    await user.click(screen.getByRole("button", { name: "Entfernen" }));
+
+    expect(screen.queryByText("lebenslauf.pdf hochgeladen")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Datei auswählen" })).toBeInTheDocument();
   });
 
   it("shows an error and keeps the form filled in when the request fails", async () => {
@@ -230,6 +390,33 @@ describe("ApplicationForm", () => {
     const alert = await screen.findByRole("alert");
     expect(alert).toHaveTextContent("Das Bewerbungsfenster wurde gerade eben geschlossen");
     expect(alert).not.toHaveTextContent("teamvorstand@unimannheim.enactus.team");
+  });
+
+  // /api/bewerbung/token is now the front door to the CV-upload token too
+  // (lib/rateLimit.ts's "bewerbung-token" bucket) — a 429 there is a real,
+  // visible problem for a genuine applicant, not an anti-spam signal, so it
+  // must surface as a real error rather than a silent no-op. It has to
+  // surface right at the CV upload attempt, not only at final submit: with
+  // CV_REQUIRED, a missing token blocks the upload itself, so a rate-limited
+  // applicant can never reach a valid submission to begin with.
+  it("shows a real, distinguishable error at the CV upload step when the token route itself was rate-limited", async () => {
+    stubFetchTokenRateLimited();
+    const user = userEvent.setup();
+    renderForm();
+    // Both mount-effect fetches (token, project-areas) resolve as
+    // microtasks; waiting for the project-areas one to land in the DOM
+    // first guarantees the token one has too, since both are triggered by
+    // the same render and mocked to resolve near-instantly — otherwise
+    // uploading immediately can race the token fetch's own state update.
+    // Scoped to one select: the same option text appears in all three.
+    await within(screen.getByLabelText("1. Wahl")).findByRole("option", { name: "SmileGreen" });
+
+    await user.upload(screen.getByLabelText("Lebenslauf"), pdfFile());
+
+    expect(
+      await screen.findByText("Gerade sind zu viele Anfragen aus deinem Netzwerk eingegangen.", { exact: false }),
+    ).toBeInTheDocument();
+    expect(uploadMock).not.toHaveBeenCalled();
   });
 
   /**

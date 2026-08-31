@@ -44,6 +44,18 @@ const MAX_PER_WINDOW: Record<string, number> = {
   reminder: 10,
   "reminder-bestaetigen": 30,
   "reminder-abmelden": 30,
+  // GET /api/bewerbung/token used to carry no limit at all — reasonable
+  // while it only issued a timing token, but it's now also the front door
+  // to the CV upload (its client token is required by
+  // onBeforeGenerateToken, /api/bewerbung/cv-upload), so a real ceiling
+  // belongs here too. Kept generous: it's called once per page load, and
+  // a whole campus WLAN can sit behind one shared egress IP (same
+  // reasoning as bewerbung/ideathon above).
+  "bewerbung-token": 60,
+  // The actual upload route — tighter than the token route on purpose,
+  // since a successful call here writes a file to the store, not just
+  // issues a token.
+  "bewerbung-cv": 10,
   // Per-address throttle for /api/reminder (lib/reminderSignupSchema.ts's
   // normalized email is the "ip" this bucket hashes), not per-IP — see
   // /api/reminder/route.ts's own comment.

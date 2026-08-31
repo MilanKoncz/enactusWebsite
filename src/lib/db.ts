@@ -1,6 +1,7 @@
 import { neon } from "@neondatabase/serverless";
 import type { NeonQueryFunction } from "@neondatabase/serverless";
 import type { DietaryPreference } from "./ideathonSignupFormSchema";
+import type { ApplicationAreaChoice } from "./applicationFormSchema";
 
 /**
  * The only file in this codebase that writes SQL. Every route in app/api/
@@ -45,11 +46,31 @@ export type ApplicationInput = {
   email: string;
   studyProgram: string;
   semester: number;
-  university: string;
+  // Dropped from the form (field-audit decision: almost every answer was
+  // "Universität Mannheim", no selection relevance — same reasoning that
+  // already removed it from the Ideathon signup). Optional only so a
+  // historic row still reads one back; every new insert leaves this
+  // undefined, which migrations/0018's relaxed constraint now allows.
+  university?: string;
   priorInvolvement?: string;
+  // Relabeled "Relevante Skills" in the UI, capped at 200 characters
+  // (down from 300) — see applicationFormSchema.ts's own comment. Same
+  // column, same optional field, just a shorter, more targeted answer.
   languagesSkills?: string;
   motivation: string;
-  desiredAreas: string[];
+  // New: forward-looking, distinct from motivation — see
+  // applicationFormSchema.ts's own comment.
+  wantToGain?: string;
+  // Legacy-only: pre-migration rows still read this back
+  // (migrations/0017's own comment on why there's no backfill). Every new
+  // insert leaves this undefined and writes to areaChoices below instead.
+  desiredAreas?: string[];
+  // Up to three prioritized Wunschbereich choices, each with its own
+  // required reason — replaces the flat desiredAreas checkbox list.
+  // Always has at least one entry for a new insert (area1 is required by
+  // applicationFormSchema.ts); insertApplication writes these to the
+  // application_area_choices child table (migrations/0017), not a column.
+  areaChoices: ApplicationAreaChoice[];
   availabilityHours: number;
   heardAboutUs?: string;
   locale: Locale;
@@ -62,6 +83,15 @@ export type ApplicationInput = {
   // insert. See migrations/0016's own comment on why this is a fixed
   // deadline, not a live calculation.
   retainUntil: Date;
+  // Populated together, from a single successful client upload
+  // (upload() from @vercel/blob/client, ApplicationForm.tsx) — never
+  // assembled field by field. See applicationFormSchema.ts's
+  // refineApplicationForm for the "all four or none" rule this relies on.
+  cvBlobUrl?: string;
+  cvPathname?: string;
+  cvOriginalFilename?: string;
+  cvSizeBytes?: number;
+  cvUploadedAt?: Date;
 };
 
 export type Application = ApplicationInput & {
@@ -73,6 +103,19 @@ export type Application = ApplicationInput & {
   mailedAt: Date | null;
 };
 
+// application_area_choices comes back as a `json_agg(...)` column
+// (area_choices) from every query that joins it — but not from
+// findPersonalDataByEmail's plain `select *`, which never joins that
+// table. Defaulting to [] here, rather than requiring every caller to
+// join, keeps that one GDPR-search query simple at the cost of it not
+// showing area choices in its result — an acceptable gap, since the board
+// already has the full admin view and PDF for that.
+function parseAreaChoices(value: unknown): ApplicationAreaChoice[] {
+  if (!value) return [];
+  const parsed = typeof value === "string" ? JSON.parse(value) : value;
+  return Array.isArray(parsed) ? (parsed as ApplicationAreaChoice[]) : [];
+}
+
 function toApplication(row: Record<string, unknown>): Application {
   return {
     id: row.id as string,
@@ -82,11 +125,13 @@ function toApplication(row: Record<string, unknown>): Application {
     email: row.email as string,
     studyProgram: row.study_program as string,
     semester: row.semester as number,
-    university: row.university as string,
+    university: (row.university as string | null) ?? undefined,
     priorInvolvement: (row.prior_involvement as string | null) ?? undefined,
     languagesSkills: (row.languages_skills as string | null) ?? undefined,
     motivation: row.motivation as string,
-    desiredAreas: row.desired_areas as string[],
+    wantToGain: (row.want_to_gain as string | null) ?? undefined,
+    desiredAreas: (row.desired_areas as string[] | null) ?? undefined,
+    areaChoices: parseAreaChoices(row.area_choices),
     availabilityHours: row.availability_hours as number,
     heardAboutUs: (row.heard_about_us as string | null) ?? undefined,
     consentAt: row.consent_at as Date,
@@ -96,28 +141,67 @@ function toApplication(row: Record<string, unknown>): Application {
     mailedAt: (row.mailed_at as Date | null) ?? null,
     recruitingSemester: row.recruiting_semester as string,
     retainUntil: row.retain_until as Date,
+    cvBlobUrl: (row.cv_blob_url as string | null) ?? undefined,
+    cvPathname: (row.cv_pathname as string | null) ?? undefined,
+    cvOriginalFilename: (row.cv_original_filename as string | null) ?? undefined,
+    cvSizeBytes: (row.cv_size_bytes as number | null) ?? undefined,
+    cvUploadedAt: (row.cv_uploaded_at as Date | null) ?? undefined,
   };
 }
 
-// consent_at is set from the database's own clock (now()), not a
-// client-supplied timestamp — it's the proof of consent, so it has to be
-// the moment the server actually received and stored the request, not
-// whatever a request body claims.
+// The one query in this file that writes to two tables — still a single
+// atomic statement (a CTE, not a transaction block), matching this file's
+// own no-multi-statement-transactions rule: either both inserts happen or
+// neither does. consent_at is set from the database's own clock (now()),
+// not a client-supplied timestamp — it's the proof of consent, so it has
+// to be the moment the server actually received and stored the request.
+//
+// The three area_choices columns are passed as parallel arrays to
+// unnest(...) rather than issued as separate insert statements — one round
+// trip for however many choices (1 to 3) an application has, and it stays
+// inside the same CTE as the applications insert.
 export async function insertApplication(input: ApplicationInput): Promise<Application> {
+  const priorities = input.areaChoices.map((choice) => choice.priority);
+  const areaLabels = input.areaChoices.map((choice) => choice.areaLabel);
+  const reasons = input.areaChoices.map((choice) => choice.reason);
+
   const rows = await sql()`
-    insert into applications (
-      first_name, last_name, email, study_program, semester, university,
-      prior_involvement, languages_skills, motivation, desired_areas,
-      availability_hours, heard_about_us, consent_at, locale, recruiting_semester,
-      retain_until
-    ) values (
-      ${input.firstName}, ${input.lastName}, ${input.email}, ${input.studyProgram},
-      ${input.semester}, ${input.university}, ${input.priorInvolvement ?? null},
-      ${input.languagesSkills ?? null}, ${input.motivation}, ${input.desiredAreas},
-      ${input.availabilityHours}, ${input.heardAboutUs ?? null}, now(), ${input.locale},
-      ${input.recruitingSemester}, ${input.retainUntil.toISOString()}
+    with new_application as (
+      insert into applications (
+        first_name, last_name, email, study_program, semester, university,
+        prior_involvement, languages_skills, motivation, want_to_gain, desired_areas,
+        availability_hours, heard_about_us, consent_at, locale, recruiting_semester,
+        retain_until, cv_blob_url, cv_pathname, cv_original_filename, cv_size_bytes, cv_uploaded_at
+      ) values (
+        ${input.firstName}, ${input.lastName}, ${input.email}, ${input.studyProgram},
+        ${input.semester}, ${input.university ?? null}, ${input.priorInvolvement ?? null},
+        ${input.languagesSkills ?? null}, ${input.motivation}, ${input.wantToGain ?? null},
+        ${input.desiredAreas ?? null}, ${input.availabilityHours}, ${input.heardAboutUs ?? null},
+        now(), ${input.locale}, ${input.recruitingSemester}, ${input.retainUntil.toISOString()},
+        ${input.cvBlobUrl ?? null}, ${input.cvPathname ?? null}, ${input.cvOriginalFilename ?? null},
+        ${input.cvSizeBytes ?? null}, ${input.cvUploadedAt ? input.cvUploadedAt.toISOString() : null}
+      )
+      returning *
+    ), inserted_choices as (
+      insert into application_area_choices (application_id, priority, area_label, reason)
+      select new_application.id, choice.priority, choice.area_label, choice.reason
+      from new_application, unnest(${priorities}::int[], ${areaLabels}::text[], ${reasons}::text[])
+        as choice(priority, area_label, reason)
+      returning priority, area_label, reason
     )
-    returning *
+    select
+      new_application.*,
+      coalesce(
+        (
+          select json_agg(
+            json_build_object('priority', priority, 'areaLabel', area_label, 'reason', reason)
+            order by priority
+          )
+          from inserted_choices
+        ),
+        '[]'::json
+      ) as area_choices
+    from new_application
   `;
   return toApplication(rows[0] as Record<string, unknown>);
 }
@@ -136,22 +220,42 @@ export async function markApplicationMailFailed(id: string, error: string): Prom
   `;
 }
 
+// The lateral join below (also in listApplications, listApplicationsBySemester,
+// and insertApplication's own CTE) is repeated rather than shared: Neon's
+// tagged-template `sql` has no fragment-composition helper that keeps
+// parameter binding safe, so each query spells it out in full. Same
+// json_agg shape everywhere, so the four can't quietly drift into
+// different orderings or field names.
+//
 // Powers /admin/mails's resend. Reads the whole row, unlike
 // ApplicationSummary below: re-rendering the PDF and re-sending the
 // notification needs every field the original send had, so this is the one
 // query allowed to return an application in full — and it's never used to
 // populate a list, only to act on a single record the board picked.
 export async function findApplicationById(id: string): Promise<Application | null> {
-  const rows = await sql()`select * from applications where id = ${id}`;
+  const rows = await sql()`
+    select a.*, coalesce(choices.area_choices, '[]'::json) as area_choices
+    from applications a
+    left join lateral (
+      select json_agg(
+        json_build_object('priority', priority, 'areaLabel', area_label, 'reason', reason)
+        order by priority
+      ) as area_choices
+      from application_area_choices where application_id = a.id
+    ) choices on true
+    where a.id = ${id}
+  `;
   return rows.length > 0 ? toApplication(rows[0] as Record<string, unknown>) : null;
 }
 
 // Powers /admin/bewerbungen and its CSV export. Every field either one
-// needs. desiredAreas was deliberately left out of both until the board
-// pointed out the CSV export is how applications actually get sorted onto
-// projects — without it, the export doesn't serve the one thing it's
-// exported for. motivation and the free-text fields stay out; those were
-// never asked for.
+// needs, including areaChoices, languagesSkills ("Skills"), and cvPathname
+// — all three were added once the board pointed out the CSV is how
+// applications actually get sorted onto projects and filtered by whether a
+// CV came in. motivation and the other free-text fields stay out; those
+// were never asked for. desiredAreas is the pre-migration fallback: a row
+// with no application_area_choices (migrations/0017 added no backfill)
+// still needs something to show.
 export type ApplicationSummary = {
   id: string;
   createdAt: Date;
@@ -159,7 +263,12 @@ export type ApplicationSummary = {
   lastName: string;
   email: string;
   studyProgram: string;
-  desiredAreas: string[];
+  semester: number;
+  availabilityHours: number;
+  desiredAreas: string[] | null;
+  areaChoices: ApplicationAreaChoice[];
+  languagesSkills: string | null;
+  cvPathname: string | null;
   mailStatus: MailStatus;
   recruitingSemester: string;
 };
@@ -172,7 +281,12 @@ function toApplicationSummary(row: Record<string, unknown>): ApplicationSummary 
     lastName: row.last_name as string,
     email: row.email as string,
     studyProgram: row.study_program as string,
-    desiredAreas: row.desired_areas as string[],
+    semester: row.semester as number,
+    availabilityHours: row.availability_hours as number,
+    desiredAreas: (row.desired_areas as string[] | null) ?? null,
+    areaChoices: parseAreaChoices(row.area_choices),
+    languagesSkills: (row.languages_skills as string | null) ?? null,
+    cvPathname: (row.cv_pathname as string | null) ?? null,
     mailStatus: row.mail_status as MailStatus,
     recruitingSemester: row.recruiting_semester as string,
   };
@@ -180,21 +294,41 @@ function toApplicationSummary(row: Record<string, unknown>): ApplicationSummary 
 
 export async function listApplications(): Promise<ApplicationSummary[]> {
   const rows = await sql()`
-    select id, created_at, first_name, last_name, email, study_program, desired_areas,
-           mail_status, recruiting_semester
-    from applications
-    order by created_at desc
+    select
+      a.id, a.created_at, a.first_name, a.last_name, a.email, a.study_program,
+      a.semester, a.availability_hours, a.desired_areas, a.languages_skills, a.cv_pathname,
+      a.mail_status, a.recruiting_semester,
+      coalesce(choices.area_choices, '[]'::json) as area_choices
+    from applications a
+    left join lateral (
+      select json_agg(
+        json_build_object('priority', priority, 'areaLabel', area_label, 'reason', reason)
+        order by priority
+      ) as area_choices
+      from application_area_choices where application_id = a.id
+    ) choices on true
+    order by a.created_at desc
   `;
   return (rows as Record<string, unknown>[]).map(toApplicationSummary);
 }
 
 export async function listApplicationsBySemester(recruitingSemester: string): Promise<ApplicationSummary[]> {
   const rows = await sql()`
-    select id, created_at, first_name, last_name, email, study_program, desired_areas,
-           mail_status, recruiting_semester
-    from applications
-    where recruiting_semester = ${recruitingSemester}
-    order by created_at desc
+    select
+      a.id, a.created_at, a.first_name, a.last_name, a.email, a.study_program,
+      a.semester, a.availability_hours, a.desired_areas, a.languages_skills, a.cv_pathname,
+      a.mail_status, a.recruiting_semester,
+      coalesce(choices.area_choices, '[]'::json) as area_choices
+    from applications a
+    left join lateral (
+      select json_agg(
+        json_build_object('priority', priority, 'areaLabel', area_label, 'reason', reason)
+        order by priority
+      ) as area_choices
+      from application_area_choices where application_id = a.id
+    ) choices on true
+    where a.recruiting_semester = ${recruitingSemester}
+    order by a.created_at desc
   `;
   return (rows as Record<string, unknown>[]).map(toApplicationSummary);
 }
@@ -203,21 +337,54 @@ export async function listApplicationsBySemester(recruitingSemester: string): Pr
 // cutoff derived from created_at — that value was computed once, at
 // insert time, from whichever recruiting window was open then (see
 // lib/retentionCutoff.ts's applicationRetainUntil). The caller just passes
-// the current instant.
-export async function deleteExpiredApplications(now: Date): Promise<number> {
+// the current instant. Returns the cv_pathname of every deleted row (never
+// null-filtered away here, just skipped) so the cron route's CV-blob pass
+// can best-effort delete them from the store — a row without a CV simply
+// contributes nothing to that list.
+export async function deleteExpiredApplications(now: Date): Promise<{ count: number; cvPathnames: string[] }> {
   const rows = await sql()`
-    delete from applications where retain_until <= ${now.toISOString()} returning id
+    delete from applications where retain_until <= ${now.toISOString()} returning cv_pathname
   `;
-  return rows.length;
+  const cvPathnames = (rows as { cv_pathname: string | null }[])
+    .map((row) => row.cv_pathname)
+    .filter((pathname): pathname is string => pathname !== null);
+  return { count: rows.length, cvPathnames };
 }
 
 // The board's own manual delete, from /admin/bewerbungen — distinct from
 // deleteExpiredApplications above (retention, cron-driven, by cutoff date)
 // and from /api/admin/loeschanfragen (GDPR erasure, by email address across
-// every table at once). Same one-row-by-id shape as deleteProjectArea.
-export async function deleteApplication(id: string): Promise<boolean> {
-  const rows = await sql()`delete from applications where id = ${id} returning id`;
-  return rows.length > 0;
+// every table at once). Returns the deleted row's cv_pathname (if any) so
+// the route can best-effort delete the blob alongside the row.
+export async function deleteApplication(id: string): Promise<{ deleted: boolean; cvPathname: string | null }> {
+  const rows = await sql()`delete from applications where id = ${id} returning cv_pathname`;
+  if (rows.length === 0) return { deleted: false, cvPathname: null };
+  return { deleted: true, cvPathname: (rows[0] as { cv_pathname: string | null }).cv_pathname };
+}
+
+// Powers the admin "CV jetzt löschen" button (/admin/bewerbungen) — clears
+// the five cv_* columns without touching the application itself. The `previous`
+// CTE looks like it would race with the UPDATE below, but it doesn't: every
+// part of one statement, CTEs included, reads the same pre-statement
+// snapshot in Postgres's MVCC, so `previous.cv_pathname` is always the value
+// from *before* this statement's own SET clause ran, letting the route
+// still best-effort delete the actual blob after the column is already
+// null. Returns null when the application doesn't exist at all, or existed
+// but had no CV to begin with — both mean nothing left to delete.
+export async function clearApplicationCv(id: string): Promise<{ cvPathname: string } | null> {
+  const rows = await sql()`
+    with previous as (
+      select cv_pathname from applications where id = ${id}
+    )
+    update applications set
+      cv_blob_url = null, cv_pathname = null, cv_original_filename = null,
+      cv_size_bytes = null, cv_uploaded_at = null
+    where id = ${id}
+    returning (select cv_pathname from previous) as previous_cv_pathname
+  `;
+  if (rows.length === 0) return null;
+  const previousCvPathname = (rows[0] as { previous_cv_pathname: string | null }).previous_cv_pathname;
+  return previousCvPathname ? { cvPathname: previousCvPathname } : null;
 }
 
 export type RecruitingWindowRow = {
@@ -372,6 +539,11 @@ export type DeletedCounts = {
   contactMessages: number;
   reminderSignups: number;
   ideathonSignups: number;
+  // Every cv_pathname from a deleted application, so the route can
+  // best-effort delete those blobs alongside an Art. 17 erasure — this is
+  // the one deletion path where "the cron picks it up within 24 hours" is
+  // not an acceptable answer.
+  cvPathnames: string[];
 };
 
 // Four statements rather than one, because they're four tables — but note
@@ -383,7 +555,7 @@ export async function deletePersonalDataByEmail(email: string): Promise<DeletedC
   const needle = email.trim().toLowerCase();
 
   const applications = await sql()`
-    delete from applications where lower(email) = ${needle} returning id
+    delete from applications where lower(email) = ${needle} returning cv_pathname
   `;
   const contactMessages = await sql()`
     delete from contact_messages where lower(email) = ${needle} returning id
@@ -395,11 +567,16 @@ export async function deletePersonalDataByEmail(email: string): Promise<DeletedC
     delete from ideathon_signups where lower(email) = ${needle} returning id
   `;
 
+  const cvPathnames = (applications as { cv_pathname: string | null }[])
+    .map((row) => row.cv_pathname)
+    .filter((pathname): pathname is string => pathname !== null);
+
   return {
     applications: applications.length,
     contactMessages: contactMessages.length,
     reminderSignups: reminderSignups.length,
     ideathonSignups: ideathonSignups.length,
+    cvPathnames,
   };
 }
 

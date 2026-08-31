@@ -11,6 +11,7 @@ const checkRateLimit = vi.fn();
 const renderToBuffer = vi.fn();
 const getRecruitingWindows = vi.fn();
 const checkFormToken = vi.fn();
+const verifyUploadedPdf = vi.fn();
 
 vi.mock("@/lib/db", () => ({
   insertApplication: (...args: unknown[]) => insertApplication(...args),
@@ -34,6 +35,13 @@ vi.mock("@/lib/rateLimit", () => ({
 vi.mock("@/lib/formToken", () => ({
   checkFormToken: (...args: unknown[]) => checkFormToken(...args),
 }));
+
+// isCvPathname is real (a pure prefix check, no reason to mock) —
+// verifyUploadedPdf is the one call that would otherwise reach Vercel Blob.
+vi.mock("@/lib/cvBlob", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/cvBlob")>();
+  return { ...actual, verifyUploadedPdf: (...args: unknown[]) => verifyUploadedPdf(...args) };
+});
 
 // A window spanning far past to far future — every test below runs at the
 // real current time, and none of them are testing the window-open gate
@@ -60,11 +68,12 @@ const STORED_APPLICATION = {
   email: "jane@example.com",
   studyProgram: "BWL",
   semester: 3,
-  university: "Universität Mannheim",
   priorInvolvement: undefined,
   languagesSkills: undefined,
+  wantToGain: undefined,
   motivation: "Ich möchte gerne aktiv mitarbeiten und Verantwortung übernehmen.",
-  desiredAreas: ["SmileGreen"],
+  desiredAreas: undefined,
+  areaChoices: [{ priority: 1, areaLabel: "SmileGreen", reason: "Weil ich dort am meisten bewirken kann." }],
   availabilityHours: 10,
   heardAboutUs: undefined,
   consentAt: new Date("2026-09-05T10:00:00Z"),
@@ -73,6 +82,11 @@ const STORED_APPLICATION = {
   mailError: null,
   mailedAt: null,
   recruitingSemester: "HWS26",
+  retainUntil: new Date("2027-01-01T00:00:00Z"),
+  cvBlobUrl: "https://example-store.private.blob.vercel-storage.com/bewerbungen/lebenslauf-abc123.pdf",
+  cvPathname: "bewerbungen/lebenslauf-abc123.pdf",
+  cvOriginalFilename: "Lebenslauf Jane Doe.pdf",
+  cvSizeBytes: 123456,
 };
 
 function validPayload(overrides: Record<string, unknown> = {}) {
@@ -82,14 +96,18 @@ function validPayload(overrides: Record<string, unknown> = {}) {
     email: "jane@example.com",
     studyProgram: "BWL",
     semester: 3,
-    university: "Universität Mannheim",
     motivation: "Ich möchte gerne aktiv mitarbeiten und Verantwortung übernehmen.",
-    desiredAreas: ["SmileGreen"],
+    area1: "SmileGreen",
+    area1Reason: "Weil ich dort am meisten bewirken kann.",
     availabilityHours: 10,
     consent: true,
     website: "",
     locale: "de",
     formToken: "test-token",
+    cvBlobUrl: "https://example-store.private.blob.vercel-storage.com/bewerbungen/lebenslauf-abc123.pdf",
+    cvPathname: "bewerbungen/lebenslauf-abc123.pdf",
+    cvOriginalFilename: "Lebenslauf Jane Doe.pdf",
+    cvSizeBytes: 123456,
     ...overrides,
   };
 }
@@ -106,6 +124,7 @@ describe("POST /api/bewerbung", () => {
   beforeEach(() => {
     getRecruitingWindows.mockResolvedValue([OPEN_WINDOW]);
     checkFormToken.mockReturnValue("valid");
+    verifyUploadedPdf.mockResolvedValue(true);
   });
 
   afterEach(() => {
@@ -180,6 +199,52 @@ describe("POST /api/bewerbung", () => {
 
     const { POST } = await import("@/app/api/bewerbung/route");
     const response = await POST(postRequest(validPayload({ email: "not-an-email" })));
+
+    expect(response.status).toBe(400);
+    expect(insertApplication).not.toHaveBeenCalled();
+  });
+
+  it("rejects a submission missing the required first-choice area", async () => {
+    checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
+
+    const { POST } = await import("@/app/api/bewerbung/route");
+    const response = await POST(postRequest(validPayload({ area1: "", area1Reason: "" })));
+
+    expect(response.status).toBe(400);
+    expect(insertApplication).not.toHaveBeenCalled();
+  });
+
+  it("rejects a submission with no CV attached, since CV_REQUIRED is true", async () => {
+    checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
+
+    const { POST } = await import("@/app/api/bewerbung/route");
+    const response = await POST(
+      postRequest(
+        validPayload({ cvBlobUrl: undefined, cvPathname: undefined, cvOriginalFilename: undefined, cvSizeBytes: undefined }),
+      ),
+    );
+
+    expect(response.status).toBe(400);
+    expect(insertApplication).not.toHaveBeenCalled();
+  });
+
+  it("rejects a submission whose uploaded file fails the magic-byte check, without writing anything", async () => {
+    checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
+    verifyUploadedPdf.mockResolvedValue(false);
+
+    const { POST } = await import("@/app/api/bewerbung/route");
+    const response = await POST(postRequest(validPayload()));
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ ok: false, error: "cv_invalid" });
+    expect(insertApplication).not.toHaveBeenCalled();
+  });
+
+  it("rejects a CV pathname outside bewerbungen/, without writing anything", async () => {
+    checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
+
+    const { POST } = await import("@/app/api/bewerbung/route");
+    const response = await POST(postRequest(validPayload({ cvPathname: "anders/lebenslauf.pdf" })));
 
     expect(response.status).toBe(400);
     expect(insertApplication).not.toHaveBeenCalled();

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { applicationFormSchema } from "./applicationFormSchema";
+import { applicationFormSchema, refineApplicationForm } from "./applicationFormSchema";
 import { contactFormSchema } from "./contactFormSchema";
 import { reminderSignupSchema } from "./reminderSignupSchema";
 import { ideathonSignupFormSchema } from "./ideathonSignupFormSchema";
@@ -23,10 +23,16 @@ const localeSchema = z.enum(["de", "en"]);
 // verify the real elapsed fill time server-side (lib/formToken.ts) — a
 // client-supplied timestamp is trivial to fake by calling the route
 // directly with any value at all.
-export const applicationRequestSchema = applicationFormSchema.extend({
-  locale: localeSchema,
-  formToken: z.string(),
-});
+// .extend() first, while applicationFormSchema is still a plain ZodObject,
+// then the same cross-field refinement applicationFormSchema.ts's own
+// client resolver runs — see that file's comment on why the refinement
+// can't live on the exported base schema itself.
+export const applicationRequestSchema = applicationFormSchema
+  .extend({
+    locale: localeSchema,
+    formToken: z.string(),
+  })
+  .superRefine(refineApplicationForm);
 export type ApplicationRequest = z.infer<typeof applicationRequestSchema>;
 
 export const reminderRequestSchema = reminderSignupSchema.extend({ locale: localeSchema });

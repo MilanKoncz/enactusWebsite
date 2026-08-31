@@ -4,10 +4,15 @@ import { NextRequest } from "next/server";
 
 const findPersonalDataByEmail = vi.fn();
 const deletePersonalDataByEmail = vi.fn();
+const deleteCvBlobs = vi.fn();
 
 vi.mock("@/lib/db", () => ({
   findPersonalDataByEmail: (...a: unknown[]) => findPersonalDataByEmail(...a),
   deletePersonalDataByEmail: (...a: unknown[]) => deletePersonalDataByEmail(...a),
+}));
+
+vi.mock("@/lib/cvBlob", () => ({
+  deleteCvBlobs: (...a: unknown[]) => deleteCvBlobs(...a),
 }));
 
 const ORIGINAL_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET;
@@ -15,6 +20,7 @@ const EMAIL = "jane@example.com";
 
 beforeEach(() => {
   process.env.ADMIN_SESSION_SECRET = "a-signing-secret-for-deletion-tests";
+  deleteCvBlobs.mockResolvedValue(undefined);
 });
 
 afterEach(() => {
@@ -113,7 +119,13 @@ describe("DELETE /api/admin/loeschanfragen", () => {
   });
 
   it("accepts a confirmation that differs only in capitalisation", async () => {
-    deletePersonalDataByEmail.mockResolvedValue({ applications: 1, contactMessages: 0, reminderSignups: 0 });
+    deletePersonalDataByEmail.mockResolvedValue({
+      applications: 1,
+      contactMessages: 0,
+      reminderSignups: 0,
+      ideathonSignups: 0,
+      cvPathnames: [],
+    });
 
     const { DELETE } = await import("@/app/api/admin/loeschanfragen/route");
     const response = await DELETE(
@@ -130,6 +142,7 @@ describe("DELETE /api/admin/loeschanfragen", () => {
       contactMessages: 1,
       reminderSignups: 1,
       ideathonSignups: 3,
+      cvPathnames: ["bewerbungen/lebenslauf-abc123.pdf", "bewerbungen/lebenslauf-def456.pdf"],
     });
 
     const { DELETE } = await import("@/app/api/admin/loeschanfragen/route");
@@ -138,8 +151,18 @@ describe("DELETE /api/admin/loeschanfragen", () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({
       ok: true,
-      deleted: { applications: 2, contactMessages: 1, reminderSignups: 1, ideathonSignups: 3 },
+      deleted: {
+        applications: 2,
+        contactMessages: 1,
+        reminderSignups: 1,
+        ideathonSignups: 3,
+        cvPathnames: ["bewerbungen/lebenslauf-abc123.pdf", "bewerbungen/lebenslauf-def456.pdf"],
+      },
     });
+    expect(deleteCvBlobs).toHaveBeenCalledWith([
+      "bewerbungen/lebenslauf-abc123.pdf",
+      "bewerbungen/lebenslauf-def456.pdf",
+    ]);
   });
 
   it("reports a database failure rather than claiming success", async () => {

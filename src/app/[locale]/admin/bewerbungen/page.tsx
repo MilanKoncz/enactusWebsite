@@ -44,6 +44,7 @@ export default async function AdminBewerbungenPage({ params }: PageProps) {
     t("applications.columns.studyProgram"),
     t("applications.columns.createdAt"),
     t("applications.columns.mailStatus"),
+    t("applications.columns.cv"),
     t("applications.columns.actions"),
   ];
 
@@ -80,6 +81,33 @@ export default async function AdminBewerbungenPage({ params }: PageProps) {
                   status={application.mailStatus}
                   label={t(`mailStatus.${application.mailStatus}`)}
                 />,
+                application.cvPathname ? (
+                  <span key="cv" className="flex flex-col items-start gap-1">
+                    <RawLink
+                      href={`/api/admin/bewerbungen/${application.id}/cv`}
+                      className="link-underline text-body-s"
+                    >
+                      {t("applications.cvDownload")}
+                    </RawLink>
+                    {/* Reuses AdminDeleteButton by giving it a compound
+                        "id" — the component only ever interpolates this
+                        into `${endpoint}/${id}`, so `${id}/cv` targets the
+                        CV-only DELETE route without a second, near-
+                        identical button component. */}
+                    <AdminDeleteButton
+                      endpoint="/api/admin/bewerbungen"
+                      id={`${application.id}/cv`}
+                      label={t("applications.cvRemove")}
+                      confirmLabel={t("applications.confirmRemoveCv", {
+                        name: `${application.firstName} ${application.lastName}`,
+                      })}
+                    />
+                  </span>
+                ) : (
+                  <span key="cv" className="text-body-s opacity-60">
+                    {t("applications.cvNone")}
+                  </span>
+                ),
                 <AdminDeleteButton
                   key="actions"
                   endpoint="/api/admin/bewerbungen"

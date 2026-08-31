@@ -114,7 +114,12 @@ describe("GET /api/admin/bewerbungen/csv", () => {
         lastName: "Döe",
         email: "jane@example.com",
         studyProgram: "BWL",
+        semester: 3,
+        availabilityHours: 10,
         desiredAreas: ["SmileGreen", "Finance-Lead"],
+        areaChoices: [],
+        languagesSkills: "Figma, Excel",
+        cvPathname: "bewerbungen/lebenslauf-abc123.pdf",
         mailStatus: "sent",
         recruitingSemester: "HWS26",
       },
@@ -138,7 +143,9 @@ describe("GET /api/admin/bewerbungen/csv", () => {
 
     const body = new TextDecoder("utf-8", { ignoreBOM: true }).decode(bytes);
     expect(body).toContain("Jäne Döe");
-    expect(body).toContain("SmileGreen; Finance-Lead");
+    expect(body).toContain("SmileGreen; Finance-Lead (ohne Priorisierung)");
+    expect(body).toContain("Figma, Excel");
+    expect(body).toContain("ja"); // Lebenslauf column, since cvPathname is set
     expect(listApplicationsBySemester).toHaveBeenCalledWith("HWS26");
   });
 });

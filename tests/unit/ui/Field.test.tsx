@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "jest-axe";
@@ -82,6 +82,37 @@ describe("Field", () => {
     const input = screen.getByLabelText("Passwort");
     expect(input).toHaveClass("pr-10");
     expect(screen.getByRole("button", { name: "Anzeigen" })).toBeInTheDocument();
+  });
+
+  it("does not render a counter for a textarea without showCount", () => {
+    render(<Field as="textarea" label="Nachricht" name="message" maxLength={300} />);
+    expect(screen.queryByText(/^\d+ \/ \d+$/)).not.toBeInTheDocument();
+  });
+
+  it("shows a live 0 / max count once showCount and maxLength are both set", () => {
+    render(<Field as="textarea" label="Begründung" name="reason" showCount maxLength={300} />);
+    expect(screen.getByText("0 / 300")).toBeInTheDocument();
+  });
+
+  it("updates the count as the visitor types, without swallowing onChange", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <Field as="textarea" label="Begründung" name="reason" showCount maxLength={300} onChange={onChange} />,
+    );
+    await user.type(screen.getByLabelText("Begründung"), "Hallo");
+    expect(screen.getByText("5 / 300")).toBeInTheDocument();
+    expect(onChange).toHaveBeenCalledTimes(5);
+  });
+
+  it("links the count via aria-describedby alongside the hint", () => {
+    render(
+      <Field as="textarea" label="Skills" name="skills" showCount maxLength={200} hint="Optional, max. 200 Zeichen." />,
+    );
+    const textarea = screen.getByLabelText("Skills");
+    const describedBy = textarea.getAttribute("aria-describedby")?.split(" ") ?? [];
+    expect(describedBy).toContain(screen.getByText("0 / 200").id);
+    expect(describedBy).toContain(screen.getByText("Optional, max. 200 Zeichen.").id);
   });
 
   it("has no accessibility violations for input, textarea, select and error states", async () => {

@@ -1,22 +1,38 @@
 import { describe, expect, it } from "vitest";
-import { applicationFormSchema } from "@/lib/applicationFormSchema";
+import {
+  applicationFormSchema,
+  CV_REQUIRED,
+  toAreaChoices,
+  validatedApplicationFormSchema,
+} from "@/lib/applicationFormSchema";
 
-function validInput() {
+function validCv() {
+  return {
+    cvBlobUrl: "https://example-store.private.blob.vercel-storage.com/bewerbungen/lebenslauf-abc123.pdf",
+    cvPathname: "bewerbungen/lebenslauf-abc123.pdf",
+    cvOriginalFilename: "Lebenslauf Jane Doe.pdf",
+    cvSizeBytes: 123456,
+  };
+}
+
+function validInput(overrides: Record<string, unknown> = {}) {
   return {
     firstName: "Jane",
     lastName: "Doe",
     email: "jane@example.com",
     studyProgram: "BWL",
     semester: "3",
-    university: "Universität Mannheim",
-    motivation: "Ich möchte gerne aktiv an einem Projekt mitarbeiten und Verantwortung übernehmen.",
-    desiredAreas: ["SmileGreen"],
     availabilityHours: "10",
+    area1: "SmileGreen",
+    area1Reason: "Weil ich dort am meisten bewirken kann.",
+    motivation: "Ich möchte gerne aktiv an einem Projekt mitarbeiten und Verantwortung übernehmen.",
     consent: true,
+    ...(CV_REQUIRED ? validCv() : {}),
+    ...overrides,
   };
 }
 
-describe("applicationFormSchema", () => {
+describe("applicationFormSchema (field-level rules, no cross-field refinement)", () => {
   it("accepts a minimal valid application with the optional fields omitted", () => {
     const result = applicationFormSchema.safeParse(validInput());
     expect(result.success).toBe(true);
@@ -26,6 +42,12 @@ describe("applicationFormSchema", () => {
     const result = applicationFormSchema.parse(validInput());
     expect(result.semester).toBe(3);
     expect(result.availabilityHours).toBe(10);
+  });
+
+  it("no longer has a university field", () => {
+    const result = applicationFormSchema.safeParse(validInput());
+    expect(result.success).toBe(true);
+    expect(result.success && "university" in result.data).toBe(false);
   });
 
   it("rejects a submission without consent", () => {
@@ -38,9 +60,24 @@ describe("applicationFormSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rejects an empty desiredAreas selection", () => {
-    const result = applicationFormSchema.safeParse({ ...validInput(), desiredAreas: [] });
+  it("rejects a missing first-choice area", () => {
+    const result = applicationFormSchema.safeParse({ ...validInput(), area1: "" });
     expect(result.success).toBe(false);
+  });
+
+  it("rejects a missing first-choice reason", () => {
+    const result = applicationFormSchema.safeParse({ ...validInput(), area1Reason: "" });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a first-choice reason over 300 characters", () => {
+    const result = applicationFormSchema.safeParse({ ...validInput(), area1Reason: "x".repeat(301) });
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts exactly 300 characters for a reason", () => {
+    const result = applicationFormSchema.safeParse({ ...validInput(), area1Reason: "x".repeat(300) });
+    expect(result.success).toBe(true);
   });
 
   it("rejects a filled honeypot field", () => {
@@ -48,49 +85,177 @@ describe("applicationFormSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("accepts a filled priorInvolvement and languagesSkills within their limits", () => {
+  it("accepts a filled priorInvolvement, languagesSkills, and wantToGain within their limits", () => {
     const result = applicationFormSchema.safeParse({
       ...validInput(),
       priorInvolvement: "Ehrenamt im Verein.",
-      languagesSkills: "Deutsch, Englisch.",
+      languagesSkills: "Figma, Excel-Modelle, Spanisch (C1).",
+      wantToGain: "Praxiserfahrung im Projektmanagement.",
     });
     expect(result.success).toBe(true);
   });
 
   it("rejects a priorInvolvement over 600 characters", () => {
-    const result = applicationFormSchema.safeParse({
-      ...validInput(),
-      priorInvolvement: "x".repeat(601),
-    });
+    const result = applicationFormSchema.safeParse({ ...validInput(), priorInvolvement: "x".repeat(601) });
     expect(result.success).toBe(false);
   });
 
-  it("rejects more than 20 desired areas", () => {
-    const result = applicationFormSchema.safeParse({
-      ...validInput(),
-      desiredAreas: Array.from({ length: 21 }, (_, i) => `Area ${i}`),
-    });
+  it("rejects languagesSkills over 200 characters — shorter than before, deliberately", () => {
+    const result = applicationFormSchema.safeParse({ ...validInput(), languagesSkills: "x".repeat(201) });
     expect(result.success).toBe(false);
   });
 
-  it("accepts exactly 20 desired areas", () => {
-    const result = applicationFormSchema.safeParse({
-      ...validInput(),
-      desiredAreas: Array.from({ length: 20 }, (_, i) => `Area ${i}`),
-    });
+  it("accepts exactly 200 characters for languagesSkills", () => {
+    const result = applicationFormSchema.safeParse({ ...validInput(), languagesSkills: "x".repeat(200) });
     expect(result.success).toBe(true);
   });
 
-  it("rejects a desired area over 120 characters", () => {
-    const result = applicationFormSchema.safeParse({
-      ...validInput(),
-      desiredAreas: ["x".repeat(121)],
-    });
+  it("rejects wantToGain over 400 characters", () => {
+    const result = applicationFormSchema.safeParse({ ...validInput(), wantToGain: "x".repeat(401) });
     expect(result.success).toBe(false);
   });
 
-  it("rejects an empty-string desired area", () => {
-    const result = applicationFormSchema.safeParse({ ...validInput(), desiredAreas: [""] });
+  it("accepts exactly 400 characters for wantToGain", () => {
+    const result = applicationFormSchema.safeParse({ ...validInput(), wantToGain: "x".repeat(400) });
+    expect(result.success).toBe(true);
+  });
+});
+
+describe("validatedApplicationFormSchema — area choice cross-field rules", () => {
+  it("accepts a single, first-choice-only submission", () => {
+    const result = validatedApplicationFormSchema.safeParse(validInput());
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts area1 and area2 with both reasons filled in", () => {
+    const result = validatedApplicationFormSchema.safeParse(
+      validInput({ area2: "Mealyo", area2Reason: "Zweitwahl, weil ich auch dort mitwirken möchte." }),
+    );
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts area1, area2, and area3 with every reason filled in", () => {
+    const result = validatedApplicationFormSchema.safeParse(
+      validInput({
+        area2: "Mealyo",
+        area2Reason: "Zweitwahl, weil ich auch dort mitwirken möchte.",
+        area3: "ReSoap",
+        area3Reason: "Drittwahl aus Interesse an Nachhaltigkeit.",
+      }),
+    );
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects area2 chosen without a reason", () => {
+    const result = validatedApplicationFormSchema.safeParse(validInput({ area2: "Mealyo" }));
     expect(result.success).toBe(false);
+  });
+
+  it("rejects a reason given without an area chosen", () => {
+    const result = validatedApplicationFormSchema.safeParse(
+      validInput({ area2Reason: "Ich hätte eine Begründung, aber keinen Bereich gewählt." }),
+    );
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a 3rd choice without a 2nd — no gaps", () => {
+    const result = validatedApplicationFormSchema.safeParse(
+      validInput({ area3: "ReSoap", area3Reason: "Drittwahl aus Interesse an Nachhaltigkeit." }),
+    );
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects area3 chosen without its own reason, even with area2 present", () => {
+    const result = validatedApplicationFormSchema.safeParse(
+      validInput({
+        area2: "Mealyo",
+        area2Reason: "Zweitwahl, weil ich auch dort mitwirken möchte.",
+        area3: "ReSoap",
+      }),
+    );
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects the same area chosen twice (1st and 2nd)", () => {
+    const result = validatedApplicationFormSchema.safeParse(
+      validInput({ area2: "SmileGreen", area2Reason: "Nochmal derselbe Bereich." }),
+    );
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects the same area chosen for 1st and 3rd, with a valid 2nd in between", () => {
+    const result = validatedApplicationFormSchema.safeParse(
+      validInput({
+        area2: "Mealyo",
+        area2Reason: "Zweitwahl, weil ich auch dort mitwirken möchte.",
+        area3: "SmileGreen",
+        area3Reason: "Nochmal derselbe Bereich wie die Erstwahl.",
+      }),
+    );
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("validatedApplicationFormSchema — CV requiredness", () => {
+  it(`CV_REQUIRED is currently ${CV_REQUIRED}`, () => {
+    // Documents the constant's current value in the test output so a
+    // flip is visible in a diff of test names, not just source.
+    expect(typeof CV_REQUIRED).toBe("boolean");
+  });
+
+  it("rejects a submission with no CV data when CV_REQUIRED is true", () => {
+    const result = validatedApplicationFormSchema.safeParse(validInput({ ...noCv() }));
+    expect(result.success).toBe(CV_REQUIRED ? false : true);
+  });
+
+  it("accepts a submission with a complete CV upload", () => {
+    const result = validatedApplicationFormSchema.safeParse(validInput({ ...validCv() }));
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects a submission with only some of the four CV fields present", () => {
+    const result = validatedApplicationFormSchema.safeParse(
+      validInput({ ...noCv(), cvPathname: "bewerbungen/lebenslauf-abc123.pdf" }),
+    );
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a CV size over 4 MB", () => {
+    const result = applicationFormSchema.safeParse(validInput({ ...validCv(), cvSizeBytes: 4 * 1024 * 1024 + 1 }));
+    expect(result.success).toBe(false);
+  });
+});
+
+function noCv() {
+  return {
+    cvBlobUrl: undefined,
+    cvPathname: undefined,
+    cvOriginalFilename: undefined,
+    cvSizeBytes: undefined,
+  };
+}
+
+describe("toAreaChoices", () => {
+  it("returns only the first choice when 2nd and 3rd are absent", () => {
+    expect(toAreaChoices({ area1: "SmileGreen", area1Reason: "Begründung 1" })).toEqual([
+      { priority: 1, areaLabel: "SmileGreen", reason: "Begründung 1" },
+    ]);
+  });
+
+  it("returns choices in priority order for all three", () => {
+    expect(
+      toAreaChoices({
+        area1: "SmileGreen",
+        area1Reason: "Begründung 1",
+        area2: "Mealyo",
+        area2Reason: "Begründung 2",
+        area3: "ReSoap",
+        area3Reason: "Begründung 3",
+      }),
+    ).toEqual([
+      { priority: 1, areaLabel: "SmileGreen", reason: "Begründung 1" },
+      { priority: 2, areaLabel: "Mealyo", reason: "Begründung 2" },
+      { priority: 3, areaLabel: "ReSoap", reason: "Begründung 3" },
+    ]);
   });
 });

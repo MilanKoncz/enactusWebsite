@@ -33,10 +33,15 @@ export function AdminDeleteButton({
   endpoint,
   id,
   confirmLabel,
+  label,
 }: {
   endpoint: string;
   id: string;
   confirmLabel: string;
+  /** Overrides the button's own visible text (defaults to the generic
+      "delete" string) — for a reused instance whose action isn't "delete
+      the row", like clearing just a CV while the application stays. */
+  label?: string;
 }) {
   const t = useTranslations("Admin");
   const router = useRouter();
@@ -60,7 +65,7 @@ export function AdminDeleteButton({
   return (
     <span className="flex flex-col items-start gap-1">
       <Button variant="ghost" size="sm" loading={state === "pending"} onClick={handleClick}>
-        {t("delete")}
+        {label ?? t("delete")}
       </Button>
       {state === "error" && (
         <span role="alert" className="text-body-s text-oxblood">

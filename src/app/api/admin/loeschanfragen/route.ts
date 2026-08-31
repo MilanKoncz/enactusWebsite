@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { isAuthenticatedRequest } from "@/lib/adminSession";
 import { deletePersonalDataByEmail, findPersonalDataByEmail } from "@/lib/db";
+import { deleteCvBlobs } from "@/lib/cvBlob";
 
 /**
  * GDPR Art. 15 (search) and Art. 17 (delete) for one address.
@@ -58,6 +59,15 @@ export async function DELETE(request: NextRequest) {
 
   try {
     const deleted = await deletePersonalDataByEmail(parsed.data.email);
+    // Best-effort, and deliberately synchronous with the request rather
+    // than left to the CV-blob pass's next run: an Art. 17 erasure is the
+    // one deletion path where "within 24 hours" is not an acceptable
+    // answer, so this is deleted now, not queued.
+    if (deleted.cvPathnames.length > 0) {
+      await deleteCvBlobs(deleted.cvPathnames).catch((error: unknown) => {
+        console.error("Failed to delete CV blobs for a subject erasure request", error);
+      });
+    }
     // Logged deliberately: an Art. 17 deletion is the one action here with
     // no undo and no other trace, so the server log is the only record that
     // it happened and how much it removed.

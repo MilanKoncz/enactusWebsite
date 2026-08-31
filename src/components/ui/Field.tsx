@@ -1,4 +1,6 @@
-import { forwardRef, useId } from "react";
+"use client";
+
+import { forwardRef, useId, useState } from "react";
 import type { ComponentPropsWithoutRef, ReactNode, Ref } from "react";
 import { AlertCircle, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/cn";
@@ -23,6 +25,11 @@ type FieldAsInput = FieldOwnProps & {
 
 type FieldAsTextarea = FieldOwnProps & {
   as: "textarea";
+  /** Shows a live "N / max" count under the field, read off this
+      textarea's own `maxLength` — for a field whose character limit is
+      part of the point (a keyword list, a short reason), not just a quiet
+      server-side cap. Opt-in: most textareas on this site don't need one. */
+  showCount?: boolean;
 } & Omit<ComponentPropsWithoutRef<"textarea">, keyof FieldOwnProps | "as">;
 
 type FieldAsSelect = FieldOwnProps & {
@@ -44,7 +51,22 @@ export const Field = forwardRef<
   const showHint = Boolean(hint) && !error;
   const hintId = showHint ? `${controlId}-hint` : undefined;
   const errorId = error ? `${controlId}-error` : undefined;
-  const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
+
+  // Declared unconditionally (React's rule of hooks), even though only the
+  // textarea-with-showCount branch below ever reads it. Seeded from
+  // defaultValue's length, not 0 — react-hook-form's register() sets a
+  // registered field's initial content via its ref callback, bypassing
+  // React's own controlled-value path entirely, so a plain onChange-driven
+  // counter would otherwise start at 0 even when a default value is
+  // already filled in.
+  const [textareaLength, setTextareaLength] = useState(() => {
+    const defaultValue = "as" in rest && rest.as === "textarea" ? rest.defaultValue : undefined;
+    return typeof defaultValue === "string" ? defaultValue.length : 0;
+  });
+
+  const countId =
+    rest.as === "textarea" && rest.showCount && typeof rest.maxLength === "number" ? `${controlId}-count` : undefined;
+  const describedBy = [hintId, errorId, countId].filter(Boolean).join(" ") || undefined;
 
   const controlClassName = cn(
     CONTROL_BASE_CLASSES,
@@ -53,9 +75,10 @@ export const Field = forwardRef<
   );
 
   let control: ReactNode;
+  let count: ReactNode = null;
 
   if (rest.as === "textarea") {
-    const { as, ...textareaProps } = rest;
+    const { as, showCount, onChange, ...textareaProps } = rest;
     control = (
       <textarea
         ref={ref as Ref<HTMLTextAreaElement>}
@@ -63,9 +86,20 @@ export const Field = forwardRef<
         aria-invalid={Boolean(error)}
         aria-describedby={describedBy}
         className={cn(controlClassName, "min-h-32")}
+        onChange={(event) => {
+          if (showCount) setTextareaLength(event.target.value.length);
+          onChange?.(event);
+        }}
         {...textareaProps}
       />
     );
+    if (showCount && typeof textareaProps.maxLength === "number") {
+      count = (
+        <p id={countId} className="text-body-s opacity-60 tabular-nums" aria-live="polite">
+          {textareaLength} / {textareaProps.maxLength}
+        </p>
+      );
+    }
   } else if (rest.as === "select") {
     const { as, ...selectProps } = rest;
     control = (
@@ -112,6 +146,7 @@ export const Field = forwardRef<
         {label}
       </label>
       {control}
+      {count}
       {showHint && (
         <p id={hintId} className="text-body-s opacity-60">
           {hint}

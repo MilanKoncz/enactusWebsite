@@ -5,11 +5,16 @@ import { NextRequest } from "next/server";
 const deleteApplication = vi.fn();
 const deleteReminderSignup = vi.fn();
 const deleteIdeathonSignup = vi.fn();
+const deleteCvBlobs = vi.fn();
 
 vi.mock("@/lib/db", () => ({
   deleteApplication: (...args: unknown[]) => deleteApplication(...args),
   deleteReminderSignup: (...args: unknown[]) => deleteReminderSignup(...args),
   deleteIdeathonSignup: (...args: unknown[]) => deleteIdeathonSignup(...args),
+}));
+
+vi.mock("@/lib/cvBlob", () => ({
+  deleteCvBlobs: (...args: unknown[]) => deleteCvBlobs(...args),
 }));
 
 const ORIGINAL_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET;
@@ -50,18 +55,27 @@ describe.each([
     resource: "bewerbungen",
     routeModule: "@/app/api/admin/bewerbungen/[id]/route",
     mock: deleteApplication,
+    // deleteApplication (lib/db.ts) returns { deleted, cvPathname }, not a
+    // plain boolean, so the route has something to best-effort delete the
+    // CV blob with — the other two resources have no CV to worry about.
+    deletedValue: { deleted: true, cvPathname: null },
+    notFoundValue: { deleted: false, cvPathname: null },
   },
   {
     resource: "erinnerungen",
     routeModule: "@/app/api/admin/erinnerungen/[id]/route",
     mock: deleteReminderSignup,
+    deletedValue: true,
+    notFoundValue: false,
   },
   {
     resource: "ideathon-anmeldungen",
     routeModule: "@/app/api/admin/ideathon-anmeldungen/[id]/route",
     mock: deleteIdeathonSignup,
+    deletedValue: true,
+    notFoundValue: false,
   },
-])("DELETE /api/admin/$resource/[id]", ({ resource, routeModule, mock }) => {
+])("DELETE /api/admin/$resource/[id]", ({ resource, routeModule, mock, deletedValue, notFoundValue }) => {
   const params = () => Promise.resolve({ id: ID });
   const url = `http://localhost/api/admin/${resource}/${ID}`;
 
@@ -84,7 +98,7 @@ describe.each([
   });
 
   it("deletes the row and answers 200", async () => {
-    mock.mockResolvedValue(true);
+    mock.mockResolvedValue(deletedValue);
     const { DELETE } = await import(routeModule);
     const response = await DELETE(await deleteRequest(url), { params: params() });
 
@@ -94,7 +108,7 @@ describe.each([
   });
 
   it("answers 404 when there was nothing to delete", async () => {
-    mock.mockResolvedValue(false);
+    mock.mockResolvedValue(notFoundValue);
     const { DELETE } = await import(routeModule);
     const response = await DELETE(await deleteRequest(url), { params: params() });
 
@@ -107,5 +121,37 @@ describe.each([
     const response = await DELETE(await deleteRequest(url), { params: params() });
 
     expect(response.status).toBe(500);
+  });
+});
+
+describe("DELETE /api/admin/bewerbungen/[id] — CV blob cleanup", () => {
+  const params = () => Promise.resolve({ id: ID });
+  const url = `http://localhost/api/admin/bewerbungen/${ID}`;
+
+  it("best-effort deletes the CV blob alongside a deleted application that had one", async () => {
+    deleteApplication.mockResolvedValue({ deleted: true, cvPathname: "bewerbungen/lebenslauf-abc123.pdf" });
+    deleteCvBlobs.mockResolvedValue(undefined);
+    const { DELETE } = await import("@/app/api/admin/bewerbungen/[id]/route");
+    const response = await DELETE(await deleteRequest(url), { params: params() });
+
+    expect(response.status).toBe(200);
+    expect(deleteCvBlobs).toHaveBeenCalledWith(["bewerbungen/lebenslauf-abc123.pdf"]);
+  });
+
+  it("still answers 200 when the blob delete itself fails", async () => {
+    deleteApplication.mockResolvedValue({ deleted: true, cvPathname: "bewerbungen/lebenslauf-abc123.pdf" });
+    deleteCvBlobs.mockRejectedValue(new Error("blob store unreachable"));
+    const { DELETE } = await import("@/app/api/admin/bewerbungen/[id]/route");
+    const response = await DELETE(await deleteRequest(url), { params: params() });
+
+    expect(response.status).toBe(200);
+  });
+
+  it("never calls deleteCvBlobs when the deleted application had no CV", async () => {
+    deleteApplication.mockResolvedValue({ deleted: true, cvPathname: null });
+    const { DELETE } = await import("@/app/api/admin/bewerbungen/[id]/route");
+    await DELETE(await deleteRequest(url), { params: params() });
+
+    expect(deleteCvBlobs).not.toHaveBeenCalled();
   });
 });

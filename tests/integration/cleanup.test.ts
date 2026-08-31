@@ -34,6 +34,11 @@ vi.mock("@/lib/reminderWindowMail", () => ({
   sendReminderWindowMailsForWindow: (...args: unknown[]) => sendReminderWindowMailsForWindow(...args),
 }));
 
+const deleteCvBlobs = vi.fn();
+vi.mock("@/lib/cvBlob", () => ({
+  deleteCvBlobs: (...args: unknown[]) => deleteCvBlobs(...args),
+}));
+
 function request(authHeader?: string) {
   return new NextRequest("http://localhost/api/cron/cleanup", {
     headers: authHeader ? { authorization: authHeader } : {},
@@ -49,6 +54,7 @@ describe("GET /api/cron/cleanup", () => {
     // Nothing due by default — most tests care about cleanup or about job
     // independence, not about what a window actually sends.
     findRecruitingWindowsNeedingReminderMail.mockResolvedValue([]);
+    deleteCvBlobs.mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -94,7 +100,7 @@ describe("GET /api/cron/cleanup", () => {
   it("runs every cleanup step and reports how many rows each deleted, given the right secret", async () => {
     process.env.CRON_SECRET = "test-secret";
     vi.resetModules();
-    deleteExpiredApplications.mockResolvedValue(2);
+    deleteExpiredApplications.mockResolvedValue({ count: 2, cvPathnames: [] });
     deleteExpiredContactMessages.mockResolvedValue(1);
     deleteExpiredReminderSignups.mockResolvedValue(3);
     deleteExpiredJobPostings.mockResolvedValue(4);
@@ -119,10 +125,43 @@ describe("GET /api/cron/cleanup", () => {
     });
   });
 
+  it("best-effort deletes the CV blobs for every expired application that had one", async () => {
+    process.env.CRON_SECRET = "test-secret";
+    vi.resetModules();
+    deleteExpiredApplications.mockResolvedValue({
+      count: 2,
+      cvPathnames: ["bewerbungen/a.pdf", "bewerbungen/b.pdf"],
+    });
+    deleteExpiredContactMessages.mockResolvedValue(0);
+    deleteExpiredReminderSignups.mockResolvedValue(0);
+    pruneRateLimitHits.mockResolvedValue(0);
+
+    const { GET } = await import("@/app/api/cron/cleanup/route");
+    const response = await GET(request("Bearer test-secret"));
+
+    expect(response.status).toBe(200);
+    expect(deleteCvBlobs).toHaveBeenCalledWith(["bewerbungen/a.pdf", "bewerbungen/b.pdf"]);
+  });
+
+  it("still answers 200 when the CV blob delete itself fails", async () => {
+    process.env.CRON_SECRET = "test-secret";
+    vi.resetModules();
+    deleteExpiredApplications.mockResolvedValue({ count: 1, cvPathnames: ["bewerbungen/a.pdf"] });
+    deleteExpiredContactMessages.mockResolvedValue(0);
+    deleteExpiredReminderSignups.mockResolvedValue(0);
+    pruneRateLimitHits.mockResolvedValue(0);
+    deleteCvBlobs.mockRejectedValue(new Error("blob store unreachable"));
+
+    const { GET } = await import("@/app/api/cron/cleanup/route");
+    const response = await GET(request("Bearer test-secret"));
+
+    expect(response.status).toBe(200);
+  });
+
   it("deletes expired ideathon signups alongside the other tables", async () => {
     process.env.CRON_SECRET = "test-secret";
     vi.resetModules();
-    deleteExpiredApplications.mockResolvedValue(0);
+    deleteExpiredApplications.mockResolvedValue({ count: 0, cvPathnames: [] });
     deleteExpiredContactMessages.mockResolvedValue(0);
     deleteExpiredReminderSignups.mockResolvedValue(0);
     pruneRateLimitHits.mockResolvedValue(0);
@@ -156,7 +195,7 @@ describe("GET /api/cron/cleanup", () => {
   it("records the run before deleting, so a crash still leaves evidence it was attempted", async () => {
     process.env.CRON_SECRET = "test-secret";
     vi.resetModules();
-    deleteExpiredApplications.mockResolvedValue(0);
+    deleteExpiredApplications.mockResolvedValue({ count: 0, cvPathnames: [] });
     deleteExpiredContactMessages.mockResolvedValue(0);
     deleteExpiredReminderSignups.mockResolvedValue(0);
     pruneRateLimitHits.mockResolvedValue(0);
@@ -182,7 +221,7 @@ describe("GET /api/cron/cleanup", () => {
   it("closes the cleanup run with the counts and no error on a clean sweep", async () => {
     process.env.CRON_SECRET = "test-secret";
     vi.resetModules();
-    deleteExpiredApplications.mockResolvedValue(2);
+    deleteExpiredApplications.mockResolvedValue({ count: 2, cvPathnames: [] });
     deleteExpiredContactMessages.mockResolvedValue(1);
     deleteExpiredReminderSignups.mockResolvedValue(3);
     pruneRateLimitHits.mockResolvedValue(10);
@@ -220,7 +259,7 @@ describe("GET /api/cron/cleanup", () => {
     process.env.CRON_SECRET = "test-secret";
     vi.resetModules();
     startCronRun.mockRejectedValue(new Error("cron_runs unreachable"));
-    deleteExpiredApplications.mockResolvedValue(2);
+    deleteExpiredApplications.mockResolvedValue({ count: 2, cvPathnames: [] });
     deleteExpiredContactMessages.mockResolvedValue(0);
     deleteExpiredReminderSignups.mockResolvedValue(0);
     pruneRateLimitHits.mockResolvedValue(0);
@@ -237,7 +276,7 @@ describe("GET /api/cron/cleanup", () => {
     beforeEach(() => {
       process.env.CRON_SECRET = "test-secret";
       vi.resetModules();
-      deleteExpiredApplications.mockResolvedValue(0);
+      deleteExpiredApplications.mockResolvedValue({ count: 0, cvPathnames: [] });
       deleteExpiredContactMessages.mockResolvedValue(0);
       deleteExpiredReminderSignups.mockResolvedValue(0);
       deleteExpiredJobPostings.mockResolvedValue(0);
@@ -299,7 +338,7 @@ describe("GET /api/cron/cleanup", () => {
     });
 
     it("still runs cleanup when the reminder-window job fails outright", async () => {
-      deleteExpiredApplications.mockResolvedValue(2);
+      deleteExpiredApplications.mockResolvedValue({ count: 2, cvPathnames: [] });
       deleteExpiredContactMessages.mockResolvedValue(1);
       deleteExpiredReminderSignups.mockResolvedValue(0);
       deleteExpiredJobPostings.mockResolvedValue(0);

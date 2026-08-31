@@ -117,6 +117,33 @@ function formatDateTime(date: Date): string {
   }).format(date);
 }
 
+// Renders the prioritized area choices (migrations/0017) a new application
+// carries, each with its own reason. A pre-migration row has none of these
+// — migrations/0017 added no backfill, since a priority or a reason
+// invented from the old checkbox order would be a fact the applicant never
+// actually stated — so it falls back to the legacy desiredAreas array,
+// marked as unprioritized rather than silently presented as if it had been
+// ranked.
+function AreaChoicesFacts({ application }: { application: Application }) {
+  if (application.areaChoices.length > 0) {
+    return (
+      <>
+        {application.areaChoices.map((choice) => (
+          <Fact
+            key={choice.priority}
+            label={`${choice.priority}. Wahl`}
+            value={`${choice.areaLabel}: ${choice.reason}`}
+          />
+        ))}
+      </>
+    );
+  }
+  if (application.desiredAreas && application.desiredAreas.length > 0) {
+    return <Fact label="Wunschbereich" value={`${application.desiredAreas.join(", ")} (ohne Priorisierung)`} />;
+  }
+  return null;
+}
+
 export function ApplicationPdfDocument({ application }: { application: Application }) {
   return (
     <Document title={`Bewerbung ${application.firstName} ${application.lastName}`}>
@@ -140,13 +167,22 @@ export function ApplicationPdfDocument({ application }: { application: Applicati
           <Text style={styles.sectionHeading}>Studium</Text>
           <Fact label="Studiengang" value={application.studyProgram} />
           <Fact label="Fachsemester" value={String(application.semester)} />
-          <Fact label="Hochschule" value={application.university} />
+          {/* Dropped from the form (field-audit decision) but still shown
+              for a pre-migration row that has one. */}
+          {application.university && <Fact label="Hochschule" value={application.university} />}
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionHeading}>Einsatz</Text>
-          <Fact label="Wunschbereich" value={application.desiredAreas.join(", ")} />
+          <AreaChoicesFacts application={application} />
           <Fact label="Verfügbarkeit" value={`${application.availabilityHours} Std. / Woche`} />
+          {/* No blob URL, ever — see cvBlob.ts's own comment on why the
+              store stays private end to end. The board downloads the file
+              from the admin area, authenticated, never from this PDF. */}
+          <Fact
+            label="Lebenslauf"
+            value={application.cvPathname ? "liegt vor (Download im Admin-Bereich)" : "nicht beigefügt"}
+          />
         </View>
 
         {(application.priorInvolvement || application.languagesSkills) && (
@@ -155,7 +191,7 @@ export function ApplicationPdfDocument({ application }: { application: Applicati
             {application.priorInvolvement && (
               <Fact label="Bisheriges Engagement" value={application.priorInvolvement} />
             )}
-            {application.languagesSkills && <Fact label="Sprachen / Kenntnisse" value={application.languagesSkills} />}
+            {application.languagesSkills && <Fact label="Relevante Skills" value={application.languagesSkills} />}
           </View>
         )}
 
@@ -163,6 +199,13 @@ export function ApplicationPdfDocument({ application }: { application: Applicati
           <Text style={styles.sectionHeading}>Motivation</Text>
           <Text style={styles.paragraph}>{application.motivation}</Text>
         </View>
+
+        {application.wantToGain && (
+          <View style={styles.section}>
+            <Text style={styles.sectionHeading}>Ausblick</Text>
+            <Fact label="Möchte mitnehmen" value={application.wantToGain} />
+          </View>
+        )}
 
         <View style={styles.section}>
           <Text style={styles.sectionHeading}>Sonstiges</Text>

@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { applicationRequestSchema } from "@/lib/apiSchemas";
+import { toAreaChoices } from "@/lib/applicationFormSchema";
 import { insertApplication, markApplicationMailed, markApplicationMailFailed } from "@/lib/db";
+import { isCvPathname, verifyUploadedPdf } from "@/lib/cvBlob";
 import { dispatchApplicationMails } from "@/lib/mailDispatch";
 import { alertOnInsertFailure } from "@/lib/insertFailureAlert";
 import { checkRateLimit } from "@/lib/rateLimit";
@@ -70,6 +72,25 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "window_closed" }, { status: 409 });
   }
 
+  // A Content-Type header from the upload is trivially spoofed — this is
+  // the check that actually runs everywhere, including local dev, where
+  // /api/bewerbung/cv-upload's own onUploadCompleted callback never fires
+  // (Vercel Blob calls back over the public network, not to localhost).
+  // isCvPathname guards against a pathname that was never issued through
+  // that route at all.
+  if (data.cvPathname) {
+    if (!isCvPathname(data.cvPathname)) {
+      return NextResponse.json({ ok: false, error: "invalid_request" }, { status: 400 });
+    }
+    const isRealPdf = await verifyUploadedPdf(data.cvPathname).catch((error: unknown) => {
+      console.error("Failed to verify uploaded CV", error);
+      return false;
+    });
+    if (!isRealPdf) {
+      return NextResponse.json({ ok: false, error: "cv_invalid" }, { status: 400 });
+    }
+  }
+
   const now = new Date();
 
   let application;
@@ -80,11 +101,11 @@ export async function POST(request: NextRequest) {
       email: data.email,
       studyProgram: data.studyProgram,
       semester: data.semester,
-      university: data.university,
       priorInvolvement: data.priorInvolvement,
       languagesSkills: data.languagesSkills,
       motivation: data.motivation,
-      desiredAreas: data.desiredAreas,
+      wantToGain: data.wantToGain,
+      areaChoices: toAreaChoices(data),
       availabilityHours: data.availabilityHours,
       heardAboutUs: data.heardAboutUs,
       locale: data.locale,
@@ -92,6 +113,11 @@ export async function POST(request: NextRequest) {
       // Fixed once, here, from whichever window is open right now — never
       // recomputed later. See lib/retentionCutoff.ts's own comment.
       retainUntil: applicationRetainUntil(now, recruitingWindows),
+      cvBlobUrl: data.cvBlobUrl,
+      cvPathname: data.cvPathname,
+      cvOriginalFilename: data.cvOriginalFilename,
+      cvSizeBytes: data.cvSizeBytes,
+      cvUploadedAt: data.cvPathname ? now : undefined,
     });
   } catch (error) {
     console.error("Failed to persist application", error);

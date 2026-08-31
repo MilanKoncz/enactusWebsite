@@ -20,6 +20,7 @@ import {
   rateLimitHitRetentionCutoff,
 } from "@/lib/retentionCutoff";
 import { sendReminderWindowMailsForWindow } from "@/lib/reminderWindowMail";
+import { deleteCvBlobs } from "@/lib/cvBlob";
 
 /**
  * Two independently-logged jobs behind one route, because Vercel Cron on
@@ -77,13 +78,26 @@ async function runCleanupJob(now: Date) {
       deleteExpiredIdeathonSignups(ideathonSignupRetentionCutoff(now)),
     ]);
 
+  // deleteExpiredApplications also returns the cv_pathname of every row it
+  // removed — best-effort deleted here rather than left for the CV-blob
+  // pass's own 24-hour orphan sweep, since that sweep is the safety net,
+  // not the primary path (see that pass's own comment). A failure here is
+  // swallowed on purpose: the application row is already gone either way,
+  // and an unreachable blob is exactly what the orphan sweep exists to
+  // catch on its next run.
+  if (applications.status === "fulfilled" && applications.value.cvPathnames.length > 0) {
+    await deleteCvBlobs(applications.value.cvPathnames).catch((error: unknown) => {
+      console.error("Failed to delete CV blobs for expired applications", error);
+    });
+  }
+
   // jobPostings and ideathonSignups aren't part of the counts object below:
   // cron_runs (migrations/0005_cron_runs.sql) has no deleted_job_postings or
   // deleted_ideathon_signups column, and both tables are purely additive —
   // so these deletions run and are reported in the response body, but don't
   // get a persisted per-run count the way the other four do.
   const summary = {
-    applications: applications.status === "fulfilled" ? applications.value : null,
+    applications: applications.status === "fulfilled" ? applications.value.count : null,
     contactMessages: contactMessages.status === "fulfilled" ? contactMessages.value : null,
     reminderSignups: reminderSignups.status === "fulfilled" ? reminderSignups.value : null,
     rateLimitHits: rateLimitHits.status === "fulfilled" ? rateLimitHits.value : null,

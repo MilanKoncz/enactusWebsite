@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { isAuthenticatedRequest } from "@/lib/adminSession";
 import { deleteApplication } from "@/lib/db";
+import { deleteCvBlobs } from "@/lib/cvBlob";
 
 // See the recruiting-windows/calendar-events routes' own comment on
 // z.guid() vs z.uuid(): the stricter one requires RFC 9562 version/variant
@@ -23,9 +24,17 @@ export async function DELETE(request: NextRequest, { params }: RouteContext) {
   }
 
   try {
-    const deleted = await deleteApplication(id.data);
-    if (!deleted) {
+    const result = await deleteApplication(id.data);
+    if (!result.deleted) {
       return NextResponse.json({ ok: false, error: "not_found" }, { status: 404 });
+    }
+    // Best-effort: the application row is already gone regardless of
+    // whether this succeeds, and a failure here just means the CV-blob
+    // pass's orphan sweep picks it up later instead.
+    if (result.cvPathname) {
+      await deleteCvBlobs([result.cvPathname]).catch((error: unknown) => {
+        console.error("Failed to delete the CV blob for a manually deleted application", error);
+      });
     }
     return NextResponse.json({ ok: true });
   } catch (error) {
