@@ -1054,15 +1054,15 @@
       "title": "Datenbank",
       "body": [
         "Bewerbungen, Kontaktanfragen und Anmeldungen zur Benachrichtigung zum Bewerbungsstart speichern wir in einer Postgres-Datenbank des Anbieters Neon Inc., USA. Die Datenbank wird in der Region „eu-central-1“ (Frankfurt am Main) betrieben; die Daten liegen damit innerhalb der Europäischen Union.",
-        "Lebensläufe, die du über das Bewerbungsformular hochlädst, speichern wir getrennt davon als Datei bei Vercel Blob, ebenfalls am Standort Frankfurt am Main. Der Zugriff auf diesen Speicher ist privat konfiguriert: eine Datei ist ausschließlich über den passwortgeschützten Vorstandsbereich abrufbar, nicht über eine öffentlich erreichbare Adresse.",
+        "Der Lebenslauf wird nicht in der Datenbank gespeichert, sondern getrennt davon in einem privaten Dateispeicher (Vercel Blob, Region Frankfurt am Main). Ein Abruf ist dort ausschließlich nach Authentifizierung über den passwortgeschützten Vorstandsbereich möglich. Zusätzlich wird der Lebenslauf einmalig als Anlage der Benachrichtigungs-E-Mail an den Vorstand übermittelt und liegt danach auch in dessen E-Mail-Postfach.",
         "Wir erheben ausschließlich Angaben, die für den jeweiligen Zweck erforderlich sind, und löschen sie, sobald dieser Zweck entfällt (Art. 5 Abs. 1 lit. c und e DSGVO). Die konkreten Fristen finden sich im Abschnitt „Speicherdauer“."
       ]
     },
     "email": {
       "title": "E-Mail-Versand",
       "body": [
-        "Für den Versand automatisch erzeugter E-Mails nutzen wir den Dienst Resend (Plus Five Five, Inc., USA). Dazu zählen die Bewerbungsbestätigung, die Weiterleitung von Kontaktanfragen und die Bestätigungsmail der Benachrichtigung zum Bewerbungsstart. Der Versand erfolgt über die Region Irland („eu-west-1“) und damit innerhalb der Europäischen Union.",
-        "Übermittelt werden die E-Mail-Adresse der empfangenden Person sowie der Inhalt der jeweiligen Nachricht.",
+        "Für den Versand automatisch erzeugter E-Mails nutzen wir den Dienst Resend (Plus Five Five, Inc., USA). Dazu zählen die Bewerbungsbestätigung, die Weiterleitung von Kontaktanfragen, die Bestätigungsmail der Benachrichtigung zum Bewerbungsstart sowie Benachrichtigungen an den Vorstand über eingegangene Bewerbungen, Ideathon-Anmeldungen und Kontaktanfragen, einschließlich der dabei beigefügten Dateianlagen. Der Versand erfolgt über die Region Irland („eu-west-1“) und damit innerhalb der Europäischen Union.",
+        "Übermittelt werden die E-Mail-Adresse der empfangenden Person, die E-Mail-Adresse der absendenden Person und der Inhalt der jeweiligen Nachricht. Bei Benachrichtigungen über eingegangene Bewerbungen werden zusätzlich die beigefügten Dateianlagen übermittelt, also die Bewerbungsangaben als PDF und, sofern vorhanden, der hochgeladene Lebenslauf.",
         "Unsere E-Mails enthalten kein Öffnungs-Tracking, kein Klick-Tracking und keine Zählpixel. Die entsprechenden Funktionen des Dienstes sind bewusst deaktiviert. Links in unseren E-Mails führen direkt zum Ziel und werden nicht über einen Zwischendienst umgeleitet."
       ],
       "legalBasisLabel": "Rechtsgrundlage",
@@ -1111,7 +1111,7 @@
       "legalBasisLabel": "Rechtsgrundlage",
       "legalBasis": "Art. 6 Abs. 1 lit. b DSGVO. Die Verarbeitung erfolgt zur Durchführung vorvertraglicher Maßnahmen auf deine Anfrage hin.",
       "accessLabel": "Empfänger",
-      "access": "Der Vorstand sowie die für die Bewerbungsbearbeitung zuständigen Personen des Vereins. Deine Bewerbung wird zunächst in unserer Datenbank gespeichert und anschließend als PDF an info@unimannheim.enactus.team übermittelt.",
+      "access": "Deine Bewerbung wird zunächst in unserer Datenbank gespeichert. Anschließend erhält der Vorstand von Enactus Mannheim e.V. unter info@unimannheim.enactus.team eine Benachrichtigung per E-Mail. Diese enthält deine Bewerbungsangaben als PDF-Datei sowie, sofern du einen Lebenslauf hochgeladen hast, diesen Lebenslauf als zweite Dateianlage. Zugriff auf die Bewerbung und die Anlagen haben der Vorstand sowie die für die Bewerbungsbearbeitung zuständigen Personen des Vereins.",
       "necessityLabel": "Erforderlichkeit",
       "necessity": "Die Bereitstellung der Daten ist weder gesetzlich noch vertraglich vorgeschrieben. Ohne die als Pflichtfelder gekennzeichneten Angaben können wir deine Bewerbung jedoch nicht bearbeiten."
     },
@@ -1182,7 +1182,7 @@
       "applicationsLabel": "Bewerbungen",
       "applicationsValue": "{months} Monate nach Ende des jeweiligen Bewerbungszeitraums",
       "cvLabel": "Lebenslauf (PDF)",
-      "cvValue": "{months} Monate nach Ende des jeweiligen Bewerbungszeitraums, gemeinsam mit der zugehörigen Bewerbung",
+      "cvValue": "{months} Monate nach Ende des jeweiligen Bewerbungszeitraums, gemeinsam mit der zugehörigen Bewerbung. Die Kopie, die als Anlage der Benachrichtigungs-E-Mail im Postfach des Vorstands liegt, wird zum selben Zeitpunkt manuell gelöscht.",
       "contactLabel": "Kontaktanfragen",
       "contactValue": "{months} Monate nach Eingang der Anfrage",
       "reminderConfirmedLabel": "Bestätigte Anmeldungen zur Benachrichtigung",

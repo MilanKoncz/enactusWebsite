@@ -1054,15 +1054,15 @@
       "title": "Database",
       "body": [
         "We store applications, contact messages, and application-start notification sign-ups in a Postgres database from provider Neon Inc., USA. The database runs in the \"eu-central-1\" region (Frankfurt am Main), so the data stays within the European Union.",
-        "CVs uploaded through the application form are stored separately, as a file, with Vercel Blob, also at the Frankfurt am Main location. Access to that storage is configured private: a file can only be retrieved through the password-protected board area, never through a publicly reachable address.",
+        "The CV is not stored in the database, but separately in a private file store (Vercel Blob, Frankfurt am Main region). It can only be retrieved there after authenticating through the password-protected board area. In addition, the CV is transmitted once as an attachment to the notification email sent to the board, and from then on also resides in its email inbox.",
         "We collect only what a given purpose requires, and delete it once that purpose no longer applies (Art. 5(1)(c) and (e) GDPR). The specific periods are in the \"Retention\" section."
       ]
     },
     "email": {
       "title": "Email delivery",
       "body": [
-        "We use Resend (Plus Five Five, Inc., USA) to send automatically generated emails. These include the application confirmation, the forwarding of contact inquiries, and the application-start notification confirmation. Sending happens from the Ireland region (\"eu-west-1\"), within the European Union.",
-        "We transmit the recipient's email address and the content of the respective message.",
+        "We use Resend (Plus Five Five, Inc., USA) to send automatically generated emails. These include the application confirmation, the forwarding of contact inquiries, the application-start notification confirmation, and notifications to the board about received applications, Ideathon signups, and contact inquiries, including any file attachments sent with them. Sending happens from the Ireland region (\"eu-west-1\"), within the European Union.",
+        "We transmit the recipient's email address, the sender's email address, and the content of the respective message. For notifications about received applications, we additionally transmit the attached files, that is, the application details as a PDF and, if provided, the uploaded CV.",
         "Our emails carry no open tracking, no click tracking, and no tracking pixels. Those features are deliberately switched off on our account. Links in our emails go straight to their destination and are never redirected through an intermediary service."
       ],
       "legalBasisLabel": "Legal basis",
@@ -1111,7 +1111,7 @@
       "legalBasisLabel": "Legal basis",
       "legalBasis": "Art. 6(1)(b) GDPR. Processing takes place to carry out pre-contractual measures at your request.",
       "accessLabel": "Recipients",
-      "access": "The board and the people responsible for processing applications within the association. Your application is stored in our database first, then sent as a PDF to info@unimannheim.enactus.team.",
+      "access": "Your application is stored in our database first. The board of Enactus Mannheim e.V. then receives a notification by email at info@unimannheim.enactus.team. It includes your application details as a PDF file and, if you uploaded a CV, that CV as a second file attachment. The board and the people responsible for processing applications within the association have access to the application and its attachments.",
       "necessityLabel": "Whether you have to provide it",
       "necessity": "Providing this data is neither legally nor contractually required. Without the fields marked as mandatory, however, we cannot process your application."
     },
@@ -1182,7 +1182,7 @@
       "applicationsLabel": "Applications",
       "applicationsValue": "{months} months after the respective application period ends",
       "cvLabel": "CV (PDF)",
-      "cvValue": "{months} months after the respective application period ends, together with the application it belongs to",
+      "cvValue": "{months} months after the respective application period ends, together with the application it belongs to. The copy that resides as an attachment to the notification email in the board's inbox is deleted manually at the same point in time.",
       "contactLabel": "Contact inquiries",
       "contactValue": "{months} months after the inquiry is received",
       "reminderConfirmedLabel": "Confirmed notification sign-ups",

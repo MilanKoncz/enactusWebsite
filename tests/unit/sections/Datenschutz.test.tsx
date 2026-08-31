@@ -94,7 +94,7 @@ describe("Datenschutz", () => {
   it("describes the CV as stored separately at Vercel Blob, with private access", () => {
     renderWithIntl(<Datenschutz />);
     expect(screen.getByText(/Vercel Blob/)).toBeInTheDocument();
-    expect(screen.getByText(/Zugriff auf diesen Speicher ist privat konfiguriert/)).toBeInTheDocument();
+    expect(screen.getByText(/ausschließlich nach Authentifizierung über den passwortgeschützten Vorstandsbereich möglich/)).toBeInTheDocument();
   });
 
   it("states the CV retention period alongside the application it belongs to", () => {
