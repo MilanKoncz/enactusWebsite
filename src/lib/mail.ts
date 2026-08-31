@@ -35,6 +35,16 @@ function requireEnv(name: string): string {
   return value;
 }
 
+// The one thing /api/admin/mails/testversand needs from every sender below:
+// redirect a mail that would otherwise go to a hardcoded board address (or
+// a fake test address already in the caller's fabricated data) to the
+// board member actually running the test, and mark the subject so it can
+// never be mistaken for a real notification if it ends up forwarded or
+// left in an inbox. Optional and trailing on every exported function here
+// — every real caller (the public routes, /admin/mails's ordinary resend)
+// omits it and gets exactly the behavior it always had.
+export type TestOverride = { to: string; subjectPrefix: string };
+
 // Every mail gets an HTML body (derived from the same plaintext every
 // dispatch function already writes, mailLayout.ts's mailHtml) and the logo
 // as an inline `cid:` attachment (mailLogoAttachment) — added here, once,
@@ -46,12 +56,13 @@ async function send(params: {
   text: string;
   attachments?: { filename: string; content: Buffer }[];
   headers?: Record<string, string>;
+  testOverride?: TestOverride;
 }): Promise<string> {
   const result = await client().emails.send({
     from: requireEnv("RESEND_FROM_EMAIL"),
     replyTo: requireEnv("RESEND_REPLY_TO_EMAIL"),
-    to: params.to,
-    subject: params.subject,
+    to: params.testOverride?.to ?? params.to,
+    subject: params.testOverride ? `${params.testOverride.subjectPrefix} ${params.subject}` : params.subject,
     text: params.text,
     html: mailHtml(params.text),
     attachments: [mailLogoAttachment(), ...(params.attachments ?? [])],
@@ -79,35 +90,46 @@ export async function sendApplicationNotification(
   application: Application,
   pdfBuffer: Buffer,
   cvAttachment: { filename: string; content: Buffer } | null,
+  testOverride?: TestOverride,
 ): Promise<string> {
   const note = cvAttachment
     ? "\n\nHinweis zum Löschkonzept: retain_until löscht automatisch den Blob und die Datenbankzeile, nicht diesen Mailanhang. Bitte den Lebenslauf nach Ablauf der Aufbewahrungsfrist manuell aus diesem Postfach löschen."
     : "\n\nHinweis: Der Lebenslauf konnte dieser Mail nicht beigefügt werden. Er liegt weiterhin im Vorstandsbereich unter /admin/bewerbungen zum Download bereit.";
   return send({
-    to: requireEnv("APPLICATION_RECIPIENT_EMAIL"),
+    // testOverride?.to short-circuits requireEnv below via `??` — a test
+    // send must work even where APPLICATION_RECIPIENT_EMAIL was never set
+    // (see ASSETS-TODO.md), since it's never actually going to be used.
+    to: testOverride?.to ?? requireEnv("APPLICATION_RECIPIENT_EMAIL"),
     subject: `Neue Bewerbung: ${application.firstName} ${application.lastName}`,
     text: `Neue Bewerbung von ${application.firstName} ${application.lastName} (${application.email}). Details im angehängten PDF${cvAttachment ? ", der Lebenslauf liegt als zweiter Anhang bei" : ""}.${note}`,
     attachments: cvAttachment
       ? [{ filename: `bewerbung-${application.id}.pdf`, content: pdfBuffer }, cvAttachment]
       : [{ filename: `bewerbung-${application.id}.pdf`, content: pdfBuffer }],
+    testOverride,
   });
 }
 
-export async function sendApplicationConfirmation(params: {
-  email: string;
-  firstName: string;
-  subject: string;
-  text: string;
-}): Promise<string> {
-  return send({ to: params.email, subject: params.subject, text: params.text });
+export async function sendApplicationConfirmation(
+  params: {
+    email: string;
+    firstName: string;
+    subject: string;
+    text: string;
+  },
+  testOverride?: TestOverride,
+): Promise<string> {
+  return send({ to: params.email, subject: params.subject, text: params.text, testOverride });
 }
 
-export async function sendReminderConfirmationEmail(params: {
-  email: string;
-  subject: string;
-  text: string;
-  unsubscribeUrl: string;
-}): Promise<string> {
+export async function sendReminderConfirmationEmail(
+  params: {
+    email: string;
+    subject: string;
+    text: string;
+    unsubscribeUrl: string;
+  },
+  testOverride?: TestOverride,
+): Promise<string> {
   // One-click unsubscribe per RFC 8058: List-Unsubscribe-Post tells a
   // compliant mail client (Gmail, Yahoo, …) it may POST to the
   // List-Unsubscribe URL directly, with no page load and no confirmation
@@ -122,6 +144,7 @@ export async function sendReminderConfirmationEmail(params: {
       "List-Unsubscribe": `<${params.unsubscribeUrl}>`,
       "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
     },
+    testOverride,
   });
 }
 
@@ -131,12 +154,15 @@ export async function sendReminderConfirmationEmail(params: {
 // Same RFC 8058 one-click headers as its sibling: it reuses the
 // subscriber's existing, never-rotated unsubscribe token, so the same
 // /api/reminder/abmelden POST handler answers a click on either mail.
-export async function sendReminderAlreadyRegisteredEmail(params: {
-  email: string;
-  subject: string;
-  text: string;
-  unsubscribeUrl: string;
-}): Promise<string> {
+export async function sendReminderAlreadyRegisteredEmail(
+  params: {
+    email: string;
+    subject: string;
+    text: string;
+    unsubscribeUrl: string;
+  },
+  testOverride?: TestOverride,
+): Promise<string> {
   return send({
     to: params.email,
     subject: params.subject,
@@ -145,15 +171,19 @@ export async function sendReminderAlreadyRegisteredEmail(params: {
       "List-Unsubscribe": `<${params.unsubscribeUrl}>`,
       "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
     },
+    testOverride,
   });
 }
 
-export async function sendReminderWindowOpenEmail(params: {
-  email: string;
-  subject: string;
-  text: string;
-  unsubscribeUrl: string;
-}): Promise<string> {
+export async function sendReminderWindowOpenEmail(
+  params: {
+    email: string;
+    subject: string;
+    text: string;
+    unsubscribeUrl: string;
+  },
+  testOverride?: TestOverride,
+): Promise<string> {
   // Same RFC 8058 one-click headers as sendReminderConfirmationEmail — this
   // mail reuses the subscriber's existing unsubscribe token/link, so the
   // same POST handler (/api/reminder/abmelden) answers a click on either.
@@ -165,6 +195,7 @@ export async function sendReminderWindowOpenEmail(params: {
       "List-Unsubscribe": `<${params.unsubscribeUrl}>`,
       "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
     },
+    testOverride,
   });
 }
 
@@ -183,44 +214,60 @@ const DIETARY_PREFERENCE_LABEL: Record<IdeathonSignup["dietaryPreference"], stri
 // Same recipient as the membership application (APPLICATION_RECIPIENT_EMAIL,
 // info@unimannheim.enactus.team) — board decision, 2026-08-25: the Ideathon
 // notification doesn't need its own env var pointed at an identical address.
-export async function sendIdeathonSignupNotification(signup: IdeathonSignup): Promise<string> {
+export async function sendIdeathonSignupNotification(
+  signup: IdeathonSignup,
+  testOverride?: TestOverride,
+): Promise<string> {
   return send({
-    to: requireEnv("APPLICATION_RECIPIENT_EMAIL"),
+    to: testOverride?.to ?? requireEnv("APPLICATION_RECIPIENT_EMAIL"),
     subject: `Neue Ideathon-Anmeldung: ${signup.firstName} ${signup.lastName}`,
     text: `Neue Ideathon-Anmeldung von ${signup.firstName} ${signup.lastName} (${signup.email}), ${signup.studyProgram} (${signup.semester}. Fachsemester).\n\nEssenspräferenz: ${DIETARY_PREFERENCE_LABEL[signup.dietaryPreference]}${signup.motivationExperience ? `\nMotivation und bisherige Erfahrung: ${signup.motivationExperience}` : ""}\n\nIdee vorhanden: ${signup.hasIdea ? "ja" : "nein"}${signup.ideaDescription ? `\nIdeenbeschreibung: ${signup.ideaDescription}` : ""}\nMeldet sich als Team an: ${signup.registeringAsTeam ? "ja" : "nein"}${signup.teamSize ? ` (${signup.teamSize} Personen)` : ""}${signup.teamMembers ? `\nTeammitglieder: ${signup.teamMembers}` : ""}${signup.heardAboutUs ? `\nAufmerksam geworden durch: ${signup.heardAboutUs}` : ""}`,
+    testOverride,
   });
 }
 
-export async function sendIdeathonSignupConfirmation(params: {
-  email: string;
-  firstName: string;
-  subject: string;
-  text: string;
-}): Promise<string> {
-  return send({ to: params.email, subject: params.subject, text: params.text });
+export async function sendIdeathonSignupConfirmation(
+  params: {
+    email: string;
+    firstName: string;
+    subject: string;
+    text: string;
+  },
+  testOverride?: TestOverride,
+): Promise<string> {
+  return send({ to: params.email, subject: params.subject, text: params.text, testOverride });
 }
 
 // Board-facing only, like DIETARY_PREFERENCE_LABEL above — never shown to a
 // visitor, so it doesn't go through next-intl. Sent by lib/insertFailureAlert.ts
 // when a form's database write fails, so a failure that a visitor already
 // saw a real error for doesn't also go unnoticed by the board.
-export async function sendInsertFailureAlert(route: string, errorMessage: string): Promise<string> {
+export async function sendInsertFailureAlert(
+  route: string,
+  errorMessage: string,
+  testOverride?: TestOverride,
+): Promise<string> {
   return send({
-    to: requireEnv("APPLICATION_RECIPIENT_EMAIL"),
+    to: testOverride?.to ?? requireEnv("APPLICATION_RECIPIENT_EMAIL"),
     subject: `Achtung: ${route}-Formular speichert nicht`,
     text: `Ein Absenden über ${route} konnte nicht in der Datenbank gespeichert werden.\n\nFehler: ${errorMessage}\n\nDie besuchende Person hat eine Fehlermeldung gesehen, aber wenn das öfter passiert, geht es sonst unbemerkt unter. Bitte /admin/system prüfen (Datenbankschema und Erreichbarkeit) und bei Bedarf technische Hilfe holen.`,
+    testOverride,
   });
 }
 
-export async function sendContactMessageNotification(params: {
-  name: string;
-  email: string;
-  subject: string;
-  text: string;
-}): Promise<string> {
+export async function sendContactMessageNotification(
+  params: {
+    name: string;
+    email: string;
+    subject: string;
+    text: string;
+  },
+  testOverride?: TestOverride,
+): Promise<string> {
   return send({
-    to: requireEnv("RESEND_REPLY_TO_EMAIL"),
+    to: testOverride?.to ?? requireEnv("RESEND_REPLY_TO_EMAIL"),
     subject: params.subject,
     text: params.text,
+    testOverride,
   });
 }

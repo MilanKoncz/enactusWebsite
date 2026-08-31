@@ -6,6 +6,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { AdminLogin } from "@/components/admin/AdminLogin";
 import { AdminTable } from "@/components/admin/AdminTable";
 import { ResendMailButton } from "@/components/admin/ResendMailButton";
+import { TestSendMailButton } from "@/components/admin/TestSendMailButton";
 import { isAdminAuthenticated } from "@/lib/adminSession";
 import { listFailedMails } from "@/lib/db";
 import { siteDateTimeFormatter } from "@/lib/formatSiteDateTime";
@@ -71,6 +72,8 @@ export default async function AdminFailedMailsPage({ params }: PageProps) {
           ],
         }))}
       />
+
+      <TestSendMailButton />
     </Container>
   );
 }

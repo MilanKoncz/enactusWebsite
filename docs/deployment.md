@@ -189,8 +189,16 @@ through, because it did.
 
 **Look at `/admin/mails` first.** It lists every failed record across all
 three tables with the provider's own error and a per-record "resend", which
-is faster and safer than a manual query. The SQL below is the fallback when
-the admin page itself can't be reached:
+is faster and safer than a manual query. The same page also has a
+"Vorlagen testen" section (`/api/admin/mails/testversand`, 2026-08-31): one
+button sends all ten real mail templates to an address the board types in,
+with recognizably fake data, a `[TESTVERSAND]` subject prefix, and nothing
+written to any table — the way to see a copy change actually render in
+Gmail/Outlook, light/dark, without waiting for a genuine submission or
+resend. Works without `APPLICATION_RECIPIENT_EMAIL` being set at all (every
+send is redirected to the typed-in address before that variable would ever
+be read). The SQL below is the fallback when the admin page itself can't be
+reached:
 
 ```sql
 select mail_status, mail_error, created_at from contact_messages

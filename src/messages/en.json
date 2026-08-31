@@ -1567,6 +1567,15 @@
         "ideathon_signups": "Ideathon signup"
       }
     },
+    "testSend": {
+      "heading": "Test templates",
+      "lead": "Sends all ten mail templates once to an address of your choice, with recognizably fake test data and the subject prefix [TESTVERSAND]. Nothing here is stored.",
+      "emailLabel": "Test address",
+      "send": "Start test send",
+      "errorGeneric": "The test send didn't work. Please try again.",
+      "resultsLabel": "Result per template",
+      "resultFailed": "failed"
+    },
     "ideathonSignups": {
       "title": "Ideathon signups",
       "lead": "Every signup for the Ideathon.",

@@ -1,4 +1,4 @@
-import { del, get, list } from "@vercel/blob";
+import { del, get, list, put } from "@vercel/blob";
 
 /**
  * The only file that talks to Vercel Blob directly. Every route that
@@ -72,6 +72,24 @@ export async function verifyUploadedPdf(pathnameOrUrl: string): Promise<boolean>
       // has nothing left to report to.
     });
   }
+}
+
+// Used only by /api/admin/mails/testversand: a small, throwaway PDF the
+// board's test send attaches for real, through the exact same
+// fetchCvBlobBuffer path a genuine application's CV goes through — proof
+// the "with CV" template actually renders the attachment, not just proof
+// the code that would build it compiles. The caller deletes the pathname
+// again right after the send (deleteCvBlobs below); `access: "private"`
+// is requested even though the store itself already enforces that
+// end to end regardless of what's passed here (this file's own top
+// comment).
+export async function putTestCvBlob(pathname: string, content: Buffer): Promise<void> {
+  await put(pathname, content, {
+    access: "private",
+    contentType: "application/pdf",
+    addRandomSuffix: false,
+    token: requireBlobToken(),
+  });
 }
 
 // A no-op on an empty array, not an error — every caller (the retention

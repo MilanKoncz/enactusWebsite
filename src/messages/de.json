@@ -1567,6 +1567,15 @@
         "ideathon_signups": "Ideathon-Anmeldung"
       }
     },
+    "testSend": {
+      "heading": "Vorlagen testen",
+      "lead": "Sendet alle zehn Mailvorlagen einmal an eine Adresse deiner Wahl, mit erkennbar falschen Testdaten und dem Betreff-Präfix [TESTVERSAND]. Nichts davon wird gespeichert.",
+      "emailLabel": "Test-Adresse",
+      "send": "Testversand starten",
+      "errorGeneric": "Der Testversand hat nicht geklappt. Bitte versuch es noch einmal.",
+      "resultsLabel": "Ergebnis je Vorlage",
+      "resultFailed": "fehlgeschlagen"
+    },
     "ideathonSignups": {
       "title": "Ideathon-Anmeldungen",
       "lead": "Alle Anmeldungen zum Ideathon.",

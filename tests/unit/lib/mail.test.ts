@@ -164,4 +164,37 @@ describe("send() mail layout wrapping", () => {
     expect(call.html).toContain("Hello there.");
     expect(call.attachments).toEqual([mailLogoAttachment()]);
   });
+
+  // /api/admin/mails/testversand's whole reason for existing: a mail that
+  // would otherwise go to a hardcoded board address (or whatever fake
+  // address the caller's test data carries) has to land in the address the
+  // board actually typed in instead, and be unmistakable as a test if it
+  // ever gets forwarded or left sitting in an inbox.
+  it("redirects to testOverride.to and prefixes the subject, leaving the real recipient env var unused", async () => {
+    const { sendContactMessageNotification } = await import("@/lib/mail");
+
+    await sendContactMessageNotification(
+      { name: "Jane", email: "jane@example.com", subject: "Neue Kontaktanfrage", text: "Hello there." },
+      { to: "board-member@example.invalid", subjectPrefix: "[TESTVERSAND]" },
+    );
+
+    const call = sendMock.mock.calls[0][0];
+    expect(call.to).toBe("board-member@example.invalid");
+    expect(call.subject).toBe("[TESTVERSAND] Neue Kontaktanfrage");
+  });
+
+  it("leaves the recipient and subject untouched when no testOverride is given", async () => {
+    const { sendContactMessageNotification } = await import("@/lib/mail");
+
+    await sendContactMessageNotification({
+      name: "Jane",
+      email: "jane@example.com",
+      subject: "Neue Kontaktanfrage",
+      text: "Hello there.",
+    });
+
+    const call = sendMock.mock.calls[0][0];
+    expect(call.to).toBe("info@unimannheim.enactus.team");
+    expect(call.subject).toBe("Neue Kontaktanfrage");
+  });
 });
