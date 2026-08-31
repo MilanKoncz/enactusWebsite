@@ -1321,6 +1321,7 @@
       "notOpen": {
         "beforeHeading": "Das Bewerbungsfenster ist noch geschlossen",
         "beforeLead": "Bewerbungen sind vom {opensDate} bis {closesDate} möglich. Lass dich per E-Mail benachrichtigen, sobald es losgeht.",
+        "timezoneNote": "Alle Zeiten in Berliner Zeit (Europe/Berlin), unabhängig davon, wo du gerade bist.",
         "afterHeading": "Das Bewerbungsfenster ist für diesen Zyklus geschlossen",
         "afterLead": "Melde dich für die Benachrichtigung zum Bewerbungsstart an, um von der nächsten Bewerbungsphase zu erfahren.",
         "countdown": {
@@ -1607,7 +1608,9 @@
       "semesterLabel": "Semester",
       "semesterHint": "Format HWS26 oder FSS27.",
       "startLabel": "Beginn",
+      "startHint": "Berliner Zeit.",
       "endLabel": "Ende",
+      "endHint": "Berliner Zeit.",
       "timezoneNote": "Alle Zeiten in Europe/Berlin, unabhängig davon, wo du gerade bist.",
       "create": "Anlegen",
       "saveChanges": "Änderungen speichern",

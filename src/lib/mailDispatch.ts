@@ -12,7 +12,7 @@ import {
   sendReminderWindowOpenEmail,
 } from "@/lib/mail";
 import { localizedPath } from "@/lib/localizedPath";
-import { RECRUITING_TIMEZONE } from "@/content/recruiting";
+import { formatSiteDateTime } from "@/lib/formatSiteDateTime";
 import { siteUrl } from "@/lib/siteUrl";
 import type { Application, ContactMessage, IdeathonSignup, Locale } from "@/lib/db";
 
@@ -143,10 +143,7 @@ export async function dispatchReminderWindowOpen(target: ReminderWindowOpenTarge
   const t = await getTranslations({ locale: target.locale, namespace: "Mail.reminderWindowOpen" });
   const base = siteUrl();
   const unsubscribeUrl = `${base}/api/reminder/abmelden?token=${target.unsubscribeToken}`;
-  const endsAt = new Intl.DateTimeFormat(target.locale, {
-    dateStyle: "long",
-    timeZone: RECRUITING_TIMEZONE,
-  }).format(new Date(target.windowEndsAt));
+  const endsAt = formatSiteDateTime(target.windowEndsAt, target.locale, { dateStyle: "long" });
 
   await sendReminderWindowOpenEmail({
     email: target.email,

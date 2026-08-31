@@ -9,6 +9,7 @@ import { ApplicationForm } from "./ApplicationForm";
 import { ReminderSignupForm } from "./ReminderSignupForm";
 import { useNow } from "@/lib/useNow";
 import { recruitingPhaseAt, currentOrNextRecruitingWindow } from "@/lib/recruitingStatus";
+import { siteDateTimeFormatter } from "@/lib/formatSiteDateTime";
 import type { RecruitingWindow } from "@/content/recruiting";
 import type { PublicProjectArea } from "@/lib/projectAreas";
 
@@ -80,7 +81,14 @@ export function MitmachenApplication({
 
   const opensAt = window ? new Date(window.start) : null;
   const closesAt = window ? new Date(window.end) : null;
-  const dateFormatter = new Intl.DateTimeFormat(locale, { dateStyle: "long", timeStyle: "short" });
+  // Pinned to Europe/Berlin (see formatSiteDateTime's own comment): this used
+  // to render in the visitor's own browser zone while notOpen.timezoneNote,
+  // just below, told them the opposite — a visitor outside Europe saw a
+  // wrong instant *and* a claim that it was Berlin time. Also closes a
+  // hydration mismatch, since this is a client component: the server-rendered
+  // pass used the server's own zone (UTC on Vercel), the client pass used the
+  // visitor's, and the two disagreed on the very first paint.
+  const dateFormatter = siteDateTimeFormatter(locale, { dateStyle: "long", timeStyle: "short" });
   const remaining = opensAt ? remainingParts(opensAt.getTime(), now) : null;
 
   return (
@@ -106,6 +114,9 @@ export function MitmachenApplication({
                       })
                     : t("notOpen.afterLead")}
               </p>
+              {phase === "before" && opensAt && closesAt && (
+                <p className="text-body-s opacity-60">{t("notOpen.timezoneNote")}</p>
+              )}
               {phase === "before" && opensAt && remaining && (
                 <>
                   <div aria-hidden="true" className="flex gap-6 py-2">

@@ -46,6 +46,42 @@ describe("MitmachenApplication", () => {
     expect(screen.queryByRole("button", { name: "Bewerbung absenden" })).not.toBeInTheDocument();
   });
 
+  // Regression coverage for the timezone bug: the sentence used to be
+  // rendered with no explicit timeZone, so it silently followed the host
+  // machine's own zone instead of Europe/Berlin — the exact bug the
+  // "Berliner Zeit" note right underneath it was supposed to rule out. None
+  // of the tests above ever looked at the actual date text, which is why
+  // the bug shipped unnoticed. hws26.start/.end are stored with an explicit
+  // +02:00 offset, so this also proves the offset is honoured, not just the
+  // zone name.
+  describe("renders the opening and closing dates in Berlin time", () => {
+    const originalTz = process.env.TZ;
+
+    afterEach(() => {
+      if (originalTz === undefined) delete process.env.TZ;
+      else process.env.TZ = originalTz;
+    });
+
+    it.each(["Asia/Seoul", "America/New_York", "Europe/Berlin"])(
+      "with the host machine set to %s",
+      (hostTimeZone) => {
+        process.env.TZ = hostTimeZone;
+        freezeNowAt(opensMs - 10_000);
+        renderWithIntl(<MitmachenApplication projectAreas={[]} recruitingWindows={[hws26]} />);
+
+        expect(
+          screen.getByText(
+            "Bewerbungen sind vom 1. September 2026 um 00:00 bis 13. September 2026 um 23:59 möglich. Lass dich per E-Mail benachrichtigen, sobald es losgeht.",
+          ),
+        ).toBeInTheDocument();
+        expect(
+          screen.getByText("Alle Zeiten in Berliner Zeit (Europe/Berlin), unabhängig davon, wo du gerade bist."),
+        ).toBeInTheDocument();
+        expect(screen.getByText("Bewerbungen öffnen am 1. September 2026 um 00:00.")).toBeInTheDocument();
+      },
+    );
+  });
+
   it("shows the real application form once the window is open", () => {
     freezeNowAt((opensMs + closesMs) / 2);
     renderWithIntl(<MitmachenApplication projectAreas={[]} recruitingWindows={[hws26]} />);

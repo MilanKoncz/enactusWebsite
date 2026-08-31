@@ -1321,6 +1321,7 @@
       "notOpen": {
         "beforeHeading": "The application window isn't open yet",
         "beforeLead": "Applications are open from {opensDate} to {closesDate}. Get an email notification for when it starts.",
+        "timezoneNote": "All times in Berlin time (Europe/Berlin), regardless of where you are.",
         "afterHeading": "The application window is closed for this cycle",
         "afterLead": "Sign up for the application-start notification to hear about the next application phase.",
         "countdown": {
@@ -1607,7 +1608,9 @@
       "semesterLabel": "Semester",
       "semesterHint": "Format HWS26 or FSS27.",
       "startLabel": "Start",
+      "startHint": "Berlin time.",
       "endLabel": "End",
+      "endHint": "Berlin time.",
       "timezoneNote": "All times in Europe/Berlin, regardless of where you are.",
       "create": "Create",
       "saveChanges": "Save changes",

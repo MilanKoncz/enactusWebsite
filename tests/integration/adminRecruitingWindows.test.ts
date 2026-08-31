@@ -1,6 +1,7 @@
 // @vitest-environment node
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
+import { instantToWallClock } from "@/lib/recruitingTime";
 
 const findOverlappingRecruitingWindows = vi.fn();
 const insertRecruitingWindow = vi.fn();
@@ -185,6 +186,38 @@ describe("PATCH /api/admin/bewerbungsfenster/[id]", () => {
 
     const [, , excludeId] = findOverlappingRecruitingWindows.mock.calls[0] as [Date, Date, string];
     expect(excludeId).toBe(ID);
+  });
+
+  it("keeps the instant unchanged when saved without modification (the round trip admin/bewerbungsfenster/page.tsx relies on)", async () => {
+    // The admin page pre-fills the edit form from instantToWallClock(stored
+    // instant) — this reproduces that exact step, then feeds the result
+    // back through the same PATCH route a click on "save" would hit, for
+    // both a summer and a winter stored instant. Opening a window and
+    // saving with no changes must not shift it by the DST offset in either
+    // direction, which is exactly the bug an earlier, live-recomputed
+    // version of a related value hit (see retentionCutoff.ts's own
+    // history).
+    findOverlappingRecruitingWindows.mockResolvedValue([]);
+    updateRecruitingWindow.mockResolvedValue({ id: ID, semester: "FSS27", start: "x", end: "y" });
+
+    for (const storedIso of ["2026-08-31T22:00:00.000Z", "2027-01-15T11:00:00.000Z"]) {
+      updateRecruitingWindow.mockClear();
+      const storedInstant = new Date(storedIso);
+      const wallClock = instantToWallClock(storedInstant);
+
+      const { PATCH } = await import("@/app/api/admin/bewerbungsfenster/[id]/route");
+      await PATCH(
+        await request("PATCH", `http://localhost/api/admin/bewerbungsfenster/${ID}`, {
+          semester: "FSS27",
+          start: wallClock,
+          end: instantToWallClock(new Date(storedInstant.getTime() + 60_000)),
+        }),
+        { params: params() },
+      );
+
+      const [, , savedStart] = updateRecruitingWindow.mock.calls[0] as [string, string, Date, Date];
+      expect(savedStart.toISOString()).toBe(storedInstant.toISOString());
+    }
   });
 
   it("answers 404 when the window is already gone", async () => {

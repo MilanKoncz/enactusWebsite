@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Document, Image, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import { colorTokens } from "./design-tokens";
+import { formatSiteDateTime } from "./formatSiteDateTime";
 import type { Application } from "./db";
 
 /**
@@ -110,11 +111,7 @@ function Fact({ label, value }: { label: string; value: string }) {
 }
 
 function formatDateTime(date: Date): string {
-  return new Intl.DateTimeFormat("de-DE", {
-    dateStyle: "long",
-    timeStyle: "short",
-    timeZone: "Europe/Berlin",
-  }).format(date);
+  return formatSiteDateTime(date, "de-DE", { dateStyle: "long", timeStyle: "short" });
 }
 
 // Renders the prioritized area choices (migrations/0017) a new application

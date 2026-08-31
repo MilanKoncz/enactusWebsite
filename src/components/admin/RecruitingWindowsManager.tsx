@@ -10,6 +10,7 @@ import { FormStatusMessage } from "@/components/ui/FormStatusMessage";
 import { AdminTable } from "@/components/admin/AdminTable";
 import { SendReminderWindowMailButton } from "@/components/admin/SendReminderWindowMailButton";
 import { recruitingWindowFormSchema } from "@/lib/recruitingWindowFormSchema";
+import { siteDateTimeFormatter } from "@/lib/formatSiteDateTime";
 
 export type ManagedWindow = {
   id: string;
@@ -138,7 +139,12 @@ export function RecruitingWindowsManager({ windows }: { windows: ManagedWindow[]
     }
   }
 
-  const dateFormatter = new Intl.DateTimeFormat("de-DE", { dateStyle: "medium", timeStyle: "short" });
+  // Pinned to Europe/Berlin (see formatSiteDateTime's own comment) — this
+  // table used to render in the admin's own browser zone, which disagreed
+  // with the edit form directly below it (pre-filled from startWallClock/
+  // endWallClock, already Berlin) whenever the admin wasn't sitting in
+  // Germany. Same instant, two different times on one screen.
+  const dateFormatter = siteDateTimeFormatter("de-DE", { dateStyle: "medium", timeStyle: "short" });
 
   return (
     <div className="flex flex-col gap-10">
@@ -177,6 +183,7 @@ export function RecruitingWindowsManager({ windows }: { windows: ManagedWindow[]
           />
           <Field
             label={t("startLabel")}
+            hint={t("startHint")}
             type="datetime-local"
             value={draft.start}
             onChange={(event) => setDraft({ ...draft, start: event.target.value })}
@@ -184,6 +191,7 @@ export function RecruitingWindowsManager({ windows }: { windows: ManagedWindow[]
           />
           <Field
             label={t("endLabel")}
+            hint={t("endHint")}
             type="datetime-local"
             value={draft.end}
             onChange={(event) => setDraft({ ...draft, end: event.target.value })}

@@ -251,3 +251,50 @@ test.describe("/mitmachen", () => {
     await expect(page.getByText("Bitte bestätige die Einwilligung.")).toBeVisible();
   });
 });
+
+// Regression coverage for the timezone bug: the "Bewerbungen sind vom … bis
+// …" sentence used to render in the *browser's* own zone while claiming
+// Berlin time underneath it. This is the honest end-to-end version of the
+// same check in tests/unit/sections/MitmachenApplication.test.tsx — unlike
+// the unit test, this one exercises the real hydration path (SSR on
+// /mitmachen's static page, then the client re-fetch and re-render), so it
+// would also catch a server/client text mismatch the unit test can't see.
+const FUTURE_WINDOW = {
+  semester: "FSS30",
+  start: "2030-06-15T10:00:00+02:00",
+  end: "2030-06-20T18:30:00+02:00",
+};
+
+function mockFutureRecruitingWindow(page: Page) {
+  return page.route("**/api/recruiting-windows", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ windows: [FUTURE_WINDOW] }),
+    }),
+  );
+}
+
+test.describe("/mitmachen — Berlin time regardless of the visitor's own timezone", () => {
+  for (const timezoneId of ["Asia/Seoul", "America/New_York"]) {
+    test.describe(`viewed from ${timezoneId}`, () => {
+      test.use({ timezoneId });
+
+      test("shows the opening and closing dates in Berlin time, not the visitor's own", async ({
+        page,
+      }) => {
+        await mockFutureRecruitingWindow(page);
+        await page.goto("/mitmachen");
+        await expect(
+          page.getByText(
+            "Bewerbungen sind vom 15. Juni 2030 um 10:00 bis 20. Juni 2030 um 18:30 möglich.",
+            { exact: false },
+          ),
+        ).toBeVisible();
+        await expect(
+          page.getByText("Alle Zeiten in Berliner Zeit (Europe/Berlin), unabhängig davon, wo du gerade bist."),
+        ).toBeVisible();
+      });
+    });
+  }
+});
