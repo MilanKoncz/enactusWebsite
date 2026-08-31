@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { isAuthenticatedRequest } from "@/lib/adminSession";
 import { listIdeathonSignups } from "@/lib/db";
 import { csvDocument } from "@/lib/csv";
+import { siteDateTimeFormatter } from "@/lib/formatSiteDateTime";
 
 const CSV_COLUMNS = [
   "Name",
@@ -45,7 +46,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "server_error" }, { status: 500 });
   }
 
-  const dateFormatter = new Intl.DateTimeFormat("de-DE", { dateStyle: "medium", timeStyle: "short" });
+  // Pinned to Europe/Berlin — this route runs on Vercel's own UTC.
+  const dateFormatter = siteDateTimeFormatter("de-DE", { dateStyle: "medium", timeStyle: "short" });
   const csv = csvDocument(
     CSV_COLUMNS,
     signups.map((signup) => [

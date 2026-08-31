@@ -11,6 +11,7 @@ import { AdminTable } from "@/components/admin/AdminTable";
 import { isAdminAuthenticated } from "@/lib/adminSession";
 import { listReminderSignups } from "@/lib/db";
 import { countReminderStates, reminderState } from "@/lib/adminReminders";
+import { siteDateTimeFormatter } from "@/lib/formatSiteDateTime";
 
 type PageProps = { params: Promise<{ locale: string }> };
 
@@ -31,7 +32,8 @@ export default async function AdminRemindersPage({ params }: PageProps) {
   const t = await getTranslations("Admin");
   const signups = await listReminderSignups();
   const totals = countReminderStates(signups);
-  const dateFormatter = new Intl.DateTimeFormat("de-DE", { dateStyle: "medium", timeStyle: "short" });
+  // Pinned to Europe/Berlin — a server component runs on Vercel's own UTC.
+  const dateFormatter = siteDateTimeFormatter("de-DE", { dateStyle: "medium", timeStyle: "short" });
 
   return (
     <Container className="flex max-w-4xl flex-col gap-8 py-16">

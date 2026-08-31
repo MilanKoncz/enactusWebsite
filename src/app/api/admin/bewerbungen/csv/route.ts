@@ -4,6 +4,7 @@ import { isAuthenticatedRequest } from "@/lib/adminSession";
 import { listApplicationsBySemester, type ApplicationSummary } from "@/lib/db";
 import { csvDocument } from "@/lib/csv";
 import { filenameSegment } from "@/lib/filenameSegment";
+import { siteDateTimeFormatter } from "@/lib/formatSiteDateTime";
 
 // Wunschbereich is how the board actually sorts applications onto
 // projects, not an incidental field — it belongs in the export the same
@@ -70,7 +71,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "server_error" }, { status: 500 });
   }
 
-  const dateFormatter = new Intl.DateTimeFormat("de-DE", { dateStyle: "medium", timeStyle: "short" });
+  // Pinned to Europe/Berlin — this route runs on Vercel's own UTC.
+  const dateFormatter = siteDateTimeFormatter("de-DE", { dateStyle: "medium", timeStyle: "short" });
   const csv = csvDocument(
     CSV_COLUMNS,
     applications.map((application) => [

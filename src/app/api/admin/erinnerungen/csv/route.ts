@@ -4,6 +4,7 @@ import { isAuthenticatedRequest } from "@/lib/adminSession";
 import { listReminderSignups } from "@/lib/db";
 import { csvDocument } from "@/lib/csv";
 import { reminderState } from "@/lib/adminReminders";
+import { siteDateTimeFormatter } from "@/lib/formatSiteDateTime";
 
 const CSV_COLUMNS = ["E-Mail", "Status", "Eingetragen am", "Bestätigt am", "Abgemeldet am", "Mailstatus"];
 
@@ -32,7 +33,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: false, error: "server_error" }, { status: 500 });
   }
 
-  const dateFormatter = new Intl.DateTimeFormat("de-DE", { dateStyle: "medium", timeStyle: "short" });
+  // Pinned to Europe/Berlin — this route runs on Vercel's own UTC.
+  const dateFormatter = siteDateTimeFormatter("de-DE", { dateStyle: "medium", timeStyle: "short" });
   const csv = csvDocument(
     CSV_COLUMNS,
     signups.map((signup) => [

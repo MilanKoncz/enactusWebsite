@@ -11,6 +11,7 @@ import { StatusIndicator } from "@/components/admin/StatusIndicator";
 import { AdminTable } from "@/components/admin/AdminTable";
 import { jobPostingCreateSchema, jobPostingFormSchema } from "@/lib/jobPostingFormSchema";
 import { isExpiredJobPosting } from "@/lib/jobPostingStatus";
+import { parseDateOnly } from "@/lib/calendarFormat";
 import { EMPLOYMENT_TYPES, REMOTE_OPTIONS } from "@/content/jobs";
 import type { EmploymentType, RemoteOption } from "@/content/jobs";
 import { partners } from "@/content/partners";
@@ -170,7 +171,15 @@ export function JobPostingsManager({ jobs, now }: { jobs: ManagedJobPosting[]; n
     }
   }
 
-  const dateFormatter = new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+  // parseDateOnly + a UTC-pinned formatter, same as CalendarEventsManager's
+  // own fix and every calendar view (calendarFormat.ts) — expiresAt is a
+  // plain "YYYY-MM-DD" with no time-of-day.
+  const dateFormatter = new Intl.DateTimeFormat("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 
   return (
     <div className="flex flex-col gap-10">
@@ -192,7 +201,7 @@ export function JobPostingsManager({ jobs, now }: { jobs: ManagedJobPosting[]; n
               job.company,
               job.title,
               tTypes(job.employmentType),
-              dateFormatter.format(new Date(`${job.expiresAt}T00:00:00`)),
+              dateFormatter.format(parseDateOnly(job.expiresAt)),
               <StatusIndicator
                 key="status"
                 level={expired ? "neutral" : "ok"}

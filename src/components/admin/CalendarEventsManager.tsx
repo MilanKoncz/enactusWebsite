@@ -10,6 +10,7 @@ import { FormStatusMessage } from "@/components/ui/FormStatusMessage";
 import { CategoryBadge } from "@/components/ui/CategoryBadge";
 import { AdminTable } from "@/components/admin/AdminTable";
 import { calendarEventFormSchema } from "@/lib/calendarEventFormSchema";
+import { parseDateOnly } from "@/lib/calendarFormat";
 import { CALENDAR_CATEGORIES } from "@/content/calendar";
 import type { CalendarCategory } from "@/content/calendar";
 
@@ -179,12 +180,24 @@ export function CalendarEventsManager({ events }: { events: ManagedCalendarEvent
     }
   }
 
-  const dateFormatter = new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+  // parseDateOnly + a UTC-pinned formatter, same as every other calendar
+  // view (calendarFormat.ts) — these columns hold a plain "YYYY-MM-DD" with
+  // no time-of-day, so a naive `new Date(\`${date}T00:00:00\`)` parsed and
+  // formatted in whatever zone the runtime happens to default to (this used
+  // to do exactly that) is a latent inconsistency with the rest of the
+  // codebase, not just a style nit: it stops being self-cancelling the
+  // moment either step's implicit zone changes independently of the other.
+  const dateFormatter = new Intl.DateTimeFormat("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 
   function formatRowDate(event: ManagedCalendarEvent): string {
-    const start = dateFormatter.format(new Date(`${event.startDate}T00:00:00`));
+    const start = dateFormatter.format(parseDateOnly(event.startDate));
     if (!event.endDate || event.endDate === event.startDate) return start;
-    return `${start}–${dateFormatter.format(new Date(`${event.endDate}T00:00:00`))}`;
+    return `${start}–${dateFormatter.format(parseDateOnly(event.endDate))}`;
   }
 
   return (

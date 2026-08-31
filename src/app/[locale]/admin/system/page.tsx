@@ -13,6 +13,7 @@ import { countRowsPerTable, listCronRuns } from "@/lib/db";
 import type { CronRun, TableCounts } from "@/lib/db";
 import { checkResend, checkMigrations } from "@/lib/serviceHealth";
 import { isCleanupStale, nextCleanupRun } from "@/lib/cronSchedule";
+import { siteDateTimeFormatter } from "@/lib/formatSiteDateTime";
 
 type PageProps = { params: Promise<{ locale: string }> };
 
@@ -77,7 +78,8 @@ export default async function AdminSystemPage({ params }: PageProps) {
   const stale = isCleanupStale(lastSuccessful?.startedAt ?? null, now);
   const nextDue = nextCleanupRun(now);
 
-  const dateFormatter = new Intl.DateTimeFormat("de-DE", { dateStyle: "medium", timeStyle: "short" });
+  // Pinned to Europe/Berlin — a server component runs on Vercel's own UTC.
+  const dateFormatter = siteDateTimeFormatter("de-DE", { dateStyle: "medium", timeStyle: "short" });
 
   return (
     <Container className="flex max-w-4xl flex-col gap-10 py-16">

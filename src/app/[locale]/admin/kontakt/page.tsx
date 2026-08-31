@@ -8,6 +8,7 @@ import { AdminTable } from "@/components/admin/AdminTable";
 import { MailStatusIndicator } from "@/components/admin/StatusIndicator";
 import { isAdminAuthenticated } from "@/lib/adminSession";
 import { listContactMessages } from "@/lib/db";
+import { siteDateTimeFormatter } from "@/lib/formatSiteDateTime";
 
 type PageProps = { params: Promise<{ locale: string }> };
 
@@ -28,7 +29,8 @@ export default async function AdminContactMessagesPage({ params }: PageProps) {
 
   const t = await getTranslations("Admin");
   const messages = await listContactMessages();
-  const dateFormatter = new Intl.DateTimeFormat("de-DE", { dateStyle: "medium", timeStyle: "short" });
+  // Pinned to Europe/Berlin — a server component runs on Vercel's own UTC.
+  const dateFormatter = siteDateTimeFormatter("de-DE", { dateStyle: "medium", timeStyle: "short" });
 
   return (
     <Container className="flex max-w-4xl flex-col gap-8 py-16">

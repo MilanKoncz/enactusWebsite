@@ -20,6 +20,7 @@ import {
 import { currentOrNextRecruitingWindow, recruitingPhaseAt } from "@/lib/recruitingStatus";
 import { isCleanupStale } from "@/lib/cronSchedule";
 import { nextUpcomingEvent } from "@/lib/calendarAgenda";
+import { siteDateTimeFormatter } from "@/lib/formatSiteDateTime";
 
 type PageProps = { params: Promise<{ locale: string }> };
 
@@ -72,8 +73,11 @@ export default async function AdminOverviewPage({ params }: PageProps) {
   const cronStale = isCleanupStale(lastSuccessfulRun?.startedAt ?? null, now);
 
   const nextEvent = nextUpcomingEvent(calendarEvents, nowMs);
-  const dateTimeFormatter = new Intl.DateTimeFormat("de-DE", { dateStyle: "medium", timeStyle: "short" });
-  const eventDateFormatter = new Intl.DateTimeFormat("de-DE", { dateStyle: "medium" });
+  // Pinned to Europe/Berlin (formatSiteDateTime's own comment): this ran on
+  // the server's own zone before, which is UTC on Vercel — the board read a
+  // cron timestamp as if it were Berlin time when it was up to two hours off.
+  const dateTimeFormatter = siteDateTimeFormatter("de-DE", { dateStyle: "medium", timeStyle: "short" });
+  const eventDateFormatter = siteDateTimeFormatter("de-DE", { dateStyle: "medium" });
 
   return (
     <Container className="flex max-w-4xl flex-col gap-10 py-16">

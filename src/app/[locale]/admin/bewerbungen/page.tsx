@@ -11,6 +11,7 @@ import { MailStatusIndicator } from "@/components/admin/StatusIndicator";
 import { isAdminAuthenticated } from "@/lib/adminSession";
 import { listApplications } from "@/lib/db";
 import { groupApplicationsBySemester } from "@/lib/adminApplications";
+import { siteDateTimeFormatter } from "@/lib/formatSiteDateTime";
 
 type PageProps = { params: Promise<{ locale: string }> };
 
@@ -36,7 +37,9 @@ export default async function AdminBewerbungenPage({ params }: PageProps) {
   const t = await getTranslations("Admin");
   const applications = await listApplications();
   const groups = groupApplicationsBySemester(applications);
-  const dateFormatter = new Intl.DateTimeFormat("de-DE", { dateStyle: "medium", timeStyle: "short" });
+  // Pinned to Europe/Berlin — a server component runs on Vercel's own UTC,
+  // so this used to show the board a submission time up to two hours off.
+  const dateFormatter = siteDateTimeFormatter("de-DE", { dateStyle: "medium", timeStyle: "short" });
 
   const columns = [
     t("applications.columns.name"),
