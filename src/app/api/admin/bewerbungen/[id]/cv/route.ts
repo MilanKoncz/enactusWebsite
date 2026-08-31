@@ -57,7 +57,15 @@ export async function GET(request: NextRequest, { params }: RouteContext) {
     return NextResponse.json({ ok: false, error: "not_found" }, { status: 404 });
   }
 
-  const filename = `Bewerbung-${filenameSegment(application.lastName)}-${filenameSegment(application.firstName)}.pdf`;
+  // filenameSegment drops anything outside A-Za-z0-9-, so a name written
+  // entirely in a non-Latin script (Cyrillic, CJK, Arabic, ...) sanitises to
+  // an empty string on both segments — without this fallback two such
+  // applicants would both download a file literally named "Bewerbung--.pdf".
+  // Same guard the ICS route already has for the equivalent case
+  // (filenameSegment(event.title) || event.id).
+  const lastName = filenameSegment(application.lastName);
+  const firstName = filenameSegment(application.firstName);
+  const filename = lastName || firstName ? `Bewerbung-${lastName}-${firstName}.pdf` : `Bewerbung-${application.id}.pdf`;
 
   return new NextResponse(blob.stream, {
     status: 200,

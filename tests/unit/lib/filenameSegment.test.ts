@@ -21,4 +21,21 @@ describe("filenameSegment", () => {
   it("drops umlauts and other non-ASCII characters rather than mangling them", () => {
     expect(filenameSegment("Bewerbungsgespräche")).toBe("Bewerbungsgesprche");
   });
+
+  // A name written entirely in a script outside A-Za-z0-9- (Cyrillic, CJK,
+  // Arabic, ...) sanitises to nothing at all — not a mangled-but-readable
+  // fallback like the umlaut case above. Every call site that builds a
+  // filename from user-entered text (the CV download route, the ICS route)
+  // must guard this case itself; filenameSegment deliberately doesn't paper
+  // over it with an invented fallback, since it has no non-empty value to
+  // fall back to.
+  it("returns an empty string for a name with no character in A-Za-z0-9-", () => {
+    expect(filenameSegment("李")).toBe("");
+    expect(filenameSegment("Иванов")).toBe("");
+    expect(filenameSegment("محمد")).toBe("");
+  });
+
+  it("returns an empty string for an already-empty input", () => {
+    expect(filenameSegment("")).toBe("");
+  });
 });
