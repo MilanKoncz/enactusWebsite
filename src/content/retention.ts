@@ -7,12 +7,14 @@ import { z } from "zod";
  * from — writing the same number in both a legal text and a SQL query
  * invites drift, so only one of them is allowed to be the source.
  *
- * Every period except `applications` is a rolling window measured from
- * each row's own created_at (see lib/retentionCutoff.ts) — this matches
- * those tables' Datenschutzerklärung wording exactly ("12 Monate" means 12
- * months from submission, not from some later, board-maintained event),
- * and it can never silently stop enforcing itself the way an anchor tied
- * to a recruiting window's close date could.
+ * Every period except `applications` and `jobPostings` is a rolling window
+ * measured from each row's own created_at (see lib/retentionCutoff.ts) —
+ * this matches those tables' Datenschutzerklärung wording exactly ("12
+ * Monate" means 12 months from submission, not from some later,
+ * board-maintained event), and it can never silently stop enforcing itself
+ * the way an anchor tied to a recruiting window's close date could.
+ * `jobPostings` is the other exception, anchored to each row's own
+ * expires_at instead — see its own field comment below for why.
  *
  * `applications` is the deliberate exception: the Datenschutzerklärung's
  * own wording for it is *not* "ab Eingang" but "nach Ende des jeweiligen

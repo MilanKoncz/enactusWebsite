@@ -1184,7 +1184,7 @@
       "cvLabel": "Lebenslauf (PDF)",
       "cvValue": "{months} Monate nach Ende des jeweiligen Bewerbungszeitraums, gemeinsam mit der zugehörigen Bewerbung",
       "contactLabel": "Kontaktanfragen",
-      "contactValue": "{months} Monate nach abschließender Bearbeitung",
+      "contactValue": "{months} Monate nach Eingang der Anfrage",
       "reminderConfirmedLabel": "Bestätigte Anmeldungen zur Benachrichtigung",
       "reminderConfirmedValue": "bis zum Widerruf",
       "reminderUnconfirmedLabel": "Unbestätigte Anmeldungen zur Benachrichtigung",

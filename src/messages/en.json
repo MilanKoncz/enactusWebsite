@@ -1184,7 +1184,7 @@
       "cvLabel": "CV (PDF)",
       "cvValue": "{months} months after the respective application period ends, together with the application it belongs to",
       "contactLabel": "Contact inquiries",
-      "contactValue": "{months} months after final processing",
+      "contactValue": "{months} months after the inquiry is received",
       "reminderConfirmedLabel": "Confirmed notification sign-ups",
       "reminderConfirmedValue": "until withdrawn",
       "reminderUnconfirmedLabel": "Unconfirmed notification sign-ups",

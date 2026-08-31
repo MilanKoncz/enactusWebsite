@@ -51,7 +51,7 @@ describe("Datenschutz", () => {
     renderWithIntl(<Datenschutz />);
     expect(screen.getByRole("heading", { level: 2, name: "Speicherdauer" })).toBeInTheDocument();
     expect(screen.getAllByText(/6 Monate nach Ende des jeweiligen Bewerbungszeitraums/).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/12 Monate nach abschließender Bearbeitung/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/12 Monate nach Eingang der Anfrage/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/30 Tage nach Anmeldung/).length).toBeGreaterThan(0);
   });
 
