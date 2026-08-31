@@ -2,24 +2,18 @@ version: 2
 updates:
   - package-ecosystem: "npm"
     directory: "/"
-    # Paused until after the 1 September 2026 launch: weekly PRs were
-    # generating red CI runs and mail noise during the final push.
-    # open-pull-requests-limit: 0 stops new PRs outright; schedule is turned
-    # down to monthly as a second layer for whenever the limit is raised
-    # again. Re-enable both (interval: "weekly", limit back to the default)
-    # once the post-launch dependency pass is scheduled — see ASSETS-TODO.md.
     schedule:
-      interval: "monthly"
-    open-pull-requests-limit: 0
+      interval: "weekly"
     groups:
       patch-and-minor:
         update-types:
           - "patch"
           - "minor"
-    # Major upgrades (typescript, eslint, jest-axe, @types/node as of
-    # 2026-08-16) land as noisy, high-risk PRs right before the 1 September
-    # launch. Ignored until after launch — remove this once the post-launch
-    # major-upgrade pass is scheduled.
+    # Major upgrades still land as noisy, high-risk PRs (typescript, eslint,
+    # jest-axe, @types/node as of 2026-08-16) that deserve a deliberate,
+    # scheduled pass rather than an unattended auto-PR — ignored on an
+    # ongoing basis, not tied to the 1 September 2026 launch date anymore.
+    # Run a major-upgrade pass manually every so often instead.
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
