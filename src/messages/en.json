@@ -1097,6 +1097,7 @@
         "degree program, semester",
         "availability in hours per week",
         "up to three prioritized areas of interest, each with its own reason (free text)",
+        "up to three departments you would like to work in (optional, no reason required)",
         "CV as a PDF file (upload)",
         "motivation (free text)",
         "previous involvement (free text)",

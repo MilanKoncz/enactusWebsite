@@ -83,6 +83,7 @@ describe("Datenschutz", () => {
     renderWithIntl(<Datenschutz />);
     expect(screen.getAllByText(/Vorname, Nachname, E-Mail-Adresse/).length).toBeGreaterThan(0);
     expect(screen.getByText(/priorisierte Wunschbereiche mit jeweiliger Begründung/)).toBeInTheDocument();
+    expect(screen.getByText(/bis zu drei Ressorts, in denen du mitarbeiten möchtest/)).toBeInTheDocument();
     expect(screen.getByText("Lebenslauf als PDF-Datei (Upload)")).toBeInTheDocument();
     expect(screen.getByText(/Relevante Skills für den gewünschten Einsatzbereich/)).toBeInTheDocument();
     expect(screen.getByText(/Was du aus deiner Zeit bei Enactus mitnehmen möchtest/)).toBeInTheDocument();
