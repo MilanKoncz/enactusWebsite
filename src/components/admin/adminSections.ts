@@ -1,6 +1,7 @@
 import {
   Activity,
   BellRing,
+  Boxes,
   Briefcase,
   CalendarDays,
   CalendarRange,
@@ -44,6 +45,7 @@ export const ADMIN_SECTIONS = [
   { href: "/admin/bewerbungen", messageKey: "applications", icon: FileText, group: "application" },
   { href: "/admin/bewerbungsfenster", messageKey: "recruitingWindows", icon: CalendarRange, group: "application" },
   { href: "/admin/wunschbereiche", messageKey: "projectAreas", icon: ListChecks, group: "application" },
+  { href: "/admin/ressorts", messageKey: "departments", icon: Boxes, group: "application" },
   { href: "/admin/erinnerungen", messageKey: "reminders", icon: BellRing, group: "application" },
   { href: "/admin/ideathon-anmeldungen", messageKey: "ideathonSignups", icon: Lightbulb, group: "application" },
   { href: "/admin/kontakt", messageKey: "contactMessages", icon: MessageSquare, group: "communication" },

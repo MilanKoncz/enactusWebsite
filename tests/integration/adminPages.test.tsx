@@ -18,6 +18,7 @@ const listRecruitingWindows = vi.fn();
 const countFutureRecruitingWindows = vi.fn();
 const listIdeathonSignups = vi.fn();
 const listReminderSignups = vi.fn();
+const listDepartments = vi.fn();
 const cookieGet = vi.fn();
 
 vi.mock("@/lib/db", () => ({
@@ -30,6 +31,7 @@ vi.mock("@/lib/db", () => ({
   countFutureRecruitingWindows: (...args: unknown[]) => countFutureRecruitingWindows(...args),
   listIdeathonSignups: (...args: unknown[]) => listIdeathonSignups(...args),
   listReminderSignups: (...args: unknown[]) => listReminderSignups(...args),
+  listDepartments: (...args: unknown[]) => listDepartments(...args),
 }));
 
 vi.mock("next/headers", () => ({
@@ -78,6 +80,7 @@ beforeEach(() => {
   countFutureRecruitingWindows.mockResolvedValue(0);
   listIdeathonSignups.mockResolvedValue([]);
   listReminderSignups.mockResolvedValue([]);
+  listDepartments.mockResolvedValue([]);
 });
 
 afterEach(() => {
@@ -411,6 +414,51 @@ describe("/admin/erinnerungen (page)", () => {
     const link = screen.getByRole("link", { name: "Als CSV herunterladen" });
     expect(link).toHaveAttribute("href", "/api/admin/erinnerungen/csv");
     expect(screen.getByRole("button", { name: "Löschen" })).toBeInTheDocument();
+  });
+});
+
+const DEPARTMENT = {
+  id: "66666666-6666-6666-6666-666666666666",
+  labelDe: "Team-Lead",
+  labelEn: "Team-Lead",
+  sortOrder: 1,
+  active: true,
+  createdAt: new Date("2026-08-01T10:00:00Z"),
+  updatedAt: new Date("2026-08-01T10:00:00Z"),
+};
+
+describe("/admin/ressorts (page)", () => {
+  it("never reads departments from the database without a session cookie", async () => {
+    cookieGet.mockReturnValue(undefined);
+
+    const { default: Page } = await import("@/app/[locale]/admin/ressorts/page");
+    await Page({ params: params() });
+
+    expect(listDepartments).not.toHaveBeenCalled();
+  });
+
+  it("renders the password prompt, not department data, without a session", async () => {
+    cookieGet.mockReturnValue(undefined);
+    listDepartments.mockResolvedValue([DEPARTMENT]);
+
+    const { default: Page } = await import("@/app/[locale]/admin/ressorts/page");
+    const tree = await Page({ params: params() });
+
+    expect(JSON.stringify(tree)).not.toContain("Team-Lead");
+  });
+
+  it("reads and renders department data with a valid session", async () => {
+    cookieGet.mockReturnValue({ value: await validSessionCookie() });
+    listDepartments.mockResolvedValue([DEPARTMENT]);
+
+    const { default: Page } = await import("@/app/[locale]/admin/ressorts/page");
+    // renderWithIntl, not render: DepartmentsManager is a "use client"
+    // component that calls useTranslations and useRouter — same reason
+    // /admin/termine above needs it.
+    renderWithIntl(await Page({ params: params() }));
+
+    expect(listDepartments).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("Team-Lead")).toBeInTheDocument();
   });
 });
 
