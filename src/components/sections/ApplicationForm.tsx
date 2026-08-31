@@ -3,16 +3,20 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { upload } from "@vercel/blob/client";
-import { useForm, useWatch } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
+import { CheckboxGroup } from "@/components/ui/CheckboxGroup";
 import { Field } from "@/components/ui/Field";
 import { FormStatusMessage } from "@/components/ui/FormStatusMessage";
 import { ConfettiBurst } from "@/components/motion/ConfettiBurst";
 import { Link } from "@/lib/navigation";
 import {
   CV_REQUIRED,
+  MAX_DEPARTMENTS,
+  MOTIVATION_MAX,
+  WANT_TO_GAIN_MAX,
   validatedApplicationFormSchema,
   type ApplicationFormInput,
   type ApplicationFormValues,
@@ -22,6 +26,7 @@ import { postJson } from "@/lib/submitForm";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { org } from "@/content/org";
 import type { PublicProjectArea } from "@/lib/projectAreas";
+import type { PublicDepartment } from "@/lib/departments";
 
 export { MIN_FILL_MS };
 
@@ -45,7 +50,13 @@ const CV_MAX_SIZE_BYTES = 4 * 1024 * 1024;
 // attached at submit time, so /api/bewerbung can verify the real elapsed
 // fill time itself (lib/formToken.ts) instead of trusting a client-supplied
 // number, which is trivial to fake by calling the route directly.
-export function ApplicationForm({ projectAreas: initialProjectAreas }: { projectAreas: PublicProjectArea[] }) {
+export function ApplicationForm({
+  projectAreas: initialProjectAreas,
+  departments: initialDepartments,
+}: {
+  projectAreas: PublicProjectArea[];
+  departments: PublicDepartment[];
+}) {
   const t = useTranslations("MitmachenPage.application.form");
   const locale = useLocale();
   const reducedMotion = usePrefersReducedMotion();
@@ -102,6 +113,27 @@ export function ApplicationForm({ projectAreas: initialProjectAreas }: { project
   }, []);
   const areaOptions = projectAreas.map((area) => (locale === "de" ? area.labelDe : area.labelEn));
 
+  // Same "prefer the fresh fetch, fall back to the build-time prop" shape
+  // as the project-areas fetch above, and the same reasoning: the seam
+  // e2e tests intercept with page.route(), which a value baked into the
+  // static page at build time can't be.
+  const [departments, setDepartments] = useState(initialDepartments);
+  useEffect(() => {
+    fetch("/api/departments")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((body: { departments?: PublicDepartment[] } | null) => {
+        if (body?.departments) setDepartments(body.departments);
+      })
+      .catch(() => {
+        // Left as the build-time prop — same reasoning as the recruiting-
+        // windows fetch above.
+      });
+  }, []);
+  const departmentOptions = departments.map((department) => {
+    const label = locale === "de" ? department.labelDe : department.labelEn;
+    return { value: label, label };
+  });
+
   const {
     register,
     control,
@@ -111,6 +143,7 @@ export function ApplicationForm({ projectAreas: initialProjectAreas }: { project
     formState: { errors },
   } = useForm<ApplicationFormInput, unknown, ApplicationFormValues>({
     resolver: zodResolver(validatedApplicationFormSchema),
+    defaultValues: { departments: [] },
   });
 
   // Watched, not read via getValues(): the three dropdowns hide whatever
@@ -392,6 +425,33 @@ export function ApplicationForm({ projectAreas: initialProjectAreas }: { project
         </div>
       </fieldset>
 
+      {/* A separate, unranked, optional category from the Wunschbereich
+          fieldset above — see applicationFormSchema.ts's own comment on
+          why a Ressort can't just be a fourth priority. Controller, not
+          register(), because react-hook-form's own multi-checkbox
+          convention (several boxes sharing one registered name) collapses
+          to a single boolean rather than an array once there's only one
+          option — exactly the shape a short Ressort list can hit. */}
+      <Controller
+        control={control}
+        name="departments"
+        render={({ field }) => {
+          const selected = field.value ?? [];
+          return (
+            <CheckboxGroup
+              legend={t("departmentsLabel")}
+              hint={t("departmentsHint", { max: MAX_DEPARTMENTS })}
+              error={errors.departments && t("departmentsError", { max: MAX_DEPARTMENTS })}
+              options={departmentOptions}
+              value={selected}
+              onChange={field.onChange}
+              max={MAX_DEPARTMENTS}
+              countLabel={t("departmentsCountLabel", { count: selected.length, max: MAX_DEPARTMENTS })}
+            />
+          );
+        }}
+      />
+
       {/* File input stays in the DOM (not conditionally unmounted) so a
           screen reader's reference to it via the button's own click
           delegation never goes stale — only visually hidden. */}
@@ -453,7 +513,10 @@ export function ApplicationForm({ projectAreas: initialProjectAreas }: { project
       <Field
         as="textarea"
         label={t("motivationLabel")}
-        hint={t("motivationHint")}
+        hint={t("motivationHint", { max: MOTIVATION_MAX })}
+        showCount
+        maxLength={MOTIVATION_MAX}
+        truncatedMessage={t("textTruncatedNotice", { max: MOTIVATION_MAX })}
         error={errors.motivation && t("motivationError")}
         {...register("motivation")}
       />
@@ -477,10 +540,10 @@ export function ApplicationForm({ projectAreas: initialProjectAreas }: { project
       <Field
         as="textarea"
         label={t("wantToGainLabel")}
-        hint={t("wantToGainHint")}
+        hint={t("wantToGainHint", { max: WANT_TO_GAIN_MAX })}
         showCount
-        maxLength={400}
-        error={errors.wantToGain && t("wantToGainError")}
+        maxLength={WANT_TO_GAIN_MAX}
+        error={errors.wantToGain && t("wantToGainError", { max: WANT_TO_GAIN_MAX })}
         {...register("wantToGain")}
       />
 

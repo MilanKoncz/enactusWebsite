@@ -8,6 +8,7 @@ import { MitmachenApplication } from "@/components/sections/MitmachenApplication
 import { MitmachenCta } from "@/components/sections/MitmachenCta";
 import { getRecruitingWindows } from "@/lib/recruitingWindows";
 import { getProjectAreas } from "@/lib/projectAreas";
+import { getDepartments } from "@/lib/departments";
 
 type PageProps = {
   params: Promise<{ locale: string }>;
@@ -33,13 +34,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 // here either: those live on /kontakt and the homepage respectively.
 export default async function MitmachenPage({ params }: PageProps) {
   await requireLocale(params);
-  const [recruitingWindows, projectAreas] = await Promise.all([getRecruitingWindows(), getProjectAreas()]);
+  const [recruitingWindows, projectAreas, departments] = await Promise.all([
+    getRecruitingWindows(),
+    getProjectAreas(),
+    getDepartments(),
+  ]);
 
   return (
     <>
       <MitmachenFit />
       <MitmachenTimeline />
-      <MitmachenApplication recruitingWindows={recruitingWindows} projectAreas={projectAreas} />
+      <MitmachenApplication recruitingWindows={recruitingWindows} projectAreas={projectAreas} departments={departments} />
       <MitmachenCta />
     </>
   );

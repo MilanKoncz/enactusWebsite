@@ -1,11 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { screen, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "jest-axe";
 import { renderWithIntl } from "../../fixtures/intl";
 import { mockMatchMedia } from "../../fixtures/matchMedia";
 import { ApplicationForm, MIN_FILL_MS } from "@/components/sections/ApplicationForm";
 import type { PublicProjectArea } from "@/lib/projectAreas";
+import type { PublicDepartment } from "@/lib/departments";
 
 const TOKEN_ISSUED_AT = 1_700_000_000_000;
 const TOKEN = `${TOKEN_ISSUED_AT}.test-signature`;
@@ -13,6 +14,13 @@ const TOKEN = `${TOKEN_ISSUED_AT}.test-signature`;
 const PROJECT_AREAS: PublicProjectArea[] = [
   { id: "area-1", labelDe: "SmileGreen", labelEn: "SmileGreen" },
   { id: "area-2", labelDe: "Finance-Lead", labelEn: "Finance-Lead" },
+];
+
+const DEPARTMENTS: PublicDepartment[] = [
+  { id: "dept-1", labelDe: "Team-Lead", labelEn: "Team-Lead" },
+  { id: "dept-2", labelDe: "Finance-Lead", labelEn: "Finance-Lead" },
+  { id: "dept-3", labelDe: "Operations-Lead", labelEn: "Operations-Lead" },
+  { id: "dept-4", labelDe: "Inno-Lead", labelEn: "Inno-Lead" },
 ];
 
 const UPLOADED_BLOB = {
@@ -27,8 +35,8 @@ vi.mock("@vercel/blob/client", () => ({
   upload: (...args: unknown[]) => uploadMock(...args),
 }));
 
-function renderForm(projectAreas: PublicProjectArea[] = PROJECT_AREAS) {
-  return renderWithIntl(<ApplicationForm projectAreas={projectAreas} />);
+function renderForm(projectAreas: PublicProjectArea[] = PROJECT_AREAS, departments: PublicDepartment[] = DEPARTMENTS) {
+  return renderWithIntl(<ApplicationForm projectAreas={projectAreas} departments={departments} />);
 }
 
 function pdfFile(name = "lebenslauf.pdf") {
@@ -58,11 +66,15 @@ async function fillRequiredFields(user: ReturnType<typeof userEvent.setup>) {
 }
 
 // Every render of ApplicationForm now fetches a timing token AND the
-// project-areas list on mount (GET /api/bewerbung/token,
-// GET /api/project-areas), so every test needs *some* fetch stub in place
-// — this branches on URL, so tests that only care about the eventual POST
-// don't have to know or care that two GETs happen first.
-function stubFetch(handlePost: () => Response | Promise<Response>, projectAreas: PublicProjectArea[] = PROJECT_AREAS) {
+// project-areas AND departments lists on mount (GET /api/bewerbung/token,
+// GET /api/project-areas, GET /api/departments), so every test needs *some*
+// fetch stub in place — this branches on URL, so tests that only care about
+// the eventual POST don't have to know or care that three GETs happen first.
+function stubFetch(
+  handlePost: () => Response | Promise<Response>,
+  projectAreas: PublicProjectArea[] = PROJECT_AREAS,
+  departments: PublicDepartment[] = DEPARTMENTS,
+) {
   vi.stubGlobal(
     "fetch",
     vi.fn((url: string) => {
@@ -71,6 +83,9 @@ function stubFetch(handlePost: () => Response | Promise<Response>, projectAreas:
       }
       if (typeof url === "string" && url.endsWith("/api/project-areas")) {
         return Promise.resolve(new Response(JSON.stringify({ areas: projectAreas }), { status: 200 }));
+      }
+      if (typeof url === "string" && url.endsWith("/api/departments")) {
+        return Promise.resolve(new Response(JSON.stringify({ departments }), { status: 200 }));
       }
       return Promise.resolve(handlePost());
     }),
@@ -86,6 +101,9 @@ function stubFetchTokenRateLimited(projectAreas: PublicProjectArea[] = PROJECT_A
       }
       if (typeof url === "string" && url.endsWith("/api/project-areas")) {
         return Promise.resolve(new Response(JSON.stringify({ areas: projectAreas }), { status: 200 }));
+      }
+      if (typeof url === "string" && url.endsWith("/api/departments")) {
+        return Promise.resolve(new Response(JSON.stringify({ departments: DEPARTMENTS }), { status: 200 }));
       }
       return Promise.resolve(new Response(JSON.stringify({ ok: true }), { status: 200 }));
     }),
@@ -202,6 +220,114 @@ describe("ApplicationForm", () => {
     expect(screen.getByText("0 / 300")).toBeInTheDocument();
     await user.type(screen.getByLabelText("Warum dieser Bereich?"), "Hallo");
     expect(screen.getByText("5 / 300")).toBeInTheDocument();
+  });
+
+  it("lists the departments passed in via departments, as an optional checkbox group", () => {
+    renderForm();
+    const group = screen.getByRole("group", { name: "Ressorts" });
+    expect(within(group).getByRole("checkbox", { name: "Team-Lead" })).toBeInTheDocument();
+    expect(within(group).getByRole("checkbox", { name: "Finance-Lead" })).toBeInTheDocument();
+    expect(within(group).getByRole("checkbox", { name: "Operations-Lead" })).toBeInTheDocument();
+    expect(within(group).getByRole("checkbox", { name: "Inno-Lead" })).toBeInTheDocument();
+  });
+
+  it("only shows the departments GET /api/departments actually returns, not a deactivated one", async () => {
+    stubFetch(() => new Response(JSON.stringify({ ok: true }), { status: 200 }), PROJECT_AREAS, [
+      { id: "dept-1", labelDe: "Team-Lead", labelEn: "Team-Lead" },
+    ]);
+    renderForm();
+
+    const group = screen.getByRole("group", { name: "Ressorts" });
+    await waitFor(() => {
+      expect(within(group).queryByRole("checkbox", { name: "Finance-Lead" })).not.toBeInTheDocument();
+    });
+    expect(within(group).getByRole("checkbox", { name: "Team-Lead" })).toBeInTheDocument();
+  });
+
+  it("lets a visitor check up to three departments, disabling the rest once the cap is reached", async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    const group = screen.getByRole("group", { name: "Ressorts" });
+    await user.click(within(group).getByRole("checkbox", { name: "Team-Lead" }));
+    await user.click(within(group).getByRole("checkbox", { name: "Finance-Lead" }));
+    await user.click(within(group).getByRole("checkbox", { name: "Operations-Lead" }));
+
+    expect(within(group).getByRole("checkbox", { name: "Inno-Lead" })).toBeDisabled();
+    expect(within(group).getByRole("checkbox", { name: "Team-Lead" })).toBeEnabled();
+    expect(screen.getByText("3 von 3 ausgewählt")).toBeInTheDocument();
+  });
+
+  it("re-enables a department once one of the three checked ones is unchecked", async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    const group = screen.getByRole("group", { name: "Ressorts" });
+    await user.click(within(group).getByRole("checkbox", { name: "Team-Lead" }));
+    await user.click(within(group).getByRole("checkbox", { name: "Finance-Lead" }));
+    await user.click(within(group).getByRole("checkbox", { name: "Operations-Lead" }));
+    await user.click(within(group).getByRole("checkbox", { name: "Team-Lead" }));
+
+    expect(within(group).getByRole("checkbox", { name: "Inno-Lead" })).toBeEnabled();
+    expect(screen.getByText("2 von 3 ausgewählt")).toBeInTheDocument();
+  });
+
+  it("lets a keyboard user tab to a department checkbox and toggle it with Space", async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    const checkbox = screen.getByRole("checkbox", { name: "Team-Lead" });
+    checkbox.focus();
+    expect(checkbox).toHaveFocus();
+    await user.keyboard(" ");
+
+    expect(checkbox).toBeChecked();
+  });
+
+  it("submits successfully with no department checked, since Ressorts are optional", async () => {
+    let now = TOKEN_ISSUED_AT;
+    vi.spyOn(Date, "now").mockImplementation(() => now);
+    const user = userEvent.setup();
+    renderForm();
+
+    await fillRequiredFields(user);
+    now += MIN_FILL_MS + 500;
+    await user.click(screen.getByRole("button", { name: "Bewerbung absenden" }));
+
+    const notice = await screen.findByRole("status");
+    expect(notice).toHaveTextContent("Danke für deine Bewerbung");
+    expect(postCallBody()).toMatchObject({ departments: [] });
+  });
+
+  it("submits the checked departments alongside the rest of the application", async () => {
+    let now = TOKEN_ISSUED_AT;
+    vi.spyOn(Date, "now").mockImplementation(() => now);
+    const user = userEvent.setup();
+    renderForm();
+
+    await fillRequiredFields(user);
+    await user.click(screen.getByRole("checkbox", { name: "Team-Lead" }));
+    await user.click(screen.getByRole("checkbox", { name: "Inno-Lead" }));
+    now += MIN_FILL_MS + 500;
+    await user.click(screen.getByRole("button", { name: "Bewerbung absenden" }));
+
+    await screen.findByRole("status");
+    expect(postCallBody()).toMatchObject({ departments: ["Team-Lead", "Inno-Lead"] });
+  });
+
+  it("shows a visible notice when a pasted motivation text is longer than the limit and gets cut", async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    const longText = "x".repeat(2100);
+    const motivation = screen.getByLabelText("Motivation");
+    motivation.focus();
+    await user.paste(longText);
+
+    expect(motivation).toHaveValue("x".repeat(2000));
+    expect(
+      await screen.findByText("Dein eingefügter Text war länger als 2000 Zeichen und wurde gekürzt."),
+    ).toBeInTheDocument();
   });
 
   it("prefers a fresher project-areas list from GET /api/project-areas over the initial prop", async () => {

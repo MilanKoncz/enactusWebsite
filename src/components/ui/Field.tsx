@@ -1,7 +1,7 @@
 "use client";
 
-import { forwardRef, useId, useState } from "react";
-import type { ComponentPropsWithoutRef, ReactNode, Ref } from "react";
+import { forwardRef, useId, useRef, useState } from "react";
+import type { ClipboardEvent, ComponentPropsWithoutRef, ReactNode, Ref } from "react";
 import { AlertCircle, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -30,6 +30,12 @@ type FieldAsTextarea = FieldOwnProps & {
       part of the point (a keyword list, a short reason), not just a quiet
       server-side cap. Opt-in: most textareas on this site don't need one. */
   showCount?: boolean;
+  /** Shown right under the count when a paste would have added more text
+      than `maxLength` allows, so a visitor notices their text was cut
+      instead of assuming everything they pasted made it in — the browser's
+      own truncation is otherwise silent. Only meaningful together with
+      `maxLength`; a field with no cap has nothing to truncate. */
+  truncatedMessage?: string;
 } & Omit<ComponentPropsWithoutRef<"textarea">, keyof FieldOwnProps | "as">;
 
 type FieldAsSelect = FieldOwnProps & {
@@ -64,6 +70,15 @@ export const Field = forwardRef<
     return typeof defaultValue === "string" ? defaultValue.length : 0;
   });
 
+  // Set by handlePaste (below) the moment a paste is predicted to overflow
+  // maxLength, and read once by the change handler that fires right after
+  // it — a paste always fires as "paste" then "input" in that order, so the
+  // ref is guaranteed to hold the right answer by the time onChange reads
+  // it. Consumed (reset to false) on every change so a truncation notice
+  // never survives past the edit that caused it.
+  const pasteOverflowRef = useRef(false);
+  const [truncated, setTruncated] = useState(false);
+
   const countId =
     rest.as === "textarea" && rest.showCount && typeof rest.maxLength === "number" ? `${controlId}-count` : undefined;
   const describedBy = [hintId, errorId, countId].filter(Boolean).join(" ") || undefined;
@@ -78,7 +93,20 @@ export const Field = forwardRef<
   let count: ReactNode = null;
 
   if (rest.as === "textarea") {
-    const { as, showCount, onChange, ...textareaProps } = rest;
+    const { as, showCount, truncatedMessage, onChange, onPaste, ...textareaProps } = rest;
+    const maxLength = textareaProps.maxLength;
+
+    function handlePaste(event: ClipboardEvent<HTMLTextAreaElement>) {
+      if (typeof maxLength === "number") {
+        const target = event.currentTarget;
+        const pastedLength = event.clipboardData.getData("text").length;
+        const replacedLength = target.selectionEnd - target.selectionStart;
+        const prospectiveLength = target.value.length - replacedLength + pastedLength;
+        pasteOverflowRef.current = prospectiveLength > maxLength;
+      }
+      onPaste?.(event);
+    }
+
     control = (
       <textarea
         ref={ref as Ref<HTMLTextAreaElement>}
@@ -86,18 +114,34 @@ export const Field = forwardRef<
         aria-invalid={Boolean(error)}
         aria-describedby={describedBy}
         className={cn(controlClassName, "min-h-32")}
+        onPaste={handlePaste}
         onChange={(event) => {
           if (showCount) setTextareaLength(event.target.value.length);
+          if (truncatedMessage) {
+            setTruncated(pasteOverflowRef.current);
+            pasteOverflowRef.current = false;
+          }
           onChange?.(event);
         }}
         {...textareaProps}
       />
     );
-    if (showCount && typeof textareaProps.maxLength === "number") {
+    if (showCount && typeof maxLength === "number") {
       count = (
         <p id={countId} className="text-body-s opacity-60 tabular-nums" aria-live="polite">
-          {textareaLength} / {textareaProps.maxLength}
+          {textareaLength} / {maxLength}
         </p>
+      );
+    }
+    if (truncated && truncatedMessage) {
+      count = (
+        <>
+          {count}
+          <p className="flex items-center gap-2 text-body-s text-oxblood" aria-live="polite">
+            <AlertCircle aria-hidden="true" className="size-4 shrink-0" />
+            {truncatedMessage}
+          </p>
+        </>
       );
     }
   } else if (rest.as === "select") {

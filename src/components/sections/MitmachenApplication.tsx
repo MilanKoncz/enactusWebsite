@@ -12,6 +12,7 @@ import { recruitingPhaseAt, currentOrNextRecruitingWindow } from "@/lib/recruiti
 import { siteDateTimeFormatter } from "@/lib/formatSiteDateTime";
 import type { RecruitingWindow } from "@/content/recruiting";
 import type { PublicProjectArea } from "@/lib/projectAreas";
+import type { PublicDepartment } from "@/lib/departments";
 
 function remainingParts(targetMs: number, nowMs: number) {
   const totalSeconds = Math.floor(Math.max(0, targetMs - nowMs) / 1000);
@@ -54,9 +55,11 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
 export function MitmachenApplication({
   recruitingWindows: initialRecruitingWindows,
   projectAreas,
+  departments,
 }: {
   recruitingWindows: RecruitingWindow[];
   projectAreas: PublicProjectArea[];
+  departments: PublicDepartment[];
 }) {
   const t = useTranslations("MitmachenPage.application");
   const locale = useLocale();
@@ -97,7 +100,7 @@ export function MitmachenApplication({
         <SectionHeading eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
 
         {phase === "open" ? (
-          <ApplicationForm projectAreas={projectAreas} />
+          <ApplicationForm projectAreas={projectAreas} departments={departments} />
         ) : (
           <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-4">

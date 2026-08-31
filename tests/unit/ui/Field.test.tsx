@@ -115,6 +115,75 @@ describe("Field", () => {
     expect(describedBy).toContain(screen.getByText("Optional, max. 200 Zeichen.").id);
   });
 
+  it("shows a truncation notice when a paste would exceed maxLength, silently clamped by the browser", async () => {
+    const user = userEvent.setup();
+    render(
+      <Field
+        as="textarea"
+        label="Motivation"
+        name="motivation"
+        showCount
+        maxLength={10}
+        truncatedMessage="Dein eingefügter Text war länger als 10 Zeichen und wurde gekürzt."
+      />,
+    );
+    const textarea = screen.getByLabelText("Motivation");
+    textarea.focus();
+    await user.paste("this text is definitely longer than ten characters");
+
+    expect(textarea).toHaveValue("this text ");
+    expect(
+      screen.getByText("Dein eingefügter Text war länger als 10 Zeichen und wurde gekürzt."),
+    ).toBeInTheDocument();
+  });
+
+  it("shows no truncation notice for a paste that fits within maxLength", async () => {
+    const user = userEvent.setup();
+    render(
+      <Field
+        as="textarea"
+        label="Motivation"
+        name="motivation"
+        showCount
+        maxLength={300}
+        truncatedMessage="Dein eingefügter Text war länger als 300 Zeichen und wurde gekürzt."
+      />,
+    );
+    const textarea = screen.getByLabelText("Motivation");
+    textarea.focus();
+    await user.paste("kurzer Text");
+
+    expect(
+      screen.queryByText("Dein eingefügter Text war länger als 300 Zeichen und wurde gekürzt."),
+    ).not.toBeInTheDocument();
+  });
+
+  it("clears a truncation notice once the visitor keeps typing normally", async () => {
+    const user = userEvent.setup();
+    render(
+      <Field
+        as="textarea"
+        label="Motivation"
+        name="motivation"
+        showCount
+        maxLength={10}
+        truncatedMessage="Dein eingefügter Text war länger als 10 Zeichen und wurde gekürzt."
+      />,
+    );
+    const textarea = screen.getByLabelText("Motivation");
+    textarea.focus();
+    await user.paste("way more than ten characters");
+    expect(
+      screen.getByText("Dein eingefügter Text war länger als 10 Zeichen und wurde gekürzt."),
+    ).toBeInTheDocument();
+
+    await user.keyboard("{Backspace}");
+
+    expect(
+      screen.queryByText("Dein eingefügter Text war länger als 10 Zeichen und wurde gekürzt."),
+    ).not.toBeInTheDocument();
+  });
+
   it("has no accessibility violations for input, textarea, select and error states", async () => {
     const { container } = render(
       <>

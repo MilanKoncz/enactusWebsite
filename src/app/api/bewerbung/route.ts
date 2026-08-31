@@ -106,6 +106,7 @@ export async function POST(request: NextRequest) {
       motivation: data.motivation,
       wantToGain: data.wantToGain,
       areaChoices: toAreaChoices(data),
+      departments: data.departments ?? [],
       availabilityHours: data.availabilityHours,
       heardAboutUs: data.heardAboutUs,
       locale: data.locale,

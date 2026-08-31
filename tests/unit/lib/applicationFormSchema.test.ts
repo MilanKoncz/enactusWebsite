@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   applicationFormSchema,
   CV_REQUIRED,
+  MAX_DEPARTMENTS,
+  MOTIVATION_MAX,
+  WANT_TO_GAIN_MAX,
   toAreaChoices,
   validatedApplicationFormSchema,
 } from "@/lib/applicationFormSchema";
@@ -60,6 +63,19 @@ describe("applicationFormSchema (field-level rules, no cross-field refinement)",
     expect(result.success).toBe(false);
   });
 
+  it(`rejects a motivation over ${MOTIVATION_MAX} characters`, () => {
+    const result = applicationFormSchema.safeParse({
+      ...validInput(),
+      motivation: "x".repeat(MOTIVATION_MAX + 1),
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it(`accepts exactly ${MOTIVATION_MAX} characters for motivation`, () => {
+    const result = applicationFormSchema.safeParse({ ...validInput(), motivation: "x".repeat(MOTIVATION_MAX) });
+    expect(result.success).toBe(true);
+  });
+
   it("rejects a missing first-choice area", () => {
     const result = applicationFormSchema.safeParse({ ...validInput(), area1: "" });
     expect(result.success).toBe(false);
@@ -110,13 +126,58 @@ describe("applicationFormSchema (field-level rules, no cross-field refinement)",
     expect(result.success).toBe(true);
   });
 
-  it("rejects wantToGain over 400 characters", () => {
-    const result = applicationFormSchema.safeParse({ ...validInput(), wantToGain: "x".repeat(401) });
+  it(`rejects wantToGain over ${WANT_TO_GAIN_MAX} characters`, () => {
+    const result = applicationFormSchema.safeParse({
+      ...validInput(),
+      wantToGain: "x".repeat(WANT_TO_GAIN_MAX + 1),
+    });
     expect(result.success).toBe(false);
   });
 
-  it("accepts exactly 400 characters for wantToGain", () => {
-    const result = applicationFormSchema.safeParse({ ...validInput(), wantToGain: "x".repeat(400) });
+  it(`accepts exactly ${WANT_TO_GAIN_MAX} characters for wantToGain`, () => {
+    const result = applicationFormSchema.safeParse({ ...validInput(), wantToGain: "x".repeat(WANT_TO_GAIN_MAX) });
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts departments omitted entirely", () => {
+    const result = applicationFormSchema.safeParse(validInput());
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts an empty departments array", () => {
+    const result = applicationFormSchema.safeParse({ ...validInput(), departments: [] });
+    expect(result.success).toBe(true);
+  });
+
+  it(`accepts exactly ${MAX_DEPARTMENTS} departments`, () => {
+    const result = applicationFormSchema.safeParse({
+      ...validInput(),
+      departments: Array.from({ length: MAX_DEPARTMENTS }, (_, index) => `Ressort ${index + 1}`),
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it(`rejects more than ${MAX_DEPARTMENTS} departments`, () => {
+    const result = applicationFormSchema.safeParse({
+      ...validInput(),
+      departments: Array.from({ length: MAX_DEPARTMENTS + 1 }, (_, index) => `Ressort ${index + 1}`),
+    });
+    expect(result.success).toBe(false);
+  });
+});
+
+describe("validatedApplicationFormSchema — department cross-field rules", () => {
+  it("rejects the same department chosen twice", () => {
+    const result = validatedApplicationFormSchema.safeParse(
+      validInput({ departments: ["Team-Lead", "Team-Lead"] }),
+    );
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts distinct departments", () => {
+    const result = validatedApplicationFormSchema.safeParse(
+      validInput({ departments: ["Team-Lead", "Finance-Lead"] }),
+    );
     expect(result.success).toBe(true);
   });
 });

@@ -50,6 +50,24 @@ function mockProjectAreas(page: Page) {
   );
 }
 
+// Same reasoning as mockProjectAreas: CI's build has no database, so
+// /api/departments would otherwise return an empty list and the Ressort
+// checkboxes these tests check for would never exist.
+function mockDepartments(page: Page) {
+  return page.route("**/api/departments", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        departments: [
+          { id: "e2e-dept-1", labelDe: "Team-Lead", labelEn: "Team-Lead" },
+          { id: "e2e-dept-2", labelDe: "Finance-Lead", labelEn: "Finance-Lead" },
+        ],
+      }),
+    }),
+  );
+}
+
 // Issued 10s in the past, so ApplicationForm's minimum-fill-time gate
 // (lib/antiSpam.ts's MIN_FILL_MS, 3s) is already satisfied the moment the
 // form is filled in — no fake clock and no real waiting needed. The
@@ -202,6 +220,7 @@ test.describe("/mitmachen", () => {
   }) => {
     await mockOpenRecruitingWindow(page);
     await mockProjectAreas(page);
+    await mockDepartments(page);
     await mockFormToken(page);
     await mockCvUpload(page);
     // /api/bewerbung itself is exercised by the Vitest integration suite
@@ -236,6 +255,42 @@ test.describe("/mitmachen", () => {
     await page.getByRole("button", { name: "Bewerbung absenden" }).click();
 
     await expect(page.getByRole("status")).toContainText("Danke für deine Bewerbung");
+  });
+
+  test("lets a visitor check optional Ressorts and still submit successfully", async ({ page }) => {
+    await mockOpenRecruitingWindow(page);
+    await mockProjectAreas(page);
+    await mockDepartments(page);
+    await mockFormToken(page);
+    await mockCvUpload(page);
+    let submittedBody: unknown;
+    await page.route("**/api/bewerbung", (route) => {
+      submittedBody = route.request().postDataJSON();
+      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true }) });
+    });
+    await page.goto("/mitmachen");
+
+    await expect(page.getByRole("checkbox", { name: "Team-Lead" })).toBeVisible();
+    await page.getByRole("checkbox", { name: "Team-Lead" }).check();
+    await page.getByRole("checkbox", { name: "Finance-Lead" }).check();
+
+    await page.getByLabel("Vorname").fill("Jane");
+    await page.getByLabel("Nachname").fill("Doe");
+    await page.getByLabel("E-Mail").fill("jane@example.com");
+    await page.getByLabel("Studiengang").fill("BWL");
+    await page.getByLabel("Fachsemester").fill("3");
+    await page.getByLabel("Verfügbarkeit in Stunden pro Woche").fill("10");
+    await page.getByLabel("1. Wahl").selectOption("SmileGreen");
+    await page.getByLabel("Warum dieser Bereich?").fill("Weil ich dort am meisten bewirken kann.");
+    await uploadCv(page);
+    await page
+      .getByLabel("Motivation")
+      .fill("Ich möchte gerne aktiv an einem Projekt mitarbeiten und Verantwortung übernehmen.");
+    await page.getByRole("checkbox", { name: /Datenschutzerklärung/ }).check();
+    await page.getByRole("button", { name: "Bewerbung absenden" }).click();
+
+    await expect(page.getByRole("status")).toContainText("Danke für deine Bewerbung");
+    expect(submittedBody).toMatchObject({ departments: ["Team-Lead", "Finance-Lead"] });
   });
 
   test("blocks the application form with visible errors when required fields are empty", async ({

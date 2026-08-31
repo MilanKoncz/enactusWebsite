@@ -269,6 +269,46 @@ describe("POST /api/bewerbung", () => {
     expect(insertApplication).not.toHaveBeenCalled();
   });
 
+  it("passes the chosen departments through to insertApplication, defaulting to an empty array", async () => {
+    checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
+    insertApplication.mockResolvedValue(STORED_APPLICATION);
+    renderToBuffer.mockResolvedValue(Buffer.from("pdf"));
+    sendApplicationNotification.mockResolvedValue("email-id-1");
+    sendApplicationConfirmation.mockResolvedValue("email-id-2");
+
+    const { POST } = await import("@/app/api/bewerbung/route");
+
+    await POST(postRequest(validPayload({ departments: ["Team-Lead", "Finance-Lead"] })));
+    expect(insertApplication).toHaveBeenCalledWith(
+      expect.objectContaining({ departments: ["Team-Lead", "Finance-Lead"] }),
+    );
+
+    await POST(postRequest(validPayload()));
+    expect(insertApplication).toHaveBeenLastCalledWith(expect.objectContaining({ departments: [] }));
+  });
+
+  it("rejects more than MAX_DEPARTMENTS departments, without writing anything", async () => {
+    checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
+
+    const { POST } = await import("@/app/api/bewerbung/route");
+    const response = await POST(
+      postRequest(validPayload({ departments: ["Team-Lead", "Finance-Lead", "Operations-Lead", "Inno-Lead"] })),
+    );
+
+    expect(response.status).toBe(400);
+    expect(insertApplication).not.toHaveBeenCalled();
+  });
+
+  it("rejects a duplicate department, without writing anything", async () => {
+    checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
+
+    const { POST } = await import("@/app/api/bewerbung/route");
+    const response = await POST(postRequest(validPayload({ departments: ["Team-Lead", "Team-Lead"] })));
+
+    expect(response.status).toBe(400);
+    expect(insertApplication).not.toHaveBeenCalled();
+  });
+
   it("rejects a submission with no CV attached, since CV_REQUIRED is true", async () => {
     checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
 

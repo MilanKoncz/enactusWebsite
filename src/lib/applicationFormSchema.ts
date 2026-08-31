@@ -33,6 +33,22 @@ export const CV_REQUIRED = true;
 const AREA_LABEL_MAX = 120;
 const AREA_REASON_MAX = 300;
 
+// Ressorts (cross-project positions like Team-Lead) are a separate,
+// unranked, unreasoned category from the Wunschbereich choices above — see
+// lib/db.ts's own comment on why they need a second table rather than a
+// fourth priority. Capped here, read by both the client and the server, and
+// enforced again in refineApplicationForm below (duplicates) — without a
+// cap an applicant would just tick everything, and the signal would be
+// worthless. One line to change if the board wants a different number.
+export const MAX_DEPARTMENTS = 3;
+const DEPARTMENT_LABEL_MAX = 120;
+
+// Read by both the schema below and the field's own maxLength/hint text
+// (ApplicationForm.tsx), so the number exists in exactly one place. 1500 and
+// 400 were the original limits; raised 2026-08-31 at the board's request.
+export const MOTIVATION_MAX = 2000;
+export const WANT_TO_GAIN_MAX = 800;
+
 // 4 MB, matching the upload route's own maximumSizeInBytes
 // (app/api/bewerbung/cv-upload/route.ts) — Vercel Blob is the real
 // enforcement point; this is a second, defensive ceiling on the number the
@@ -60,6 +76,13 @@ export const applicationFormSchema = z.object({
   area3: z.string().trim().max(AREA_LABEL_MAX).optional(),
   area3Reason: z.string().trim().max(AREA_REASON_MAX).optional(),
 
+  // Ressorts: an unranked, optional checkbox group, deliberately not three
+  // more flat fields like area1..area3 above — there is no priority to bind
+  // to individual controls, just a set. Duplicates can't occur through the
+  // checkbox UI itself, but refineApplicationForm still checks them, the
+  // same defense-in-depth as the area duplicate check below.
+  departments: z.array(z.string().trim().min(1).max(DEPARTMENT_LABEL_MAX)).max(MAX_DEPARTMENTS).optional(),
+
   // Populated together, as a unit, once the client's direct-to-Blob upload
   // (upload() from @vercel/blob/client against /api/bewerbung/cv-upload)
   // resolves — never assembled field by field. All four optional here so
@@ -70,7 +93,7 @@ export const applicationFormSchema = z.object({
   cvOriginalFilename: z.string().trim().min(1).max(200).optional(),
   cvSizeBytes: z.coerce.number().int().min(1).max(CV_MAX_SIZE_BYTES).optional(),
 
-  motivation: z.string().trim().min(20).max(1500),
+  motivation: z.string().trim().min(20).max(MOTIVATION_MAX),
   priorInvolvement: z.string().trim().max(600).optional(),
   // Relabeled "Relevante Skills" — deliberately shorter than every other
   // free-text field here (200, not the 300 a full sentence would fit):
@@ -80,7 +103,7 @@ export const applicationFormSchema = z.object({
   // New: forward-looking, deliberately distinct from motivation ("why us")
   // and the area reasons ("why this area") — see ApplicationForm.tsx's
   // hint text for how the four free-text fields stay non-redundant.
-  wantToGain: z.string().trim().max(400).optional(),
+  wantToGain: z.string().trim().max(WANT_TO_GAIN_MAX).optional(),
 
   heardAboutUs: z.string().trim().max(150).optional(),
   consent: z.boolean().refine((value) => value === true),
@@ -136,6 +159,19 @@ export function refineApplicationForm(data: RawApplicationForm, ctx: z.Refinemen
       ctx.addIssue({ code: "custom", path: [entry.path], message: "duplicate area" });
     }
     seen.add(entry.value);
+  }
+
+  // Belt and braces: the checkbox UI can't itself produce a duplicate, but
+  // a direct request to the API route could still supply one.
+  if (data.departments) {
+    const seenDepartments = new Set<string>();
+    for (const department of data.departments) {
+      if (seenDepartments.has(department)) {
+        ctx.addIssue({ code: "custom", path: ["departments"], message: "duplicate department" });
+        break;
+      }
+      seenDepartments.add(department);
+    }
   }
 
   // The four CV fields are only ever populated together, by the same
