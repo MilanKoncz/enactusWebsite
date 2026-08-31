@@ -84,6 +84,12 @@
     "gateConstruction": "Construction site",
     "gateInnolab": "InnoLab"
   },
+  "Error": {
+    "title": "Something went wrong.",
+    "note": "That's on us, not you. Try again, or head back to the homepage.",
+    "retry": "Try again",
+    "backHome": "Go to homepage"
+  },
   "Secret": {
     "title": "You found the secret chill area!",
     "body": "Nothing to get done here, just take a breath. Nobody's expecting you, so make yourself at home.",
@@ -1869,6 +1875,17 @@
         "ideathonSignups": "Ideathon signups"
       }
     }
+  },
+  "AdminError": {
+    "title": "This view couldn't load.",
+    "note": "Usually a database connection issue. Try again, or come back later.",
+    "retry": "Try again",
+    "backToOverview": "Back to overview"
+  },
+  "AdminNotFound": {
+    "title": "This admin page doesn't exist.",
+    "note": "Check the link, or head back to the overview.",
+    "backToOverview": "Back to overview"
   },
   "ImageLightbox": {
     "openLabel": "Enlarge {alt}",

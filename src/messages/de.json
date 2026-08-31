@@ -84,6 +84,12 @@
     "gateConstruction": "Baustelle",
     "gateInnolab": "InnoLab"
   },
+  "Error": {
+    "title": "Da ist etwas schiefgelaufen.",
+    "note": "Das liegt an uns, nicht an dir. Versuch es noch einmal oder geh zurück zur Startseite.",
+    "retry": "Erneut versuchen",
+    "backHome": "Zur Startseite"
+  },
   "Secret": {
     "title": "Du hast die geheime Chill Area gefunden!",
     "body": "Hier gibt's nichts zu erledigen, nur kurz durchatmen. Niemand erwartet dich hier, also mach's dir bequem.",
@@ -1869,6 +1875,17 @@
         "ideathonSignups": "Ideathon-Anmeldungen"
       }
     }
+  },
+  "AdminError": {
+    "title": "Diese Ansicht konnte nicht geladen werden.",
+    "note": "Meist liegt es an der Datenbankverbindung. Versuch es noch einmal, oder komm später wieder.",
+    "retry": "Erneut versuchen",
+    "backToOverview": "Zur Übersicht"
+  },
+  "AdminNotFound": {
+    "title": "Diese Adminseite gibt es nicht.",
+    "note": "Prüf den Link, oder geh zurück zur Übersicht.",
+    "backToOverview": "Zur Übersicht"
   },
   "ImageLightbox": {
     "openLabel": "{alt} vergrößern",
