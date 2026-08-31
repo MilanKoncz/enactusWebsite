@@ -313,12 +313,18 @@ async function verifyCronRuns() {
 
   await sql`
     update cron_runs set finished_at = now(), ok = true, deleted_applications = 2,
-      pruned_rate_limit_hits = 7, error = null
+      pruned_rate_limit_hits = 7, deleted_cv_blobs = 3, deleted_orphan_blobs = 1,
+      remaining_cv_blobs = 5, error = null
     where id = ${started.id}
   `;
   const [finished] = await sql`select * from cron_runs where id = ${started.id}`;
   check("finishing a run records ok and the counts", [finished.ok, finished.deleted_applications], [true, 2]);
   check("pruned counter round-trips", finished.pruned_rate_limit_hits, 7);
+  check(
+    "cv-blobs counters round-trip",
+    [finished.deleted_cv_blobs, finished.deleted_orphan_blobs, finished.remaining_cv_blobs],
+    [3, 1, 5],
+  );
 
   const recent = await sql`select id from cron_runs where job = ${MARKER} order by started_at desc limit 1`;
   check("most-recent-first ordering finds the run", recent.length, 1);

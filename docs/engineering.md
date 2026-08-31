@@ -14,10 +14,47 @@ Forms, data, privacy, performance, SEO, and testing detail.
    against a signed token (`GET /api/bewerbung/token`, `lib/formToken.ts`) —
    not a client-supplied timestamp, which a script could set to anything.
    No CAPTCHA: it is an accessibility and privacy problem.
-7. Free-text fields only, no file upload.
+7. The CV upload goes directly from the browser to Vercel Blob
+   (`upload()` from `@vercel/blob/client`, store `enactus-bewerbungen`,
+   region `fra1`, access private) — never through this server. The token
+   route (`/api/bewerbung/cv-upload`) only issues the short-lived upload
+   token, gated by the same signed form-token as the timing check above
+   plus its own rate limit (`lib/rateLimit.ts`'s `bewerbung-cv` bucket).
+   Only `application/pdf`, capped at 4 MB. Up to three prioritized
+   Wunschbereich choices, each with its own required reason
+   (`application_area_choices`, migration `0017`), replace the old
+   checkbox list — validated for gaps and duplicates by one refinement
+   shared between the client resolver and the API request schema
+   (`lib/applicationFormSchema.ts`'s `refineApplicationForm`).
 8. The route rejects with 409 when no recruiting window is currently open —
    the form only renders while one is, but the route itself is public and
    reachable regardless of what a page already open in some tab still shows.
+
+**Hochgeladene PDFs werden nicht auf Schadsoftware geprüft.** Es läuft kein
+Virenscanner über den Store, und der Vorstand öffnet die Dateien. Das ist ein
+bewusst akzeptiertes Restrisiko: ein Scanner wäre ein weiterer
+Auftragsverarbeiter für genau die sensibelste Datenkategorie dieser Seite.
+Was stattdessen greift: nur `application/pdf` wird angenommen, die ersten
+Bytes werden serverseitig gegen `%PDF-` geprüft (`lib/cvBlob.ts`'s
+`hasPdfMagicBytes`, in `onUploadCompleted` und noch einmal in
+`/api/bewerbung` — die zweite Prüfung ist die, die überall läuft,
+`onUploadCompleted` feuert nie gegen `localhost`), die Datei ist auf 4 MB
+begrenzt, der Store ist privat, und die Auslieferung erfolgt ausschließlich
+als `Content-Disposition: attachment` mit `X-Content-Type-Options: nosniff`
+— nie gerendert, immer heruntergeladen. Der Vorstand sollte
+Bewerbungs-PDFs im Browser-Viewer öffnen, nicht in einem Desktop-Reader mit
+aktiviertem JavaScript.
+
+CV retention is a fixed deadline on the row itself
+(`applications.retain_until`, migration `0016`), computed once at insert
+time from whichever recruiting window is open then — never recomputed, so
+it can't silently freeze the way an earlier, live-recomputed version did
+(see `lib/retentionCutoff.ts`'s own comment). The cleanup cron's `cv-blobs`
+pass deletes the blob for every application the retention pass removes,
+then sweeps Vercel Blob for orphaned uploads (a CV whose upload succeeded
+but whose form was never submitted) older than 24 hours — batched and
+skipped outright, recorded as a skip rather than a failure, if the shared
+cron time budget is already spent.
 
 Open/closed state comes from the `recruiting_windows` table (see
 `docs/content-guide.md`), read through a short-lived cache
@@ -121,13 +158,16 @@ board member can delete a single entry directly from this page.
 
 ## Data protection
 
-- All regions EU: Vercel `fra1`, Neon `eu-central-1`, Resend EU.
+- All regions EU: Vercel `fra1` (also where uploaded CVs live, in the private
+  Vercel Blob store `enactus-bewerbungen`), Neon `eu-central-1`, Resend EU.
 - Collect the minimum. A field not used in selection does not belong on the form.
 - Data processing agreements required with Vercel, Neon, and Resend. Track their
   status in `ASSETS-TODO.md`.
 - Access and erasure requests (GDPR Art. 15 and 17) are served by
   `/admin/loeschanfragen`: search one address across all three tables, see
-  every stored field, delete after confirming the address twice.
+  every stored field, delete after confirming the address twice — this also
+  best-effort deletes that person's CV blob, synchronously, rather than
+  waiting for the cleanup cron's next run.
 - Enactus Germany provides a data protection officer who advises student teams
   free of charge. The privacy policy draft goes to him before launch, clearly
   marked as a draft until then.

@@ -25,6 +25,15 @@ the LCP budget above, and Radix UI / `motion` position and animate elements
 via inline `style` attributes that no nonce can ever cover regardless.
 `frame-src`/`img-src` carry the two YouTube hosts the click-to-load facade
 needs (`youtube-nocookie.com`, `i.ytimg.com`); everything else is `'self'`.
+`connect-src` carries one addition beyond `'self'`: `https://vercel.com` —
+the CV upload (`upload()` from `@vercel/blob/client`, `ApplicationForm.tsx`)
+runs entirely in the browser and PUTs straight to that host (the package's
+own default control-plane endpoint), not through this project's server.
+Missing this broke the upload silently the first time it shipped: not as
+an application error, but as a CSP-blocked fetch the browser's own console
+reports — invisible to any mocked Vitest test, since the request never
+reaches this server at all, and caught only by the e2e suite actually
+driving a real browser.
 
 After any change here, load a representative set of pages in a real browser
 (or `node`-drive one with Playwright) and check the console for CSP
@@ -56,6 +65,15 @@ the full list and current values.
   green with this unset, since Next collects route metadata without
   running a request handler. Only a real deployment (or `npm run
   db:migrate` / `npm run db:verify`) actually needs it present.
+- `BLOB_STORE_ID` / `BLOB_READ_WRITE_TOKEN` — the Vercel Blob store for
+  uploaded application CVs (`enactus-bewerbungen`, region `fra1`, access
+  private). Both come from `vercel blob store` / `vercel env pull`, not
+  hand-generated. `BLOB_READ_WRITE_TOKEN` is what `lib/cvBlob.ts` and the CV
+  upload/download routes authenticate with — read lazily, same contract as
+  `DATABASE_URL`, so `next build` stays green with it unset. With it
+  missing at runtime, the CV upload token route, the admin CV download
+  route, and the cleanup cron's `cv-blobs` pass all fail closed with a
+  clear error rather than silently doing nothing.
 - `RESEND_API_KEY` — Resend API key, EU-region sending. Same lazy-read
   contract as `DATABASE_URL`, in `lib/mail.ts`.
 - `APPLICATION_RECIPIENT_EMAIL` — mailbox that receives the PDF for every
@@ -202,7 +220,7 @@ Eleven sections, all behind the same gate:
 | Path | What it's for |
 | --- | --- |
 | `/admin` | Overview linking every section, plus a compact status bar (applications in the running window, failed mails, whether a future application window is scheduled, last cron run, next calendar event) |
-| `/admin/bewerbungen` | Applications by recruiting semester, CSV per group, delete a single application |
+| `/admin/bewerbungen` | Applications by recruiting semester, CSV per group (now including prioritized areas with reasons, skills, and CV yes/no), authenticated CV download per row, delete a CV or a whole application |
 | `/admin/mails` | Every failed send across all five tables, with a resend |
 | `/admin/bewerbungsfenster` | Create, edit, delete application windows |
 | `/admin/termine` | Create, edit, delete the homepage's calendar events |
@@ -254,12 +272,21 @@ Two sections are worth knowing about before you need them:
 
 `content/retention.ts` states how long each table keeps a row; nothing
 enforces that on its own — `/api/cron/cleanup` does, once a day, deleting
-whatever `lib/retentionCutoff.ts` says has expired. Wired up two ways,
-not as alternatives to each other but as a primary path and a fallback:
+whatever `lib/retentionCutoff.ts` says has expired. The route runs three
+independently-logged passes — `cleanup` (the table sweep above),
+`cv-blobs` (deletes the CV blob for every application `cleanup` just
+removed, then sweeps Vercel Blob for orphaned uploads older than 24 hours;
+batched and skipped, not failed, if the shared time budget is already
+spent — see `app/api/cron/cleanup/route.ts`'s own comment), and
+`reminder-window` (mails the confirmed reminder list once a window opens)
+— behind one route, not three. That's deliberate, not just convenient:
+Vercel's Hobby plan allows only two cron jobs at daily granularity, one
+slot is already spent on this route, and the second stays free rather
+than being spent on a fourth. Wired up two ways, not as alternatives to
+each other but as a primary path and a fallback:
 
 1. **Vercel Cron** (`vercel.json`) calls the route once a day at 03:00 UTC
-   with `Authorization: Bearer $CRON_SECRET`. Vercel's Hobby plan allows up
-   to two cron jobs at daily granularity, so this fits without a paid plan.
+   with `Authorization: Bearer $CRON_SECRET`.
 
    **This has already failed silently once.** On 2026-08-17 the job was
    registered correctly (`npx vercel crons ls` confirmed it) and still did
@@ -293,3 +320,10 @@ purely additive, so adding one was out of scope alongside it. The deleted
 count still appears in the route's own JSON response, just not in
 `/admin/system`'s persisted run history — a job posting's row count there
 comes from `countRowsPerTable` directly, same as every other table.
+
+A CV's actual deadline isn't computed by this route at all: `retain_until`
+(`migrations/0016`) is fixed once, at insert time, on the application row
+itself (`lib/retentionCutoff.ts`'s `applicationRetainUntil`). The `cv-blobs`
+pass just compares that column to `now()`, the same way `cleanup` does for
+every other table — there's no separate CV-specific period to keep in sync
+in `content/retention.ts`.
