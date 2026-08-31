@@ -55,7 +55,7 @@ test.describe("/datenschutz", () => {
     await expect(page.getByRole("heading", { level: 1, name: "Datenschutzerklärung" })).toBeVisible();
     await expect(page.getByText("Stand: August 2026")).toBeVisible();
     await expect(page.getByRole("heading", { level: 2, name: "Bewerbungsformular" })).toBeVisible();
-    await expect(page.getByText(/Es gibt keinen Datei-Upload/)).toBeVisible();
+    await expect(page.getByText(/Der Lebenslauf ist als PDF-Datei hochzuladen, maximal 4 MB/)).toBeVisible();
   });
 
   test("renders all 19 sections, including the two retention and processor tables", async ({ page }) => {
