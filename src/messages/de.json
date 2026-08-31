@@ -1547,6 +1547,7 @@
       "cvNone": "Keiner",
       "cvRemove": "CV löschen",
       "confirmRemoveCv": "Lebenslauf von {name} wirklich löschen? Die Bewerbung selbst bleibt erhalten.",
+      "departmentsNone": "keine",
       "columns": {
         "name": "Name",
         "email": "E-Mail",
@@ -1554,6 +1555,7 @@
         "createdAt": "Eingangsdatum",
         "mailStatus": "Mailstatus",
         "cv": "Lebenslauf",
+        "departments": "Ressorts",
         "actions": "Aktionen"
       }
     },

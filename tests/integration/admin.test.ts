@@ -148,4 +148,58 @@ describe("GET /api/admin/bewerbungen/csv", () => {
     expect(body).toContain("ja"); // Lebenslauf column, since cvPathname is set
     expect(listApplicationsBySemester).toHaveBeenCalledWith("HWS26");
   });
+
+  it("includes a separate Ressorts column, never merged into Wunschbereiche", async () => {
+    listApplicationsBySemester.mockResolvedValue([
+      {
+        id: "1",
+        createdAt: new Date("2026-09-05T10:00:00Z"),
+        firstName: "Jane",
+        lastName: "Doe",
+        email: "jane@example.com",
+        studyProgram: "BWL",
+        semester: 3,
+        availabilityHours: 10,
+        desiredAreas: null,
+        areaChoices: [{ priority: 1, areaLabel: "SmileGreen", reason: "Weil ich dort am meisten bewirken kann." }],
+        departments: ["Team-Lead", "Finance-Lead"],
+        languagesSkills: null,
+        cvPathname: null,
+        mailStatus: "sent",
+        recruitingSemester: "HWS26",
+      },
+      {
+        id: "2",
+        createdAt: new Date("2026-09-05T10:00:00Z"),
+        firstName: "Legacy",
+        lastName: "Applicant",
+        email: "legacy@example.com",
+        studyProgram: "BWL",
+        semester: 3,
+        availabilityHours: 10,
+        desiredAreas: null,
+        areaChoices: [{ priority: 1, areaLabel: "SmileGreen", reason: "Weil ich dort am meisten bewirken kann." }],
+        departments: null,
+        languagesSkills: null,
+        cvPathname: null,
+        mailStatus: "sent",
+        recruitingSemester: "HWS26",
+      },
+    ]);
+
+    const { createSessionCookieValue } = await import("@/lib/adminAuth");
+    const cookie = createSessionCookieValue()!;
+    const { GET } = await import("@/app/api/admin/bewerbungen/csv/route");
+    const response = await GET(
+      csvRequest("http://localhost/api/admin/bewerbungen/csv?semester=HWS26", `admin_session=${cookie}`),
+    );
+
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    const body = new TextDecoder("utf-8", { ignoreBOM: true }).decode(bytes);
+    const [header, janeRow, legacyRow] = body.trim().split("\r\n");
+    expect(header.split(",")).toContain("Ressorts");
+    expect(janeRow).toContain("Team-Lead; Finance-Lead");
+    expect(legacyRow).toContain("Legacy");
+    expect(legacyRow).not.toContain("Team-Lead");
+  });
 });

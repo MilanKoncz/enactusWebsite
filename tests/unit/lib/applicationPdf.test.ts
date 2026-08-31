@@ -88,6 +88,25 @@ describe("ApplicationPdfDocument", () => {
     await expect(renderToBuffer(ApplicationPdfDocument({ application: legacy }))).resolves.toBeInstanceOf(Buffer);
   });
 
+  it("renders a Ressorts section when departments are present", async () => {
+    const withDepartments: Application = { ...baseApplication, departments: ["Team-Lead", "Finance-Lead"] };
+    await expect(renderToBuffer(ApplicationPdfDocument({ application: withDepartments }))).resolves.toBeInstanceOf(
+      Buffer,
+    );
+  });
+
+  it("renders without a Ressorts section when departments is an empty array", async () => {
+    const noDepartments: Application = { ...baseApplication, departments: [] };
+    await expect(renderToBuffer(ApplicationPdfDocument({ application: noDepartments }))).resolves.toBeInstanceOf(
+      Buffer,
+    );
+  });
+
+  it("renders without a Ressorts section for a pre-migration row with no departments field", async () => {
+    const legacy: Application = { ...baseApplication, departments: undefined };
+    await expect(renderToBuffer(ApplicationPdfDocument({ application: legacy }))).resolves.toBeInstanceOf(Buffer);
+  });
+
   it("renders without a CV attached", async () => {
     const noCv: Application = {
       ...baseApplication,

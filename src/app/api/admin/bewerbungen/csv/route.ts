@@ -20,6 +20,7 @@ const CSV_COLUMNS = [
   "Fachsemester",
   "Verfügbarkeit",
   "Wunschbereiche",
+  "Ressorts",
   "Skills",
   "Lebenslauf",
   "Eingangsdatum",
@@ -42,6 +43,16 @@ function formatAreaChoices(application: ApplicationSummary): string {
     return `${application.desiredAreas.join("; ")} (ohne Priorisierung)`;
   }
   return "";
+}
+
+// A separate column from Wunschbereiche, never merged into it — a Ressort
+// carries no priority and no reason, so joining it into the same cell would
+// misrepresent it as another ranked choice. Empty for both NULL
+// (pre-migration) and an empty array (asked, nothing chosen).
+function formatDepartments(application: ApplicationSummary): string {
+  return application.departments && application.departments.length > 0
+    ? application.departments.join("; ")
+    : "";
 }
 
 const MAIL_STATUS_LABEL: Record<string, string> = {
@@ -82,6 +93,7 @@ export async function GET(request: NextRequest) {
       String(application.semester),
       `${application.availabilityHours} Std./Woche`,
       formatAreaChoices(application),
+      formatDepartments(application),
       application.languagesSkills ?? "",
       application.cvPathname ? "ja" : "nein",
       dateFormatter.format(application.createdAt),

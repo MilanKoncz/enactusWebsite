@@ -1547,6 +1547,7 @@
       "cvNone": "None",
       "cvRemove": "Remove CV",
       "confirmRemoveCv": "Remove the CV from {name}'s application? The application itself stays.",
+      "departmentsNone": "none",
       "columns": {
         "name": "Name",
         "email": "Email",
@@ -1554,6 +1555,7 @@
         "createdAt": "Received",
         "mailStatus": "Mail status",
         "cv": "CV",
+        "departments": "Departments",
         "actions": "Actions"
       }
     },

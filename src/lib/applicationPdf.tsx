@@ -182,6 +182,20 @@ export function ApplicationPdfDocument({ application }: { application: Applicati
           />
         </View>
 
+        {/* Its own section, not another Fact inside "Einsatz" above — a
+            Ressort has no priority and no reason, so folding it into the
+            same block would blur it with the ranked Wunschbereich choices
+            it's deliberately kept separate from (see
+            applicationFormSchema.ts's own comment). Nothing renders for
+            NULL (pre-migration) or an empty array (asked, nothing chosen);
+            no fact is invented either way. */}
+        {application.departments && application.departments.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionHeading}>Ressorts</Text>
+            <Fact label="Ressorts" value={application.departments.join(", ")} />
+          </View>
+        )}
+
         {(application.priorInvolvement || application.languagesSkills) && (
           <View style={styles.section}>
             <Text style={styles.sectionHeading}>Erfahrung</Text>

@@ -48,6 +48,7 @@ export default async function AdminBewerbungenPage({ params }: PageProps) {
     t("applications.columns.createdAt"),
     t("applications.columns.mailStatus"),
     t("applications.columns.cv"),
+    t("applications.columns.departments"),
     t("applications.columns.actions"),
   ];
 
@@ -109,6 +110,13 @@ export default async function AdminBewerbungenPage({ params }: PageProps) {
                 ) : (
                   <span key="cv" className="text-body-s opacity-60">
                     {t("applications.cvNone")}
+                  </span>
+                ),
+                application.departments && application.departments.length > 0 ? (
+                  <span key="departments">{application.departments.join(", ")}</span>
+                ) : (
+                  <span key="departments" className="opacity-60">
+                    {t("applications.departmentsNone")}
                   </span>
                 ),
                 <AdminDeleteButton
