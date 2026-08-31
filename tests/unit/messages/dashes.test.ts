@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import de from "@/messages/de.json";
 import en from "@/messages/en.json";
+import { collectStrings } from "../../fixtures/collectStrings";
 
 /**
  * This project never uses an em dash or a prose en dash in visitor-facing
@@ -16,22 +17,6 @@ import en from "@/messages/en.json";
 
 const EM_DASH = "—";
 const EN_DASH = "–";
-
-function collectStrings(value: unknown, path: string, out: Array<{ path: string; value: string }>): void {
-  if (typeof value === "string") {
-    out.push({ path, value });
-    return;
-  }
-  if (Array.isArray(value)) {
-    value.forEach((item, index) => collectStrings(item, `${path}[${index}]`, out));
-    return;
-  }
-  if (value !== null && typeof value === "object") {
-    for (const [key, child] of Object.entries(value)) {
-      collectStrings(child, path ? `${path}.${key}` : key, out);
-    }
-  }
-}
 
 // A digit-dash-digit run ("8–10") is the one allowed shape for an en dash —
 // stripping every such run out first means whatever en dash is left over,

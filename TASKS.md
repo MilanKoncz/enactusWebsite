@@ -76,8 +76,9 @@ A real translation pass, not a mirror of the German — see `ASSETS-TODO.md`'s
 State plainly in the English FAQ and on `/mitmachen` that club and project
 work happen in German. Do not bury it.
 
-Then `hreflang` alternates, localised metadata, and a test that every key
-exists in both files.
+`hreflang` alternates and localised metadata are covered by
+`tests/e2e/seo.spec.ts`. ~~A test that every key exists in both files~~ Done,
+2026-08-31 — `tests/unit/messages/parity.test.ts`.
 
 ## Phase 7 — Launch
 
