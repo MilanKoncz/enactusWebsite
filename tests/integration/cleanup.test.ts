@@ -11,6 +11,7 @@ const pruneRateLimitHits = vi.fn();
 const startCronRun = vi.fn();
 const finishCronRun = vi.fn();
 const findRecruitingWindowsNeedingReminderMail = vi.fn();
+const findReferencedCvPathnames = vi.fn();
 
 const sendReminderWindowMailsForWindow = vi.fn();
 
@@ -24,20 +25,28 @@ vi.mock("@/lib/db", () => ({
   startCronRun: (...args: unknown[]) => startCronRun(...args),
   finishCronRun: (...args: unknown[]) => finishCronRun(...args),
   findRecruitingWindowsNeedingReminderMail: (...args: unknown[]) => findRecruitingWindowsNeedingReminderMail(...args),
+  findReferencedCvPathnames: (...args: unknown[]) => findReferencedCvPathnames(...args),
 }));
 
 // The reminder-window job's own send/claim logic (idempotency, batching) is
 // covered by tests/unit/lib/reminderWindowMail.test.ts — this file only
-// needs to prove the route wires the two jobs together correctly and
+// needs to prove the route wires the jobs together correctly and
 // independently, so sendReminderWindowMailsForWindow is a plain stub here.
 vi.mock("@/lib/reminderWindowMail", () => ({
   sendReminderWindowMailsForWindow: (...args: unknown[]) => sendReminderWindowMailsForWindow(...args),
 }));
 
 const deleteCvBlobs = vi.fn();
+const listCvBlobs = vi.fn();
 vi.mock("@/lib/cvBlob", () => ({
   deleteCvBlobs: (...args: unknown[]) => deleteCvBlobs(...args),
+  listCvBlobs: (...args: unknown[]) => listCvBlobs(...args),
 }));
+
+// The cv-blobs job's own default response shape when there's nothing to
+// delete and nothing orphaned — matches most tests below, which aren't
+// testing that job specifically.
+const EMPTY_CV_BLOBS = { deletedCvBlobs: 0, deletedOrphanBlobs: 0, remainingCvBlobs: 0, skipped: false, error: null };
 
 function request(authHeader?: string) {
   return new NextRequest("http://localhost/api/cron/cleanup", {
@@ -55,6 +64,8 @@ describe("GET /api/cron/cleanup", () => {
     // independence, not about what a window actually sends.
     findRecruitingWindowsNeedingReminderMail.mockResolvedValue([]);
     deleteCvBlobs.mockResolvedValue(undefined);
+    listCvBlobs.mockResolvedValue([]);
+    findReferencedCvPathnames.mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -120,42 +131,113 @@ describe("GET /api/cron/cleanup", () => {
         jobPostings: 4,
         rateLimitHits: 10,
         ideathonSignups: 5,
+        cvPathnamesFromExpiredApplications: [],
       },
+      cvBlobs: EMPTY_CV_BLOBS,
       reminderWindowMails: { sent: 0, failed: 0, error: null },
     });
   });
 
-  it("best-effort deletes the CV blobs for every expired application that had one", async () => {
-    process.env.CRON_SECRET = "test-secret";
-    vi.resetModules();
-    deleteExpiredApplications.mockResolvedValue({
-      count: 2,
-      cvPathnames: ["bewerbungen/a.pdf", "bewerbungen/b.pdf"],
+  describe("the cv-blobs job", () => {
+    beforeEach(() => {
+      process.env.CRON_SECRET = "test-secret";
+      vi.resetModules();
+      deleteExpiredContactMessages.mockResolvedValue(0);
+      deleteExpiredReminderSignups.mockResolvedValue(0);
+      pruneRateLimitHits.mockResolvedValue(0);
     });
-    deleteExpiredContactMessages.mockResolvedValue(0);
-    deleteExpiredReminderSignups.mockResolvedValue(0);
-    pruneRateLimitHits.mockResolvedValue(0);
 
-    const { GET } = await import("@/app/api/cron/cleanup/route");
-    const response = await GET(request("Bearer test-secret"));
+    it("deletes the CV blobs for every expired application the cleanup pass just removed", async () => {
+      deleteExpiredApplications.mockResolvedValue({
+        count: 2,
+        cvPathnames: ["bewerbungen/a.pdf", "bewerbungen/b.pdf"],
+      });
 
-    expect(response.status).toBe(200);
-    expect(deleteCvBlobs).toHaveBeenCalledWith(["bewerbungen/a.pdf", "bewerbungen/b.pdf"]);
-  });
+      const { GET } = await import("@/app/api/cron/cleanup/route");
+      const response = await GET(request("Bearer test-secret"));
 
-  it("still answers 200 when the CV blob delete itself fails", async () => {
-    process.env.CRON_SECRET = "test-secret";
-    vi.resetModules();
-    deleteExpiredApplications.mockResolvedValue({ count: 1, cvPathnames: ["bewerbungen/a.pdf"] });
-    deleteExpiredContactMessages.mockResolvedValue(0);
-    deleteExpiredReminderSignups.mockResolvedValue(0);
-    pruneRateLimitHits.mockResolvedValue(0);
-    deleteCvBlobs.mockRejectedValue(new Error("blob store unreachable"));
+      expect(response.status).toBe(200);
+      expect(deleteCvBlobs).toHaveBeenCalledWith(["bewerbungen/a.pdf", "bewerbungen/b.pdf"]);
+      const body = await response.json();
+      expect(body.cvBlobs).toEqual({ ...EMPTY_CV_BLOBS, deletedCvBlobs: 2 });
+      expect(startCronRun).toHaveBeenCalledWith("cv-blobs");
+    });
 
-    const { GET } = await import("@/app/api/cron/cleanup/route");
-    const response = await GET(request("Bearer test-secret"));
+    it("still answers 200, and still runs the reminder-window job, when the blob delete itself fails", async () => {
+      deleteExpiredApplications.mockResolvedValue({ count: 1, cvPathnames: ["bewerbungen/a.pdf"] });
+      deleteCvBlobs.mockRejectedValue(new Error("blob store unreachable"));
 
-    expect(response.status).toBe(200);
+      const { GET } = await import("@/app/api/cron/cleanup/route");
+      const response = await GET(request("Bearer test-secret"));
+
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.cvBlobs.error).toContain("blob store unreachable");
+      expect(startCronRun).toHaveBeenCalledWith("reminder-window");
+    });
+
+    it("sweeps orphaned blobs older than 24 hours that no application references", async () => {
+      deleteExpiredApplications.mockResolvedValue({ count: 0, cvPathnames: [] });
+      const old = new Date(Date.now() - 25 * 60 * 60 * 1000);
+      const recent = new Date(Date.now() - 60 * 60 * 1000);
+      listCvBlobs.mockResolvedValue([
+        { pathname: "bewerbungen/orphan-old.pdf", uploadedAt: old },
+        { pathname: "bewerbungen/orphan-recent.pdf", uploadedAt: recent },
+        { pathname: "bewerbungen/referenced.pdf", uploadedAt: old },
+      ]);
+      findReferencedCvPathnames.mockResolvedValue(["bewerbungen/referenced.pdf"]);
+
+      const { GET } = await import("@/app/api/cron/cleanup/route");
+      const response = await GET(request("Bearer test-secret"));
+
+      // Only the old, unreferenced blob qualifies — not the recent one
+      // (still inside the 24h grace period an in-progress upload gets)
+      // and not the referenced one (a real application still points to it).
+      expect(deleteCvBlobs).toHaveBeenCalledWith(["bewerbungen/orphan-old.pdf"]);
+      const body = await response.json();
+      expect(body.cvBlobs).toEqual({ ...EMPTY_CV_BLOBS, deletedOrphanBlobs: 1 });
+    });
+
+    it("reports the orphans left over once the per-run cap is hit", async () => {
+      deleteExpiredApplications.mockResolvedValue({ count: 0, cvPathnames: [] });
+      const old = new Date(Date.now() - 25 * 60 * 60 * 1000);
+      // One more than the per-run cap (50) — see the route's own
+      // CV_BLOBS_MAX_ORPHANS_PER_RUN.
+      listCvBlobs.mockResolvedValue(
+        Array.from({ length: 51 }, (_, i) => ({ pathname: `bewerbungen/orphan-${i}.pdf`, uploadedAt: old })),
+      );
+      findReferencedCvPathnames.mockResolvedValue([]);
+
+      const { GET } = await import("@/app/api/cron/cleanup/route");
+      const response = await GET(request("Bearer test-secret"));
+
+      const body = await response.json();
+      expect(body.cvBlobs.deletedOrphanBlobs).toBe(50);
+      expect(body.cvBlobs.remainingCvBlobs).toBe(1);
+    });
+
+    it("skips the pass entirely, without error, when the shared time budget is already spent", async () => {
+      deleteExpiredApplications.mockResolvedValue({ count: 1, cvPathnames: ["bewerbungen/a.pdf"] });
+      const realNow = Date.now;
+      let callCount = 0;
+      vi.spyOn(Date, "now").mockImplementation(() => {
+        callCount += 1;
+        // First call computes the deadline; by the time the cv-blobs job
+        // checks its own remaining budget, the clock has "moved" past it.
+        return callCount === 1 ? realNow() : realNow() + 60_000;
+      });
+
+      const { GET } = await import("@/app/api/cron/cleanup/route");
+      const response = await GET(request("Bearer test-secret"));
+
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body.cvBlobs).toEqual({ ...EMPTY_CV_BLOBS, skipped: true });
+      // Skipped, not failed — the row still exists tomorrow's run can pick
+      // up, and this run's own status must not read as a failure.
+      expect(deleteCvBlobs).not.toHaveBeenCalled();
+      expect(listCvBlobs).not.toHaveBeenCalled();
+    });
   });
 
   it("deletes expired ideathon signups alongside the other tables", async () => {
@@ -350,7 +432,14 @@ describe("GET /api/cron/cleanup", () => {
 
       expect(response.status).toBe(200);
       const body = await response.json();
-      expect(body.deleted).toEqual({ applications: 2, contactMessages: 1, reminderSignups: 0, jobPostings: 0, rateLimitHits: 0 });
+      expect(body.deleted).toEqual({
+        applications: 2,
+        contactMessages: 1,
+        reminderSignups: 0,
+        jobPostings: 0,
+        rateLimitHits: 0,
+        cvPathnamesFromExpiredApplications: [],
+      });
       expect(startCronRun).toHaveBeenCalledWith("cleanup");
     });
   });

@@ -45,10 +45,10 @@ export default async function AdminSystemPage({ params }: PageProps) {
   // the page from reporting on the others, which is precisely when someone
   // is looking at it.
   const [runsResult, countsResult, resend, migrations] = await Promise.all([
-    // 20, not 10: cron_runs now interleaves two job types (cleanup,
-    // reminder-window) on the same daily trigger, so 10 rows would often
-    // show only one of them.
-    listCronRuns(20).then(
+    // 30, not 10: cron_runs now interleaves three job types (cleanup,
+    // cv-blobs, reminder-window) on the same daily trigger, so a small
+    // limit would often show only one or two of them.
+    listCronRuns(30).then(
       (runs) => ({ ok: true as const, runs }),
       (error: unknown) => ({ ok: false as const, error }),
     ),
@@ -130,7 +130,13 @@ export default async function AdminSystemPage({ params }: PageProps) {
             key: run.id,
             cells: [
               dateFormatter.format(run.startedAt),
-              t(run.job === "cleanup" ? "system.jobs.cleanup" : "system.jobs.reminderWindow"),
+              t(
+                run.job === "cleanup"
+                  ? "system.jobs.cleanup"
+                  : run.job === "cv-blobs"
+                    ? "system.jobs.cvBlobs"
+                    : "system.jobs.reminderWindow",
+              ),
               <StatusIndicator
                 key="ok"
                 level={run.ok ? "ok" : "error"}
@@ -144,10 +150,16 @@ export default async function AdminSystemPage({ params }: PageProps) {
                       reminderSignups: run.deletedReminderSignups,
                       rateLimitHits: run.prunedRateLimitHits,
                     })
-                  : t("system.reminderWindowCounts", {
-                      sent: run.sentReminderWindowMails,
-                      failed: run.failedReminderWindowMails,
-                    })}
+                  : run.job === "cv-blobs"
+                    ? t("system.cvBlobsCounts", {
+                        deleted: run.deletedCvBlobs,
+                        orphans: run.deletedOrphanBlobs,
+                        remaining: run.remainingCvBlobs,
+                      })
+                    : t("system.reminderWindowCounts", {
+                        sent: run.sentReminderWindowMails,
+                        failed: run.failedReminderWindowMails,
+                      })}
               </span>,
               <span key="error" className="font-mono text-mono-s opacity-80">
                 {run.error ?? "—"}

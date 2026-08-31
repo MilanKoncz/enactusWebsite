@@ -73,17 +73,40 @@ describe("Datenschutz", () => {
     expect(screen.getByText(/Ein Captcha setzen wir bewusst nicht ein/)).toBeInTheDocument();
   });
 
-  it("states the application form has no file upload, only structured fields", () => {
+  it("states the application form has a CV upload, as a PDF up to 4 MB, and warns about Art. 9 data", () => {
     renderWithIntl(<Datenschutz />);
-    expect(screen.getByText(/Es gibt keinen Datei-Upload/)).toBeInTheDocument();
+    expect(screen.getByText(/Der Lebenslauf ist als PDF-Datei hochzuladen, maximal 4 MB/)).toBeInTheDocument();
+    expect(screen.getByText(/nicht auf Schadsoftware geprüft/)).toBeInTheDocument();
   });
 
-  it("lists every application field named in the /mitmachen brief", () => {
+  it("lists every application field named in the /mitmachen brief, including the CV upload and prioritized areas", () => {
     renderWithIntl(<Datenschutz />);
     expect(screen.getAllByText(/Vorname, Nachname, E-Mail-Adresse/).length).toBeGreaterThan(0);
-    expect(screen.getByText("gewünschter Einsatzbereich")).toBeInTheDocument();
+    expect(screen.getByText(/priorisierte Wunschbereiche mit jeweiliger Begründung/)).toBeInTheDocument();
+    expect(screen.getByText("Lebenslauf als PDF-Datei (Upload)")).toBeInTheDocument();
+    expect(screen.getByText(/Relevante Skills für den gewünschten Einsatzbereich/)).toBeInTheDocument();
+    expect(screen.getByText(/Was du aus deiner Zeit bei Enactus mitnehmen möchtest/)).toBeInTheDocument();
     expect(screen.getByText(/Verfügbarkeit in Stunden pro Woche/)).toBeInTheDocument();
     expect(screen.getByText(/Zeitpunkt deiner Einwilligung/)).toBeInTheDocument();
+    expect(screen.queryByText(/Hochschule/)).not.toBeInTheDocument();
+  });
+
+  it("describes the CV as stored separately at Vercel Blob, with private access", () => {
+    renderWithIntl(<Datenschutz />);
+    expect(screen.getByText(/Vercel Blob/)).toBeInTheDocument();
+    expect(screen.getByText(/Zugriff auf diesen Speicher ist privat konfiguriert/)).toBeInTheDocument();
+  });
+
+  it("states the CV retention period alongside the application it belongs to", () => {
+    // LegalTable renders every row twice (a <table> for wide viewports, a
+    // <dl> for narrow ones — see its own comment), so table content is
+    // always asserted with getAllByText, never getByText.
+    renderWithIntl(<Datenschutz />);
+    expect(screen.getAllByText("Lebenslauf (PDF)").length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText(/6 Monate nach Ende des jeweiligen Bewerbungszeitraums, gemeinsam mit der zugehörigen Bewerbung/)
+        .length,
+    ).toBeGreaterThan(0);
   });
 
   it("lists the Ideathon signup section with its field list and purpose", () => {
@@ -141,6 +164,6 @@ describe("Datenschutz", () => {
   it("renders a genuine English translation, not a German mirror", () => {
     renderWithIntl(<Datenschutz />, { locale: "en" });
     expect(screen.getByRole("heading", { level: 1, name: "Privacy policy" })).toBeInTheDocument();
-    expect(screen.getByText(/no file upload/)).toBeInTheDocument();
+    expect(screen.getByText(/must be uploaded as a PDF file, 4 MB maximum/)).toBeInTheDocument();
   });
 });

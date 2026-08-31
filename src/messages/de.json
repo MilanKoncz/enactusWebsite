@@ -1048,6 +1048,7 @@
       "title": "Datenbank",
       "body": [
         "Bewerbungen, Kontaktanfragen und Anmeldungen zur Benachrichtigung zum Bewerbungsstart speichern wir in einer Postgres-Datenbank des Anbieters Neon Inc., USA. Die Datenbank wird in der Region „eu-central-1“ (Frankfurt am Main) betrieben; die Daten liegen damit innerhalb der Europäischen Union.",
+        "Lebensläufe, die du über das Bewerbungsformular hochlädst, speichern wir getrennt davon als Datei bei Vercel Blob, ebenfalls am Standort Frankfurt am Main. Der Zugriff auf diesen Speicher ist privat konfiguriert: eine Datei ist ausschließlich über den passwortgeschützten Vorstandsbereich abrufbar, nicht über eine öffentlich erreichbare Adresse.",
         "Wir erheben ausschließlich Angaben, die für den jeweiligen Zweck erforderlich sind, und löschen sie, sobald dieser Zweck entfällt (Art. 5 Abs. 1 lit. c und e DSGVO). Die konkreten Fristen finden sich im Abschnitt „Speicherdauer“."
       ]
     },
@@ -1087,16 +1088,18 @@
       "fieldsHeading": "Erhobene Angaben",
       "fields": [
         "Vorname, Nachname, E-Mail-Adresse",
-        "Studiengang, Fachsemester, Hochschule",
-        "Bisheriges Engagement / Berufserfahrung (Freitext)",
-        "Sprachen und weitere Kenntnisse (Freitext)",
-        "Motivation (Freitext)",
-        "gewünschter Einsatzbereich",
+        "Studiengang, Fachsemester",
         "Verfügbarkeit in Stunden pro Woche",
+        "bis zu drei priorisierte Wunschbereiche mit jeweiliger Begründung (Freitext)",
+        "Lebenslauf als PDF-Datei (Upload)",
+        "Motivation (Freitext)",
+        "Bisheriges Engagement (Freitext)",
+        "Relevante Skills für den gewünschten Einsatzbereich (Freitext)",
+        "Was du aus deiner Zeit bei Enactus mitnehmen möchtest (Freitext)",
         "Angabe, wie du auf uns aufmerksam geworden bist",
         "Zeitpunkt deiner Einwilligung"
       ],
-      "noUpload": "Es gibt keinen Datei-Upload. Angaben, die üblicherweise in einem Lebenslauf stehen, erheben wir ausschließlich als strukturierte Formularfelder. Wir bitten dich, keine Angaben zu besonderen Kategorien personenbezogener Daten nach Art. 9 DSGVO zu machen, etwa zu Gesundheit, religiöser oder weltanschaulicher Überzeugung, politischer Meinung oder sexueller Orientierung. Solche Angaben sind für die Auswahl nicht erforderlich.",
+      "cvUpload": "Der Lebenslauf ist als PDF-Datei hochzuladen, maximal 4 MB. Die Datei wird nicht auf Schadsoftware geprüft; öffne sie wie jeden E-Mail-Anhang mit der gebotenen Vorsicht. Wir bitten dich, weder im Lebenslauf noch in den übrigen Angaben besondere Kategorien personenbezogener Daten nach Art. 9 DSGVO zu machen, etwa zu Gesundheit, religiöser oder weltanschaulicher Überzeugung, politischer Meinung oder sexueller Orientierung, und auf ein Bewerbungsfoto, Geburtsdatum, Staatsangehörigkeit sowie Familienstand zu verzichten. Solche Angaben sind für die Auswahl nicht erforderlich.",
       "purposeLabel": "Zweck",
       "purpose": "Prüfung und Bearbeitung deiner Bewerbung sowie Kontaktaufnahme im Rahmen des Auswahlverfahrens.",
       "legalBasisLabel": "Rechtsgrundlage",
@@ -1172,6 +1175,8 @@
       "columns": ["Daten", "Dauer"],
       "applicationsLabel": "Bewerbungen",
       "applicationsValue": "{months} Monate nach Ende des jeweiligen Bewerbungszeitraums",
+      "cvLabel": "Lebenslauf (PDF)",
+      "cvValue": "{months} Monate nach Ende des jeweiligen Bewerbungszeitraums, gemeinsam mit der zugehörigen Bewerbung",
       "contactLabel": "Kontaktanfragen",
       "contactValue": "{months} Monate nach abschließender Bearbeitung",
       "reminderConfirmedLabel": "Bestätigte Anmeldungen zur Benachrichtigung",
@@ -1192,7 +1197,7 @@
       "tableCaption": "Eingesetzte Auftragsverarbeiter",
       "columns": ["Dienst", "Zweck", "Verarbeitungsort"],
       "rows": [
-        ["Vercel Inc., USA", "Hosting, Auslieferung, Reichweitenmessung", "Frankfurt am Main"],
+        ["Vercel Inc., USA", "Hosting, Auslieferung, Reichweitenmessung, Speicherung hochgeladener Bewerbungsunterlagen", "Frankfurt am Main"],
         ["Neon Inc., USA", "Datenbank", "Frankfurt am Main"],
         ["Plus Five Five, Inc. (Resend), USA", "E-Mail-Versand", "Irland"]
       ],
@@ -1808,8 +1813,10 @@
       "failed": "fehlgeschlagen",
       "deletedCounts": "{applications} Bew. / {contactMessages} Kont. / {reminderSignups} Erin. / {rateLimitHits} Limits",
       "reminderWindowCounts": "{sent} gesendet / {failed} fehlgeschlagen",
+      "cvBlobsCounts": "{deleted} gelöscht / {orphans} verwaist entfernt / {remaining} noch offen",
       "jobs": {
         "cleanup": "Löschroutine",
+        "cvBlobs": "CV-Speicher",
         "reminderWindow": "Fenster-Benachrichtigung"
       },
       "columns": {

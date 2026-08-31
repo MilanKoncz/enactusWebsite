@@ -187,7 +187,7 @@ export function Datenschutz() {
               <p className="text-mono-s font-mono uppercase opacity-60">{t("application.fieldsHeading")}</p>
               <BulletList items={t.raw("application.fields") as string[]} />
             </div>
-            <p>{t("application.noUpload")}</p>
+            <p>{t("application.cvUpload")}</p>
             <Fact label={t("application.purposeLabel")}>{t("application.purpose")}</Fact>
             <Fact label={t("application.legalBasisLabel")}>{t("application.legalBasis")}</Fact>
             <Fact label={t("application.accessLabel")}>{t("application.access")}</Fact>
@@ -237,6 +237,7 @@ export function Datenschutz() {
               columns={t.raw("retention.columns") as string[]}
               rows={[
                 [t("retention.applicationsLabel"), t("retention.applicationsValue", { months: retention.applications.months })],
+                [t("retention.cvLabel"), t("retention.cvValue", { months: retention.applications.months })],
                 [t("retention.contactLabel"), t("retention.contactValue", { months: retention.contactMessages.months })],
                 [t("retention.reminderConfirmedLabel"), t("retention.reminderConfirmedValue")],
                 [

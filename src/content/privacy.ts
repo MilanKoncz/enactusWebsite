@@ -29,8 +29,12 @@ export type PrivacyReviewStatus = z.infer<typeof privacyReviewStatusSchema>;
 
 // Flipped back to draft on 2026-08-25: the new Ideathon signup section
 // (Datenschutz.tsx, messages' "ideathonSignup" key) hasn't been reviewed by
-// the Enactus Germany data protection officer yet. Flip back to `true` with
-// a fresh `reviewedAt` once that sign-off happens — see ASSETS-TODO.md.
+// the Enactus Germany data protection officer yet. Still draft as of
+// 2026-08-31 for a second reason: the application form's own section now
+// describes a new data category (the uploaded CV, stored at Vercel Blob),
+// which needs the same sign-off before either can flip back to `true`.
+// Flip back to `true` with a fresh `reviewedAt` once that sign-off happens
+// — see ASSETS-TODO.md.
 export const privacyReviewStatus: PrivacyReviewStatus = privacyReviewStatusSchema.parse({
   reviewed: false,
   reviewedAt: null,

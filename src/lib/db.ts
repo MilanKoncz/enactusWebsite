@@ -1711,6 +1711,9 @@ export type CronRun = {
   prunedRateLimitHits: number;
   sentReminderWindowMails: number;
   failedReminderWindowMails: number;
+  deletedCvBlobs: number;
+  deletedOrphanBlobs: number;
+  remainingCvBlobs: number;
   error: string | null;
 };
 
@@ -1727,6 +1730,9 @@ function toCronRun(row: Record<string, unknown>): CronRun {
     prunedRateLimitHits: row.pruned_rate_limit_hits as number,
     sentReminderWindowMails: row.sent_reminder_window_mails as number,
     failedReminderWindowMails: row.failed_reminder_window_mails as number,
+    deletedCvBlobs: row.deleted_cv_blobs as number,
+    deletedOrphanBlobs: row.deleted_orphan_blobs as number,
+    remainingCvBlobs: row.remaining_cv_blobs as number,
     error: (row.error as string | null) ?? null,
   };
 }
@@ -1742,8 +1748,9 @@ export async function startCronRun(job: string): Promise<string> {
 
 // `counts` is a partial: the cleanup job only ever populates its four
 // deleted/pruned fields, the reminder-window job only its two
-// sent/failed fields, and each leaves the other job's columns at their
-// default 0 — the two jobs share this table but never share a row.
+// sent/failed fields, the cv-blobs job only its three blob counters, and
+// each leaves the other jobs' columns at their default 0 — all three jobs
+// share this table but never share a row.
 export async function finishCronRun(
   id: string,
   counts: {
@@ -1753,6 +1760,9 @@ export async function finishCronRun(
     rateLimitHits?: number | null;
     sentReminderWindowMails?: number | null;
     failedReminderWindowMails?: number | null;
+    deletedCvBlobs?: number | null;
+    deletedOrphanBlobs?: number | null;
+    remainingCvBlobs?: number | null;
   },
   error: string | null,
 ): Promise<void> {
@@ -1766,6 +1776,9 @@ export async function finishCronRun(
       pruned_rate_limit_hits = ${counts.rateLimitHits ?? 0},
       sent_reminder_window_mails = ${counts.sentReminderWindowMails ?? 0},
       failed_reminder_window_mails = ${counts.failedReminderWindowMails ?? 0},
+      deleted_cv_blobs = ${counts.deletedCvBlobs ?? 0},
+      deleted_orphan_blobs = ${counts.deletedOrphanBlobs ?? 0},
+      remaining_cv_blobs = ${counts.remainingCvBlobs ?? 0},
       error = ${error}
     where id = ${id}
   `;
@@ -1776,12 +1789,26 @@ export async function listCronRuns(limit = 10): Promise<CronRun[]> {
     select id, job, started_at, finished_at, ok, deleted_applications,
            deleted_contact_messages, deleted_reminder_signups,
            pruned_rate_limit_hits, sent_reminder_window_mails,
-           failed_reminder_window_mails, error
+           failed_reminder_window_mails, deleted_cv_blobs,
+           deleted_orphan_blobs, remaining_cv_blobs, error
     from cron_runs
     order by started_at desc
     limit ${limit}
   `;
   return (rows as Record<string, unknown>[]).map(toCronRun);
+}
+
+// Powers the cv-blobs cron pass's orphan sweep: given every pathname
+// currently sitting in the Blob store's bewerbungen/ prefix, which of them
+// are still referenced by an application. Anything not in the result is a
+// candidate for deletion — either the upload was never completed by a
+// submission, or the row it belonged to is already gone.
+export async function findReferencedCvPathnames(pathnames: string[]): Promise<string[]> {
+  if (pathnames.length === 0) return [];
+  const rows = await sql()`
+    select cv_pathname from applications where cv_pathname = any(${pathnames})
+  `;
+  return (rows as { cv_pathname: string }[]).map((row) => row.cv_pathname);
 }
 
 /**

@@ -1048,6 +1048,7 @@
       "title": "Database",
       "body": [
         "We store applications, contact messages, and application-start notification sign-ups in a Postgres database from provider Neon Inc., USA. The database runs in the \"eu-central-1\" region (Frankfurt am Main), so the data stays within the European Union.",
+        "CVs uploaded through the application form are stored separately, as a file, with Vercel Blob, also at the Frankfurt am Main location. Access to that storage is configured private: a file can only be retrieved through the password-protected board area, never through a publicly reachable address.",
         "We collect only what a given purpose requires, and delete it once that purpose no longer applies (Art. 5(1)(c) and (e) GDPR). The specific periods are in the \"Retention\" section."
       ]
     },
@@ -1087,16 +1088,18 @@
       "fieldsHeading": "Information collected",
       "fields": [
         "first name, last name, email address",
-        "degree program, semester, university",
-        "previous involvement / work experience (free text)",
-        "languages and other skills (free text)",
-        "motivation (free text)",
-        "desired area of involvement",
+        "degree program, semester",
         "availability in hours per week",
+        "up to three prioritized areas of interest, each with its own reason (free text)",
+        "CV as a PDF file (upload)",
+        "motivation (free text)",
+        "previous involvement (free text)",
+        "relevant skills for the chosen area of involvement (free text)",
+        "what you hope to take from your time at Enactus (free text)",
         "how you heard about us",
         "the time you gave consent"
       ],
-      "noUpload": "There is no file upload. Information that would usually sit in a CV is collected exclusively through structured form fields. We ask you not to provide any special category personal data under Art. 9 GDPR, for instance about health, religious or philosophical belief, political opinion, or sexual orientation. Such information is not required for selection.",
+      "cvUpload": "Your CV must be uploaded as a PDF file, 4 MB maximum. The file is not scanned for malware; open it with the same care you would any email attachment. We ask you not to include any special category personal data under Art. 9 GDPR in your CV or elsewhere in your application, for instance about health, religious or philosophical belief, political opinion, or sexual orientation, and to leave out a photo, date of birth, nationality, or marital status. Such information is not required for selection.",
       "purposeLabel": "Purpose",
       "purpose": "Reviewing and processing your application, and getting in touch as part of the selection process.",
       "legalBasisLabel": "Legal basis",
@@ -1172,6 +1175,8 @@
       "columns": ["Data", "Duration"],
       "applicationsLabel": "Applications",
       "applicationsValue": "{months} months after the respective application period ends",
+      "cvLabel": "CV (PDF)",
+      "cvValue": "{months} months after the respective application period ends, together with the application it belongs to",
       "contactLabel": "Contact inquiries",
       "contactValue": "{months} months after final processing",
       "reminderConfirmedLabel": "Confirmed notification sign-ups",
@@ -1192,7 +1197,7 @@
       "tableCaption": "Processors we use",
       "columns": ["Service", "Purpose", "Processing location"],
       "rows": [
-        ["Vercel Inc., USA", "Hosting, delivery, analytics", "Frankfurt am Main"],
+        ["Vercel Inc., USA", "Hosting, delivery, analytics, storage of uploaded application documents", "Frankfurt am Main"],
         ["Neon Inc., USA", "Database", "Frankfurt am Main"],
         ["Plus Five Five, Inc. (Resend), USA", "Email delivery", "Ireland"]
       ],
@@ -1808,8 +1813,10 @@
       "failed": "failed",
       "deletedCounts": "{applications} appl. / {contactMessages} cont. / {reminderSignups} rem. / {rateLimitHits} limits",
       "reminderWindowCounts": "{sent} sent / {failed} failed",
+      "cvBlobsCounts": "{deleted} deleted / {orphans} orphans removed / {remaining} still open",
       "jobs": {
         "cleanup": "Cleanup routine",
+        "cvBlobs": "CV storage",
         "reminderWindow": "Window notification"
       },
       "columns": {
