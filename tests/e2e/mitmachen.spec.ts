@@ -66,6 +66,62 @@ function mockFormToken(page: Page) {
   );
 }
 
+// The CV upload runs client → Vercel Blob directly, bypassing this site's
+// own server entirely (see lib/cvBlob.ts's own comment on why the store
+// stays private end to end) — there is no page.route() seam on *this*
+// site's API for the actual file transfer, only for the two calls
+// @vercel/blob/client's upload() itself makes: a POST to the
+// handleUploadUrl (/api/bewerbung/cv-upload) for a client token, then a
+// PUT to Vercel's own control-plane endpoint, https://vercel.com/api/blob
+// (the package's default `getApiUrl` — not a `*.blob.vercel-storage.com`
+// subdomain, despite what the store's own download URLs look like; see
+// lib/securityHeaders.ts's own comment on why that specific host is also
+// the one addition this project's CSP needed). Both calls are mocked
+// here; no test run ever reaches the real Vercel Blob store.
+//
+// The fake client token has to actually look like one: upload() throws
+// client-side (BlobError) unless the string starts with
+// "vercel_blob_client_", and derives the store id by splitting on "_" and
+// taking the 4th segment — hence the exact shape below, not an arbitrary
+// string.
+function mockCvUpload(page: Page) {
+  return Promise.all([
+    page.route("**/api/bewerbung/cv-upload", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          type: "blob.generate-client-token",
+          clientToken: "vercel_blob_client_e2eteststore_signature",
+        }),
+      }),
+    ),
+    page.route("https://vercel.com/api/blob**", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          url: "https://e2eteststore.private.blob.vercel-storage.com/bewerbungen/lebenslauf.pdf",
+          downloadUrl:
+            "https://e2eteststore.private.blob.vercel-storage.com/bewerbungen/lebenslauf.pdf?download=1",
+          pathname: "bewerbungen/lebenslauf.pdf",
+          contentType: "application/pdf",
+          contentDisposition: 'attachment; filename="lebenslauf.pdf"',
+        }),
+      }),
+    ),
+  ]);
+}
+
+async function uploadCv(page: Page) {
+  await page.getByLabel("Lebenslauf").setInputFiles({
+    name: "lebenslauf.pdf",
+    mimeType: "application/pdf",
+    buffer: Buffer.from("%PDF-1.4 e2e test content"),
+  });
+  await expect(page.getByText("lebenslauf.pdf hochgeladen")).toBeVisible();
+}
+
 test.describe("/mitmachen", () => {
   test("has no automatically detectable accessibility violations", async ({ page }) => {
     await page.goto("/mitmachen");
@@ -147,6 +203,7 @@ test.describe("/mitmachen", () => {
     await mockOpenRecruitingWindow(page);
     await mockProjectAreas(page);
     await mockFormToken(page);
+    await mockCvUpload(page);
     // /api/bewerbung itself is exercised by the Vitest integration suite
     // against a mocked db/mail/PDF layer — this only proves the form calls
     // the route and reacts to its response, without needing a real
@@ -163,12 +220,15 @@ test.describe("/mitmachen", () => {
     await page.getByLabel("E-Mail").fill("jane@example.com");
     await page.getByLabel("Studiengang").fill("BWL");
     await page.getByLabel("Fachsemester").fill("3");
-    await page.getByLabel("Hochschule").fill("Universität Mannheim");
+    await page.getByLabel("Verfügbarkeit in Stunden pro Woche").fill("10");
+    await page.getByLabel("1. Wahl").selectOption("SmileGreen");
+    await page
+      .getByLabel("Warum dieser Bereich?")
+      .fill("Weil ich dort am meisten bewirken kann.");
+    await uploadCv(page);
     await page
       .getByLabel("Motivation")
       .fill("Ich möchte gerne aktiv an einem Projekt mitarbeiten und Verantwortung übernehmen.");
-    await page.getByRole("checkbox", { name: "SmileGreen" }).check();
-    await page.getByLabel("Verfügbarkeit in Stunden pro Woche").fill("10");
     await page.getByRole("checkbox", { name: /Datenschutzerklärung/ }).check();
 
     // No wait needed for the anti-spam minimum fill time: mockFormToken
@@ -186,6 +246,8 @@ test.describe("/mitmachen", () => {
     await page.goto("/mitmachen");
     await page.getByRole("button", { name: "Bewerbung absenden" }).click();
     await expect(page.getByText("Bitte gib deinen Vornamen ein.")).toBeVisible();
+    await expect(page.getByText("Bitte wähle deinen Wunschbereich.")).toBeVisible();
+    await expect(page.getByText("Bitte lade deinen Lebenslauf als PDF-Datei hoch.")).toBeVisible();
     await expect(page.getByText("Bitte bestätige die Einwilligung.")).toBeVisible();
   });
 });

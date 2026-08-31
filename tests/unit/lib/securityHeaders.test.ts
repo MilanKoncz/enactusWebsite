@@ -23,6 +23,19 @@ describe("SECURITY_HEADERS", () => {
     expect(csp).toContain("https://www.youtube-nocookie.com");
   });
 
+  // Regression guard: upload() from @vercel/blob/client (the CV upload,
+  // ApplicationForm.tsx) runs entirely in the browser and PUTs straight to
+  // https://vercel.com/api/blob — the package's own default control-plane
+  // endpoint, not this project's server. Without this in connect-src,
+  // every real CV upload fails as a CSP-blocked fetch, invisible to any
+  // mocked Vitest test since the request never reaches this server at
+  // all; caught only by the e2e suite actually driving a real browser.
+  it("allows the CV upload's own browser-to-Vercel-Blob connection", () => {
+    const csp = header("Content-Security-Policy");
+    const connectSrc = csp.split(";").find((directive) => directive.trim().startsWith("connect-src"));
+    expect(connectSrc).toContain("https://vercel.com");
+  });
+
   it("sets X-Frame-Options as a belt-and-braces clickjacking defense", () => {
     expect(header("X-Frame-Options")).toBe("DENY");
   });

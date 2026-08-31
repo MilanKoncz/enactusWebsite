@@ -22,6 +22,18 @@
  * `frame-ancestors 'none'` is doing the practically important work: it
  * closes the one concrete gap the review found (REVIEW.md's finding 5) —
  * /admin/bewerbungen was embeddable in a foreign frame.
+ *
+ * `connect-src` needed one addition for the CV upload: `upload()` from
+ * `@vercel/blob/client` (ApplicationForm.tsx) runs entirely in the
+ * browser and PUTs the file straight to `https://vercel.com/api/blob`
+ * (the package's own default control-plane endpoint, `getApiUrl` in its
+ * source — not this project's server, and not a `*.blob.vercel-storage.com`
+ * subdomain despite what the store's own download URLs look like). Without
+ * this, every real CV upload fails the same way it failed here first: not
+ * as an application error, but as a CSP-blocked fetch the browser's own
+ * console reports as "violates connect-src" — caught by the e2e suite,
+ * not by any Vitest mock, since the request never reaches this server at
+ * all.
  */
 
 const CONTENT_SECURITY_POLICY = [
@@ -31,7 +43,7 @@ const CONTENT_SECURITY_POLICY = [
   "img-src 'self' data: https://i.ytimg.com",
   "media-src 'self'",
   "font-src 'self'",
-  "connect-src 'self'",
+  "connect-src 'self' https://vercel.com",
   "frame-src https://www.youtube-nocookie.com",
   "frame-ancestors 'none'",
   "object-src 'none'",
