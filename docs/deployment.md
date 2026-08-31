@@ -233,14 +233,16 @@ nothing for the deployed site.
 
 `/admin` (German URLs only — `proxy.ts` returns 404 for the `/en`-prefixed
 variants, since board tooling has no translated UI worth a second URL).
-Eleven sections, all behind the same gate:
+Thirteen sections, all behind the same gate:
 
 | Path | What it's for |
 | --- | --- |
 | `/admin` | Overview linking every section, plus a compact status bar (applications in the running window, failed mails, whether a future application window is scheduled, last cron run, next calendar event) |
-| `/admin/bewerbungen` | Applications by recruiting semester, CSV per group (now including prioritized areas with reasons, skills, and CV yes/no), authenticated CV download per row, delete a CV or a whole application |
+| `/admin/bewerbungen` | Applications by recruiting semester, CSV per group (now including prioritized areas with reasons, Ressorts, skills, and CV yes/no), authenticated CV download per row, delete a CV or a whole application |
 | `/admin/mails` | Every failed send across all five tables, with a resend |
 | `/admin/bewerbungsfenster` | Create, edit, delete application windows |
+| `/admin/wunschbereiche` | Create, rename, sort, activate/deactivate the "Wunschbereich" choices on the application form — deactivating, not deleting, is the everyday action, since applications store the chosen label, not a foreign key (migrations/0010) |
+| `/admin/ressorts` | Same lifecycle as `/admin/wunschbereiche`, for the separate, unranked "Ressort" checkboxes (migrations/0020) — cross-project positions like Team-Lead, kept apart from the prioritized Wunschbereich choices so an applicant can't spend all three priorities on one and land in no project |
 | `/admin/termine` | Create, edit, delete the homepage's calendar events |
 | `/admin/jobs` | Create, edit, delete partner job postings shown on `/jobs` |
 | `/admin/erinnerungen` | Application-start notification list, confirmed/unconfirmed/unsubscribed, CSV, delete a single entry |

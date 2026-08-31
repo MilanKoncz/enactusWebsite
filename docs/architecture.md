@@ -118,10 +118,11 @@ limiting, is in `docs/engineering.md`.
 
 ## The admin area
 
-Ten sections under `[locale]/admin` — applications, failed mails,
-application windows, calendar events, job postings, the reminder list,
-contact messages, deletion requests, system status, plus an overview. Full
-list and what each is for: `docs/deployment.md`'s "The admin area".
+Twelve sections under `[locale]/admin` — applications, failed mails,
+application windows, the Wunschbereich and Ressort lists, calendar events,
+job postings, Ideathon signups, the reminder list, contact messages,
+deletion requests, system status, plus an overview. Full list and what each
+is for: `docs/deployment.md`'s "The admin area".
 
 Gated by comparing a password (`ADMIN_PASSWORD`) against a signed, httpOnly
 session cookie (`src/lib/adminAuth.ts`, signed with `ADMIN_SESSION_SECRET`)

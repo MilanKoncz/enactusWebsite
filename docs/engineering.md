@@ -29,7 +29,29 @@ Forms, data, privacy, performance, SEO, and testing detail.
 8. The route rejects with 409 when no recruiting window is currently open —
    the form only renders while one is, but the route itself is public and
    reachable regardless of what a page already open in some tab still shows.
-9. The board notification carries the uploaded CV as a **second, separate
+9. **Ressorts** are a separate, optional, unranked category from the
+   Wunschbereich choices above — up to `MAX_DEPARTMENTS` (currently 3,
+   `lib/applicationFormSchema.ts`) checkboxes with no priority and no
+   reason, added because positions like Team-Lead sat in the same
+   prioritized list as real project areas and let an applicant spend all
+   three priorities on positions, landing in no project. Same
+   admin-managed, label-snapshot pattern as Wunschbereich (own table,
+   `departments`, migration `0020`; own admin page, `/admin/ressorts`;
+   `applications.departments` stores the chosen labels directly, never a
+   foreign key, so renaming or deactivating a Ressort can't change a
+   historic application). Shown as their own block — never merged into the
+   Wunschbereich cell or Fact — in the admin table, the CSV export, and the
+   application PDF.
+10. Two free-text fields were widened at the board's request, each via one
+    exported constant read by the Zod schema, the field's own `maxLength`,
+    and the hint/error copy's `{max}` placeholder, so the number exists
+    once: **Motivation** 1500 → `MOTIVATION_MAX` (2000), which also gained
+    a live character counter and a visible "your pasted text was cut"
+    notice it never had before — a paste over the new cap used to have
+    nowhere to go but a length limit it now hits silently unless told
+    about it (`Field.tsx`'s `truncatedMessage`). **"Was möchtest du
+    mitnehmen"** 400 → `WANT_TO_GAIN_MAX` (800), already had a counter.
+11. The board notification carries the uploaded CV as a **second, separate
    attachment** (`lebenslauf-<id>.pdf`) alongside the existing application
    PDF (`bewerbung-<id>.pdf`) — never merged into the PDF itself
    (`lib/mailDispatch.ts`'s `dispatchApplicationMails`, `lib/cvBlob.ts`'s
