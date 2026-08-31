@@ -15,6 +15,12 @@ const privacyReviewStatusSchema = z
   .object({
     reviewed: z.boolean(),
     reviewedAt: z.iso.date().nullable(),
+    // Who actually signed off — not shown anywhere on the page (this
+    // status has never been rendered, see Datenschutz.tsx's own comment),
+    // but the record of *who* approved *what* is the whole point of
+    // tracking this at all, not just *whether*.
+    reviewedBy: z.string().nullable(),
+    reviewerRole: z.string().nullable(),
   })
   .superRefine((status, ctx) => {
     if (status.reviewed && !status.reviewedAt) {
@@ -24,20 +30,37 @@ const privacyReviewStatusSchema = z
         message: "reviewedAt is required once reviewed is true",
       });
     }
+    if (status.reviewed && !status.reviewedBy) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["reviewedBy"],
+        message: "reviewedBy is required once reviewed is true",
+      });
+    }
+    if (status.reviewed && !status.reviewerRole) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["reviewerRole"],
+        message: "reviewerRole is required once reviewed is true",
+      });
+    }
   });
 export type PrivacyReviewStatus = z.infer<typeof privacyReviewStatusSchema>;
 
-// Flipped back to draft on 2026-08-25: the new Ideathon signup section
-// (Datenschutz.tsx, messages' "ideathonSignup" key) hasn't been reviewed by
-// the Enactus Germany data protection officer yet. Still draft as of
-// 2026-08-31 for a second reason: the application form's own section now
-// describes a new data category (the uploaded CV, stored at Vercel Blob),
-// which needs the same sign-off before either can flip back to `true`.
-// Flip back to `true` with a fresh `reviewedAt` once that sign-off happens
-// — see ASSETS-TODO.md.
+// Reviewed and confirmed 2026-08-31 by Marco Becker, Datenschutzbeauftragter
+// Enactus Germany — covering everything this status had been sitting on
+// since flipping to draft on 2026-08-25: the Ideathon signup section
+// (Datenschutz.tsx, messages' "ideathonSignup" key) including the expanded
+// field list from migration 0015 (team members, motivation/experience,
+// dietary preference), the CV as its own data category (uploaded to Vercel
+// Blob), and sending that CV as a mail attachment to the board. Flip back
+// to `false` if any of those three areas change again before the next
+// sign-off.
 export const privacyReviewStatus: PrivacyReviewStatus = privacyReviewStatusSchema.parse({
-  reviewed: false,
-  reviewedAt: null,
+  reviewed: true,
+  reviewedAt: "2026-08-31",
+  reviewedBy: "Marco Becker",
+  reviewerRole: "Datenschutzbeauftragter Enactus Germany",
 });
 
 export { privacyReviewStatusSchema };
