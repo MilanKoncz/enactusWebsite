@@ -40,7 +40,6 @@ src/
       layout.tsx           # the ONE root layout — see its own comment on why
       (site)/              # every public page; adds Header/Footer chrome
       admin/                # board-only, password-gated, no Header/Footer
-      styleguide/           # internal design reference, excluded from the crawl
     api/                    # route handlers — bewerbung, kontakt, reminder, admin, cron
   content/                 # facts and structure, Zod-validated — see content-guide.md
   lib/                     # everything that isn't a component or a fact

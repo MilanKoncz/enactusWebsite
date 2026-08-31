@@ -3,14 +3,14 @@ import { headers } from "next/headers";
 import { siteUrl } from "@/lib/siteUrl";
 import { isProductionDeployment } from "@/lib/productionDeployment";
 
-// /styleguide is a design reference for the team, /admin is the board's
-// password-gated application list (also carries its own noindex metadata,
-// belt-and-braces — see admin/bewerbungen/page.tsx) — neither is public
-// content, kept out of the crawl in both locales, same reasoning as
-// sitemap.ts excluding both entirely. /api/ has no crawlable pages, just
-// endpoints. /secret is easter egg 7/7 (docs/eastereggs.md) — a hidden,
-// unlinked page that also carries its own noindex/nofollow metadata,
-// disallowed here on top of that for the same belt-and-braces reason.
+// /admin is the board's password-gated application list (also carries its
+// own noindex metadata, belt-and-braces — see admin/bewerbungen/page.tsx) —
+// not public content, kept out of the crawl in both locales, same
+// reasoning as sitemap.ts excluding it entirely. /api/ has no crawlable
+// pages, just endpoints. /secret is easter egg 7/7 (docs/eastereggs.md) — a
+// hidden, unlinked page that also carries its own noindex/nofollow
+// metadata, disallowed here on top of that for the same belt-and-braces
+// reason.
 // /erinnerung-status is the reminder double-opt-in confirm/unsubscribe
 // landing page (erinnerung-status/page.tsx) — only ever reached via a
 // one-time emailed link, never a page anyone should find through search,
@@ -40,8 +40,6 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
       allow: "/",
       disallow: [
         "/api/",
-        "/styleguide",
-        "/en/styleguide",
         "/admin",
         "/en/admin",
         "/secret",

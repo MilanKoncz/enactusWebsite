@@ -12,10 +12,6 @@ describe("sitemap", () => {
     expect(entries).toHaveLength(expectedPaths * 2);
   });
 
-  it("never includes /styleguide — a design reference, not public content", () => {
-    expect(entries.some((entry) => entry.url.includes("styleguide"))).toBe(false);
-  });
-
   it("never includes /secret — a hidden, unlinked page (docs/eastereggs.md)", () => {
     expect(entries.some((entry) => entry.url.includes("secret"))).toBe(false);
   });

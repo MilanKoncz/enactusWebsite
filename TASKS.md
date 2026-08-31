@@ -81,7 +81,7 @@ exists in both files.
 
 ## Phase 7 — Launch
 
-- Remove `/styleguide`
+- ~~Remove `/styleguide`~~ Done, 2026-08-31
 - Full accessibility pass: tab order, visible focus, alt text, form errors
   with `aria-live`, contrast everywhere (two contrast bugs already fixed
   ahead of this pass — footer LinkedIn icon and `/projekte`'s "Kein Video

@@ -36,9 +36,8 @@ const LINKEDIN_MARK_CLASSES =
 // what turns the scale into a crop instead of the image spilling over its
 // neighbors. `motion-safe` because the blanket reduced-motion rule in
 // globals.css only shortens the transition — without it the zoom would still
-// land, instantly. Exported for the same reason NAV_BUTTON_CLASSES is: the
-// styleguide demos the real class string.
-export const PORTRAIT_ZOOM_CLASSES =
+// land, instantly.
+const PORTRAIT_ZOOM_CLASSES =
   "transition-transform duration-[var(--duration-calm)] ease-signature motion-safe:desktop-hover:group-hover:scale-[1.06] motion-safe:desktop-hover:group-focus-within:scale-[1.06]";
 
 // member.slug is a validated string (content/board.ts), not a literal union,

@@ -18,10 +18,8 @@ import { cn } from "@/lib/cn";
 // Same lift/scale as Button (docs/design-system.md's Interaction section),
 // dropped onto a bare icon button: a hover/focus tint plus the identical
 // transform, so these read as siblings of Button rather than a plainer
-// control that happens to sit next to it. Exported so the styleguide's
-// Interaction section can demo the exact class string used here, not a
-// hand-copied approximation of it.
-export const NAV_BUTTON_CLASSES = cn(
+// control that happens to sit next to it.
+const NAV_BUTTON_CLASSES = cn(
   "inline-flex items-center justify-center rounded-md p-2 transition-[background-color,transform] duration-[var(--duration-fast)] ease-signature",
   "hover:-translate-y-px hover:scale-[1.02] hover:bg-ink/5 focus-visible:-translate-y-px focus-visible:scale-[1.02] active:translate-y-0 active:scale-[0.99] active:bg-ink/10",
   "disabled:pointer-events-none disabled:opacity-30",

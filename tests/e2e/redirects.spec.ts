@@ -36,7 +36,7 @@ test.describe("old Webflow URL redirects", () => {
 });
 
 test.describe("sitemap.xml and robots.txt", () => {
-  test("sitemap.xml lists both locales for the homepage and excludes /styleguide", async ({
+  test("sitemap.xml lists both locales for the homepage", async ({
     request,
     baseURL,
   }) => {
@@ -45,14 +45,14 @@ test.describe("sitemap.xml and robots.txt", () => {
     const body = await response.text();
     expect(body).toContain("hreflang=\"de\"");
     expect(body).toContain("hreflang=\"en\"");
-    expect(body).not.toContain("styleguide");
   });
 
   // The e2e server runs locally, never on the confirmed production host —
   // lib/productionDeployment.ts is deliberately strict about that, so
   // robots.txt here always takes the blanket-disallow branch rather than
-  // the granular one. That branch (only /api/, /styleguide disallowed) is
-  // covered instead by tests/unit/app/robots.test.ts, which mocks the host.
+  // the granular one. That branch (only /api/, /admin, /secret, and
+  // /erinnerung-status disallowed) is covered instead by
+  // tests/unit/app/robots.test.ts, which mocks the host.
   test("robots.txt disallows everything outside the confirmed production deployment, and points at the sitemap", async ({
     request,
     baseURL,

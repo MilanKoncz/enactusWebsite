@@ -90,7 +90,7 @@ export const metadata: Metadata = {
 // This is the app's one and only root layout — deliberately no src/app/layout.tsx.
 // Next.js's root-layout check is positional (whichever layout is outermost in the
 // rendered tree), not tied to that file path, and [locale] is the sole top-level
-// entry under src/app/ (styleguide lives at [locale]/styleguide too). If anyone
+// entry under src/app/ (admin lives at [locale]/admin too). If anyone
 // adds a page directly under src/app/ outside [locale], Next will silently
 // regenerate a bare app/layout.tsx in dev to satisfy that check — delete it and
 // move the new page under [locale] instead.

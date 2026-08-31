@@ -3,8 +3,8 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { HeaderSurfaceProviderClient } from "@/components/HeaderSurfaceProviderClient";
 import { getJobPostings } from "@/lib/jobPostings";
-// Route group (site) keeps this chrome away from [locale]/styleguide, which
-// needs its own single <main>.
+// Route group (site) keeps this chrome away from [locale]/admin, which has
+// its own layout and single <main>.
 export default async function SiteLayout({
   children,
   params,

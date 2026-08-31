@@ -32,9 +32,10 @@ export default function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // /styleguide lives at [locale]/styleguide — it still needs this middleware's
-  // implicit-locale rewrite to resolve at all (that's how the unprefixed
-  // German URL maps to the [locale]=de segment). It stays chrome-free via the
-  // (site) route group, not via exclusion here.
+  // Every page under [locale] — including /admin — still needs this
+  // middleware's implicit-locale rewrite to resolve at all (that's how the
+  // unprefixed German URL maps to the [locale]=de segment); /admin stays
+  // chrome-free via the (site) route group, not via exclusion here, and is
+  // kept off its /en-prefixed variant by BLOCKED_ADMIN_PATH above instead.
   matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
 };

@@ -7,9 +7,7 @@ import { projects } from "@/content/projects";
 // The route tree this generates from: content/navigation.ts's `routes`
 // record (the same single source of truth Header/Footer link against) plus
 // the two route shapes it doesn't cover because they're not nav items —
-// /projekte/archiv and one entry per content/projects.ts slug. /styleguide
-// is deliberately excluded: it's a design reference, not public content
-// (see robots.ts, which also keeps it out of the crawl).
+// /projekte/archiv and one entry per content/projects.ts slug.
 const EXTRA_PATHS = ["/projekte/archiv", ...projects.map((project) => `/projekte/${project.slug}`)];
 
 const LOCALES = ["de", "en"] as const;

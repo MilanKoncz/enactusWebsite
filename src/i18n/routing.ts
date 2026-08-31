@@ -36,7 +36,6 @@ export const routing = defineRouting({
     "/jobs": "/jobs",
     "/impressum": "/impressum",
     "/datenschutz": "/datenschutz",
-    "/styleguide": "/styleguide",
     "/admin": "/admin",
     "/admin/mails": "/admin/mails",
     "/admin/bewerbungsfenster": "/admin/bewerbungsfenster",

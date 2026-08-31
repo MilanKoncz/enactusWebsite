@@ -1,6 +1,6 @@
 /**
  * WCAG 2.x contrast ratio (relative luminance formula, spec §1.4.3).
- * Used by the styleguide page and its contrast-regression test.
+ * Used by tests/unit/contrast.test.ts's contrast-regression suite.
  */
 
 function srgbToLinear(channel: number): number {

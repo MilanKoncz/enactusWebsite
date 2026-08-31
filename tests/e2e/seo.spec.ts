@@ -67,7 +67,7 @@ test.describe("SEO: metadata completeness across every public page", () => {
 });
 
 test.describe("SEO: hidden pages stay hidden", () => {
-  for (const path of ["/secret", "/erinnerung-status", "/styleguide"]) {
+  for (const path of ["/secret", "/erinnerung-status"]) {
     test(`${path} carries noindex, nofollow`, async ({ page }) => {
       await page.goto(path);
       const robotsMeta = page.locator('meta[name="robots"]');
@@ -76,10 +76,10 @@ test.describe("SEO: hidden pages stay hidden", () => {
     });
   }
 
-  test("sitemap.xml never lists /secret, /styleguide, /admin, or /erinnerung-status", async ({ page }) => {
+  test("sitemap.xml never lists /secret, /admin, or /erinnerung-status", async ({ page }) => {
     const response = await page.goto("/sitemap.xml");
     const body = (await response?.text()) ?? "";
-    for (const hidden of ["/secret", "/styleguide", "/admin", "/erinnerung-status"]) {
+    for (const hidden of ["/secret", "/admin", "/erinnerung-status"]) {
       expect(body, hidden).not.toContain(hidden);
     }
   });

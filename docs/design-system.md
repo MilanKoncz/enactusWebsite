@@ -321,9 +321,6 @@ Component specifics:
   its `overflow-hidden` wrapper), never on the outer card, so neighboring
   content never shifts.
 
-All of the above is demoed side by side in the styleguide's "Interaction"
-section — hover and tab through it there to compare states directly.
-
 ## Copy
 
 Words are design material, not decoration. Name things by what people control and
