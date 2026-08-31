@@ -71,6 +71,13 @@ export type ApplicationInput = {
   // applicationFormSchema.ts); insertApplication writes these to the
   // application_area_choices child table (migrations/0017), not a column.
   areaChoices: ApplicationAreaChoice[];
+  // Up to MAX_DEPARTMENTS (applicationFormSchema.ts) plain labels, unranked
+  // and unreasoned — a separate category from areaChoices above, not a
+  // fourth priority. Undefined/omitted on a pre-migration insert path is
+  // never produced by this codebase (every new insert passes an array, even
+  // an empty one); reading one back as undefined only happens for a row from
+  // before migrations/0020, via toApplication below.
+  departments?: string[];
   availabilityHours: number;
   heardAboutUs?: string;
   locale: Locale;
@@ -132,6 +139,7 @@ function toApplication(row: Record<string, unknown>): Application {
     wantToGain: (row.want_to_gain as string | null) ?? undefined,
     desiredAreas: (row.desired_areas as string[] | null) ?? undefined,
     areaChoices: parseAreaChoices(row.area_choices),
+    departments: (row.departments as string[] | null) ?? undefined,
     availabilityHours: row.availability_hours as number,
     heardAboutUs: (row.heard_about_us as string | null) ?? undefined,
     consentAt: row.consent_at as Date,
@@ -169,14 +177,14 @@ export async function insertApplication(input: ApplicationInput): Promise<Applic
     with new_application as (
       insert into applications (
         first_name, last_name, email, study_program, semester, university,
-        prior_involvement, languages_skills, motivation, want_to_gain, desired_areas,
+        prior_involvement, languages_skills, motivation, want_to_gain, desired_areas, departments,
         availability_hours, heard_about_us, consent_at, locale, recruiting_semester,
         retain_until, cv_blob_url, cv_pathname, cv_original_filename, cv_size_bytes, cv_uploaded_at
       ) values (
         ${input.firstName}, ${input.lastName}, ${input.email}, ${input.studyProgram},
         ${input.semester}, ${input.university ?? null}, ${input.priorInvolvement ?? null},
         ${input.languagesSkills ?? null}, ${input.motivation}, ${input.wantToGain ?? null},
-        ${input.desiredAreas ?? null}, ${input.availabilityHours}, ${input.heardAboutUs ?? null},
+        ${input.desiredAreas ?? null}, ${input.departments ?? []}, ${input.availabilityHours}, ${input.heardAboutUs ?? null},
         now(), ${input.locale}, ${input.recruitingSemester}, ${input.retainUntil.toISOString()},
         ${input.cvBlobUrl ?? null}, ${input.cvPathname ?? null}, ${input.cvOriginalFilename ?? null},
         ${input.cvSizeBytes ?? null}, ${input.cvUploadedAt ? input.cvUploadedAt.toISOString() : null}
@@ -267,6 +275,7 @@ export type ApplicationSummary = {
   availabilityHours: number;
   desiredAreas: string[] | null;
   areaChoices: ApplicationAreaChoice[];
+  departments: string[] | null;
   languagesSkills: string | null;
   cvPathname: string | null;
   mailStatus: MailStatus;
@@ -285,6 +294,7 @@ function toApplicationSummary(row: Record<string, unknown>): ApplicationSummary 
     availabilityHours: row.availability_hours as number,
     desiredAreas: (row.desired_areas as string[] | null) ?? null,
     areaChoices: parseAreaChoices(row.area_choices),
+    departments: (row.departments as string[] | null) ?? null,
     languagesSkills: (row.languages_skills as string | null) ?? null,
     cvPathname: (row.cv_pathname as string | null) ?? null,
     mailStatus: row.mail_status as MailStatus,
@@ -296,7 +306,7 @@ export async function listApplications(): Promise<ApplicationSummary[]> {
   const rows = await sql()`
     select
       a.id, a.created_at, a.first_name, a.last_name, a.email, a.study_program,
-      a.semester, a.availability_hours, a.desired_areas, a.languages_skills, a.cv_pathname,
+      a.semester, a.availability_hours, a.desired_areas, a.departments, a.languages_skills, a.cv_pathname,
       a.mail_status, a.recruiting_semester,
       coalesce(choices.area_choices, '[]'::json) as area_choices
     from applications a
@@ -316,7 +326,7 @@ export async function listApplicationsBySemester(recruitingSemester: string): Pr
   const rows = await sql()`
     select
       a.id, a.created_at, a.first_name, a.last_name, a.email, a.study_program,
-      a.semester, a.availability_hours, a.desired_areas, a.languages_skills, a.cv_pathname,
+      a.semester, a.availability_hours, a.desired_areas, a.departments, a.languages_skills, a.cv_pathname,
       a.mail_status, a.recruiting_semester,
       coalesce(choices.area_choices, '[]'::json) as area_choices
     from applications a
@@ -862,6 +872,88 @@ export async function updateProjectArea(id: string, input: ProjectAreaInput): Pr
 
 export async function deleteProjectArea(id: string): Promise<boolean> {
   const rows = await sql()`delete from project_areas where id = ${id} returning id`;
+  return rows.length > 0;
+}
+
+/**
+ * The "Ressort" checkbox list on the /mitmachen application form
+ * (/admin/ressorts), migrations/0020. Structurally identical to
+ * project_areas above — same columns, same label-snapshot rule, same
+ * deactivate-don't-delete lifecycle — because it is deliberately the same
+ * concept applied to a second category, not a second design. What differs is
+ * only how an application stores the choice: no priority, no reason, so a
+ * plain applications.departments text[] rather than a child table.
+ */
+export type DepartmentRow = {
+  id: string;
+  labelDe: string;
+  labelEn: string;
+  sortOrder: number;
+  active: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type DepartmentInput = {
+  labelDe: string;
+  labelEn: string;
+  sortOrder: number;
+  active: boolean;
+};
+
+const DEPARTMENT_COLUMNS = "id, label_de, label_en, sort_order, active, created_at, updated_at";
+
+function toDepartmentRow(row: Record<string, unknown>): DepartmentRow {
+  return {
+    id: row.id as string,
+    labelDe: row.label_de as string,
+    labelEn: row.label_en as string,
+    sortOrder: row.sort_order as number,
+    active: row.active as boolean,
+    createdAt: row.created_at as Date,
+    updatedAt: row.updated_at as Date,
+  };
+}
+
+// Powers /admin/ressorts — every department, active or not, in the board's
+// own order.
+export async function listDepartments(): Promise<DepartmentRow[]> {
+  const rows = await sql().query(`select ${DEPARTMENT_COLUMNS} from departments order by sort_order asc`);
+  return (rows as Record<string, unknown>[]).map(toDepartmentRow);
+}
+
+// Powers /mitmachen's Ressort checkboxes — only what the board has switched
+// on. A deactivated department therefore never reaches an applicant, while
+// staying readable in every application that already named it.
+export async function listActiveDepartments(): Promise<DepartmentRow[]> {
+  const rows = await sql().query(
+    `select ${DEPARTMENT_COLUMNS} from departments where active = true order by sort_order asc`,
+  );
+  return (rows as Record<string, unknown>[]).map(toDepartmentRow);
+}
+
+export async function insertDepartment(input: DepartmentInput): Promise<DepartmentRow> {
+  const rows = await sql()`
+    insert into departments (label_de, label_en, sort_order, active)
+    values (${input.labelDe}, ${input.labelEn}, ${input.sortOrder}, ${input.active})
+    returning id, label_de, label_en, sort_order, active, created_at, updated_at
+  `;
+  return toDepartmentRow(rows[0] as Record<string, unknown>);
+}
+
+export async function updateDepartment(id: string, input: DepartmentInput): Promise<DepartmentRow | null> {
+  const rows = await sql()`
+    update departments
+    set label_de = ${input.labelDe}, label_en = ${input.labelEn}, sort_order = ${input.sortOrder},
+        active = ${input.active}, updated_at = now()
+    where id = ${id}
+    returning id, label_de, label_en, sort_order, active, created_at, updated_at
+  `;
+  return rows.length > 0 ? toDepartmentRow(rows[0] as Record<string, unknown>) : null;
+}
+
+export async function deleteDepartment(id: string): Promise<boolean> {
+  const rows = await sql()`delete from departments where id = ${id} returning id`;
   return rows.length > 0;
 }
 
