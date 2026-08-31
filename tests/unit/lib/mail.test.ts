@@ -86,29 +86,82 @@ describe("sendApplicationNotification", () => {
 
   it("attaches both the application PDF and the CV, and mentions the retention caveat", async () => {
     const { sendApplicationNotification } = await import("@/lib/mail");
+    const { mailLogoAttachment } = await import("@/lib/mailLayout");
     const pdfBuffer = Buffer.from("pdf");
     const cvAttachment = { filename: `lebenslauf-${APPLICATION.id}.pdf`, content: Buffer.from("cv") };
 
     await sendApplicationNotification(APPLICATION, pdfBuffer, cvAttachment);
 
     const call = sendMock.mock.calls[0][0];
+    // The logo (send()'s own addition, ahead of every mail-specific
+    // attachment) comes first — see lib/mail.ts's own comment on send().
     expect(call.attachments).toEqual([
+      mailLogoAttachment(),
       { filename: `bewerbung-${APPLICATION.id}.pdf`, content: pdfBuffer },
       cvAttachment,
     ]);
     expect(call.text).toMatch(/Lebenslauf liegt als zweiter Anhang bei/);
     expect(call.text).toMatch(/Löschkonzept/);
+    expect(call.html).toContain(`cid:${mailLogoAttachment().contentId}`);
   });
 
   it("sends only the PDF and a not-attached note when there is no CV attachment", async () => {
     const { sendApplicationNotification } = await import("@/lib/mail");
+    const { mailLogoAttachment } = await import("@/lib/mailLayout");
     const pdfBuffer = Buffer.from("pdf");
 
     await sendApplicationNotification(APPLICATION, pdfBuffer, null);
 
     const call = sendMock.mock.calls[0][0];
-    expect(call.attachments).toEqual([{ filename: `bewerbung-${APPLICATION.id}.pdf`, content: pdfBuffer }]);
+    expect(call.attachments).toEqual([
+      mailLogoAttachment(),
+      { filename: `bewerbung-${APPLICATION.id}.pdf`, content: pdfBuffer },
+    ]);
     expect(call.text).toMatch(/konnte dieser Mail nicht beigefügt werden/);
     expect(call.text).toMatch(/\/admin\/bewerbungen/);
+  });
+});
+
+describe("send() mail layout wrapping", () => {
+  const originalEnv = {
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,
+    RESEND_REPLY_TO_EMAIL: process.env.RESEND_REPLY_TO_EMAIL,
+  };
+
+  beforeEach(() => {
+    process.env.RESEND_API_KEY = "test-api-key";
+    process.env.RESEND_FROM_EMAIL = "bewerbung@enactus-mannheim.com";
+    process.env.RESEND_REPLY_TO_EMAIL = "info@unimannheim.enactus.team";
+    sendMock.mockResolvedValue({ data: { id: "email-id" }, error: null });
+  });
+
+  afterEach(() => {
+    for (const [key, value] of Object.entries(originalEnv)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+    vi.resetModules();
+    sendMock.mockReset();
+  });
+
+  // Every send goes through the same one function (lib/mail.ts's private
+  // send()); sendContactMessageNotification is just a convenient one to
+  // drive it through, not the point of the test.
+  it("sends both a plaintext and an HTML body, and includes the logo as an inline attachment", async () => {
+    const { sendContactMessageNotification } = await import("@/lib/mail");
+    const { mailLogoAttachment } = await import("@/lib/mailLayout");
+
+    await sendContactMessageNotification({
+      name: "Jane",
+      email: "jane@example.com",
+      subject: "Hi",
+      text: "Hello there.",
+    });
+
+    const call = sendMock.mock.calls[0][0];
+    expect(call.text).toBe("Hello there.");
+    expect(call.html).toContain("Hello there.");
+    expect(call.attachments).toEqual([mailLogoAttachment()]);
   });
 });

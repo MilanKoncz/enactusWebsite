@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import type { Application, IdeathonSignup } from "./db";
+import { mailHtml, mailLogoAttachment } from "./mailLayout";
 
 /**
  * The only file that talks to Resend. Every send goes through here so the
@@ -34,6 +35,11 @@ function requireEnv(name: string): string {
   return value;
 }
 
+// Every mail gets an HTML body (derived from the same plaintext every
+// dispatch function already writes, mailLayout.ts's mailHtml) and the logo
+// as an inline `cid:` attachment (mailLogoAttachment) — added here, once,
+// rather than in each of the functions below, so none of them need to know
+// this wrapper exists. Before this, every send was plaintext-only.
 async function send(params: {
   to: string;
   subject: string;
@@ -47,7 +53,8 @@ async function send(params: {
     to: params.to,
     subject: params.subject,
     text: params.text,
-    attachments: params.attachments,
+    html: mailHtml(params.text),
+    attachments: [mailLogoAttachment(), ...(params.attachments ?? [])],
     headers: params.headers,
   });
   if (result.error) throw new Error(result.error.message);

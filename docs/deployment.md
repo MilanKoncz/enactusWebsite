@@ -172,6 +172,16 @@ a build failure: `next build` stays green with the whole Resend
 configuration unset, and the first sign of trouble is mail silently not
 arriving.
 
+Every mail carries both a plaintext and an HTML body (`lib/mailLayout.ts`'s
+`mailHtml`, added 2026-08-31) — the HTML is derived from the same plaintext
+every dispatch function already writes, so there is exactly one copy to
+keep accurate, not two that can drift apart. The logo in the header is sent
+as an inline `cid:` attachment read from the local filesystem
+(`mailLogoAttachment`), never fetched over the network at send time — no
+tracking pixel, no external image request, consistent with the
+Datenschutzerklärung's "kein Öffnungs-Tracking, kein Klick-Tracking, keine
+Zählpixel" claim (`Datenschutz.email`), which this doesn't change.
+
 Silently is not quite right, though — it is recorded. All three form routes
 write to Postgres *before* attempting a send, and a failed send is stored on
 the row rather than surfaced to the sender, who is told their message went
