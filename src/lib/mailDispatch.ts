@@ -14,6 +14,7 @@ import {
 import { localizedPath } from "@/lib/localizedPath";
 import { formatSiteDateTime } from "@/lib/formatSiteDateTime";
 import { siteUrl } from "@/lib/siteUrl";
+import { fetchCvBlobBuffer } from "@/lib/cvBlob";
 import type { Application, ContactMessage, IdeathonSignup, Locale } from "@/lib/db";
 
 /**
@@ -32,7 +33,26 @@ import type { Application, ContactMessage, IdeathonSignup, Locale } from "@/lib/
  */
 export async function dispatchApplicationMails(application: Application): Promise<void> {
   const pdfBuffer = await renderToBuffer(ApplicationPdfDocument({ application }));
-  await sendApplicationNotification(application, pdfBuffer);
+
+  // Best-effort, deliberately not allowed to throw: the application PDF
+  // must reach the board's inbox regardless of whether the CV can be
+  // attached alongside it (docs/engineering.md — "die Bewerbung darf nie
+  // am Mailversand scheitern"). A missing cvPathname (no upload, or the
+  // board already cleared it via "CV jetzt löschen"), a blob that has
+  // since expired past retain_until, or any fetch failure all land here the
+  // same way: cvAttachment stays null, and sendApplicationNotification's
+  // own text tells the board where to find it instead.
+  let cvAttachment: { filename: string; content: Buffer } | null = null;
+  if (application.cvPathname) {
+    try {
+      const cv = await fetchCvBlobBuffer(application.cvPathname);
+      if (cv) cvAttachment = { filename: `lebenslauf-${application.id}.pdf`, content: cv.buffer };
+    } catch (error) {
+      console.error("Failed to attach the CV to the application notification mail", error);
+    }
+  }
+
+  await sendApplicationNotification(application, pdfBuffer, cvAttachment);
 
   const t = await getTranslations({
     locale: application.locale,

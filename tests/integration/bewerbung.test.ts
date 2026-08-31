@@ -12,6 +12,7 @@ const renderToBuffer = vi.fn();
 const getRecruitingWindows = vi.fn();
 const checkFormToken = vi.fn();
 const verifyUploadedPdf = vi.fn();
+const fetchCvBlobBuffer = vi.fn();
 
 vi.mock("@/lib/db", () => ({
   insertApplication: (...args: unknown[]) => insertApplication(...args),
@@ -37,10 +38,15 @@ vi.mock("@/lib/formToken", () => ({
 }));
 
 // isCvPathname is real (a pure prefix check, no reason to mock) —
-// verifyUploadedPdf is the one call that would otherwise reach Vercel Blob.
+// verifyUploadedPdf and fetchCvBlobBuffer are the two calls that would
+// otherwise reach Vercel Blob.
 vi.mock("@/lib/cvBlob", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/lib/cvBlob")>();
-  return { ...actual, verifyUploadedPdf: (...args: unknown[]) => verifyUploadedPdf(...args) };
+  return {
+    ...actual,
+    verifyUploadedPdf: (...args: unknown[]) => verifyUploadedPdf(...args),
+    fetchCvBlobBuffer: (...args: unknown[]) => fetchCvBlobBuffer(...args),
+  };
 });
 
 // A window spanning far past to far future — every test below runs at the
@@ -125,6 +131,7 @@ describe("POST /api/bewerbung", () => {
     getRecruitingWindows.mockResolvedValue([OPEN_WINDOW]);
     checkFormToken.mockReturnValue("valid");
     verifyUploadedPdf.mockResolvedValue(true);
+    fetchCvBlobBuffer.mockResolvedValue({ buffer: Buffer.from("%PDF-1.4 cv"), contentType: "application/pdf" });
   });
 
   afterEach(() => {
@@ -175,11 +182,59 @@ describe("POST /api/bewerbung", () => {
     const response = await POST(postRequest(validPayload()));
 
     expect(response.status).toBe(200);
-    expect(sendApplicationNotification).toHaveBeenCalledWith(STORED_APPLICATION, expect.any(Buffer));
+    expect(sendApplicationNotification).toHaveBeenCalledWith(STORED_APPLICATION, expect.any(Buffer), {
+      filename: `lebenslauf-${STORED_APPLICATION.id}.pdf`,
+      content: Buffer.from("%PDF-1.4 cv"),
+    });
     expect(sendApplicationConfirmation).toHaveBeenCalledWith(
       expect.objectContaining({ email: STORED_APPLICATION.email, firstName: STORED_APPLICATION.firstName }),
     );
     expect(markApplicationMailed).toHaveBeenCalledWith(STORED_APPLICATION.id);
+  });
+
+  // The load-bearing case for the "an application can never fail on the CV
+  // attachment" contract (docs/engineering.md): the CV blob is unreachable
+  // (retain_until already deleted it, or Vercel Blob simply errors), but the
+  // board notification — with the application PDF — must still go out, and
+  // the applicant's own confirmation must still be sent. mail.ts's own text
+  // covers telling the board where to find the CV instead.
+  it("still sends the notification, degraded, when the CV blob can't be fetched", async () => {
+    checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
+    insertApplication.mockResolvedValue(STORED_APPLICATION);
+    renderToBuffer.mockResolvedValue(Buffer.from("pdf"));
+    fetchCvBlobBuffer.mockRejectedValue(new Error("blob not found"));
+    sendApplicationNotification.mockResolvedValue("email-id-1");
+    sendApplicationConfirmation.mockResolvedValue("email-id-2");
+    markApplicationMailed.mockResolvedValue(undefined);
+
+    const { POST } = await import("@/app/api/bewerbung/route");
+    const response = await POST(postRequest(validPayload()));
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ ok: true });
+    expect(sendApplicationNotification).toHaveBeenCalledWith(STORED_APPLICATION, expect.any(Buffer), null);
+    expect(sendApplicationConfirmation).toHaveBeenCalled();
+    expect(markApplicationMailed).toHaveBeenCalledWith(STORED_APPLICATION.id);
+  });
+
+  it("never tries to fetch a CV blob for an application that never had one", async () => {
+    checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
+    insertApplication.mockResolvedValue({ ...STORED_APPLICATION, cvPathname: undefined });
+    renderToBuffer.mockResolvedValue(Buffer.from("pdf"));
+    sendApplicationNotification.mockResolvedValue("email-id-1");
+    sendApplicationConfirmation.mockResolvedValue("email-id-2");
+    markApplicationMailed.mockResolvedValue(undefined);
+
+    const { POST } = await import("@/app/api/bewerbung/route");
+    const response = await POST(postRequest(validPayload()));
+
+    expect(response.status).toBe(200);
+    expect(fetchCvBlobBuffer).not.toHaveBeenCalled();
+    expect(sendApplicationNotification).toHaveBeenCalledWith(
+      { ...STORED_APPLICATION, cvPathname: undefined },
+      expect.any(Buffer),
+      null,
+    );
   });
 
   it("reports a server error and never claims success when the database write itself fails", async () => {

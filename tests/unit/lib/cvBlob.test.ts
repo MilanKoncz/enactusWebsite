@@ -167,3 +167,56 @@ describe("fetchCvBlob", () => {
     await expect(fetchCvBlob("bewerbungen/missing.pdf")).resolves.toBeNull();
   });
 });
+
+// Feeds a fixed sequence of chunks to a ReadableStream — unlike streamOf's
+// single enqueue, this is what actually exercises fetchCvBlobBuffer's
+// read-loop and running byte count across multiple reads.
+function multiChunkStreamOf(chunks: number[][]): ReadableStream<Uint8Array> {
+  return new ReadableStream({
+    start(controller) {
+      for (const chunk of chunks) controller.enqueue(new Uint8Array(chunk));
+      controller.close();
+    },
+  });
+}
+
+describe("fetchCvBlobBuffer", () => {
+  it("concatenates every chunk into one buffer, preserving content type", async () => {
+    process.env.BLOB_READ_WRITE_TOKEN = "test-token";
+    vi.resetModules();
+    getMock.mockResolvedValue({
+      statusCode: 200,
+      stream: multiChunkStreamOf([[1, 2], [3, 4, 5]]),
+      blob: { contentType: "application/pdf" },
+    });
+    const { fetchCvBlobBuffer } = await import("@/lib/cvBlob");
+    const result = await fetchCvBlobBuffer("bewerbungen/a.pdf");
+    expect(result?.contentType).toBe("application/pdf");
+    expect(result?.buffer).toEqual(Buffer.from([1, 2, 3, 4, 5]));
+  });
+
+  it("returns null when the blob is missing, without reading anything", async () => {
+    process.env.BLOB_READ_WRITE_TOKEN = "test-token";
+    vi.resetModules();
+    getMock.mockResolvedValue(null);
+    const { fetchCvBlobBuffer } = await import("@/lib/cvBlob");
+    await expect(fetchCvBlobBuffer("bewerbungen/missing.pdf")).resolves.toBeNull();
+  });
+
+  // Defensive re-check, not the primary guard (the upload route and the
+  // form schema already refuse anything over 4 MB before a blob like this
+  // can exist) — this proves the read loop actually aborts instead of
+  // buffering an unbounded amount of memory if that ever stops being true.
+  it("throws rather than buffering a blob larger than the upload cap", async () => {
+    process.env.BLOB_READ_WRITE_TOKEN = "test-token";
+    vi.resetModules();
+    const oversizedChunk = new Array(4 * 1024 * 1024 + 1).fill(0);
+    getMock.mockResolvedValue({
+      statusCode: 200,
+      stream: multiChunkStreamOf([oversizedChunk]),
+      blob: { contentType: "application/pdf" },
+    });
+    const { fetchCvBlobBuffer } = await import("@/lib/cvBlob");
+    await expect(fetchCvBlobBuffer("bewerbungen/too-big.pdf")).rejects.toThrow(/larger than/);
+  });
+});

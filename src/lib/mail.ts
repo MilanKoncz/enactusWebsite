@@ -54,12 +54,35 @@ async function send(params: {
   return result.data.id;
 }
 
-export async function sendApplicationNotification(application: Application, pdfBuffer: Buffer): Promise<string> {
+// cvAttachment is null both when the application has no CV at all (a
+// pre-CV-upload row, or the board already cleared it via "CV jetzt löschen")
+// and when fetching it failed — mailDispatch.ts's dispatchApplicationMails
+// is the one place that tells those two apart if it ever needs to; here
+// they're the same case, "nothing to attach", and the text says so either
+// way rather than guessing which one happened.
+//
+// Size: Resend's own limit is 40 MB per email (see the installed SDK's
+// CreateEmailOptions doc comment). The upload path enforces a 4 MB cap on
+// the CV itself (applicationFormSchema.ts's CV_MAX_SIZE_BYTES); the
+// rendered application PDF is a single page in the tens of KB. Base64
+// inflates raw bytes by roughly a third, so the worst case here is on the
+// order of 5.5 MB — comfortably under Resend's limit even with both
+// attachments present.
+export async function sendApplicationNotification(
+  application: Application,
+  pdfBuffer: Buffer,
+  cvAttachment: { filename: string; content: Buffer } | null,
+): Promise<string> {
+  const note = cvAttachment
+    ? "\n\nHinweis zum Löschkonzept: retain_until löscht automatisch den Blob und die Datenbankzeile, nicht diesen Mailanhang. Bitte den Lebenslauf nach Ablauf der Aufbewahrungsfrist manuell aus diesem Postfach löschen."
+    : "\n\nHinweis: Der Lebenslauf konnte dieser Mail nicht beigefügt werden. Er liegt weiterhin im Vorstandsbereich unter /admin/bewerbungen zum Download bereit.";
   return send({
     to: requireEnv("APPLICATION_RECIPIENT_EMAIL"),
     subject: `Neue Bewerbung: ${application.firstName} ${application.lastName}`,
-    text: `Neue Bewerbung von ${application.firstName} ${application.lastName} (${application.email}). Details im angehängten PDF.`,
-    attachments: [{ filename: `bewerbung-${application.id}.pdf`, content: pdfBuffer }],
+    text: `Neue Bewerbung von ${application.firstName} ${application.lastName} (${application.email}). Details im angehängten PDF${cvAttachment ? ", der Lebenslauf liegt als zweiter Anhang bei" : ""}.${note}`,
+    attachments: cvAttachment
+      ? [{ filename: `bewerbung-${application.id}.pdf`, content: pdfBuffer }, cvAttachment]
+      : [{ filename: `bewerbung-${application.id}.pdf`, content: pdfBuffer }],
   });
 }
 

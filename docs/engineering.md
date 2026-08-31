@@ -29,6 +29,26 @@ Forms, data, privacy, performance, SEO, and testing detail.
 8. The route rejects with 409 when no recruiting window is currently open —
    the form only renders while one is, but the route itself is public and
    reachable regardless of what a page already open in some tab still shows.
+9. The board notification carries the uploaded CV as a **second, separate
+   attachment** (`lebenslauf-<id>.pdf`) alongside the existing application
+   PDF (`bewerbung-<id>.pdf`) — never merged into the PDF itself
+   (`lib/mailDispatch.ts`'s `dispatchApplicationMails`, `lib/cvBlob.ts`'s
+   `fetchCvBlobBuffer`). Fetching the CV is best-effort and cannot fail the
+   send: if the blob is unreachable (already deleted past `retain_until`, or
+   a transient Vercel Blob error), the mail still goes out with the PDF
+   alone and a note that the CV remains available under
+   `/admin/bewerbungen`. The rendered PDF is a few tens of KB and the CV is
+   capped at 4 MB (`CV_MAX_SIZE_BYTES`); Base64 inflates that by roughly a
+   third, well under Resend's 40 MB per-email limit even with both
+   attachments present.
+
+   **This mailbox copy sits outside the deletion concept.** `retain_until`
+   deletes the Vercel Blob object and the `applications` row — it does not,
+   and cannot, reach into `RESEND_REPLY_TO_EMAIL`'s inbox. The notification
+   mail's own text says so and asks the board to delete the attachment from
+   the mailbox by hand once the retention period has passed;
+   `src/content/privacy.ts`'s CV section and `Datenschutz.email.body.0`/
+   `.application.access` describe the same fact to visitors.
 
 **Hochgeladene PDFs werden nicht auf Schadsoftware geprüft.** Es läuft kein
 Virenscanner über den Store, und der Vorstand öffnet die Dateien. Das ist ein

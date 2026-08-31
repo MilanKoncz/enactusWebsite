@@ -107,3 +107,44 @@ export async function fetchCvBlob(
   if (!result || result.statusCode !== 200) return null;
   return { stream: result.stream, contentType: result.blob.contentType };
 }
+
+// Matches applicationFormSchema.ts's own CV_MAX_SIZE_BYTES — kept as its own
+// copy rather than a shared import, same reasoning as cv-upload/route.ts's
+// own copy: this is a defensive re-check at the point a blob's bytes are
+// about to be read fully into memory (for the mail attachment, see
+// mailDispatch.ts), not the place that decides the actual limit.
+const CV_MAX_SIZE_BYTES = 4 * 1024 * 1024;
+
+// Reads a CV blob to completion, for the one caller that needs the whole
+// file in memory rather than a stream to pipe through — the application
+// notification mail's second attachment. Aborts rather than buffering
+// without limit if the blob is somehow larger than the enforced upload cap
+// (a defensive check, not the primary guard: the upload route and the form
+// schema already refuse anything larger before a blob like this can exist).
+export async function fetchCvBlobBuffer(
+  pathnameOrUrl: string,
+): Promise<{ buffer: Buffer; contentType: string } | null> {
+  const blob = await fetchCvBlob(pathnameOrUrl);
+  if (!blob) return null;
+
+  const reader = blob.stream.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+  try {
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      totalBytes += value.byteLength;
+      if (totalBytes > CV_MAX_SIZE_BYTES) {
+        throw new Error(`CV blob at ${pathnameOrUrl} is larger than the ${CV_MAX_SIZE_BYTES}-byte upload cap`);
+      }
+      chunks.push(value);
+    }
+  } finally {
+    await reader.cancel().catch(() => {
+      // Same reasoning as verifyUploadedPdf's own cancel: the connection is
+      // being torn down either way, a failure here has nothing to report to.
+    });
+  }
+  return { buffer: Buffer.concat(chunks), contentType: blob.contentType };
+}
