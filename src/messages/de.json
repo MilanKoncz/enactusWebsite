@@ -1284,7 +1284,7 @@
       "offers": {
         "responsibility": {
           "title": "Verantwortung ab Tag eins",
-          "lead": "Du übernimmst echte Aufgaben, nicht Zuarbeit.",
+          "lead": "Du übernimmst echte Aufgaben, keine Hilfstätigkeiten.",
           "detail": "Du triffst operative Entscheidungen und verantwortest die Ergebnisse selbst."
         },
         "network": {
@@ -1412,7 +1412,7 @@
         "priorInvolvementError": "Bitte kürze auf maximal 600 Zeichen.",
         "languagesSkillsLabel": "(Optional) Relevante Skills",
         "languagesSkillsHint": "Welche Sprachen, Tools oder Methoden bringen genau in deinem 1. Wunschbereich etwas? Stichworte reichen, drei bis fünf genügen. Deinen vollständigen Werdegang lesen wir im Lebenslauf.",
-        "languagesSkillsPlaceholder": "z. B. Figma, Excel-Modelle, Vereinsvorstand, Spanisch (C1)",
+        "languagesSkillsPlaceholder": "z. B. Figma, Excel-Modelle, Vereinsvorstand, Spanisch (C1), Canva, Umgang mit KI, etc.",
         "languagesSkillsError": "Bitte kürze auf maximal 200 Zeichen.",
         "wantToGainLabel": "(Optional) Was möchtest du aus deiner Zeit bei Enactus mitnehmen?",
         "wantToGainHint": "Was willst du am Ende können oder erlebt haben, das heute noch nicht geht?",

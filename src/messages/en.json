@@ -1412,7 +1412,7 @@
         "priorInvolvementError": "Please shorten this to 600 characters or fewer.",
         "languagesSkillsLabel": "(Optional) Relevant skills",
         "languagesSkillsHint": "Which languages, tools, or methods are actually useful for your 1st choice area? Keywords are enough, three to five is plenty. We'll read your full background in your CV.",
-        "languagesSkillsPlaceholder": "e.g. Figma, spreadsheet modeling, club board member, Spanish (C1)",
+        "languagesSkillsPlaceholder": "e.g. Figma, spreadsheet modeling, club board member, Spanish (C1), Canva, working with AI, etc.",
         "languagesSkillsError": "Please shorten this to 200 characters or fewer.",
         "wantToGainLabel": "(Optional) What do you hope to take away from your time at Enactus?",
         "wantToGainHint": "What do you want to be able to do, or have experienced, by the end that you can't yet?",
