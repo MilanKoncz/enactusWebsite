@@ -6,6 +6,7 @@ import { Menu, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { Nav } from "@/components/layout/Nav";
+import { HeaderSocialLinks } from "@/components/layout/HeaderSocialLinks";
 import { LocaleSwitch } from "@/components/layout/LocaleSwitch";
 import { Logo } from "@/components/layout/Logo";
 import { Link } from "@/lib/navigation";
@@ -82,6 +83,7 @@ export function MobileMenu({ className, hasJobs = false }: MobileMenuProps) {
           <Button href="/mitmachen" onClick={close}>
             {t("cta")}
           </Button>
+          <HeaderSocialLinks className="justify-center gap-6 border-t border-paper/10 pt-6" />
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

@@ -170,6 +170,29 @@ test.describe("/mitmachen", () => {
     await expect(page.getByRole("button", { name: "Bewerbung absenden" })).toHaveCount(0);
   });
 
+  test("shows the WhatsApp community line under the application section", async ({ page }) => {
+    await page.goto("/mitmachen");
+    // Scoped to #bewerbung, not just an accessible-name match: the header's
+    // own small WhatsApp icon link (HeaderSocialLinks.tsx) is also on this
+    // page at desktop widths and shares "WhatsApp-Community" as a substring
+    // of its aria-label.
+    const link = page.locator("#bewerbung").getByRole("link", { name: "WhatsApp-Community", exact: true });
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute("href", "https://chat.whatsapp.com/FplqECI7eYL2CmoxR2OR2Q");
+    await expect(link).toHaveAttribute("target", "_blank");
+  });
+
+  test("also shows the WhatsApp community line once the application window is open", async ({ page }) => {
+    await mockOpenRecruitingWindow(page);
+    await mockProjectAreas(page);
+    await mockDepartments(page);
+    await page.goto("/mitmachen");
+    await expect(page.getByRole("button", { name: "Bewerbung absenden" })).toBeVisible();
+    const link = page.locator("#bewerbung").getByRole("link", { name: "WhatsApp-Community", exact: true });
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute("href", "https://chat.whatsapp.com/FplqECI7eYL2CmoxR2OR2Q");
+  });
+
   test("submits the reminder sign-up and shows a real confirmation notice", async ({ page }) => {
     // /api/reminder itself is exercised by the Vitest integration suite
     // against a mocked db/mail layer — this only proves the form calls the

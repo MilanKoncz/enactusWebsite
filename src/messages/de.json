@@ -43,7 +43,12 @@
     "cta": "Mitmachen",
     "openMenu": "Menü öffnen",
     "closeMenu": "Menü schließen",
-    "mobileMenuLabel": "Menü"
+    "mobileMenuLabel": "Menü",
+    "social": {
+      "label": "Social Media",
+      "whatsappLabel": "WhatsApp-Community (öffnet in einem neuen Tab)",
+      "instagramLabel": "Instagram (öffnet in einem neuen Tab)"
+    }
   },
   "LocaleSwitch": {
     "label": "Sprache wechseln",
@@ -65,7 +70,8 @@
       "label": "Social Media",
       "instagram": "Instagram",
       "linkedin": "LinkedIn",
-      "facebook": "Facebook"
+      "facebook": "Facebook",
+      "whatsapp": "WhatsApp"
     },
     "externalHint": "Öffnet in einem neuen Tab",
     "missingUrl": "URL fehlt",
@@ -1325,6 +1331,7 @@
       "eyebrow": "Bewerbung",
       "title": "Jetzt bewerben",
       "lead": "Sobald das Bewerbungsfenster offen ist, kannst du dich hier direkt bewerben.",
+      "whatsappHint": "Du willst schon vorher in Kontakt bleiben? Tritt unserer <whatsappLink>WhatsApp-Community</whatsappLink> bei.",
       "notOpen": {
         "beforeHeading": "Das Bewerbungsfenster ist noch geschlossen",
         "beforeLead": "Bewerbungen sind vom {opensDate} bis {closesDate} möglich. Lass dich per E-Mail benachrichtigen, sobald es losgeht.",

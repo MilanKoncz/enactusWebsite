@@ -71,10 +71,18 @@ describe("Footer", () => {
   it("renders a real icon next to every social link, including LinkedIn", () => {
     renderWithIntl(<Footer />);
     const socialGroup = screen.getByRole("group", { name: "Social Media" });
-    for (const name of ["Instagram", "LinkedIn", "Facebook"]) {
+    for (const name of ["Instagram", "LinkedIn", "Facebook", "WhatsApp"]) {
       const link = within(socialGroup).getByRole("link", { name });
       expect(link.parentElement?.querySelector("svg")).toBeInTheDocument();
     }
+  });
+
+  it("links WhatsApp to the community invite, target=_blank", () => {
+    renderWithIntl(<Footer />);
+    const link = screen.getByRole("link", { name: "WhatsApp" });
+    expect(link).toHaveAttribute("href", "https://chat.whatsapp.com/FplqECI7eYL2CmoxR2OR2Q");
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
   });
 
   it("has no accessibility violations", async () => {

@@ -46,6 +46,34 @@ describe("MitmachenApplication", () => {
     expect(screen.queryByRole("button", { name: "Bewerbung absenden" })).not.toBeInTheDocument();
   });
 
+  it("shows the WhatsApp community line while the window is closed, below the reminder sign-up", () => {
+    freezeNowAt(opensMs - 10_000);
+    renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[hws26]} />);
+
+    const link = screen.getByRole("link", { name: "WhatsApp-Community" });
+    expect(link).toHaveAttribute("href", "https://chat.whatsapp.com/FplqECI7eYL2CmoxR2OR2Q");
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
+
+    const reminderHeading = screen.getByText("Benachrichtigung zum Bewerbungsstart");
+    expect(
+      reminderHeading.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it("shows the WhatsApp community line once the window is open, below the application form", () => {
+    freezeNowAt((opensMs + closesMs) / 2);
+    renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[hws26]} />);
+
+    const link = screen.getByRole("link", { name: "WhatsApp-Community" });
+    expect(link).toHaveAttribute("href", "https://chat.whatsapp.com/FplqECI7eYL2CmoxR2OR2Q");
+
+    const submitButton = screen.getByRole("button", { name: "Bewerbung absenden" });
+    expect(
+      submitButton.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
   // Regression coverage for the timezone bug: the sentence used to be
   // rendered with no explicit timeZone, so it silently followed the host
   // machine's own zone instead of Europe/Berlin — the exact bug the

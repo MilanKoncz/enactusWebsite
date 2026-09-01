@@ -35,8 +35,8 @@ describe("content/navigation", () => {
     ]);
   });
 
-  it("has the three confirmed social links and both network links, all with real URLs", () => {
-    expect(socialLinks.map((link) => link.key)).toEqual(["instagram", "linkedin", "facebook"]);
+  it("has the four confirmed social links and both network links, all with real URLs", () => {
+    expect(socialLinks.map((link) => link.key)).toEqual(["instagram", "linkedin", "facebook", "whatsapp"]);
     expect(socialLinks.every((link) => link.href !== null)).toBe(true);
     expect(networkLinks.map((link) => link.key)).toEqual(["enactusGermany", "enactusGlobal"]);
     expect(networkLinks.every((link) => link.href !== null)).toBe(true);

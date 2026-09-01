@@ -10,6 +10,7 @@ import { ReminderSignupForm } from "./ReminderSignupForm";
 import { useNow } from "@/lib/useNow";
 import { recruitingPhaseAt, currentOrNextRecruitingWindow } from "@/lib/recruitingStatus";
 import { siteDateTimeFormatter } from "@/lib/formatSiteDateTime";
+import { socialLinks } from "@/content/navigation";
 import type { RecruitingWindow } from "@/content/recruiting";
 import type { PublicProjectArea } from "@/lib/projectAreas";
 import type { PublicDepartment } from "@/lib/departments";
@@ -137,6 +138,21 @@ export function MitmachenApplication({
             <ReminderSignupForm />
           </div>
         )}
+
+        <p className="text-body-s opacity-60">
+          {t.rich("whatsappHint", {
+            whatsappLink: (chunks) => (
+              <a
+                href={socialLinks.find((link) => link.key === "whatsapp")?.href ?? undefined}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link-underline"
+              >
+                {chunks}
+              </a>
+            ),
+          })}
+        </p>
       </Container>
     </Section>
   );

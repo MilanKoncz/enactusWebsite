@@ -108,7 +108,7 @@ export const networkLinks: NetworkLink[] = [
 // No Spotify or YouTube account exists for the club — not omitted for lack
 // of a link, there is simply nothing to link to. Don't re-add either without
 // confirming a real account first.
-const socialKeySchema = z.enum(["instagram", "linkedin", "facebook"]);
+const socialKeySchema = z.enum(["instagram", "linkedin", "facebook", "whatsapp"]);
 export type SocialKey = z.infer<typeof socialKeySchema>;
 
 const socialLinkSchema = z.object({
@@ -121,4 +121,15 @@ export const socialLinks: SocialLink[] = [
   socialLinkSchema.parse({ key: "instagram", href: "https://www.instagram.com/enactus_mannheim/" }),
   socialLinkSchema.parse({ key: "linkedin", href: "https://www.linkedin.com/company/enactusmannheim/" }),
   socialLinkSchema.parse({ key: "facebook", href: "https://www.facebook.com/unimannheim.enactus/" }),
+  // Group invite link, deliberately without a tracking parameter.
+  socialLinkSchema.parse({ key: "whatsapp", href: "https://chat.whatsapp.com/FplqECI7eYL2CmoxR2OR2Q" }),
 ];
+
+// Subset of socialLinks the Header/MobileMenu surface as small icon-only
+// links, kept separate from the Footer's full social row (which lists all
+// four) — the header only calls out the two channels worth making more
+// discoverable outside the footer. `as const satisfies` keeps each entry's
+// literal type (not the widened SocialKey) so HeaderSocialLinks.tsx can
+// build statically-checked `Header.social.${key}Label` message keys from it.
+export const headerSocialKeys = ["whatsapp", "instagram"] as const satisfies readonly SocialKey[];
+export type HeaderSocialKey = (typeof headerSocialKeys)[number];

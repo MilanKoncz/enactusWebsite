@@ -27,6 +27,20 @@ describe("Header", () => {
     expect(within(banner).getByRole("group", { name: "Sprache wechseln" })).toBeInTheDocument();
   });
 
+  it("shows the WhatsApp and Instagram icon links without outranking the Mitmachen CTA", () => {
+    mockMatchMedia(false);
+    mockIntersectionObserver();
+    mockPathname.mockReturnValue("/");
+    renderWithIntl(<Header />);
+    const banner = screen.getByRole("banner");
+    const socialGroup = within(banner).getByRole("group", { name: "Social Media" });
+    expect(within(socialGroup).getByRole("link", { name: /WhatsApp-Community/ })).toBeInTheDocument();
+    expect(within(socialGroup).getByRole("link", { name: /Instagram/ })).toBeInTheDocument();
+    // The CTA stays a real <Button>-styled link, the social icons carry no
+    // visible text at all — that visual weight difference is the point.
+    expect(within(banner).getByRole("link", { name: "Mitmachen" })).toBeInTheDocument();
+  });
+
   it("is not compact initially", () => {
     mockMatchMedia(false);
     mockIntersectionObserver();

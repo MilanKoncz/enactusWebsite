@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe } from "jest-axe";
 import { renderWithIntl } from "../../fixtures/intl";
@@ -90,5 +90,24 @@ describe("MobileMenu", () => {
     renderWithIntl(<MobileMenu />);
     await user.click(screen.getByRole("button", { name: "Menü öffnen" }));
     expect(await axe(screen.getByRole("dialog"))).toHaveNoViolations();
+  });
+
+  it("shows WhatsApp and Instagram below the nav, separated from it and the CTA", async () => {
+    mockPathname.mockReturnValue("/");
+    const user = userEvent.setup();
+    renderWithIntl(<MobileMenu />);
+    await user.click(screen.getByRole("button", { name: "Menü öffnen" }));
+    const dialog = screen.getByRole("dialog");
+    const socialGroup = within(dialog).getByRole("group", { name: "Social Media" });
+    expect(within(socialGroup).getByRole("link", { name: /WhatsApp-Community/ })).toBeInTheDocument();
+    expect(within(socialGroup).getByRole("link", { name: /Instagram/ })).toBeInTheDocument();
+    expect(socialGroup).toHaveClass("border-t");
+
+    const focusables = getFocusables(dialog);
+    const ctaIndex = focusables.indexOf(within(dialog).getByRole("link", { name: "Mitmachen" }));
+    const socialLinkIndices = within(socialGroup)
+      .getAllByRole("link")
+      .map((link) => focusables.indexOf(link));
+    expect(Math.min(...socialLinkIndices)).toBeGreaterThan(ctaIndex);
   });
 });

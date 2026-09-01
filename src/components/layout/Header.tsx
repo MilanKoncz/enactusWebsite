@@ -7,6 +7,7 @@ import { Container } from "@/components/ui/Container";
 import { Logo } from "@/components/layout/Logo";
 import { Nav } from "@/components/layout/Nav";
 import { LocaleSwitch } from "@/components/layout/LocaleSwitch";
+import { HeaderSocialLinks } from "@/components/layout/HeaderSocialLinks";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import { NightModeZzz } from "@/components/motion/NightModeZzz";
 import { SkipLink } from "@/components/layout/SkipLink";
@@ -88,6 +89,7 @@ export function Header({ hasJobs = false }: HeaderProps) {
           <Nav variant="desktop" showJobs={hasJobs} className="hidden lg:flex" />
           <div className="flex items-center gap-4">
             <LocaleSwitch className="hidden lg:flex" />
+            <HeaderSocialLinks className="hidden lg:flex" />
             <Button href="/mitmachen" size="sm" className="hidden lg:inline-flex">
               {t("cta")}
             </Button>

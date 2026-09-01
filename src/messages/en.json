@@ -43,7 +43,12 @@
     "cta": "Get involved",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
-    "mobileMenuLabel": "Menu"
+    "mobileMenuLabel": "Menu",
+    "social": {
+      "label": "Social media",
+      "whatsappLabel": "WhatsApp community (opens in a new tab)",
+      "instagramLabel": "Instagram (opens in a new tab)"
+    }
   },
   "LocaleSwitch": {
     "label": "Switch language",
@@ -65,7 +70,8 @@
       "label": "Social media",
       "instagram": "Instagram",
       "linkedin": "LinkedIn",
-      "facebook": "Facebook"
+      "facebook": "Facebook",
+      "whatsapp": "WhatsApp"
     },
     "externalHint": "Opens in a new tab",
     "missingUrl": "URL missing",
@@ -1325,6 +1331,7 @@
       "eyebrow": "Application",
       "title": "Apply now",
       "lead": "Once the application window is open, you can apply right here.",
+      "whatsappHint": "Want to stay in touch beforehand? Join our <whatsappLink>WhatsApp community</whatsappLink>.",
       "notOpen": {
         "beforeHeading": "The application window isn't open yet",
         "beforeLead": "Applications are open from {opensDate} to {closesDate}. Get an email notification for when it starts.",

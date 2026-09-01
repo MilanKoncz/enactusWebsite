@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 import { ExternalLink as ExternalLinkIcon } from "lucide-react";
-import { SiFacebook, SiInstagram } from "@icons-pack/react-simple-icons";
+import { SiFacebook, SiInstagram, SiWhatsapp } from "@icons-pack/react-simple-icons";
 import { FaLinkedin } from "react-icons/fa";
 import { useTranslations } from "next-intl";
 import { Container } from "@/components/ui/Container";
@@ -31,6 +31,7 @@ const SOCIAL_ICONS: Partial<Record<SocialKey, ComponentType<{ className?: string
   instagram: SiInstagram,
   linkedin: FaLinkedin,
   facebook: SiFacebook,
+  whatsapp: SiWhatsapp,
 };
 
 function ExternalLinkItem({
