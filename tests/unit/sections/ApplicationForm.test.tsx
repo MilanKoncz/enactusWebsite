@@ -166,10 +166,12 @@ describe("ApplicationForm", () => {
     expect(screen.getByLabelText("3. Wahl")).toBeInTheDocument();
     expect(screen.getByLabelText("Lebenslauf")).toBeInTheDocument();
     expect(screen.getByLabelText("Motivation")).toBeInTheDocument();
-    expect(screen.getByLabelText("Bisheriges Engagement")).toBeInTheDocument();
-    expect(screen.getByLabelText("Relevante Skills")).toBeInTheDocument();
-    expect(screen.getByLabelText("Was möchtest du aus deiner Zeit bei Enactus mitnehmen?")).toBeInTheDocument();
-    expect(screen.getByLabelText("Wie bist du auf uns aufmerksam geworden?")).toBeInTheDocument();
+    expect(screen.getByLabelText("(Optional) Bisheriges Engagement")).toBeInTheDocument();
+    expect(screen.getByLabelText("(Optional) Relevante Skills")).toBeInTheDocument();
+    expect(
+      screen.getByLabelText("(Optional) Was möchtest du aus deiner Zeit bei Enactus mitnehmen?"),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("(Optional) Wie bist du auf uns aufmerksam geworden?")).toBeInTheDocument();
     expect(screen.queryByLabelText("Hochschule")).not.toBeInTheDocument();
   });
 
@@ -224,7 +226,7 @@ describe("ApplicationForm", () => {
 
   it("lists the departments passed in via departments, as an optional checkbox group", () => {
     renderForm();
-    const group = screen.getByRole("group", { name: "Ressorts" });
+    const group = screen.getByRole("group", { name: "(Optional) Ressorts" });
     expect(within(group).getByRole("checkbox", { name: "Team-Lead" })).toBeInTheDocument();
     expect(within(group).getByRole("checkbox", { name: "Finance-Lead" })).toBeInTheDocument();
     expect(within(group).getByRole("checkbox", { name: "Operations-Lead" })).toBeInTheDocument();
@@ -237,7 +239,7 @@ describe("ApplicationForm", () => {
     ]);
     renderForm();
 
-    const group = screen.getByRole("group", { name: "Ressorts" });
+    const group = screen.getByRole("group", { name: "(Optional) Ressorts" });
     await waitFor(() => {
       expect(within(group).queryByRole("checkbox", { name: "Finance-Lead" })).not.toBeInTheDocument();
     });
@@ -248,7 +250,7 @@ describe("ApplicationForm", () => {
     const user = userEvent.setup();
     renderForm();
 
-    const group = screen.getByRole("group", { name: "Ressorts" });
+    const group = screen.getByRole("group", { name: "(Optional) Ressorts" });
     await user.click(within(group).getByRole("checkbox", { name: "Team-Lead" }));
     await user.click(within(group).getByRole("checkbox", { name: "Finance-Lead" }));
     await user.click(within(group).getByRole("checkbox", { name: "Operations-Lead" }));
@@ -262,7 +264,7 @@ describe("ApplicationForm", () => {
     const user = userEvent.setup();
     renderForm();
 
-    const group = screen.getByRole("group", { name: "Ressorts" });
+    const group = screen.getByRole("group", { name: "(Optional) Ressorts" });
     await user.click(within(group).getByRole("checkbox", { name: "Team-Lead" }));
     await user.click(within(group).getByRole("checkbox", { name: "Finance-Lead" }));
     await user.click(within(group).getByRole("checkbox", { name: "Operations-Lead" }));

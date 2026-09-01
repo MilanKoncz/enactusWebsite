@@ -524,6 +524,8 @@ export function ApplicationForm({
         as="textarea"
         label={t("priorInvolvementLabel")}
         hint={t("priorInvolvementHint")}
+        showCount
+        maxLength={600}
         error={errors.priorInvolvement && t("priorInvolvementError")}
         {...register("priorInvolvement")}
       />
