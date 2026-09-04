@@ -113,6 +113,15 @@ export function IdeathonSignupForm() {
   return (
     <form onSubmit={handleFormSubmit} noValidate className="flex flex-col gap-8">
       <h3 className="text-heading-2 font-display font-normal!">{t("heading")}</h3>
+      <p className="text-body-s opacity-60">
+        {t.rich("membershipNotice", {
+          mitmachenLink: (chunks) => (
+            <Link href="/mitmachen" className="link-underline">
+              {chunks}
+            </Link>
+          ),
+        })}
+      </p>
 
       <input
         type="text"

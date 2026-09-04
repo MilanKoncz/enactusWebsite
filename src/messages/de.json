@@ -646,6 +646,7 @@
     },
     "form": {
       "heading": "Anmeldung",
+      "membershipNotice": "Das hier ist die Anmeldung für die Veranstaltung Ideathon. Du willst dich stattdessen als Mitglied bei Enactus Mannheim bewerben? Das geht über die <mitmachenLink>Mitgliedschaftsbewerbung</mitmachenLink>.",
       "firstNameLabel": "Vorname",
       "firstNameError": "Bitte gib deinen Vornamen an.",
       "lastNameLabel": "Nachname",

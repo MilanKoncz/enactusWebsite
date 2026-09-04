@@ -113,6 +113,15 @@ test.describe("/ideathon", () => {
     );
   });
 
+  test("links the form's membership notice to /mitmachen, reachable by keyboard", async ({ page }) => {
+    await mockCalendarEvents(page, [UPCOMING_IDEATHON]);
+    await page.goto("/ideathon");
+    const link = page.getByRole("link", { name: "Mitgliedschaftsbewerbung" });
+    await expect(link).toHaveAttribute("href", "/mitmachen");
+    await link.focus();
+    await expect(link).toBeFocused();
+  });
+
   test("submits the signup form and shows a real success notice", async ({ page }) => {
     await mockCalendarEvents(page, [UPCOMING_IDEATHON]);
     await mockFormToken(page);

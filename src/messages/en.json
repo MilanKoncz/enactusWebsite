@@ -646,6 +646,7 @@
     },
     "form": {
       "heading": "Sign up",
+      "membershipNotice": "This is the sign-up for the Ideathon event. Looking to apply for membership at Enactus Mannheim instead? That happens over on the <mitmachenLink>membership application</mitmachenLink>.",
       "firstNameLabel": "First name",
       "firstNameError": "Please give your first name.",
       "lastNameLabel": "Last name",
