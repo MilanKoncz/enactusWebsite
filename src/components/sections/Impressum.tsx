@@ -80,6 +80,14 @@ export function Impressum() {
         <p className="text-body-s opacity-60">
           {t("copyright", { year: new Date().getFullYear() })}
         </p>
+        {/* Deliberately its own labeled block, outside the dl above and with
+            its own heading — a credit for the site's design and development,
+            not a claim of editorial or legal responsibility. That stays with
+            the board under responsibleLabel/responsibleSame. */}
+        <div className="flex flex-col gap-1 border-l-2 border-ink/10 py-1 pl-4">
+          <h2 className="text-mono-s font-mono uppercase opacity-60">{t("creditsHeading")}</h2>
+          <p className="text-body-m">{t("creditsName")}</p>
+        </div>
       </Container>
     </Section>
   );

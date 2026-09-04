@@ -1018,7 +1018,9 @@
     "contactLabel": "Kontakt",
     "responsibleLabel": "Inhaltlich verantwortlich gemäß § 18 Abs. 2 MStV",
     "responsibleSame": "Dieselben Personen wie unter „Vertreten durch“.",
-    "copyright": "© {year} Enactus Mannheim e.V. Alle Rechte vorbehalten."
+    "copyright": "© {year} Enactus Mannheim e.V. Alle Rechte vorbehalten.",
+    "creditsHeading": "Design and development",
+    "creditsName": "Milan Koncz"
   },
   "Datenschutz": {
     "eyebrow": "Legal",

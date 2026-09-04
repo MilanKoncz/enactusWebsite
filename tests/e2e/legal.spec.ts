@@ -33,6 +33,12 @@ test.describe("/impressum", () => {
     await expect(page.getByText(/This legal notice \(Impressum\) is required under German law/)).toBeVisible();
     await expect(page.getByText("Vertreten durch", { exact: true })).toBeVisible();
   });
+
+  test("credits design and development, separate from the responsible persons", async ({ page }) => {
+    await page.goto("/impressum");
+    await expect(page.getByRole("heading", { level: 2, name: "Gestaltung und Entwicklung" })).toBeVisible();
+    await expect(page.getByText("Milan Koncz")).toBeVisible();
+  });
 });
 
 test.describe("/datenschutz", () => {

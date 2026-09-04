@@ -56,6 +56,18 @@ describe("Impressum", () => {
     ).toBeInTheDocument();
   });
 
+  it("credits design and development as its own labeled block, not part of the responsible-persons list", () => {
+    renderWithIntl(<Impressum />);
+    expect(screen.getByRole("heading", { level: 2, name: "Gestaltung und Entwicklung" })).toBeInTheDocument();
+    expect(screen.getByText("Milan Koncz")).toBeInTheDocument();
+  });
+
+  it("translates the design credit on the English route, unlike the legal labels above it", () => {
+    renderWithIntl(<Impressum />, { locale: "en" });
+    expect(screen.getByRole("heading", { level: 2, name: "Design and development" })).toBeInTheDocument();
+    expect(screen.getByText("Milan Koncz")).toBeInTheDocument();
+  });
+
   it("shows the English notice only on the English route", () => {
     renderWithIntl(<Impressum />, { locale: "en" });
     expect(
