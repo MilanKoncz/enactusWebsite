@@ -175,6 +175,12 @@ describe("ApplicationForm", () => {
     expect(screen.queryByLabelText("Hochschule")).not.toBeInTheDocument();
   });
 
+  it("links the areas notice's Ideathon mention to the Ideathon page", () => {
+    renderForm();
+    const link = screen.getByRole("link", { name: "Ideathon" });
+    expect(link).toHaveAttribute("href", "/ideathon");
+  });
+
   it("has exactly one file upload input, wired to the CV field", () => {
     renderForm();
     const fileInputs = document.querySelectorAll('input[type="file"]');

@@ -193,6 +193,19 @@ test.describe("/mitmachen", () => {
     await expect(link).toHaveAttribute("href", "https://chat.whatsapp.com/FplqECI7eYL2CmoxR2OR2Q");
   });
 
+  test("links the areas notice's Ideathon mention to the Ideathon page, reachable by keyboard", async ({
+    page,
+  }) => {
+    await mockOpenRecruitingWindow(page);
+    await mockProjectAreas(page);
+    await mockDepartments(page);
+    await page.goto("/mitmachen");
+    const link = page.locator("#bewerbung").getByRole("link", { name: "Ideathon", exact: true });
+    await expect(link).toHaveAttribute("href", "/ideathon");
+    await link.focus();
+    await expect(link).toBeFocused();
+  });
+
   test("submits the reminder sign-up and shows a real confirmation notice", async ({ page }) => {
     // /api/reminder itself is exercised by the Vitest integration suite
     // against a mocked db/mail layer — this only proves the form calls the

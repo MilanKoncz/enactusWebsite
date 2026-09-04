@@ -1376,6 +1376,7 @@
         "availabilityError": "Please enter a valid number of hours.",
         "areasLabel": "Areas of interest",
         "areasHint": "Choose up to three areas, in order of preference. The first choice is required.",
+        "areasNotice": "This list shows which projects are currently looking for members. In the Innolab, you develop your own ideas in weekly sessions. Signing up for the <ideathonLink>Ideathon</ideathonLink> is a separate event and doesn't lead to membership automatically, that's what this application is for.",
         "areaPlaceholder": "Please choose",
         "area1Label": "1st choice",
         "area1Error": "Please choose your preferred area.",

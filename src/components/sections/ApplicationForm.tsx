@@ -357,6 +357,15 @@ export function ApplicationForm({
       <fieldset className="flex flex-col gap-6">
         <legend className="text-body-s font-medium text-ink">{t("areasLabel")}</legend>
         <p className="text-body-s opacity-60">{t("areasHint")}</p>
+        <p className="text-body-s opacity-60">
+          {t.rich("areasNotice", {
+            ideathonLink: (chunks) => (
+              <Link href="/ideathon" className="link-underline">
+                {chunks}
+              </Link>
+            ),
+          })}
+        </p>
 
         <div className="flex flex-col gap-3">
           <Field as="select" label={t("area1Label")} error={errors.area1 && t("area1Error")} {...register("area1")}>

@@ -1376,6 +1376,7 @@
         "availabilityError": "Bitte gib eine gültige Stundenzahl ein.",
         "areasLabel": "Wunschbereiche",
         "areasHint": "Wähle bis zu drei Bereiche in der Reihenfolge deiner Präferenz. Die erste Wahl ist Pflicht.",
+        "areasNotice": "Hier siehst du, welche Projekte gerade Mitglieder suchen. Im Innolab feilst du in wöchentlichen Sessions an eigenen Ideen. Die Anmeldung für den <ideathonLink>Ideathon</ideathonLink> läuft separat und führt nicht automatisch zu einer Mitgliedschaft im Verein, dafür bewirbst du dich hier.",
         "areaPlaceholder": "Bitte wählen",
         "area1Label": "1. Wahl",
         "area1Error": "Bitte wähle deinen Wunschbereich.",
