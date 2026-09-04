@@ -200,7 +200,7 @@ test.describe("/mitmachen", () => {
     await mockProjectAreas(page);
     await mockDepartments(page);
     await page.goto("/mitmachen");
-    const link = page.locator("#bewerbung").getByRole("link", { name: "Ideathon", exact: true });
+    const link = page.locator("#bewerbung").getByRole("link", { name: "hier", exact: true });
     await expect(link).toHaveAttribute("href", "/ideathon");
     await link.focus();
     await expect(link).toBeFocused();
