@@ -19,7 +19,7 @@ afterEach(() => {
 describe("KontaktContent", () => {
   it("renders the page heading, the FAQ, and the contact form", () => {
     renderWithIntl(<KontaktContent />);
-    expect(screen.getByRole("heading", { level: 1, name: "Sprechen wir." })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "Lass uns reden." })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: "Häufige Fragen" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: "Nachricht schreiben" })).toBeInTheDocument();
   });
