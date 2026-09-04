@@ -177,7 +177,7 @@ describe("ApplicationForm", () => {
 
   it("links the areas notice's Ideathon mention to the Ideathon page", () => {
     renderForm();
-    const link = screen.getByRole("link", { name: "Ideathon" });
+    const link = screen.getByRole("link", { name: "hier" });
     expect(link).toHaveAttribute("href", "/ideathon");
   });
 
