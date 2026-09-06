@@ -7,6 +7,7 @@ import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Section } from "@/components/ui/Section";
 import { BoardContactCard } from "@/components/ui/BoardContactCard";
+import { Link } from "@/lib/navigation";
 import { faqEntries } from "@/content/ideathon";
 import { board } from "@/content/board";
 
@@ -45,7 +46,24 @@ export function IdeathonFaq() {
                   </Accordion.Trigger>
                 </Accordion.Header>
                 <Accordion.Content className="overflow-hidden text-body-s opacity-80 data-[state=closed]:animate-[accordion-up_var(--duration-calm)_var(--ease-grow)] data-[state=open]:animate-[accordion-down_var(--duration-calm)_var(--ease-grow)]">
-                  <p className="pb-4">{t(`${entry.key}.answer` as FaqCopyKey)}</p>
+                  {/* t.rich, not t(), for every entry uniformly: only
+                      afterIdeathon's answer actually contains an
+                      <innolabLink> tag (pointing a "what happens after"
+                      question at /innolab, a short pointer rather than
+                      repeating the whole InnoLab/Ideathon split here — that
+                      split already has its own answer on /innolab, and its
+                      own page-to-page pointer in the areas notice on
+                      /mitmachen) — every other entry's plain-text answer
+                      renders identically either way. */}
+                  <p className="pb-4">
+                    {t.rich(`${entry.key}.answer` as FaqCopyKey, {
+                      innolabLink: (chunks) => (
+                        <Link href="/innolab" className="link-underline">
+                          {chunks}
+                        </Link>
+                      ),
+                    })}
+                  </p>
                 </Accordion.Content>
               </Accordion.Item>
             ))}

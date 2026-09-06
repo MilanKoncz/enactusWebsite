@@ -172,6 +172,17 @@ test.describe("/ideathon", () => {
     await expect(page.getByText(/Die Idee entwickelst du im Team/)).toBeVisible();
   });
 
+  test("points the 'after the Ideathon' FAQ answer at /innolab, reachable by keyboard", async ({ page }) => {
+    await mockCalendarEvents(page, [UPCOMING_IDEATHON]);
+    await page.goto("/ideathon");
+    const trigger = page.getByRole("button", { name: "Was passiert nach dem Ideathon?" });
+    await trigger.click();
+    const link = page.getByRole("link", { name: "InnoLab-Seite" });
+    await expect(link).toHaveAttribute("href", "/innolab");
+    await link.focus();
+    await expect(link).toBeFocused();
+  });
+
   test("switches locale between /ideathon and /en/ideathon, landing on the same route", async ({
     page,
     isMobile,
