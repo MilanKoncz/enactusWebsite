@@ -240,9 +240,12 @@ board member can delete a single entry directly from this page.
   `content/navigation.ts` — never a fact invented for the schema alone.
 - **301 redirects from the old Webflow URLs** in `next.config.ts`: `/team`
   (→ `/`, since there's no dedicated team route on this site — the Vorstand
-  only appears on the homepage), `/projekte`, `/innolab`, `/mitmachen`,
-  `/faq`, `/kontakt`, `/partner`, and the individual project pages. Losing
-  these throws away years of ranking.
+  only appears on the homepage), `/faq`, and the individual project pages.
+  Losing these throws away years of ranking. `/innolab` was on this list
+  too (→ `/prozess`, from when the old site folded its InnoLab content into
+  the process timeline) until /innolab became a real page again — removed
+  rather than left in place, since a redirect whose source is a route this
+  app actually serves is a loop Next.js rejects outright.
 - `sitemap.ts` and `robots.ts` generated from the route tree.
 - **Only the confirmed production domain gets indexed.** `robots.ts` checks
   the request's Host header and `VERCEL_ENV` (via

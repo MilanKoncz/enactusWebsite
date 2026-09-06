@@ -88,7 +88,6 @@ test.describe("SEO: hidden pages stay hidden", () => {
 test.describe("SEO: old Webflow URLs redirect, not 404", () => {
   const REDIRECTS: Array<[string, string]> = [
     ["/team", "/"],
-    ["/innolab", "/prozess"],
     ["/faq", "/kontakt"],
     ["/mealyo", "/projekte/mealyo"],
     ["/safesteps", "/projekte/safesteps"],

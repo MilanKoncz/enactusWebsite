@@ -5,7 +5,6 @@ import { expect, test } from "@playwright/test";
 test.describe("old Webflow URL redirects", () => {
   const cases: Array<[string, string]> = [
     ["/team", "/"],
-    ["/innolab", "/prozess"],
     ["/faq", "/kontakt"],
     ["/differgy", "/projekte/differgy"],
     ["/mealyo", "/projekte/mealyo"],
@@ -28,7 +27,12 @@ test.describe("old Webflow URL redirects", () => {
     request,
     baseURL,
   }) => {
-    for (const path of ["/projekte", "/mitmachen", "/kontakt", "/partner"]) {
+    // /innolab joined this list once it became a real page again — it used
+    // to redirect to /prozess (the old site had folded its InnoLab content
+    // into the process timeline), removed from next.config.ts's redirects()
+    // for exactly this reason: a redirect whose source is a route this app
+    // now serves is a loop Next.js rejects outright.
+    for (const path of ["/projekte", "/mitmachen", "/kontakt", "/partner", "/innolab"]) {
       const response = await request.fetch(`${baseURL}${path}`, { maxRedirects: 0 });
       expect(response.status(), path).toBe(200);
     }

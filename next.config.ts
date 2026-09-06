@@ -33,9 +33,13 @@ const nextConfig: NextConfig = {
       // The Vorstand only appears on the homepage now — see
       // content/navigation.ts's footerColumns comment.
       { source: "/team", destination: "/", statusCode: 301 },
-      // /prozess's timeline now covers the Ideation phase / InnoLab as one
-      // of its eight stations.
-      { source: "/innolab", destination: "/prozess", statusCode: 301 },
+      // /innolab used to redirect here (the old site had folded its
+      // InnoLab content into /prozess's timeline) — removed now that
+      // /innolab is a real page again, taking the exact URL the redirect
+      // used to send elsewhere. A redirect rule whose source is a route
+      // this app actually serves is a loop Next.js rejects outright, and
+      // an exact-URL page match is strictly better for the old ranking
+      // this redirect existed to preserve than a 301 ever was.
       // No standalone FAQ route — the list lives as a section on /kontakt.
       { source: "/faq", destination: "/kontakt", statusCode: 301 },
       // Individual project pages — each maps to its own content/projects.ts
