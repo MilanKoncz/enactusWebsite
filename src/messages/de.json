@@ -9,6 +9,7 @@
     "prozess": "Prozess",
     "projekte": "Projekte",
     "events": "Events",
+    "innolab": "InnoLab",
     "ideathon": "Ideathon",
     "termine": "Termine",
     "partner": "Partner",
@@ -25,6 +26,7 @@
     "projekteArchiv": "Alle Projekte, die Enactus Mannheim seit der Gründung durchlaufen hat, inklusive der Ausgründungen.",
     "projektFallback": "Ein früheres Projekt von Enactus Mannheim.",
     "events": "Neben unserer Arbeit in den Projekten und den Ressorts veranstalten wir ebenfalls Events zum Netzwerken, Lernen und Spaß haben.",
+    "innolab": "Das InnoLab ist der Ort, an dem aus eigenen Ideen erste echte Projekte werden, mit wöchentlichen Sessions und Zugang zu unserem Advisor-Netzwerk.",
     "ideathon": "Vier Tage, ein Team, deine Idee: der Ideathon 2026 ist dein Fast-Track ins unternehmerische Machen, offen für alle Studierenden.",
     "termine": "Der Semesterplan auf einen Blick, von der Bewerbung bis zum nächsten Pitchcontest.",
     "partner": "Mit unserem Netzwerk aus Partnern, Business Advisors, Fördermitgliedern und Alumni schaffen wir das Ökosystem für unsere nachhaltigen Projekte.",
@@ -528,6 +530,142 @@
     "title": "Vier Tage, eine Idee, dein Pitch",
     "lead": "Unser größtes InnoLab-Format: ein viertägiger Ideathon für alle Studierenden, ganz ohne Vorerfahrung.",
     "cta": "Zur Ideathon-Seite"
+  },
+  "InnoLabPage": {
+    "hero": {
+      "eyebrow": "Enactus Mannheim · InnoLab",
+      "title": "Dein Einstieg mit einer <em>Idee</em>.",
+      "lead": "Das InnoLab ist der Ort, an dem aus eigenen Ideen erste echte Projekte werden. Mit wöchentlichen Sessions, Team-Support und Zugang zu unserem Advisor-Netzwerk baust du dein Konzept auf und wirst dabei Mitglied bei Enactus Mannheim.",
+      "cadenceLabel": "Sessions im InnoLab",
+      "cadenceValue": "Wöchentlich",
+      "registerCta": "Jetzt bewerben",
+      "howCta": "So funktioniert's",
+      "languageNote": "The InnoLab's weekly sessions and mentoring take place in German. This page explains what to expect in English."
+    },
+    "paths": {
+      "eyebrow": "Zwei Wege ins InnoLab",
+      "title": "Zwei Einstiegspfade, ein Ziel.",
+      "lead": "Ob du beim Ideathon dabei warst oder mit deiner eigenen Idee einsteigst, der Weg endet im selben InnoLab.",
+      "ideathon": {
+        "badge": "Einmal jährlich",
+        "title": "Über den Ideathon",
+        "description": "Vier Tage, ein festes Team, eine Idee bis zum finalen Pitch. Die Anmeldung läuft getrennt vom InnoLab und führt nicht automatisch zu einer Mitgliedschaft.",
+        "bullet1": "Kompakt: vier intensive Tage",
+        "bullet2": "Einzeln oder direkt als Team anmelden",
+        "bullet3": "Drei Workshops zu Ideation, Business Modelling und Pitching",
+        "cta": "Mehr zum Ideathon"
+      },
+      "ownIdea": {
+        "badge": "Jederzeit möglich",
+        "title": "Mit deiner eigenen Idee",
+        "description": "Du hast eine Idee oder ein Problem, das dich beschäftigt. Im InnoLab arbeitest du in wöchentlichen Sessions daran und wirst dabei Mitglied bei Enactus Mannheim.",
+        "bullet1": "Wöchentliche Sessions",
+        "bullet2": "Zugriff auf unsere Knowledge-Base",
+        "bullet3": "Mentoring von unseren Business Advisor:innen",
+        "cta": "Zu den Schritten"
+      }
+    },
+    "steps": {
+      "eyebrow": "Der Solo-Weg",
+      "title": "In fünf Schritten zu deinem Konzept.",
+      "lead": "Jeder Schritt baut auf dem vorherigen auf. Am Ende steht ein Pitch vor dem InnoLab.",
+      "regionLabel": "Die fünf Schritte des Solo-Wegs",
+      "inspiration": {
+        "title": "Inspiration",
+        "description": "Verstehe, was Social Entrepreneurship sein kann, mit echten Beispielen und den 17 UN-Nachhaltigkeitszielen als Rahmen. Am Ende weißt du, welche Themen dich wirklich packen."
+      },
+      "problemUnderstanding": {
+        "title": "Problem-Verständnis",
+        "description": "Aus einem allgemeinen Interesse wird ein konkretes Problem. Mit der 5-Why-Methode gräbst du dich bis zur Wurzel und formulierst ein präzises Problem-Statement."
+      },
+      "ideationMarketAnalysis": {
+        "title": "Ideation und Marktanalyse",
+        "description": "Aus einem Problem werden viele Ideen, mit Techniken wie Crazy 8s und SCAMPER. Am Ende bewertest du sie nach Wirkung und Machbarkeit und wählst deine stärkste aus."
+      },
+      "businessModelOutline": {
+        "title": "Business Model Outline",
+        "description": "Deine Idee auf einem Blatt: neun Felder von Problem und Zielgruppe bis Kanäle und Kosten. Das Fundament für alles, was danach kommt."
+      },
+      "pitchInnoGate": {
+        "title": "Pitch und Inno Gate",
+        "description": "Du stellst dein Konzept in einer InnoLab-Session vor. Überzeugt dein Pitch, bekommst du das Inno Gating und wechselst in den MVP-Prozess."
+      }
+    },
+    "inside": {
+      "eyebrow": "Was dich erwartet",
+      "title": "Im InnoLab",
+      "lead": "Aus deiner Idee wird ein Projekt, mit Struktur, Rhythmus und Unterstützung.",
+      "weeklySessions": {
+        "title": "Wöchentliche Sessions",
+        "description": "Feste Termine, an denen Teams gemeinsam arbeiten, pitchen und Feedback bekommen."
+      },
+      "advisorAccess": {
+        "title": "Advisor-Zugang",
+        "description": "Erfahrene Mentor:innen aus Wirtschaft und Wissenschaft stehen dir und deinem Team zur Seite, für strategische Fragen oder eine zweite Meinung."
+      },
+      "innoGating": {
+        "title": "Inno Gating",
+        "description": "Überzeugt dein Pitch, bekommst du das Inno Gating und befindest dich in der MVP-Phase. Mehr dazu auf unserer Prozess-Seite."
+      }
+    },
+    "boundary": {
+      "eyebrow": "InnoLab und Ideathon",
+      "title": "Zwei Anmeldungen, ein Ziel.",
+      "lead": "Die beiden Formate gehören zusammen, angemeldet wirst du aber getrennt.",
+      "innolab": {
+        "title": "Fürs InnoLab",
+        "description": "Du bewirbst dich über das Mitgliedsformular, kommst zu den wöchentlichen Sessions und wirst Mitglied bei Enactus Mannheim.",
+        "cta": "Zur Bewerbung"
+      },
+      "ideathon": {
+        "title": "Für den Ideathon",
+        "description": "Du meldest dich separat an. In den Verein eintreten musst du dafür nicht, du kannst einfach mitmachen.",
+        "cta": "Zum Ideathon"
+      },
+      "closingNote": "Trotzdem passt beides zusammen. Wer beim Ideathon war, bringt eine durchdachte Idee und ein eingespieltes Team mit ins InnoLab. Wir sehen dich also gern bei beidem."
+    },
+    "after": {
+      "eyebrow": "Und danach?",
+      "title": "Das InnoLab ist der Anfang.",
+      "lead": "Wenn dein Projekt im InnoLab reift, geht es weiter, über das Inno-Gating in die MVP-Phase und langfristig bis zur Ausgründung als eigenständiges Unternehmen.",
+      "processNote": "Der komplette Weg ist auf unserer <processLink>Prozess-Seite</processLink> beschrieben, acht Stationen vom ersten Pitch bis zum eigenen Unternehmen."
+    },
+    "faq": {
+      "eyebrow": "Fragen",
+      "title": "Häufige Fragen",
+      "bringOwnIdea": {
+        "question": "Muss ich schon eine fertige Idee mitbringen?",
+        "answer": "Nein. Wichtig ist nur die Bereitschaft, die fünf Schritte durchzuarbeiten."
+      },
+      "differenceFromIdeathon": {
+        "question": "Was ist der Unterschied zwischen Ideathon und InnoLab?",
+        "answer": "Der Ideathon ist ein einmaliges, kompaktes Format im Herbst mit fest gebildeten Teams. Das InnoLab läuft das ganze Jahr in wöchentlichen Sessions. Wie sich die Anmeldung dafür unterscheidet, steht oben unter InnoLab und Ideathon."
+      },
+      "pitchNotConvincing": {
+        "question": "Was, wenn meine Idee beim Pitch nicht überzeugt?",
+        "answer": "Kein Problem. Du bekommst ehrliches Feedback und zwei Optionen: die Idee weiterentwickeln oder an einer neuen arbeiten. Der Verein bleibt dir in beiden Fällen offen."
+      },
+      "whatToStudy": {
+        "question": "Was studiere ich am besten dafür?",
+        "answer": "Alles. Wir mischen die Teams bewusst über Studiengänge hinweg, BWLer:innen, Techniker:innen, Sozialwissenschaftler:innen und Designer:innen ergänzen sich gegenseitig."
+      },
+      "cost": {
+        "question": "Kostet das etwas?",
+        "answer": "Nein. Die Teilnahme am InnoLab und der gesamte Prozess sind für Studierende kostenlos."
+      }
+    },
+    "contact": {
+      "eyebrow": "Direkter Kontakt",
+      "title": "Hast du eine Frage?",
+      "lead": "Wenn deine Frage oben nicht dabei ist, schreib mir einfach, ich antworte persönlich.",
+      "cta": "Nachricht schreiben"
+    },
+    "closing": {
+      "eyebrow": "Bereit?",
+      "title": "Starte mit deiner <em>Idee</em>.",
+      "lead": "Ein kurzes Formular reicht, danach laden wir dich zur nächsten InnoLab-Session ein.",
+      "registerCta": "Jetzt bewerben"
+    }
   },
   "IdeathonPage": {
     "hero": {

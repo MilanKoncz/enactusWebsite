@@ -11,6 +11,7 @@ const routeKeySchema = z.enum([
   "prozess",
   "projekte",
   "events",
+  "innolab",
   "ideathon",
   "termine",
   "partner",
@@ -35,6 +36,7 @@ const ROUTE_HREFS = {
   prozess: "/prozess",
   projekte: "/projekte",
   events: "/events",
+  innolab: "/innolab",
   ideathon: "/ideathon",
   termine: "/termine",
   partner: "/partner",
@@ -65,6 +67,7 @@ export const mainNav: NavItem[] = [
   navItem("prozess"),
   navItem("projekte"),
   navItem("events"),
+  navItem("innolab"),
   navItem("ideathon"),
   navItem("termine"),
   navItem("partner"),
@@ -84,7 +87,7 @@ export const jobsNavItem: NavItem = navItem("jobs");
 // grid (see docs/engineering.md's old-URL redirect map — the old site's
 // /team now redirects to / instead of a same-named page here).
 export const footerColumns = {
-  association: [navItem("partner"), navItem("prozess"), navItem("termine")],
+  association: [navItem("partner"), navItem("prozess"), navItem("innolab"), navItem("termine")],
   legal: [navItem("impressum"), navItem("datenschutz")],
 } as const;
 

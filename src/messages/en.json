@@ -9,6 +9,7 @@
     "prozess": "Process",
     "projekte": "Projects",
     "events": "Events",
+    "innolab": "InnoLab",
     "ideathon": "Ideathon",
     "termine": "Calendar",
     "partner": "Partners",
@@ -25,6 +26,7 @@
     "projekteArchiv": "Every project Enactus Mannheim has run since its founding, including the spin-offs.",
     "projektFallback": "A former Enactus Mannheim project.",
     "events": "Beyond our work in the projects and internal teams, we also run events for networking, learning, and having fun together.",
+    "innolab": "The InnoLab is where your own idea becomes a real project, with weekly sessions and access to our advisor network.",
     "ideathon": "Four days, one team, your idea: Ideathon 2026 is your fast track into entrepreneurial doing, open to every student.",
     "termine": "The semester plan at a glance, from applications to the next pitch contest.",
     "partner": "With our network of partners, business advisors, supporting members, and alumni, we build the ecosystem our sustainable projects need.",
@@ -528,6 +530,142 @@
     "title": "Four days, one idea, your pitch",
     "lead": "Our biggest InnoLab format: a four-day Ideathon open to every student, no prior experience needed.",
     "cta": "Go to the Ideathon page"
+  },
+  "InnoLabPage": {
+    "hero": {
+      "eyebrow": "Enactus Mannheim · InnoLab",
+      "title": "Your way in, with an <em>idea</em>.",
+      "lead": "The InnoLab is where your own idea becomes a real project. With weekly sessions, team support, and access to our advisor network, you build out your concept and become a member of Enactus Mannheim along the way.",
+      "cadenceLabel": "sessions in the InnoLab",
+      "cadenceValue": "Weekly",
+      "registerCta": "Apply now",
+      "howCta": "How it works",
+      "languageNote": "The InnoLab's weekly sessions and mentoring take place in German. This page explains what to expect in English."
+    },
+    "paths": {
+      "eyebrow": "Two ways into the InnoLab",
+      "title": "Two entry paths, one destination.",
+      "lead": "Whether you joined the Ideathon or bring your own idea, the path ends in the same InnoLab.",
+      "ideathon": {
+        "badge": "Once a year",
+        "title": "Via the Ideathon",
+        "description": "Four days, one fixed team, one idea through to the final pitch. Sign-up runs separately from the InnoLab and doesn't lead to membership automatically.",
+        "bullet1": "Compact: four intense days",
+        "bullet2": "Sign up solo or as a ready-made team",
+        "bullet3": "Three workshops on ideation, business modelling, and pitching",
+        "cta": "More about the Ideathon"
+      },
+      "ownIdea": {
+        "badge": "Anytime",
+        "title": "With your own idea",
+        "description": "You have an idea or a problem that keeps you thinking. In the InnoLab you work on it in weekly sessions and become a member of Enactus Mannheim along the way.",
+        "bullet1": "Weekly sessions",
+        "bullet2": "Access to our knowledge base",
+        "bullet3": "Mentoring from our business advisors",
+        "cta": "See the steps"
+      }
+    },
+    "steps": {
+      "eyebrow": "The solo path",
+      "title": "Five steps to your concept.",
+      "lead": "Every step builds on the last. At the end is a pitch in front of the InnoLab.",
+      "regionLabel": "The five steps of the solo path",
+      "inspiration": {
+        "title": "Inspiration",
+        "description": "Understand what social entrepreneurship can look like, with real examples and the 17 UN Sustainable Development Goals as a frame. By the end you know which topics genuinely grab you."
+      },
+      "problemUnderstanding": {
+        "title": "Understanding the problem",
+        "description": "A general interest becomes a concrete problem. Using the 5 Whys method, you dig down to the root and write a precise problem statement."
+      },
+      "ideationMarketAnalysis": {
+        "title": "Ideation and market analysis",
+        "description": "One problem becomes many ideas, using techniques like Crazy 8s and SCAMPER. By the end you score them on impact and feasibility and pick your strongest."
+      },
+      "businessModelOutline": {
+        "title": "Business model outline",
+        "description": "Your idea on one page: nine fields from problem and target group to channels and costs. The foundation for everything that follows."
+      },
+      "pitchInnoGate": {
+        "title": "Pitch and Inno Gate",
+        "description": "You present your concept at an InnoLab session. If your pitch convinces us, you get the Inno Gating and move into the MVP process."
+      }
+    },
+    "inside": {
+      "eyebrow": "What to expect",
+      "title": "Inside the InnoLab",
+      "lead": "Your idea becomes a project, with structure, rhythm, and support.",
+      "weeklySessions": {
+        "title": "Weekly sessions",
+        "description": "Fixed dates where teams work together, pitch, and get feedback."
+      },
+      "advisorAccess": {
+        "title": "Advisor access",
+        "description": "Experienced mentors from business and academia are there for you and your team, for strategic questions or a second opinion."
+      },
+      "innoGating": {
+        "title": "Inno Gating",
+        "description": "If your pitch convinces us, you get the Inno Gating and move into the MVP phase. More on that on our process page."
+      }
+    },
+    "boundary": {
+      "eyebrow": "InnoLab and Ideathon",
+      "title": "Two sign-ups, one goal.",
+      "lead": "The two formats belong together, but you sign up for them separately.",
+      "innolab": {
+        "title": "For the InnoLab",
+        "description": "You apply through the membership form, join the weekly sessions, and become a member of Enactus Mannheim.",
+        "cta": "Apply now"
+      },
+      "ideathon": {
+        "title": "For the Ideathon",
+        "description": "You sign up separately. You do not have to join the association for it, you can simply take part.",
+        "cta": "Go to the Ideathon"
+      },
+      "closingNote": "The two still fit together. If you were at the Ideathon, you bring a developed idea and a team that already works into the InnoLab. So we would be glad to see you at both."
+    },
+    "after": {
+      "eyebrow": "And after that?",
+      "title": "The InnoLab is the beginning.",
+      "lead": "As your project matures in the InnoLab, it keeps going, through the Inno Gating into the MVP phase and, over time, to spinning off as an independent company.",
+      "processNote": "The complete path is described on our <processLink>process page</processLink>, eight stations from the first pitch to your own company."
+    },
+    "faq": {
+      "eyebrow": "Questions",
+      "title": "Frequently asked questions",
+      "bringOwnIdea": {
+        "question": "Do I need to already have a finished idea?",
+        "answer": "No. All that matters is your willingness to work through the five steps."
+      },
+      "differenceFromIdeathon": {
+        "question": "What's the difference between the Ideathon and the InnoLab?",
+        "answer": "The Ideathon is a one-off, compact format in autumn with teams formed on the spot. The InnoLab runs all year in weekly sessions. How sign-up differs between the two is explained above, under InnoLab and Ideathon."
+      },
+      "pitchNotConvincing": {
+        "question": "What if my idea doesn't convince at the pitch?",
+        "answer": "No problem. You get honest feedback and two options: keep developing the idea, or work on a new one. Either way, the association stays open to you."
+      },
+      "whatToStudy": {
+        "question": "What should I study for this?",
+        "answer": "Anything. We deliberately mix teams across degree programs, business, engineering, social sciences, and design students all complement each other."
+      },
+      "cost": {
+        "question": "Does it cost anything?",
+        "answer": "No. Taking part in the InnoLab and the whole process is free for students."
+      }
+    },
+    "contact": {
+      "eyebrow": "Direct contact",
+      "title": "Have a question?",
+      "lead": "If your question isn't listed above, just write to me, I answer personally.",
+      "cta": "Send a message"
+    },
+    "closing": {
+      "eyebrow": "Ready?",
+      "title": "Start with your <em>idea</em>.",
+      "lead": "A short form is all it takes, then we'll invite you to the next InnoLab session.",
+      "registerCta": "Apply now"
+    }
   },
   "IdeathonPage": {
     "hero": {

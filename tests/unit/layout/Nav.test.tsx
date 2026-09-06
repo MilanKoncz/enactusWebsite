@@ -8,12 +8,14 @@ import { Nav } from "@/components/layout/Nav";
 vi.mock("next/navigation", async () => (await import("../../fixtures/navigation")).nextNavigationMock);
 
 describe("Nav", () => {
-  it("renders all five header nav links with correct hrefs", () => {
+  it("renders every header nav link with correct hrefs, InnoLab right after Events", () => {
     mockPathname.mockReturnValue("/");
     renderWithIntl(<Nav />);
     expect(screen.getByRole("link", { name: "Prozess" })).toHaveAttribute("href", "/prozess");
     expect(screen.getByRole("link", { name: "Projekte" })).toHaveAttribute("href", "/projekte");
     expect(screen.getByRole("link", { name: "Events" })).toHaveAttribute("href", "/events");
+    expect(screen.getByRole("link", { name: "InnoLab" })).toHaveAttribute("href", "/innolab");
+    expect(screen.getByRole("link", { name: "Ideathon" })).toHaveAttribute("href", "/ideathon");
     expect(screen.getByRole("link", { name: "Partner" })).toHaveAttribute("href", "/partner");
     expect(screen.getByRole("link", { name: "Kontakt" })).toHaveAttribute("href", "/kontakt");
   });

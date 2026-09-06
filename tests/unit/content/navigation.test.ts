@@ -6,11 +6,12 @@ describe("content/navigation", () => {
     expect(mainNav.some((item) => item.key === "home")).toBe(false);
   });
 
-  it("lists exactly the seven header nav items in order, ideathon right after events", () => {
+  it("lists exactly the eight header nav items in order, innolab right after events and ideathon right after innolab", () => {
     expect(mainNav.map((item) => item.key)).toEqual([
       "prozess",
       "projekte",
       "events",
+      "innolab",
       "ideathon",
       "termine",
       "partner",
@@ -24,8 +25,13 @@ describe("content/navigation", () => {
     }
   });
 
-  it("lists Partner, Prozess and Termine under the footer's association column — no dedicated team route", () => {
-    expect(footerColumns.association.map((item) => item.key)).toEqual(["partner", "prozess", "termine"]);
+  it("lists Partner, Prozess, InnoLab and Termine under the footer's association column — no dedicated team route", () => {
+    expect(footerColumns.association.map((item) => item.key)).toEqual([
+      "partner",
+      "prozess",
+      "innolab",
+      "termine",
+    ]);
   });
 
   it("lists Impressum and Datenschutz under the legal column", () => {
