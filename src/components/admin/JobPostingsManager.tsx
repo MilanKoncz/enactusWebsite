@@ -9,6 +9,7 @@ import { Field } from "@/components/ui/Field";
 import { FormStatusMessage } from "@/components/ui/FormStatusMessage";
 import { StatusIndicator } from "@/components/admin/StatusIndicator";
 import { AdminTable } from "@/components/admin/AdminTable";
+import { AdminRowActions } from "@/components/admin/AdminRowActions";
 import { jobPostingCreateSchema, jobPostingFormSchema } from "@/lib/jobPostingFormSchema";
 import { isExpiredJobPosting } from "@/lib/jobPostingStatus";
 import { parseDateOnly } from "@/lib/calendarFormat";
@@ -207,14 +208,14 @@ export function JobPostingsManager({ jobs, now }: { jobs: ManagedJobPosting[]; n
                 level={expired ? "neutral" : "ok"}
                 label={expired ? t("expiredBadge") : t("activeBadge")}
               />,
-              <span key="actions" className="flex gap-2">
+              <AdminRowActions key="actions">
                 <Button variant="ghost" size="sm" onClick={() => startEditing(job)} disabled={pending}>
                   {t("edit")}
                 </Button>
                 <Button variant="ghost" size="sm" onClick={() => handleDelete(job)} disabled={pending}>
                   {t("delete")}
                 </Button>
-              </span>,
+              </AdminRowActions>,
             ],
           };
         })}

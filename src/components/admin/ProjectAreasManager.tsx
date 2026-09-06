@@ -9,6 +9,7 @@ import { Field } from "@/components/ui/Field";
 import { FormStatusMessage } from "@/components/ui/FormStatusMessage";
 import { StatusIndicator } from "@/components/admin/StatusIndicator";
 import { AdminTable } from "@/components/admin/AdminTable";
+import { AdminRowActions, AdminToggleButton } from "@/components/admin/AdminRowActions";
 import { projectAreaFormSchema } from "@/lib/projectAreaFormSchema";
 
 export type ManagedProjectArea = {
@@ -178,17 +179,20 @@ export function ProjectAreasManager({ areas }: { areas: ManagedProjectArea[] }) 
               level={area.active ? "ok" : "neutral"}
               label={area.active ? t("active") : t("inactive")}
             />,
-            <span key="actions" className="flex flex-wrap gap-2">
-              <Button variant="ghost" size="sm" onClick={() => toggleActive(area)} disabled={pending}>
-                {area.active ? t("deactivate") : t("activate")}
-              </Button>
+            <AdminRowActions key="actions">
+              <AdminToggleButton
+                current={area.active ? t("deactivate") : t("activate")}
+                labels={[t("deactivate"), t("activate")]}
+                onClick={() => toggleActive(area)}
+                disabled={pending}
+              />
               <Button variant="ghost" size="sm" onClick={() => startEditing(area)} disabled={pending}>
                 {t("edit")}
               </Button>
               <Button variant="ghost" size="sm" onClick={() => handleDelete(area)} disabled={pending}>
                 {t("delete")}
               </Button>
-            </span>,
+            </AdminRowActions>,
           ],
         }))}
       />

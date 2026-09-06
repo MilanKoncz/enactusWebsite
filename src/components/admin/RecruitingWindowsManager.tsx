@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { FormStatusMessage } from "@/components/ui/FormStatusMessage";
 import { AdminTable } from "@/components/admin/AdminTable";
+import { AdminRowActions } from "@/components/admin/AdminRowActions";
 import { SendReminderWindowMailButton } from "@/components/admin/SendReminderWindowMailButton";
 import { recruitingWindowFormSchema } from "@/lib/recruitingWindowFormSchema";
 import { siteDateTimeFormatter } from "@/lib/formatSiteDateTime";
@@ -157,7 +158,7 @@ export function RecruitingWindowsManager({ windows }: { windows: ManagedWindow[]
             window.semester,
             dateFormatter.format(new Date(window.start)),
             dateFormatter.format(new Date(window.end)),
-            <span key="actions" className="flex flex-wrap items-center gap-2">
+            <AdminRowActions key="actions">
               <Button variant="ghost" size="sm" onClick={() => startEditing(window)} disabled={pending}>
                 {t("edit")}
               </Button>
@@ -165,7 +166,7 @@ export function RecruitingWindowsManager({ windows }: { windows: ManagedWindow[]
                 {t("delete")}
               </Button>
               <SendReminderWindowMailButton windowId={window.id} semester={window.semester} />
-            </span>,
+            </AdminRowActions>,
           ],
         }))}
       />

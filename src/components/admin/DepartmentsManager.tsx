@@ -9,6 +9,7 @@ import { Field } from "@/components/ui/Field";
 import { FormStatusMessage } from "@/components/ui/FormStatusMessage";
 import { StatusIndicator } from "@/components/admin/StatusIndicator";
 import { AdminTable } from "@/components/admin/AdminTable";
+import { AdminRowActions, AdminToggleButton } from "@/components/admin/AdminRowActions";
 import { departmentFormSchema } from "@/lib/departmentFormSchema";
 
 export type ManagedDepartment = {
@@ -180,17 +181,20 @@ export function DepartmentsManager({ departments }: { departments: ManagedDepart
               level={department.active ? "ok" : "neutral"}
               label={department.active ? t("active") : t("inactive")}
             />,
-            <span key="actions" className="flex flex-wrap gap-2">
-              <Button variant="ghost" size="sm" onClick={() => toggleActive(department)} disabled={pending}>
-                {department.active ? t("deactivate") : t("activate")}
-              </Button>
+            <AdminRowActions key="actions">
+              <AdminToggleButton
+                current={department.active ? t("deactivate") : t("activate")}
+                labels={[t("deactivate"), t("activate")]}
+                onClick={() => toggleActive(department)}
+                disabled={pending}
+              />
               <Button variant="ghost" size="sm" onClick={() => startEditing(department)} disabled={pending}>
                 {t("edit")}
               </Button>
               <Button variant="ghost" size="sm" onClick={() => handleDelete(department)} disabled={pending}>
                 {t("delete")}
               </Button>
-            </span>,
+            </AdminRowActions>,
           ],
         }))}
       />

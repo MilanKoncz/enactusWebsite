@@ -9,6 +9,7 @@ import { Field } from "@/components/ui/Field";
 import { FormStatusMessage } from "@/components/ui/FormStatusMessage";
 import { CategoryBadge } from "@/components/ui/CategoryBadge";
 import { AdminTable } from "@/components/admin/AdminTable";
+import { AdminRowActions } from "@/components/admin/AdminRowActions";
 import { calendarEventFormSchema } from "@/lib/calendarEventFormSchema";
 import { parseDateOnly } from "@/lib/calendarFormat";
 import { CALENDAR_CATEGORIES } from "@/content/calendar";
@@ -211,14 +212,14 @@ export function CalendarEventsManager({ events }: { events: ManagedCalendarEvent
             formatRowDate(event),
             event.title,
             <CategoryBadge key="category" category={event.category} />,
-            <span key="actions" className="flex gap-2">
+            <AdminRowActions key="actions">
               <Button variant="ghost" size="sm" onClick={() => startEditing(event)} disabled={pending}>
                 {t("edit")}
               </Button>
               <Button variant="ghost" size="sm" onClick={() => handleDelete(event)} disabled={pending}>
                 {t("delete")}
               </Button>
-            </span>,
+            </AdminRowActions>,
           ],
         }))}
       />
