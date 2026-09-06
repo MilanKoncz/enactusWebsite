@@ -1,13 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import * as Accordion from "@radix-ui/react-accordion";
 import { ChevronDown } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { buttonClasses } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Section } from "@/components/ui/Section";
+import { BoardContactCard } from "@/components/ui/BoardContactCard";
 import { faqEntries } from "@/content/ideathon";
 import { board } from "@/content/board";
 
@@ -54,29 +53,14 @@ export function IdeathonFaq() {
         </div>
 
         {contact && (
-          <aside className="h-fit rounded-md border border-ink/10 bg-paper p-6 shadow-[0_8px_40px_rgba(19,28,50,0.04)] lg:sticky lg:top-24">
-            <div className="flex flex-col gap-4">
-              <Eyebrow>{tContact("eyebrow")}</Eyebrow>
-              <h3 className="text-heading-3 font-medium">{tContact("title")}</h3>
-              <p className="text-body-s opacity-80">{tContact("lead")}</p>
-              <div className="flex items-center gap-3 border-y border-ink/10 py-4">
-                <span className="relative size-12 shrink-0 overflow-hidden rounded-full bg-ink/5">
-                  {contact.photo && (
-                    <Image src={contact.photo} alt="" fill sizes="48px" className="object-cover" />
-                  )}
-                </span>
-                <div className="flex flex-col">
-                  <span className="text-body-s font-medium">{contact.name}</span>
-                  <span className="text-body-s opacity-70">{contact.role}</span>
-                </div>
-              </div>
-              {contact.email && (
-                <a href={`mailto:${contact.email}`} className={buttonClasses("secondary", "md")}>
-                  {tContact("cta")}
-                </a>
-              )}
-            </div>
-          </aside>
+          <BoardContactCard
+            member={contact}
+            eyebrow={tContact("eyebrow")}
+            title={tContact("title")}
+            lead={tContact("lead")}
+            cta={tContact("cta")}
+            className="lg:sticky lg:top-24"
+          />
         )}
       </Container>
     </Section>
