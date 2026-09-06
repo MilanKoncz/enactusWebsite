@@ -66,13 +66,15 @@ test.describe("/ideathon", () => {
     expect(results.violations).toEqual([]);
   });
 
-  test("is reachable from the header navigation, right after Events", async ({ page, isMobile }) => {
+  test("is reachable from the header navigation, right after InnoLab", async ({ page, isMobile }) => {
     test.skip(isMobile, "desktop header nav only — mobile-nav.spec.ts covers the fullscreen menu");
     await page.goto("/");
     const nav = page.getByRole("navigation", { name: "Hauptnavigation" });
     const labels = await nav.getByRole("link").allTextContents();
-    const eventsIndex = labels.indexOf("Events");
-    expect(labels[eventsIndex + 1]).toBe("Ideathon");
+    // InnoLab sits between Events and Ideathon since /innolab was added —
+    // see content/navigation.ts's mainNav order.
+    const innolabIndex = labels.indexOf("InnoLab");
+    expect(labels[innolabIndex + 1]).toBe("Ideathon");
     await nav.getByRole("link", { name: "Ideathon", exact: true }).click();
     await expect(page).toHaveURL(/\/ideathon$/);
   });
