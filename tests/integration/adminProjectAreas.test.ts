@@ -25,7 +25,7 @@ vi.mock("next/cache", async (importOriginal) => {
 const ORIGINAL_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET;
 const ID = "0f2b8c3a-9d4e-4b1f-8a7c-2e5d6f7a8b9c";
 
-const VALID = { labelDe: "SmileGreen", labelEn: "SmileGreen", sortOrder: 1, active: true };
+const VALID = { labelDe: "SmileGreen", labelEn: "SmileGreen", sortOrder: 1, active: true, ideathonHint: false };
 
 beforeEach(() => {
   process.env.ADMIN_SESSION_SECRET = "a-signing-secret-for-project-area-tests";
@@ -84,6 +84,17 @@ describe("POST /api/admin/wunschbereiche", () => {
 
     expect(response.status).toBe(201);
     expect(revalidateTag).toHaveBeenCalledWith("project-areas", { expire: 0 });
+  });
+
+  it("passes ideathonHint through to the write, not silently dropped", async () => {
+    insertProjectArea.mockResolvedValue({ id: ID, ...VALID, ideathonHint: true });
+    const { POST } = await import("@/app/api/admin/wunschbereiche/route");
+    const response = await POST(
+      await request("POST", "http://localhost/api/admin/wunschbereiche", { ...VALID, ideathonHint: true }),
+    );
+
+    expect(response.status).toBe(201);
+    expect(insertProjectArea).toHaveBeenCalledWith({ ...VALID, ideathonHint: true });
   });
 
   it("answers 500 without invalidating the cache when the database write fails", async () => {

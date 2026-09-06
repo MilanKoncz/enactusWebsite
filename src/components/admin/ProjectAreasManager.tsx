@@ -18,11 +18,18 @@ export type ManagedProjectArea = {
   labelEn: string;
   sortOrder: number;
   active: boolean;
+  ideathonHint: boolean;
 };
 
-type Draft = { labelDe: string; labelEn: string; sortOrder: string; active: boolean };
+type Draft = {
+  labelDe: string;
+  labelEn: string;
+  sortOrder: string;
+  active: boolean;
+  ideathonHint: boolean;
+};
 
-const EMPTY_DRAFT: Draft = { labelDe: "", labelEn: "", sortOrder: "0", active: true };
+const EMPTY_DRAFT: Draft = { labelDe: "", labelEn: "", sortOrder: "0", active: true, ideathonHint: false };
 
 function toDraft(area: ManagedProjectArea): Draft {
   return {
@@ -30,6 +37,7 @@ function toDraft(area: ManagedProjectArea): Draft {
     labelEn: area.labelEn,
     sortOrder: String(area.sortOrder),
     active: area.active,
+    ideathonHint: area.ideathonHint,
   };
 }
 
@@ -122,6 +130,7 @@ export function ProjectAreasManager({ areas }: { areas: ManagedProjectArea[] }) 
           labelEn: area.labelEn,
           sortOrder: area.sortOrder,
           active: !area.active,
+          ideathonHint: area.ideathonHint,
         }),
       });
       if (!response.ok) {
@@ -162,7 +171,13 @@ export function ProjectAreasManager({ areas }: { areas: ManagedProjectArea[] }) 
   return (
     <div className="flex flex-col gap-10">
       <AdminTable
-        columns={[t("columns.label"), t("columns.sortOrder"), t("columns.active"), t("columns.action")]}
+        columns={[
+          t("columns.label"),
+          t("columns.sortOrder"),
+          t("columns.active"),
+          t("columns.ideathonHint"),
+          t("columns.action"),
+        ]}
         empty={t("empty")}
         rows={areas.map((area) => ({
           key: area.id,
@@ -178,6 +193,11 @@ export function ProjectAreasManager({ areas }: { areas: ManagedProjectArea[] }) 
               key="active"
               level={area.active ? "ok" : "neutral"}
               label={area.active ? t("active") : t("inactive")}
+            />,
+            <StatusIndicator
+              key="ideathonHint"
+              level={area.ideathonHint ? "ok" : "neutral"}
+              label={area.ideathonHint ? t("ideathonHintOn") : t("ideathonHintOff")}
             />,
             <AdminRowActions key="actions">
               <AdminToggleButton
@@ -232,6 +252,16 @@ export function ProjectAreasManager({ areas }: { areas: ManagedProjectArea[] }) 
             className="mt-0.5 size-4 shrink-0 rounded border-ink/20 focus-visible:outline-2 focus-visible:outline-offset-2"
           />
           <span>{t("activeLabel")}</span>
+        </label>
+
+        <label className="flex items-start gap-3 text-body-s">
+          <input
+            type="checkbox"
+            checked={draft.ideathonHint}
+            onChange={(event) => setDraft({ ...draft, ideathonHint: event.target.checked })}
+            className="mt-0.5 size-4 shrink-0 rounded border-ink/20 focus-visible:outline-2 focus-visible:outline-offset-2"
+          />
+          <span>{t("ideathonHintLabel")}</span>
         </label>
 
         {error && <FormStatusMessage variant="error">{error}</FormStatusMessage>}

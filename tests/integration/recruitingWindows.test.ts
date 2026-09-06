@@ -43,8 +43,8 @@ describe("GET /api/project-areas", () => {
     vi.resetAllMocks();
   });
 
-  it("returns the cached active-areas list as-is", async () => {
-    const areas = [{ id: "1", labelDe: "SmileGreen", labelEn: "SmileGreen" }];
+  it("returns the cached active-areas list as-is, ideathonHint included", async () => {
+    const areas = [{ id: "1", labelDe: "SmileGreen", labelEn: "SmileGreen", ideathonHint: false }];
     getProjectAreas.mockResolvedValue(areas);
 
     const { GET } = await import("@/app/api/project-areas/route");

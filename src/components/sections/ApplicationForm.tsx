@@ -159,6 +159,17 @@ export function ApplicationForm({
     return areaOptions.filter((area) => !chosenElsewhere.includes(area));
   }
 
+  // Driven by the board's ideathonHint flag (migrations/0022), never a
+  // hardcoded label — a chosen area's *localized* label is what area1/2/3
+  // actually hold, so this checks that label against whichever areas
+  // currently carry the flag rather than comparing ids. Naturally survives
+  // a rename (the flag stays on the row) and a deactivation (the area drops
+  // out of `projectAreas` entirely, so it can never match here again).
+  const ideathonHintLabels = new Set(
+    projectAreas.filter((area) => area.ideathonHint).map((area) => (locale === "de" ? area.labelDe : area.labelEn)),
+  );
+  const showIdeathonHint = [area1, area2, area3].some((area) => area && ideathonHintLabels.has(area));
+
   // Confetti burst, same as ContactForm.tsx (ConfettiBurst) — origin is the
   // success message's own rendered position, read right after it mounts.
   // Only on a genuine successful submit — never on error, never while
@@ -432,6 +443,18 @@ export function ApplicationForm({
             />
           )}
         </div>
+
+        {showIdeathonHint && (
+          <p className="border-l-2 border-gold pl-4 text-body-s opacity-70">
+            {t.rich("ideathonHint", {
+              ideathonLink: (chunks) => (
+                <Link href="/ideathon" className="link-underline">
+                  {chunks}
+                </Link>
+              ),
+            })}
+          </p>
+        )}
       </fieldset>
 
       {/* A separate, unranked, optional category from the Wunschbereich

@@ -14,6 +14,10 @@ export const projectAreaFormSchema = z.object({
   labelEn: z.string().trim().min(1).max(120),
   sortOrder: z.coerce.number().int(),
   active: z.boolean(),
+  // Shows the Ideathon hint on /mitmachen when this area is chosen
+  // (ApplicationForm.tsx) — see migrations/0022's own comment on why this
+  // is a flag the board sets, not a label match.
+  ideathonHint: z.boolean(),
 });
 
 export type ProjectAreaFormInput = z.input<typeof projectAreaFormSchema>;

@@ -24,8 +24,8 @@ describe("admin manager row actions, aligned regardless of toggle state", () => 
     renderWithIntl(
       <ProjectAreasManager
         areas={[
-          { id: "a1", labelDe: "SmileGreen", labelEn: "SmileGreen", sortOrder: 1, active: true },
-          { id: "a2", labelDe: "Mealyo", labelEn: "Mealyo", sortOrder: 2, active: false },
+          { id: "a1", labelDe: "SmileGreen", labelEn: "SmileGreen", sortOrder: 1, active: true, ideathonHint: false },
+          { id: "a2", labelDe: "Mealyo", labelEn: "Mealyo", sortOrder: 2, active: false, ideathonHint: false },
         ]}
       />,
     );
@@ -49,8 +49,8 @@ describe("admin manager row actions, aligned regardless of toggle state", () => 
     renderWithIntl(
       <ProjectAreasManager
         areas={[
-          { id: "a1", labelDe: "SmileGreen", labelEn: "SmileGreen", sortOrder: 1, active: true },
-          { id: "a2", labelDe: "Mealyo", labelEn: "Mealyo", sortOrder: 2, active: false },
+          { id: "a1", labelDe: "SmileGreen", labelEn: "SmileGreen", sortOrder: 1, active: true, ideathonHint: false },
+          { id: "a2", labelDe: "Mealyo", labelEn: "Mealyo", sortOrder: 2, active: false, ideathonHint: false },
         ]}
       />,
       { locale: "en" },
@@ -83,7 +83,7 @@ describe("admin manager row actions, aligned regardless of toggle state", () => 
     const managers = [
       renderWithIntl(
         <ProjectAreasManager
-          areas={[{ id: "a1", labelDe: "SmileGreen", labelEn: "SmileGreen", sortOrder: 1, active: true }]}
+          areas={[{ id: "a1", labelDe: "SmileGreen", labelEn: "SmileGreen", sortOrder: 1, active: true, ideathonHint: false }]}
         />,
       ),
       renderWithIntl(

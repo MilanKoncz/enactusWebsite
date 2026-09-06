@@ -39,13 +39,19 @@ function mockOpenRecruitingWindow(page: Page) {
 // Same reasoning as mockOpenRecruitingWindow: CI's build has no database
 // (docs/deployment.md), so /api/project-areas would otherwise return an
 // empty list and the "SmileGreen" checkbox these tests check for would
-// never exist.
-function mockProjectAreas(page: Page) {
+// never exist. `extraAreas` lets a test add a flagged InnoLab-style area
+// alongside the default one without duplicating the whole fixture.
+function mockProjectAreas(page: Page, extraAreas: Array<Record<string, unknown>> = []) {
   return page.route("**/api/project-areas", (route) =>
     route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify({ areas: [{ id: "e2e-area-1", labelDe: "SmileGreen", labelEn: "SmileGreen" }] }),
+      body: JSON.stringify({
+        areas: [
+          { id: "e2e-area-1", labelDe: "SmileGreen", labelEn: "SmileGreen", ideathonHint: false },
+          ...extraAreas,
+        ],
+      }),
     }),
   );
 }
@@ -204,6 +210,44 @@ test.describe("/mitmachen", () => {
     await expect(link).toHaveAttribute("href", "/ideathon");
     await link.focus();
     await expect(link).toBeFocused();
+  });
+
+  // The German anchor text was renamed to "hier" (commit 7b95128) without
+  // its English counterpart following along — messages/en.json still said
+  // "Ideathon" until this was caught. Locked in here so the two can't drift
+  // apart silently again.
+  test("links the areas notice's Ideathon mention on the English route too", async ({ page }) => {
+    await mockOpenRecruitingWindow(page);
+    await mockProjectAreas(page);
+    await mockDepartments(page);
+    await page.goto("/en/mitmachen");
+    const link = page.locator("#bewerbung").getByRole("link", { name: "here", exact: true });
+    await expect(link).toHaveAttribute("href", "/en/ideathon");
+  });
+
+  test("shows the Ideathon hint once the flagged area is chosen, in any of the three slots, and hides it on change", async ({
+    page,
+  }) => {
+    await mockOpenRecruitingWindow(page);
+    await mockProjectAreas(page, [
+      { id: "e2e-area-innolab", labelDe: "InnoLab", labelEn: "InnoLab", ideathonHint: true },
+    ]);
+    await mockDepartments(page);
+    await page.goto("/mitmachen");
+
+    const hintText = "Du hast InnoLab als Wunschbereich gewählt";
+    await expect(page.getByText(hintText)).not.toBeVisible();
+
+    await page.getByLabel("2. Wahl").selectOption("InnoLab");
+    const hint = page.getByText(hintText);
+    await expect(hint).toBeVisible();
+    const link = hint.getByRole("link");
+    await expect(link).toHaveAttribute("href", "/ideathon");
+    await link.focus();
+    await expect(link).toBeFocused();
+
+    await page.getByLabel("2. Wahl").selectOption("SmileGreen");
+    await expect(page.getByText(hintText)).not.toBeVisible();
   });
 
   test("submits the reminder sign-up and shows a real confirmation notice", async ({ page }) => {

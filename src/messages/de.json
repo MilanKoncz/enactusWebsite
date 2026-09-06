@@ -1518,6 +1518,7 @@
         "areasLabel": "Wunschbereiche",
         "areasHint": "Wähle bis zu drei Bereiche in der Reihenfolge deiner Präferenz. Die erste Wahl ist Pflicht.",
         "areasNotice": "Hier siehst du, welche Projekte gerade Mitglieder suchen. Im Innolab feilst du in wöchentlichen Sessions an eigenen Ideen. Für den Ideathon meldest du dich <ideathonLink>hier</ideathonLink> separat an, das führt nicht automatisch zu einer Mitgliedschaft im Verein, dafür bewirbst du dich mit diesem Formular.",
+        "ideathonHint": "Du hast InnoLab als Wunschbereich gewählt. Der <ideathonLink>Ideathon</ideathonLink> ist dafür ein guter Einstieg, auch wenn die Anmeldung getrennt läuft.",
         "areaPlaceholder": "Bitte wählen",
         "area1Label": "1. Wahl",
         "area1Error": "Bitte wähle deinen Wunschbereich.",
@@ -1825,6 +1826,9 @@
       "inactive": "inaktiv",
       "activate": "Aktivieren",
       "deactivate": "Deaktivieren",
+      "ideathonHintLabel": "Ideathon-Hinweis zeigen, wenn dieser Bereich gewählt wird",
+      "ideathonHintOn": "aktiv",
+      "ideathonHintOff": "aus",
       "create": "Anlegen",
       "saveChanges": "Änderungen speichern",
       "cancelEdit": "Abbrechen",
@@ -1839,6 +1843,7 @@
         "label": "Bezeichnung",
         "sortOrder": "Sortierung",
         "active": "Status",
+        "ideathonHint": "Ideathon-Hinweis",
         "action": "Aktion"
       }
     },

@@ -21,12 +21,22 @@ export const PROJECT_AREAS_TAG = "project-areas";
 // other admin-managed list on this site.
 export const PROJECT_AREAS_REVALIDATE = { expire: 0 } as const;
 
-export type PublicProjectArea = { id: string; labelDe: string; labelEn: string };
+export type PublicProjectArea = {
+  id: string;
+  labelDe: string;
+  labelEn: string;
+  ideathonHint: boolean;
+};
 
 async function loadProjectAreas(): Promise<PublicProjectArea[]> {
   try {
     const rows = await listActiveProjectAreas();
-    return rows.map((row) => ({ id: row.id, labelDe: row.labelDe, labelEn: row.labelEn }));
+    return rows.map((row) => ({
+      id: row.id,
+      labelDe: row.labelDe,
+      labelEn: row.labelEn,
+      ideathonHint: row.ideathonHint,
+    }));
   } catch (error) {
     console.error("Failed to load project areas", error);
     return [];

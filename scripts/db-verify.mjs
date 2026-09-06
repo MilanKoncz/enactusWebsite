@@ -291,6 +291,39 @@ async function verifyRecruitingWindows() {
   check("delete removes exactly one row", deleted.length, 1);
 }
 
+// No project_areas check existed before this — added specifically to prove
+// migration 0022's ideathon_hint column actually reached production, not
+// just that its .sql file sits in the repo. Same round-trip shape as every
+// other check here: insert with the flag on, read it back, insert again
+// with it off (the column's own default), read that back too, then clean up.
+async function verifyProjectAreas() {
+  console.log("\nproject_areas");
+  const flaggedLabel = `${MARKER}-innolab`;
+  const [flagged] = await sql`
+    insert into project_areas (label_de, label_en, sort_order, ideathon_hint)
+    values (${flaggedLabel}, ${flaggedLabel}, 999, true)
+    returning *
+  `;
+  check("ideathon_hint round-trips true", flagged.ideathon_hint, true);
+
+  const [unflagged] = await sql`
+    insert into project_areas (label_de, label_en, sort_order)
+    values (${`${MARKER}-plain`}, ${`${MARKER}-plain`}, 999)
+    returning *
+  `;
+  check("ideathon_hint defaults to false when not set", unflagged.ideathon_hint, false);
+
+  const active = await sql`
+    select label_de from project_areas where ideathon_hint = true and label_de = ${flaggedLabel}
+  `;
+  check("an active, flagged area is findable by the flag", active.length, 1);
+
+  const deleted = await sql`
+    delete from project_areas where id in (${flagged.id}, ${unflagged.id}) returning id
+  `;
+  check("delete removes both rows", deleted.length, 2);
+}
+
 async function verifyContactMessages() {
   console.log("\ncontact_messages");
   const email = `${MARKER}-contact@example.invalid`;
@@ -509,6 +542,7 @@ await verifyApplicationAreaChoices();
 await verifyReminderSignups();
 await verifyReminderFiltering();
 await verifyRecruitingWindows();
+await verifyProjectAreas();
 await verifyCalendarEvents();
 await verifyContactMessages();
 await verifyCronRuns();

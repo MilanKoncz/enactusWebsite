@@ -12,8 +12,8 @@ const TOKEN_ISSUED_AT = 1_700_000_000_000;
 const TOKEN = `${TOKEN_ISSUED_AT}.test-signature`;
 
 const PROJECT_AREAS: PublicProjectArea[] = [
-  { id: "area-1", labelDe: "SmileGreen", labelEn: "SmileGreen" },
-  { id: "area-2", labelDe: "Finance-Lead", labelEn: "Finance-Lead" },
+  { id: "area-1", labelDe: "SmileGreen", labelEn: "SmileGreen", ideathonHint: false },
+  { id: "area-2", labelDe: "Finance-Lead", labelEn: "Finance-Lead", ideathonHint: false },
 ];
 
 const DEPARTMENTS: PublicDepartment[] = [
@@ -220,6 +220,52 @@ describe("ApplicationForm", () => {
     expect(screen.getAllByLabelText("Warum dieser Bereich?")).toHaveLength(1);
   });
 
+  it("shows the Ideathon hint once the flagged area is chosen in any of the three slots, and hides it again", async () => {
+    const user = userEvent.setup();
+    const areasWithHint: PublicProjectArea[] = [
+      ...PROJECT_AREAS,
+      { id: "area-innolab", labelDe: "InnoLab", labelEn: "InnoLab", ideathonHint: true },
+    ];
+    // Overrides the beforeEach default: ApplicationForm re-fetches
+    // /api/project-areas on mount and prefers that result over the initial
+    // prop (see the component's own comment), so the flagged area has to
+    // come from the fetch mock, not just the render prop.
+    stubFetch(() => new Response(JSON.stringify({ ok: true }), { status: 200 }), areasWithHint);
+    renderForm(areasWithHint);
+
+    expect(screen.queryByText(/Du hast InnoLab als Wunschbereich gewählt/)).not.toBeInTheDocument();
+
+    await user.selectOptions(screen.getByLabelText("2. Wahl"), "InnoLab");
+    const hint = screen.getByText(/Du hast InnoLab als Wunschbereich gewählt/);
+    expect(hint).toBeInTheDocument();
+    expect(within(hint.closest("p")!).getByRole("link")).toHaveAttribute("href", "/ideathon");
+
+    // Changing the choice away from the flagged area makes the hint go away
+    // again — it must not stay "stuck" once shown.
+    await user.selectOptions(screen.getByLabelText("2. Wahl"), "Finance-Lead");
+    expect(screen.queryByText(/Du hast InnoLab als Wunschbereich gewählt/)).not.toBeInTheDocument();
+  });
+
+  it("shows the Ideathon hint regardless of which of the three slots holds the flagged area", async () => {
+    const user = userEvent.setup();
+    const areasWithHint: PublicProjectArea[] = [
+      ...PROJECT_AREAS,
+      { id: "area-innolab", labelDe: "InnoLab", labelEn: "InnoLab", ideathonHint: true },
+    ];
+    stubFetch(() => new Response(JSON.stringify({ ok: true }), { status: 200 }), areasWithHint);
+    renderForm(areasWithHint);
+
+    await user.selectOptions(screen.getByLabelText("3. Wahl"), "InnoLab");
+    expect(screen.getByText(/Du hast InnoLab als Wunschbereich gewählt/)).toBeInTheDocument();
+  });
+
+  it("never shows the Ideathon hint when no area carries the flag", async () => {
+    const user = userEvent.setup();
+    renderForm();
+    await user.selectOptions(screen.getByLabelText("1. Wahl"), "SmileGreen");
+    expect(screen.queryByText(/Du hast InnoLab als Wunschbereich gewählt/)).not.toBeInTheDocument();
+  });
+
   it("shows a live character count for the area reason", async () => {
     const user = userEvent.setup();
     renderForm();
@@ -341,9 +387,9 @@ describe("ApplicationForm", () => {
   it("prefers a fresher project-areas list from GET /api/project-areas over the initial prop", async () => {
     stubFetch(
       () => new Response(JSON.stringify({ ok: true }), { status: 200 }),
-      [{ id: "area-3", labelDe: "ReSoap", labelEn: "ReSoap" }],
+      [{ id: "area-3", labelDe: "ReSoap", labelEn: "ReSoap", ideathonHint: false }],
     );
-    renderForm([{ id: "area-1", labelDe: "SmileGreen", labelEn: "SmileGreen" }]);
+    renderForm([{ id: "area-1", labelDe: "SmileGreen", labelEn: "SmileGreen", ideathonHint: false }]);
 
     const firstChoice = screen.getByLabelText("1. Wahl");
     expect(await within(firstChoice).findByRole("option", { name: "ReSoap" })).toBeInTheDocument();

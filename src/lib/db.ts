@@ -809,6 +809,12 @@ export type ProjectAreaRow = {
   labelEn: string;
   sortOrder: number;
   active: boolean;
+  // Whether choosing this area on /mitmachen shows the Ideathon hint
+  // (ApplicationForm.tsx) — a board-set flag, migrations/0022, deliberately
+  // not derived from the label: labelDe/labelEn are free text the board can
+  // rename at any time, so keying the hint off a string match would break
+  // the moment someone renamed "InnoLab" to anything else.
+  ideathonHint: boolean;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -818,9 +824,11 @@ export type ProjectAreaInput = {
   labelEn: string;
   sortOrder: number;
   active: boolean;
+  ideathonHint: boolean;
 };
 
-const PROJECT_AREA_COLUMNS = "id, label_de, label_en, sort_order, active, created_at, updated_at";
+const PROJECT_AREA_COLUMNS =
+  "id, label_de, label_en, sort_order, active, ideathon_hint, created_at, updated_at";
 
 function toProjectAreaRow(row: Record<string, unknown>): ProjectAreaRow {
   return {
@@ -829,6 +837,7 @@ function toProjectAreaRow(row: Record<string, unknown>): ProjectAreaRow {
     labelEn: row.label_en as string,
     sortOrder: row.sort_order as number,
     active: row.active as boolean,
+    ideathonHint: row.ideathon_hint as boolean,
     createdAt: row.created_at as Date,
     updatedAt: row.updated_at as Date,
   };
@@ -852,9 +861,9 @@ export async function listActiveProjectAreas(): Promise<ProjectAreaRow[]> {
 
 export async function insertProjectArea(input: ProjectAreaInput): Promise<ProjectAreaRow> {
   const rows = await sql()`
-    insert into project_areas (label_de, label_en, sort_order, active)
-    values (${input.labelDe}, ${input.labelEn}, ${input.sortOrder}, ${input.active})
-    returning id, label_de, label_en, sort_order, active, created_at, updated_at
+    insert into project_areas (label_de, label_en, sort_order, active, ideathon_hint)
+    values (${input.labelDe}, ${input.labelEn}, ${input.sortOrder}, ${input.active}, ${input.ideathonHint})
+    returning id, label_de, label_en, sort_order, active, ideathon_hint, created_at, updated_at
   `;
   return toProjectAreaRow(rows[0] as Record<string, unknown>);
 }
@@ -863,9 +872,9 @@ export async function updateProjectArea(id: string, input: ProjectAreaInput): Pr
   const rows = await sql()`
     update project_areas
     set label_de = ${input.labelDe}, label_en = ${input.labelEn}, sort_order = ${input.sortOrder},
-        active = ${input.active}, updated_at = now()
+        active = ${input.active}, ideathon_hint = ${input.ideathonHint}, updated_at = now()
     where id = ${id}
-    returning id, label_de, label_en, sort_order, active, created_at, updated_at
+    returning id, label_de, label_en, sort_order, active, ideathon_hint, created_at, updated_at
   `;
   return rows.length > 0 ? toProjectAreaRow(rows[0] as Record<string, unknown>) : null;
 }

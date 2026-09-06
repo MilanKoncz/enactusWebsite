@@ -1517,7 +1517,8 @@
         "availabilityError": "Please enter a valid number of hours.",
         "areasLabel": "Areas of interest",
         "areasHint": "Choose up to three areas, in order of preference. The first choice is required.",
-        "areasNotice": "This list shows which projects are currently looking for members. In the Innolab, you develop your own ideas in weekly sessions. Signing up for the <ideathonLink>Ideathon</ideathonLink> is a separate event and doesn't lead to membership automatically, that's what this application is for.",
+        "areasNotice": "This list shows which projects are currently looking for members. In the InnoLab, you develop your own ideas in weekly sessions. You sign up for the Ideathon <ideathonLink>here</ideathonLink> separately, that doesn't lead to membership automatically, that's what this application is for.",
+        "ideathonHint": "You've chosen the InnoLab as an area. The <ideathonLink>Ideathon</ideathonLink> is a great starting point for it, even though sign-up runs separately.",
         "areaPlaceholder": "Please choose",
         "area1Label": "1st choice",
         "area1Error": "Please choose your preferred area.",
@@ -1825,6 +1826,9 @@
       "inactive": "inactive",
       "activate": "Activate",
       "deactivate": "Deactivate",
+      "ideathonHintLabel": "Show the Ideathon hint when this area is chosen",
+      "ideathonHintOn": "on",
+      "ideathonHintOff": "off",
       "create": "Create",
       "saveChanges": "Save changes",
       "cancelEdit": "Cancel",
@@ -1839,6 +1843,7 @@
         "label": "Label",
         "sortOrder": "Sort order",
         "active": "Status",
+        "ideathonHint": "Ideathon hint",
         "action": "Action"
       }
     },
