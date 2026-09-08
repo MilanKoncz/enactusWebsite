@@ -259,6 +259,23 @@ describe("ApplicationForm", () => {
     expect(screen.getByText(/Du hast InnoLab als Wunschbereich gewählt/)).toBeInTheDocument();
   });
 
+  it("renders the hint directly under the slot that triggered it, not collected at the end", async () => {
+    const user = userEvent.setup();
+    const areasWithHint: PublicProjectArea[] = [
+      ...PROJECT_AREAS,
+      { id: "area-innolab", labelDe: "InnoLab", labelEn: "InnoLab", ideathonHint: true },
+    ];
+    stubFetch(() => new Response(JSON.stringify({ ok: true }), { status: 200 }), areasWithHint);
+    renderForm(areasWithHint);
+
+    await user.selectOptions(screen.getByLabelText("1. Wahl"), "InnoLab");
+    const hint = screen.getByText(/Du hast InnoLab als Wunschbereich gewählt/);
+    const secondChoiceSelect = screen.getByLabelText("2. Wahl");
+    // The hint must precede the next slot's own select in the DOM — proof
+    // it sits right under slot 1, not appended after all three dropdowns.
+    expect(hint.compareDocumentPosition(secondChoiceSelect) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it("never shows the Ideathon hint when no area carries the flag", async () => {
     const user = userEvent.setup();
     renderForm();

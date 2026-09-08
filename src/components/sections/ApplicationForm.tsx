@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { upload } from "@vercel/blob/client";
+import { Lightbulb } from "lucide-react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocale, useTranslations } from "next-intl";
@@ -168,7 +169,36 @@ export function ApplicationForm({
   const ideathonHintLabels = new Set(
     projectAreas.filter((area) => area.ideathonHint).map((area) => (locale === "de" ? area.labelDe : area.labelEn)),
   );
-  const showIdeathonHint = [area1, area2, area3].some((area) => area && ideathonHintLabels.has(area));
+  function isIdeathonHintArea(label?: string): boolean {
+    return Boolean(label && ideathonHintLabels.has(label));
+  }
+
+  // A plain render helper, not a nested component (that would redefine a
+  // component on every render and reset its own state — react-hooks/
+  // static-components) — called directly as {renderIdeathonHint(areaN)}.
+  // Rendered directly under whichever of the three slots just picked the
+  // flagged area, not collected at the end of the fieldset, so it's the
+  // very next thing a visitor sees rather than something to scroll past two
+  // more dropdowns to find. Weighted like MitmachenFit.tsx's "fitNote" (a
+  // filled gold-tinted block, not a muted footnote): this is exactly the
+  // kind of detail a visitor could otherwise miss entirely.
+  function renderIdeathonHint(label?: string) {
+    if (!isIdeathonHintArea(label)) return null;
+    return (
+      <p className="flex items-start gap-2.5 rounded-md border-l-2 border-gold bg-gold/10 px-4 py-3 text-body-s font-medium text-ink">
+        <Lightbulb aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-ink/70" />
+        <span>
+          {t.rich("ideathonHint", {
+            ideathonLink: (chunks) => (
+              <Link href="/ideathon" className="link-underline">
+                {chunks}
+              </Link>
+            ),
+          })}
+        </span>
+      </p>
+    );
+  }
 
   // Confetti burst, same as ContactForm.tsx (ConfettiBurst) — origin is the
   // success message's own rendered position, read right after it mounts.
@@ -398,6 +428,7 @@ export function ApplicationForm({
               {...register("area1Reason")}
             />
           )}
+          {renderIdeathonHint(area1)}
         </div>
 
         <div className="flex flex-col gap-3">
@@ -420,6 +451,7 @@ export function ApplicationForm({
               {...register("area2Reason")}
             />
           )}
+          {renderIdeathonHint(area2)}
         </div>
 
         <div className="flex flex-col gap-3">
@@ -442,19 +474,8 @@ export function ApplicationForm({
               {...register("area3Reason")}
             />
           )}
+          {renderIdeathonHint(area3)}
         </div>
-
-        {showIdeathonHint && (
-          <p className="border-l-2 border-gold pl-4 text-body-s opacity-70">
-            {t.rich("ideathonHint", {
-              ideathonLink: (chunks) => (
-                <Link href="/ideathon" className="link-underline">
-                  {chunks}
-                </Link>
-              ),
-            })}
-          </p>
-        )}
       </fieldset>
 
       {/* A separate, unranked, optional category from the Wunschbereich
