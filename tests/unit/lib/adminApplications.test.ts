@@ -15,6 +15,7 @@ function application(overrides: Partial<ApplicationSummary>): ApplicationSummary
     desiredAreas: ["SmileGreen"],
     areaChoices: [],
     departments: null,
+    interviewSlots: null,
     languagesSkills: null,
     cvPathname: null,
     mailStatus: "sent",

@@ -34,16 +34,19 @@ async function verifyApplications() {
   console.log("\napplications");
   const email = `${MARKER}@example.invalid`;
   const retainUntil = new Date(Date.now() - 1000); // already due, for the cleanup-query check below
+  const interviewSlot = "2026-09-15T08:00:00.000Z";
   const [inserted] = await sql`
     insert into applications (
       first_name, last_name, email, study_program, semester, university,
       motivation, desired_areas, availability_hours, consent_at, locale, recruiting_semester,
-      cv_blob_url, cv_pathname, cv_original_filename, cv_size_bytes, cv_uploaded_at, retain_until
+      cv_blob_url, cv_pathname, cv_original_filename, cv_size_bytes, cv_uploaded_at, retain_until,
+      interview_slots
     ) values (
       'Verify', 'Script', ${email}, 'Testfach', 3, 'Testuniversität',
       'Verification run, not a real application.', ${["SmileGreen", "Team-Lead"]}, 5, now(), 'de', 'HWS26',
       'https://example-store.public.blob.vercel-storage.com/bewerbungen/verify-abc123.pdf',
-      ${`bewerbungen/${MARKER}.pdf`}, 'lebenslauf.pdf', 12345, now(), ${retainUntil.toISOString()}
+      ${`bewerbungen/${MARKER}.pdf`}, 'lebenslauf.pdf', 12345, now(), ${retainUntil.toISOString()},
+      ${[interviewSlot]}::timestamptz[]
     )
     returning *
   `;
@@ -57,6 +60,28 @@ async function verifyApplications() {
   check("cv_pathname round-trips", read.cv_pathname, `bewerbungen/${MARKER}.pdf`);
   check("cv_original_filename round-trips", read.cv_original_filename, "lebenslauf.pdf");
   check("cv_size_bytes round-trips", read.cv_size_bytes, 12345);
+  check(
+    "interview_slots round-trips as the same instant",
+    new Date(read.interview_slots[0]).toISOString(),
+    interviewSlot,
+  );
+
+  const [withoutInterviewSlots] = await sql`
+    insert into applications (
+      first_name, last_name, email, study_program, semester,
+      motivation, availability_hours, consent_at, locale, recruiting_semester, retain_until
+    ) values (
+      'Verify', 'NoSlots', ${`${MARKER}-noslots@example.invalid`}, 'Testfach', 3,
+      'Verification run, not a real application.', 5, now(), 'de', 'HWS26', now()
+    )
+    returning id, interview_slots
+  `;
+  check(
+    "interview_slots is NULL, not [], when the application doesn't set it",
+    withoutInterviewSlots.interview_slots,
+    null,
+  );
+  await sql`delete from applications where id = ${withoutInterviewSlots.id}`;
 
   // The exact query the cron cleanup route's CV-blob pass runs (see
   // app/api/cron/cleanup/route.ts) — this row must be a hit, since its
@@ -270,11 +295,16 @@ async function verifyRecruitingWindows() {
 
   const validSemester = `HWS${String(Date.now()).slice(-2)}`;
   const [inserted] = await sql`
-    insert into recruiting_windows (semester, starts_at, ends_at)
-    values (${validSemester}, ${startsAt}, ${endsAt})
-    returning *
+    insert into recruiting_windows (semester, starts_at, ends_at, interview_days, interview_start_time, interview_end_time, interview_slot_minutes)
+    values (${validSemester}, ${startsAt}, ${endsAt}, ${["2026-09-15", "2026-09-16"]}::date[], '10:00'::time, '19:00'::time, 60)
+    returning id, interview_days::text[] as interview_days, interview_start_time::text as interview_start_time,
+      interview_end_time::text as interview_end_time, interview_slot_minutes
   `;
   check("insert returns an id", typeof inserted.id, "string");
+  check("interview_days round-trips", inserted.interview_days, ["2026-09-15", "2026-09-16"]);
+  check("interview_start_time round-trips", inserted.interview_start_time.slice(0, 5), "10:00");
+  check("interview_end_time round-trips", inserted.interview_end_time.slice(0, 5), "19:00");
+  check("interview_slot_minutes round-trips", inserted.interview_slot_minutes, 60);
 
   let endBeforeStartRejected = false;
   try {
@@ -286,6 +316,26 @@ async function verifyRecruitingWindows() {
     endBeforeStartRejected = true;
   }
   check("end-after-start check rejects an inverted window", endBeforeStartRejected, true);
+
+  let interviewRangeRejected = false;
+  try {
+    await sql`
+      insert into recruiting_windows (semester, starts_at, ends_at, interview_start_time, interview_end_time)
+      values (${`FSS${String(Date.now()).slice(-2)}`}, ${startsAt}, ${endsAt}, '19:00'::time, '10:00'::time)
+    `;
+  } catch {
+    interviewRangeRejected = true;
+  }
+  check("interview end-after-start check rejects an inverted interview range", interviewRangeRejected, true);
+
+  const [withoutGrid] = await sql`
+    insert into recruiting_windows (semester, starts_at, ends_at)
+    values (${`FSS${String(Date.now() + 1).slice(-2)}`}, ${startsAt}, ${endsAt})
+    returning id, interview_days::text[] as interview_days, interview_start_time::text as interview_start_time
+  `;
+  check("a window created without an interview grid defaults to no days, not NULL", withoutGrid.interview_days, []);
+  check("a window created without an interview grid defaults to 10:00", withoutGrid.interview_start_time.slice(0, 5), "10:00");
+  await sql`delete from recruiting_windows where id = ${withoutGrid.id}`;
 
   const deleted = await sql`delete from recruiting_windows where id = ${inserted.id} returning id`;
   check("delete removes exactly one row", deleted.length, 1);

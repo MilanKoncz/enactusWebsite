@@ -78,6 +78,15 @@ export type ApplicationInput = {
   // an empty one); reading one back as undefined only happens for a row from
   // before migrations/0020, via toApplication below.
   departments?: string[];
+  // ISO 8601 instants, one per chosen interview slot — see
+  // applicationFormSchema.ts and /api/bewerbung's own comments for how this
+  // differs from departments above: undefined means the recruiting window
+  // this application belongs to had no interview days configured at
+  // submission time (there was nothing to choose from), an empty array
+  // means slots were offered and none were chosen. Both are real,
+  // server-decided states — never left to the client to distinguish, see
+  // /api/bewerbung's own comment.
+  interviewSlots?: string[];
   availabilityHours: number;
   heardAboutUs?: string;
   locale: Locale;
@@ -123,6 +132,16 @@ function parseAreaChoices(value: unknown): ApplicationAreaChoice[] {
   return Array.isArray(parsed) ? (parsed as ApplicationAreaChoice[]) : [];
 }
 
+// interview_slots is a timestamptz[] — read back as either Date objects or
+// strings depending on the driver's own array parsing, so this accepts
+// both rather than assuming one. Always re-expressed as ISO strings, the
+// same shape /api/bewerbung wrote, so nothing downstream has to care which
+// form the row arrived in.
+function parseInterviewSlots(value: unknown): string[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  return value.map((entry) => (entry instanceof Date ? entry.toISOString() : new Date(entry as string).toISOString()));
+}
+
 function toApplication(row: Record<string, unknown>): Application {
   return {
     id: row.id as string,
@@ -140,6 +159,7 @@ function toApplication(row: Record<string, unknown>): Application {
     desiredAreas: (row.desired_areas as string[] | null) ?? undefined,
     areaChoices: parseAreaChoices(row.area_choices),
     departments: (row.departments as string[] | null) ?? undefined,
+    interviewSlots: parseInterviewSlots(row.interview_slots),
     availabilityHours: row.availability_hours as number,
     heardAboutUs: (row.heard_about_us as string | null) ?? undefined,
     consentAt: row.consent_at as Date,
@@ -178,13 +198,16 @@ export async function insertApplication(input: ApplicationInput): Promise<Applic
       insert into applications (
         first_name, last_name, email, study_program, semester, university,
         prior_involvement, languages_skills, motivation, want_to_gain, desired_areas, departments,
+        interview_slots,
         availability_hours, heard_about_us, consent_at, locale, recruiting_semester,
         retain_until, cv_blob_url, cv_pathname, cv_original_filename, cv_size_bytes, cv_uploaded_at
       ) values (
         ${input.firstName}, ${input.lastName}, ${input.email}, ${input.studyProgram},
         ${input.semester}, ${input.university ?? null}, ${input.priorInvolvement ?? null},
         ${input.languagesSkills ?? null}, ${input.motivation}, ${input.wantToGain ?? null},
-        ${input.desiredAreas ?? null}, ${input.departments ?? []}, ${input.availabilityHours}, ${input.heardAboutUs ?? null},
+        ${input.desiredAreas ?? null}, ${input.departments ?? []},
+        ${input.interviewSlots ?? null}::timestamptz[],
+        ${input.availabilityHours}, ${input.heardAboutUs ?? null},
         now(), ${input.locale}, ${input.recruitingSemester}, ${input.retainUntil.toISOString()},
         ${input.cvBlobUrl ?? null}, ${input.cvPathname ?? null}, ${input.cvOriginalFilename ?? null},
         ${input.cvSizeBytes ?? null}, ${input.cvUploadedAt ? input.cvUploadedAt.toISOString() : null}
@@ -276,6 +299,7 @@ export type ApplicationSummary = {
   desiredAreas: string[] | null;
   areaChoices: ApplicationAreaChoice[];
   departments: string[] | null;
+  interviewSlots: string[] | null;
   languagesSkills: string | null;
   cvPathname: string | null;
   mailStatus: MailStatus;
@@ -295,6 +319,7 @@ function toApplicationSummary(row: Record<string, unknown>): ApplicationSummary 
     desiredAreas: (row.desired_areas as string[] | null) ?? null,
     areaChoices: parseAreaChoices(row.area_choices),
     departments: (row.departments as string[] | null) ?? null,
+    interviewSlots: parseInterviewSlots(row.interview_slots) ?? null,
     languagesSkills: (row.languages_skills as string | null) ?? null,
     cvPathname: (row.cv_pathname as string | null) ?? null,
     mailStatus: row.mail_status as MailStatus,
@@ -306,7 +331,7 @@ export async function listApplications(): Promise<ApplicationSummary[]> {
   const rows = await sql()`
     select
       a.id, a.created_at, a.first_name, a.last_name, a.email, a.study_program,
-      a.semester, a.availability_hours, a.desired_areas, a.departments, a.languages_skills, a.cv_pathname,
+      a.semester, a.availability_hours, a.desired_areas, a.departments, a.interview_slots, a.languages_skills, a.cv_pathname,
       a.mail_status, a.recruiting_semester,
       coalesce(choices.area_choices, '[]'::json) as area_choices
     from applications a
@@ -326,7 +351,7 @@ export async function listApplicationsBySemester(recruitingSemester: string): Pr
   const rows = await sql()`
     select
       a.id, a.created_at, a.first_name, a.last_name, a.email, a.study_program,
-      a.semester, a.availability_hours, a.desired_areas, a.departments, a.languages_skills, a.cv_pathname,
+      a.semester, a.availability_hours, a.desired_areas, a.departments, a.interview_slots, a.languages_skills, a.cv_pathname,
       a.mail_status, a.recruiting_semester,
       coalesce(choices.area_choices, '[]'::json) as area_choices
     from applications a
@@ -403,6 +428,17 @@ export type RecruitingWindowRow = {
   start: string;
   end: string;
   createdAt: Date;
+  // The interview-availability grid this window's applicants are offered —
+  // see migrations/0023's own comment on why these live on this row rather
+  // than a table of their own. A window with no days configured yet reads
+  // back an empty array, not null: the column itself has a not-null
+  // default (unlike departments/desired_areas, there is no "predates the
+  // feature" state to preserve here, since every recruiting_windows row
+  // either has this configured or genuinely has no interview days yet).
+  interviewDays: string[];
+  interviewStartTime: string;
+  interviewEndTime: string;
+  interviewSlotMinutes: number;
 };
 
 function toRecruitingWindowRow(row: Record<string, unknown>): RecruitingWindowRow {
@@ -416,12 +452,30 @@ function toRecruitingWindowRow(row: Record<string, unknown>): RecruitingWindowRo
     start: (row.starts_at as Date).toISOString(),
     end: (row.ends_at as Date).toISOString(),
     createdAt: row.created_at as Date,
+    interviewDays: (row.interview_days as string[] | null) ?? [],
+    // ::text cast above strips any trailing seconds Postgres would
+    // otherwise add to a `time` column's default text output — same
+    // reasoning as calendarFormat.ts's start_date::text cast for `date`.
+    interviewStartTime: ((row.interview_start_time as string | null) ?? "10:00").slice(0, 5),
+    interviewEndTime: ((row.interview_end_time as string | null) ?? "19:00").slice(0, 5),
+    interviewSlotMinutes: row.interview_slot_minutes as number,
   };
 }
 
+// The five-column select below (id, semester, starts_at, ends_at,
+// created_at, plus the four interview_* columns) is repeated rather than
+// shared across every query in this section, for the same reason
+// insertApplication's own comment gives for area_choices: Neon's tagged
+// template has no safe fragment-composition helper, so each query spells
+// it out in full.
 export async function listRecruitingWindows(): Promise<RecruitingWindowRow[]> {
   const rows = await sql()`
-    select id, semester, starts_at, ends_at, created_at
+    select
+      id, semester, starts_at, ends_at, created_at,
+      interview_days::text[] as interview_days,
+      interview_start_time::text as interview_start_time,
+      interview_end_time::text as interview_end_time,
+      interview_slot_minutes
     from recruiting_windows
     order by starts_at asc
   `;
@@ -447,7 +501,12 @@ export async function findOverlappingRecruitingWindows(
   excludeId?: string,
 ): Promise<RecruitingWindowRow[]> {
   const rows = await sql()`
-    select id, semester, starts_at, ends_at, created_at
+    select
+      id, semester, starts_at, ends_at, created_at,
+      interview_days::text[] as interview_days,
+      interview_start_time::text as interview_start_time,
+      interview_end_time::text as interview_end_time,
+      interview_slot_minutes
     from recruiting_windows
     where tstzrange(starts_at, ends_at, '[]') && tstzrange(${startsAt.toISOString()}, ${endsAt.toISOString()}, '[]')
       and (${excludeId ?? null}::uuid is null or id != ${excludeId ?? null}::uuid)
@@ -455,15 +514,37 @@ export async function findOverlappingRecruitingWindows(
   return (rows as Record<string, unknown>[]).map(toRecruitingWindowRow);
 }
 
+// The interview grid a create/edit submits alongside semester/start/end —
+// pulled out as its own type since insertRecruitingWindow and
+// updateRecruitingWindow both take it, and recruitingWindowFormSchema.ts's
+// parsed output is exactly this shape.
+export type InterviewGridInput = {
+  interviewDays: string[];
+  interviewStartTime: string;
+  interviewEndTime: string;
+  interviewSlotMinutes: number;
+};
+
 export async function insertRecruitingWindow(
   semester: string,
   startsAt: Date,
   endsAt: Date,
+  grid: InterviewGridInput,
 ): Promise<RecruitingWindowRow> {
   const rows = await sql()`
-    insert into recruiting_windows (semester, starts_at, ends_at)
-    values (${semester}, ${startsAt.toISOString()}, ${endsAt.toISOString()})
-    returning id, semester, starts_at, ends_at, created_at
+    insert into recruiting_windows (
+      semester, starts_at, ends_at, interview_days, interview_start_time, interview_end_time, interview_slot_minutes
+    )
+    values (
+      ${semester}, ${startsAt.toISOString()}, ${endsAt.toISOString()}, ${grid.interviewDays}::date[],
+      ${grid.interviewStartTime}::time, ${grid.interviewEndTime}::time, ${grid.interviewSlotMinutes}
+    )
+    returning
+      id, semester, starts_at, ends_at, created_at,
+      interview_days::text[] as interview_days,
+      interview_start_time::text as interview_start_time,
+      interview_end_time::text as interview_end_time,
+      interview_slot_minutes
   `;
   return toRecruitingWindowRow(rows[0] as Record<string, unknown>);
 }
@@ -473,12 +554,22 @@ export async function updateRecruitingWindow(
   semester: string,
   startsAt: Date,
   endsAt: Date,
+  grid: InterviewGridInput,
 ): Promise<RecruitingWindowRow | null> {
   const rows = await sql()`
     update recruiting_windows
-    set semester = ${semester}, starts_at = ${startsAt.toISOString()}, ends_at = ${endsAt.toISOString()}
+    set semester = ${semester}, starts_at = ${startsAt.toISOString()}, ends_at = ${endsAt.toISOString()},
+      interview_days = ${grid.interviewDays}::date[],
+      interview_start_time = ${grid.interviewStartTime}::time,
+      interview_end_time = ${grid.interviewEndTime}::time,
+      interview_slot_minutes = ${grid.interviewSlotMinutes}
     where id = ${id}
-    returning id, semester, starts_at, ends_at, created_at
+    returning
+      id, semester, starts_at, ends_at, created_at,
+      interview_days::text[] as interview_days,
+      interview_start_time::text as interview_start_time,
+      interview_end_time::text as interview_end_time,
+      interview_slot_minutes
   `;
   return rows.length > 0 ? toRecruitingWindowRow(rows[0] as Record<string, unknown>) : null;
 }
@@ -616,7 +707,12 @@ export async function deleteRecruitingWindow(id: string): Promise<boolean> {
 // below.
 export async function findRecruitingWindowById(id: string): Promise<RecruitingWindowRow | null> {
   const rows = await sql()`
-    select id, semester, starts_at, ends_at, created_at
+    select
+      id, semester, starts_at, ends_at, created_at,
+      interview_days::text[] as interview_days,
+      interview_start_time::text as interview_start_time,
+      interview_end_time::text as interview_end_time,
+      interview_slot_minutes
     from recruiting_windows where id = ${id}
   `;
   return rows.length > 0 ? toRecruitingWindowRow(rows[0] as Record<string, unknown>) : null;
@@ -634,7 +730,12 @@ export async function findRecruitingWindowById(id: string): Promise<RecruitingWi
  */
 export async function findRecruitingWindowsNeedingReminderMail(now: Date): Promise<RecruitingWindowRow[]> {
   const rows = await sql()`
-    select id, semester, starts_at, ends_at, created_at
+    select
+      id, semester, starts_at, ends_at, created_at,
+      interview_days::text[] as interview_days,
+      interview_start_time::text as interview_start_time,
+      interview_end_time::text as interview_end_time,
+      interview_slot_minutes
     from recruiting_windows w
     where w.starts_at <= ${now.toISOString()}
       and exists (
