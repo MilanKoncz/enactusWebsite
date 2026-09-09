@@ -107,6 +107,26 @@ describe("ApplicationPdfDocument", () => {
     await expect(renderToBuffer(ApplicationPdfDocument({ application: legacy }))).resolves.toBeInstanceOf(Buffer);
   });
 
+  it("renders a Gesprächsverfügbarkeit section, grouped by day, when interview slots are chosen", async () => {
+    const withSlots: Application = {
+      ...baseApplication,
+      interviewSlots: ["2026-09-15T08:00:00.000Z", "2026-09-15T09:00:00.000Z", "2026-09-16T08:00:00.000Z"],
+    };
+    await expect(renderToBuffer(ApplicationPdfDocument({ application: withSlots }))).resolves.toBeInstanceOf(Buffer);
+  });
+
+  it("renders the Gesprächsverfügbarkeit section with a 'none chosen' notice for an empty array", async () => {
+    const noSlotsChosen: Application = { ...baseApplication, interviewSlots: [] };
+    await expect(renderToBuffer(ApplicationPdfDocument({ application: noSlotsChosen }))).resolves.toBeInstanceOf(
+      Buffer,
+    );
+  });
+
+  it("omits the Gesprächsverfügbarkeit section entirely when the window had no interview grid configured", async () => {
+    const noGrid: Application = { ...baseApplication, interviewSlots: undefined };
+    await expect(renderToBuffer(ApplicationPdfDocument({ application: noGrid }))).resolves.toBeInstanceOf(Buffer);
+  });
+
   it("renders without a CV attached", async () => {
     const noCv: Application = {
       ...baseApplication,

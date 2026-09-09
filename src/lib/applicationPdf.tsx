@@ -141,6 +141,38 @@ function AreaChoicesFacts({ application }: { application: Application }) {
   return null;
 }
 
+// Groups the applicant's chosen slots by calendar day and lists the start
+// times on each — not a start-end range, since this document has no access
+// to the recruiting window's slotMinutes and inventing an end time would
+// be exactly the kind of fabricated fact CLAUDE.md rules out. Only called
+// once application.interviewSlots is known to be a non-empty array (the
+// empty-array and undefined cases are each handled once, at the call
+// site below, so this never has to branch on either itself).
+function InterviewSlotFacts({ slots }: { slots: string[] }) {
+  const byDay = new Map<string, Date[]>();
+  for (const iso of slots) {
+    const date = new Date(iso);
+    const day = formatSiteDateTime(date, "de-DE", { dateStyle: "long" });
+    const existing = byDay.get(day);
+    if (existing) existing.push(date);
+    else byDay.set(day, [date]);
+  }
+  return (
+    <>
+      {Array.from(byDay.entries()).map(([day, dates]) => (
+        <Fact
+          key={day}
+          label={day}
+          value={[...dates]
+            .sort((a, b) => a.getTime() - b.getTime())
+            .map((date) => formatSiteDateTime(date, "de-DE", { timeStyle: "short" }))
+            .join(", ")}
+        />
+      ))}
+    </>
+  );
+}
+
 export function ApplicationPdfDocument({ application }: { application: Application }) {
   return (
     <Document title={`Bewerbung ${application.firstName} ${application.lastName}`}>
@@ -193,6 +225,26 @@ export function ApplicationPdfDocument({ application }: { application: Applicati
           <View style={styles.section}>
             <Text style={styles.sectionHeading}>Ressorts</Text>
             <Fact label="Ressorts" value={application.departments.join(", ")} />
+          </View>
+        )}
+
+        {/* Its own section, not folded into "Einsatz" above — this is a
+            preference for scheduling, not part of the applicant's actual
+            fit. Three distinct states, deliberately kept apart: undefined
+            (the recruiting window this application belongs to had no
+            interview days configured, so the section is omitted outright,
+            same as Ressorts above), an empty array (asked, nothing chosen —
+            shown, not hidden, so the board can tell "no answer" from
+            "answered but unavailable everywhere offered"), and a populated
+            one. */}
+        {application.interviewSlots !== undefined && (
+          <View style={styles.section}>
+            <Text style={styles.sectionHeading}>Gesprächsverfügbarkeit</Text>
+            {application.interviewSlots.length > 0 ? (
+              <InterviewSlotFacts slots={application.interviewSlots} />
+            ) : (
+              <Fact label="Verfügbarkeit" value="keine Zeitfenster ausgewählt" />
+            )}
           </View>
         )}
 
