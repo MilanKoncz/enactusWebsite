@@ -74,6 +74,34 @@ function mockDepartments(page: Page) {
   );
 }
 
+// Same reasoning as mockProjectAreas/mockDepartments: CI's build has no
+// database, so /api/gespraechsslots would otherwise return an empty list
+// and the interview-availability field these tests check for would never
+// render. Returns the raw windows-with-grid shape the real route returns —
+// MitmachenApplication.tsx does its own windowContaining/generateInterviewSlots
+// derivation from this, same as it does for recruitingWindows — so this has
+// to be a real window bracketing "now", same as OPEN_WINDOW above.
+// `days: []` (the default the "no interview days configured" test overrides
+// to) is the "nothing configured yet" state; the two-day default here
+// yields four slots (two per day, 10:00-11:00 and 11:00-12:00), small
+// enough to assert on individually.
+function mockInterviewSlots(page: Page, days: string[] = ["2026-09-15", "2026-09-16"]) {
+  return page.route("**/api/gespraechsslots", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        windows: [
+          {
+            ...OPEN_WINDOW,
+            interviewGrid: { days, startTime: "10:00", endTime: "12:00", slotMinutes: 60 },
+          },
+        ],
+      }),
+    }),
+  );
+}
+
 // Issued 10s in the past, so ApplicationForm's minimum-fill-time gate
 // (lib/antiSpam.ts's MIN_FILL_MS, 3s) is already satisfied the moment the
 // form is filled in — no fake clock and no real waiting needed. The
@@ -371,6 +399,161 @@ test.describe("/mitmachen", () => {
 
     await expect(page.getByRole("status")).toContainText("Danke für deine Bewerbung");
     expect(submittedBody).toMatchObject({ departments: ["Team-Lead", "Finance-Lead"] });
+  });
+
+  test("submits successfully with no interview slot checked, since availability is optional", async ({
+    page,
+  }) => {
+    await mockOpenRecruitingWindow(page);
+    await mockProjectAreas(page);
+    await mockDepartments(page);
+    await mockInterviewSlots(page);
+    await mockFormToken(page);
+    await mockCvUpload(page);
+    let submittedBody: unknown;
+    await page.route("**/api/bewerbung", (route) => {
+      submittedBody = route.request().postDataJSON();
+      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true }) });
+    });
+    await page.goto("/mitmachen");
+
+    await expect(page.getByText("(Optional) Verfügbarkeit für ein Bewerbungsgespräch")).toBeVisible();
+
+    await page.getByLabel("Vorname").fill("Jane");
+    await page.getByLabel("Nachname").fill("Doe");
+    await page.getByLabel("E-Mail").fill("jane@example.com");
+    await page.getByLabel("Studiengang").fill("BWL");
+    await page.getByLabel("Fachsemester").fill("3");
+    await page.getByLabel("Verfügbarkeit in Stunden pro Woche").fill("10");
+    await page.getByLabel("1. Wahl").selectOption("SmileGreen");
+    await page.getByLabel("Warum dieser Bereich?").fill("Weil ich dort am meisten bewirken kann.");
+    await uploadCv(page);
+    await page
+      .getByLabel("Motivation")
+      .fill("Ich möchte gerne aktiv an einem Projekt mitarbeiten und Verantwortung übernehmen.");
+    await page.getByRole("checkbox", { name: /Datenschutzerklärung/ }).check();
+    await page.getByRole("button", { name: "Bewerbung absenden" }).click();
+
+    await expect(page.getByRole("status")).toContainText("Danke für deine Bewerbung");
+    expect(submittedBody).toMatchObject({ interviewSlots: [] });
+  });
+
+  test("lets a visitor check interview slots across both configured days and submits them all", async ({
+    page,
+  }) => {
+    await mockOpenRecruitingWindow(page);
+    await mockProjectAreas(page);
+    await mockDepartments(page);
+    await mockInterviewSlots(page);
+    await mockFormToken(page);
+    await mockCvUpload(page);
+    let submittedBody: unknown;
+    await page.route("**/api/bewerbung", (route) => {
+      submittedBody = route.request().postDataJSON();
+      return route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true }) });
+    });
+    await page.goto("/mitmachen");
+
+    // Each day is its own group ("Dienstag · 15. September 2026"), scoped
+    // so the identical "10:00–11:00" label on both days resolves to the
+    // right checkbox.
+    const day15 = page.getByRole("group", { name: /15\. September 2026/ });
+    const day16 = page.getByRole("group", { name: /16\. September 2026/ });
+    await day15.getByRole("checkbox", { name: "10:00–11:00" }).check();
+    await day16.getByRole("checkbox", { name: "11:00–12:00" }).check();
+
+    await page.getByLabel("Vorname").fill("Jane");
+    await page.getByLabel("Nachname").fill("Doe");
+    await page.getByLabel("E-Mail").fill("jane@example.com");
+    await page.getByLabel("Studiengang").fill("BWL");
+    await page.getByLabel("Fachsemester").fill("3");
+    await page.getByLabel("Verfügbarkeit in Stunden pro Woche").fill("10");
+    await page.getByLabel("1. Wahl").selectOption("SmileGreen");
+    await page.getByLabel("Warum dieser Bereich?").fill("Weil ich dort am meisten bewirken kann.");
+    await uploadCv(page);
+    await page
+      .getByLabel("Motivation")
+      .fill("Ich möchte gerne aktiv an einem Projekt mitarbeiten und Verantwortung übernehmen.");
+    await page.getByRole("checkbox", { name: /Datenschutzerklärung/ }).check();
+    await page.getByRole("button", { name: "Bewerbung absenden" }).click();
+
+    await expect(page.getByRole("status")).toContainText("Danke für deine Bewerbung");
+    expect(submittedBody).toMatchObject({
+      interviewSlots: ["2026-09-15T08:00:00.000Z", "2026-09-16T09:00:00.000Z"],
+    });
+  });
+
+  test("shows no interview-availability field when no interview days are configured", async ({ page }) => {
+    await mockOpenRecruitingWindow(page);
+    await mockProjectAreas(page);
+    await mockDepartments(page);
+    await mockInterviewSlots(page, []);
+    await page.goto("/mitmachen");
+
+    await expect(page.getByRole("button", { name: "Bewerbung absenden" })).toBeVisible();
+    await expect(page.getByText("Verfügbarkeit für ein Bewerbungsgespräch")).not.toBeVisible();
+  });
+
+  test("lets a keyboard user tab to an interview slot checkbox and toggle it with Space", async ({ page }) => {
+    await mockOpenRecruitingWindow(page);
+    await mockProjectAreas(page);
+    await mockDepartments(page);
+    await mockInterviewSlots(page);
+    await page.goto("/mitmachen");
+
+    const checkbox = page
+      .getByRole("group", { name: /15\. September 2026/ })
+      .getByRole("checkbox", { name: "10:00–11:00" });
+    await checkbox.focus();
+    await expect(checkbox).toBeFocused();
+    await page.keyboard.press("Space");
+    await expect(checkbox).toBeChecked();
+  });
+
+  test("has no automatically detectable accessibility violations with the interview-availability field rendered", async ({
+    page,
+  }) => {
+    await mockOpenRecruitingWindow(page);
+    await mockProjectAreas(page);
+    await mockDepartments(page);
+    await mockInterviewSlots(page);
+    await page.goto("/mitmachen");
+    await expect(page.getByText("(Optional) Verfügbarkeit für ein Bewerbungsgespräch")).toBeVisible();
+
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations).toEqual([]);
+  });
+
+  test("has no automatically detectable accessibility violations with the interview-availability field rendered, on the English route", async ({
+    page,
+  }) => {
+    await mockOpenRecruitingWindow(page);
+    await mockProjectAreas(page);
+    await mockDepartments(page);
+    await mockInterviewSlots(page);
+    await page.goto("/en/mitmachen");
+    await expect(page.getByText("(Optional) Availability for an interview")).toBeVisible();
+
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations).toEqual([]);
+  });
+
+  test("never introduces a horizontal scrollbar at 360px with the interview-availability field rendered", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+    await mockOpenRecruitingWindow(page);
+    await mockProjectAreas(page);
+    await mockDepartments(page);
+    await mockInterviewSlots(page);
+    await page.goto("/mitmachen");
+    await expect(page.getByText("(Optional) Verfügbarkeit für ein Bewerbungsgespräch")).toBeVisible();
+
+    const { scrollWidth, clientWidth } = await page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth,
+    }));
+    expect(scrollWidth).toBeLessThanOrEqual(clientWidth);
   });
 
   test("blocks the application form with visible errors when required fields are empty", async ({
