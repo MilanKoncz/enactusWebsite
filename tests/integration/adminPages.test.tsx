@@ -462,6 +462,74 @@ describe("/admin/ressorts (page)", () => {
   });
 });
 
+describe("/admin/gespraechsplanung (page)", () => {
+  it("never reads applications or windows from the database without a session cookie", async () => {
+    cookieGet.mockReturnValue(undefined);
+
+    const { default: Page } = await import("@/app/[locale]/admin/gespraechsplanung/page");
+    await Page({ params: params() });
+
+    expect(listApplications).not.toHaveBeenCalled();
+    expect(listRecruitingWindows).not.toHaveBeenCalled();
+  });
+
+  it("renders the password prompt, not application data, without a session", async () => {
+    cookieGet.mockReturnValue(undefined);
+    listApplications.mockResolvedValue([APPLICATION]);
+
+    const { default: Page } = await import("@/app/[locale]/admin/gespraechsplanung/page");
+    const tree = await Page({ params: params() });
+
+    expect(JSON.stringify(tree)).not.toContain("Jäne");
+  });
+
+  it("renders the matrix for a semester with an application, with a session", async () => {
+    cookieGet.mockReturnValue({ value: await validSessionCookie() });
+    listApplications.mockResolvedValue([{ ...APPLICATION, interviewSlots: null }]);
+    listRecruitingWindows.mockResolvedValue([
+      {
+        id: "w1",
+        semester: "HWS26",
+        start: "2026-08-31T22:00:00.000Z",
+        end: "2026-09-13T21:59:00.000Z",
+        interviewDays: ["2026-09-15"],
+        interviewStartTime: "10:00",
+        interviewEndTime: "12:00",
+        interviewSlotMinutes: 60,
+      },
+    ]);
+
+    const { default: Page } = await import("@/app/[locale]/admin/gespraechsplanung/page");
+    render(await Page({ params: params() }));
+
+    expect(listApplications).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("Jäne Döe")).toBeInTheDocument();
+    expect(screen.getByText("HWS26")).toBeInTheDocument();
+  });
+
+  it("warns when the semester's window has no interview days configured", async () => {
+    cookieGet.mockReturnValue({ value: await validSessionCookie() });
+    listApplications.mockResolvedValue([{ ...APPLICATION, interviewSlots: null }]);
+    listRecruitingWindows.mockResolvedValue([
+      {
+        id: "w1",
+        semester: "HWS26",
+        start: "2026-08-31T22:00:00.000Z",
+        end: "2026-09-13T21:59:00.000Z",
+        interviewDays: [],
+        interviewStartTime: "10:00",
+        interviewEndTime: "19:00",
+        interviewSlotMinutes: 60,
+      },
+    ]);
+
+    const { default: Page } = await import("@/app/[locale]/admin/gespraechsplanung/page");
+    render(await Page({ params: params() }));
+
+    expect(screen.getByRole("status")).toBeInTheDocument();
+  });
+});
+
 describe("/admin (overview page)", () => {
   it("renders the password prompt and no section links without a session", async () => {
     cookieGet.mockReturnValue(undefined);
