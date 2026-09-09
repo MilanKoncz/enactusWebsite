@@ -236,8 +236,22 @@ test.describe("/termine event calendar", () => {
 
       const start = page.locator('[role="gridcell"][tabindex="0"]');
       await start.focus();
+      // Confirms the *actual* DOM focus lands on each intended day before
+      // firing the next key, rather than trusting daysToGridEvent blind
+      // presses in a row: EventCalendarGrid.tsx moves real focus via an
+      // effect (its own comment: "must move real DOM focus when the
+      // active cell changes"), one render tick behind the state update a
+      // keypress causes. A bare loop assumes that tick always finishes
+      // before Playwright's next dispatched keydown — true on a quiet
+      // machine, not guaranteed once the suite (or the runner) is busy
+      // enough to widen the gap. Asserting focus after every step turns
+      // that assumption into a wait, at whatever pace the page actually
+      // keeps up.
+      let expectedDate = initialFocusDate;
       for (let i = 0; i < daysToGridEvent; i++) {
         await page.keyboard.press("ArrowRight");
+        expectedDate = new Date(Date.parse(`${expectedDate}T00:00:00Z`) + 86_400_000).toISOString().slice(0, 10);
+        await expect(gridCellFor(page, expectedDate)).toBeFocused();
       }
       await page.keyboard.press("Enter");
 
