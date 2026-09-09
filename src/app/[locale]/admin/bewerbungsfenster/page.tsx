@@ -59,6 +59,10 @@ export default async function AdminRecruitingWindowsPage({ params }: PageProps) 
           end: window.end,
           startWallClock: instantToWallClock(new Date(window.start)),
           endWallClock: instantToWallClock(new Date(window.end)),
+          interviewDays: window.interviewDays,
+          interviewStartTime: window.interviewStartTime,
+          interviewEndTime: window.interviewEndTime,
+          interviewSlotMinutes: window.interviewSlotMinutes,
         }))}
       />
     </Container>

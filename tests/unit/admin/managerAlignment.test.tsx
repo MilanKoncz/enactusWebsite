@@ -141,6 +141,10 @@ describe("admin manager row actions, aligned regardless of toggle state", () => 
               end: "2026-09-30T00:00:00.000Z",
               startWallClock: "2026-09-01T00:00",
               endWallClock: "2026-09-30T00:00",
+              interviewDays: [],
+              interviewStartTime: "10:00",
+              interviewEndTime: "19:00",
+              interviewSlotMinutes: 60,
             },
           ]}
         />,
