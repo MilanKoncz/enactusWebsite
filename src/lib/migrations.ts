@@ -19,4 +19,4 @@
  * this project has no test for, on the one page whose job is to be
  * trustworthy when something else has already gone wrong.
  */
-export const LATEST_MIGRATION = "0021_departments_seed.sql";
+export const LATEST_MIGRATION = "0022_project_areas_ideathon_hint.sql";
