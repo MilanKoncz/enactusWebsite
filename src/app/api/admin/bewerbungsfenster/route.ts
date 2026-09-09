@@ -37,7 +37,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const created = await insertRecruitingWindow(parsed.data.semester, startsAt, endsAt);
+    const created = await insertRecruitingWindow(parsed.data.semester, startsAt, endsAt, {
+      interviewDays: parsed.data.interviewDays,
+      interviewStartTime: parsed.data.interviewStartTime,
+      interviewEndTime: parsed.data.interviewEndTime,
+      interviewSlotMinutes: parsed.data.interviewSlotMinutes,
+    });
     revalidateTag(RECRUITING_WINDOWS_TAG, RECRUITING_WINDOWS_REVALIDATE);
     return NextResponse.json({ ok: true, window: created }, { status: 201 });
   } catch (error) {

@@ -50,7 +50,12 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
       );
     }
 
-    const updated = await updateRecruitingWindow(id.data, parsed.data.semester, startsAt, endsAt);
+    const updated = await updateRecruitingWindow(id.data, parsed.data.semester, startsAt, endsAt, {
+      interviewDays: parsed.data.interviewDays,
+      interviewStartTime: parsed.data.interviewStartTime,
+      interviewEndTime: parsed.data.interviewEndTime,
+      interviewSlotMinutes: parsed.data.interviewSlotMinutes,
+    });
     if (!updated) {
       return NextResponse.json({ ok: false, error: "not_found" }, { status: 404 });
     }

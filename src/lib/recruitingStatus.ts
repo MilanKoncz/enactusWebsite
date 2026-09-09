@@ -12,8 +12,11 @@ export type RecruitingPhase = "before" | "open" | "after" | "unscheduled";
 // Exported for lib/recruitingSemester.ts (resolveApplicationSemester) and
 // lib/retentionCutoff.ts (applicationRetainUntil) — both need "the window a
 // given instant falls inside, if any" and previously duplicated this same
-// find() rather than share it.
-export function windowContaining(nowMs: number, windows: RecruitingWindow[]): RecruitingWindow | null {
+// find() rather than share it. Generic (not fixed to RecruitingWindow) so a
+// caller carrying extra fields on top of start/end/semester — e.g.
+// lib/recruitingWindows.ts's interview-grid-bearing windows — gets that
+// window back with its own fields intact, not narrowed to the base shape.
+export function windowContaining<T extends RecruitingWindow>(nowMs: number, windows: T[]): T | null {
   return (
     windows.find((window) => {
       const startMs = new Date(window.start).getTime();

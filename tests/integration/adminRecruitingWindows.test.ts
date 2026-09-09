@@ -158,6 +158,60 @@ describe("POST /api/admin/bewerbungsfenster", () => {
 
     expect(revalidateTag).not.toHaveBeenCalled();
   });
+
+  it("passes the interview grid through to insertRecruitingWindow", async () => {
+    findOverlappingRecruitingWindows.mockResolvedValue([]);
+    insertRecruitingWindow.mockResolvedValue({ id: ID, semester: "FSS27", start: "x", end: "y" });
+
+    const { POST } = await import("@/app/api/admin/bewerbungsfenster/route");
+    await POST(
+      await request("POST", "http://localhost/api/admin/bewerbungsfenster", {
+        ...VALID,
+        interviewDays: ["2027-03-15", "2027-03-16"],
+        interviewStartTime: "10:00",
+        interviewEndTime: "19:00",
+        interviewSlotMinutes: 60,
+      }),
+    );
+
+    expect(insertRecruitingWindow).toHaveBeenCalledWith("FSS27", expect.any(Date), expect.any(Date), {
+      interviewDays: ["2027-03-15", "2027-03-16"],
+      interviewStartTime: "10:00",
+      interviewEndTime: "19:00",
+      interviewSlotMinutes: 60,
+    });
+  });
+
+  it("defaults the interview grid to no days, 10-19, 60 minutes when omitted", async () => {
+    findOverlappingRecruitingWindows.mockResolvedValue([]);
+    insertRecruitingWindow.mockResolvedValue({ id: ID, semester: "FSS27", start: "x", end: "y" });
+
+    const { POST } = await import("@/app/api/admin/bewerbungsfenster/route");
+    await POST(await request("POST", "http://localhost/api/admin/bewerbungsfenster", VALID));
+
+    expect(insertRecruitingWindow).toHaveBeenCalledWith("FSS27", expect.any(Date), expect.any(Date), {
+      interviewDays: [],
+      interviewStartTime: "10:00",
+      interviewEndTime: "19:00",
+      interviewSlotMinutes: 60,
+    });
+  });
+
+  it("rejects an interview grid whose slot length doesn't fit its own time range", async () => {
+    const { POST } = await import("@/app/api/admin/bewerbungsfenster/route");
+    const response = await POST(
+      await request("POST", "http://localhost/api/admin/bewerbungsfenster", {
+        ...VALID,
+        interviewDays: ["2027-03-15"],
+        interviewStartTime: "10:00",
+        interviewEndTime: "10:30",
+        interviewSlotMinutes: 60,
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    expect(insertRecruitingWindow).not.toHaveBeenCalled();
+  });
 });
 
 describe("PATCH /api/admin/bewerbungsfenster/[id]", () => {

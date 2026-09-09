@@ -1,6 +1,7 @@
 import { unstable_cache as nextCache } from "next/cache";
 import { listRecruitingWindows } from "@/lib/db";
 import type { RecruitingWindow } from "@/content/recruiting";
+import type { InterviewSlotGrid } from "@/lib/interviewSlots";
 
 /**
  * The public-facing view of the recruiting windows the board manages at
@@ -49,5 +50,48 @@ async function loadRecruitingWindows(): Promise<RecruitingWindow[]> {
 export const getRecruitingWindows: () => Promise<RecruitingWindow[]> = nextCache(
   loadRecruitingWindows,
   ["recruiting-windows"],
+  { tags: [RECRUITING_WINDOWS_TAG], revalidate: 3600 },
+);
+
+/**
+ * A recruiting window plus the interview-availability grid it carries
+ * (migrations/0023) — kept as its own type rather than added to
+ * RecruitingWindow itself, since that base type feeds phase gating, mail
+ * dispatch, and retention math across the site, none of which has any use
+ * for four extra columns. Only /mitmachen's application form and
+ * /api/bewerbung's own validation need this richer shape.
+ */
+export type RecruitingWindowWithInterviewGrid = RecruitingWindow & {
+  interviewGrid: InterviewSlotGrid;
+};
+
+async function loadRecruitingWindowsWithInterviewGrid(): Promise<RecruitingWindowWithInterviewGrid[]> {
+  try {
+    const rows = await listRecruitingWindows();
+    return rows.map((row) => ({
+      semester: row.semester,
+      start: row.start,
+      end: row.end,
+      interviewGrid: {
+        days: row.interviewDays,
+        startTime: row.interviewStartTime,
+        endTime: row.interviewEndTime,
+        slotMinutes: row.interviewSlotMinutes,
+      },
+    }));
+  } catch (error) {
+    console.error("Failed to load recruiting windows with interview grid", error);
+    return [];
+  }
+}
+
+// Same cache tag as getRecruitingWindows above, deliberately: every admin
+// mutation that can change a window's interview grid
+// (RecruitingWindowsManager.tsx) already calls
+// revalidateTag(RECRUITING_WINDOWS_TAG, RECRUITING_WINDOWS_REVALIDATE) for
+// the plain window fields, so this needs no separate invalidation wiring.
+export const getRecruitingWindowsWithInterviewGrid: () => Promise<RecruitingWindowWithInterviewGrid[]> = nextCache(
+  loadRecruitingWindowsWithInterviewGrid,
+  ["recruiting-windows-interview-grid"],
   { tags: [RECRUITING_WINDOWS_TAG], revalidate: 3600 },
 );
