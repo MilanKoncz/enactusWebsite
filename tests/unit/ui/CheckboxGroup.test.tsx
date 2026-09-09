@@ -152,6 +152,18 @@ describe("CheckboxGroup", () => {
     expect(within(document.body).queryByRole("checkbox", { name: "Operations-Lead" })).not.toHaveFocus();
   });
 
+  it("defaults to a single-column layout, unchanged from before columns existed", () => {
+    render(<CheckboxGroup legend="Ressorts" options={OPTIONS} value={[]} onChange={vi.fn()} />);
+    const group = screen.getByRole("group", { name: "Ressorts" });
+    expect(group.querySelector(":scope > div:last-child")).toHaveClass("flex", "flex-col", "gap-2");
+  });
+
+  it("lays options out in a grid when columns is given", () => {
+    render(<CheckboxGroup legend="Ressorts" options={OPTIONS} value={[]} onChange={vi.fn()} columns={2} />);
+    const group = screen.getByRole("group", { name: "Ressorts" });
+    expect(group.querySelector(":scope > div:last-child")).toHaveClass("grid", "sm:grid-cols-2");
+  });
+
   it("has no accessibility violations, checked, unchecked, disabled, and with an error", async () => {
     const { container } = render(
       <CheckboxGroup

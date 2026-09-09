@@ -23,7 +23,20 @@ type CheckboxGroupProps = {
       has no i18n of its own, same as Field.tsx) — announced via
       aria-live="polite" so reaching the cap is heard, not just seen. */
   countLabel?: string;
+  /** How many options sit side by side from the `sm` breakpoint up (always
+      one per row at 360px, satisfying the quality floor regardless of this
+      value). Default 1 — every existing caller keeps its exact current
+      layout. Static, Tailwind-v4-scannable class names, not a computed
+      `grid-cols-${columns}` string, which the build's class scanner would
+      never pick up. */
+  columns?: 1 | 2 | 3;
   className?: string;
+};
+
+const OPTIONS_LAYOUT_CLASSES: Record<1 | 2 | 3, string> = {
+  1: "flex flex-col gap-2",
+  2: "grid grid-cols-1 gap-2 sm:grid-cols-2",
+  3: "grid grid-cols-1 gap-2 sm:grid-cols-3",
 };
 
 /**
@@ -34,7 +47,18 @@ type CheckboxGroupProps = {
  * (consent, honeypot-adjacent toggles, admin `active` flags) — this is the
  * first one governing more than one related option at once.
  */
-export function CheckboxGroup({ legend, hint, error, options, value, onChange, max, countLabel, className }: CheckboxGroupProps) {
+export function CheckboxGroup({
+  legend,
+  hint,
+  error,
+  options,
+  value,
+  onChange,
+  max,
+  countLabel,
+  columns = 1,
+  className,
+}: CheckboxGroupProps) {
   const generatedId = useId();
   const errorId = error ? `${generatedId}-error` : undefined;
   const atMax = typeof max === "number" && value.length >= max;
@@ -57,7 +81,7 @@ export function CheckboxGroup({ legend, hint, error, options, value, onChange, m
           {countLabel}
         </p>
       )}
-      <div className="flex flex-col gap-2">
+      <div className={OPTIONS_LAYOUT_CLASSES[columns]}>
         {options.map((option) => {
           const checked = value.includes(option.value);
           const disabled = !checked && atMax;
