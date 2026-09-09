@@ -12,6 +12,7 @@ import { CheckboxGroup } from "@/components/ui/CheckboxGroup";
 import { Field } from "@/components/ui/Field";
 import { FormStatusMessage } from "@/components/ui/FormStatusMessage";
 import { ConfettiBurst } from "@/components/motion/ConfettiBurst";
+import { InterviewAvailabilityField } from "@/components/sections/InterviewAvailabilityField";
 import { Link } from "@/lib/navigation";
 import {
   CV_REQUIRED,
@@ -25,9 +26,23 @@ import {
 import { MIN_FILL_MS } from "@/lib/antiSpam";
 import { postJson } from "@/lib/submitForm";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
+import { parseDateOnly } from "@/lib/calendarFormat";
 import { org } from "@/content/org";
 import type { PublicProjectArea } from "@/lib/projectAreas";
 import type { PublicDepartment } from "@/lib/departments";
+import type { InterviewSlot } from "@/lib/interviewSlots";
+
+// "Dienstag · 15. September 2026" — same weekday-plus-long-date shape as
+// IdeathonTimeline.tsx's formatStopDay, so a day heading here reads exactly
+// like every other place this site names a specific day.
+function formatDayHeading(dateStr: string, locale: string): string {
+  const date = parseDateOnly(dateStr);
+  const weekday = new Intl.DateTimeFormat(locale, { weekday: "long", timeZone: "UTC" }).format(date);
+  const day = new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(
+    date,
+  );
+  return `${weekday} · ${day}`;
+}
 
 export { MIN_FILL_MS };
 
@@ -54,9 +69,15 @@ const CV_MAX_SIZE_BYTES = 4 * 1024 * 1024;
 export function ApplicationForm({
   projectAreas: initialProjectAreas,
   departments: initialDepartments,
+  interviewSlots,
 }: {
   projectAreas: PublicProjectArea[];
   departments: PublicDepartment[];
+  // Already resolved to "whichever window is open right now, if any" by
+  // MitmachenApplication.tsx — that component already owns the real clock
+  // (useNow.ts) for the exact same phase decision that gates this form
+  // being rendered at all, so this component doesn't need a second one.
+  interviewSlots: InterviewSlot[];
 }) {
   const t = useTranslations("MitmachenPage.application.form");
   const locale = useLocale();
@@ -144,7 +165,7 @@ export function ApplicationForm({
     formState: { errors },
   } = useForm<ApplicationFormInput, unknown, ApplicationFormValues>({
     resolver: zodResolver(validatedApplicationFormSchema),
-    defaultValues: { departments: [] },
+    defaultValues: { departments: [], interviewSlots: [] },
   });
 
   // Watched, not read via getValues(): the three dropdowns hide whatever
@@ -602,6 +623,29 @@ export function ApplicationForm({
         {...register("wantToGain")}
       />
 
+      {/* Renders nothing when no interview days are configured for the
+          currently open window — see InterviewAvailabilityField's own
+          comment. No per-applicant cap, unlike departments above:
+          interviews run in parallel, so checking every offered slot is a
+          genuinely useful answer. */}
+      <Controller
+        control={control}
+        name="interviewSlots"
+        render={({ field }) => (
+          <InterviewAvailabilityField
+            legend={t("interviewSlotsLabel")}
+            hint={t("interviewSlotsHint")}
+            countLabel={t("interviewSlotsCountLabel", { count: (field.value ?? []).length })}
+            slots={interviewSlots}
+            value={field.value ?? []}
+            onChange={field.onChange}
+            dayHeading={(day) => formatDayHeading(day, locale)}
+            slotLabel={(slot) => `${slot.startTime}–${slot.endTime}`}
+            error={errors.interviewSlots && t("interviewSlotsError")}
+          />
+        )}
+      />
+
       <Field label={t("heardAboutLabel")} {...register("heardAboutUs")} />
 
       <div className="flex flex-col gap-2">
@@ -636,7 +680,9 @@ export function ApplicationForm({
               ? t("submitFormExpired")
               : submitError === "rate_limited"
                 ? t("submitRateLimited")
-                : t("submitError", { email: org.contactEmails.board })}
+                : submitError === "invalid_interview_slot"
+                  ? t("submitInterviewSlotChanged")
+                  : t("submitError", { email: org.contactEmails.board })}
         </FormStatusMessage>
       )}
 

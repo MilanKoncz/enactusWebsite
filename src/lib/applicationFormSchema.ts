@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MAX_INTERVIEW_SLOTS } from "@/lib/interviewSlots";
 
 /**
  * Validation for the /mitmachen application form, shared by the client
@@ -82,6 +83,15 @@ export const applicationFormSchema = z.object({
   // checkbox UI itself, but refineApplicationForm still checks them, the
   // same defense-in-depth as the area duplicate check below.
   departments: z.array(z.string().trim().min(1).max(DEPARTMENT_LABEL_MAX)).max(MAX_DEPARTMENTS).optional(),
+
+  // Interview-availability preferences: an unranked, optional checkbox set
+  // like departments above, but with no per-applicant cap — several
+  // interviews run in parallel, so checking every offered slot is a
+  // genuinely useful answer, not noise the way ticking every Ressort would
+  // be. Values are the slots' own ISO instants (lib/interviewSlots.ts),
+  // never trusted as-is: /api/bewerbung re-derives the offered set from
+  // whichever window is actually open and rejects anything not in it.
+  interviewSlots: z.array(z.iso.datetime({ offset: true })).max(MAX_INTERVIEW_SLOTS).optional(),
 
   // Populated together, as a unit, once the client's direct-to-Blob upload
   // (upload() from @vercel/blob/client against /api/bewerbung/cv-upload)
@@ -171,6 +181,18 @@ export function refineApplicationForm(data: RawApplicationForm, ctx: z.Refinemen
         break;
       }
       seenDepartments.add(department);
+    }
+  }
+
+  // Same belt-and-braces reasoning as departments above.
+  if (data.interviewSlots) {
+    const seenSlots = new Set<string>();
+    for (const slot of data.interviewSlots) {
+      if (seenSlots.has(slot)) {
+        ctx.addIssue({ code: "custom", path: ["interviewSlots"], message: "duplicate interview slot" });
+        break;
+      }
+      seenSlots.add(slot);
     }
   }
 

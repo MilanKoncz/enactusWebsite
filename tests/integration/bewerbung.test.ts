@@ -54,10 +54,23 @@ vi.mock("@/lib/cvBlob", async (importOriginal) => {
 // (tests/integration/bewerbung-window.test.ts covers that), so this just
 // needs to always contain "now" and always resolve to the semester label
 // STORED_APPLICATION expects.
+const getRecruitingWindowsWithInterviewGrid = vi.fn();
 vi.mock("@/lib/recruitingWindows", () => ({
   getRecruitingWindows: (...args: unknown[]) => getRecruitingWindows(...args),
+  getRecruitingWindowsWithInterviewGrid: (...args: unknown[]) => getRecruitingWindowsWithInterviewGrid(...args),
 }));
 const OPEN_WINDOW = { semester: "HWS26", start: "2000-01-01T00:00:00+00:00", end: "2100-01-01T00:00:00+00:00" };
+// No interview days configured — the default for every test that isn't
+// specifically about the interview-slots feature, so their
+// insertApplication assertions don't have to account for it.
+const NO_INTERVIEW_GRID = {
+  ...OPEN_WINDOW,
+  interviewGrid: { days: [], startTime: "10:00", endTime: "19:00", slotMinutes: 60 },
+};
+const INTERVIEW_GRID_OPEN = {
+  ...OPEN_WINDOW,
+  interviewGrid: { days: ["2026-09-15", "2026-09-16"], startTime: "10:00", endTime: "19:00", slotMinutes: 60 },
+};
 
 vi.mock("@react-pdf/renderer", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@react-pdf/renderer")>();
@@ -129,6 +142,7 @@ function postRequest(body: unknown) {
 describe("POST /api/bewerbung", () => {
   beforeEach(() => {
     getRecruitingWindows.mockResolvedValue([OPEN_WINDOW]);
+    getRecruitingWindowsWithInterviewGrid.mockResolvedValue([NO_INTERVIEW_GRID]);
     checkFormToken.mockReturnValue("valid");
     verifyUploadedPdf.mockResolvedValue(true);
     fetchCvBlobBuffer.mockResolvedValue({ buffer: Buffer.from("%PDF-1.4 cv"), contentType: "application/pdf" });
@@ -427,5 +441,69 @@ describe("POST /api/bewerbung", () => {
 
     expect(response.status).toBe(409);
     expect(insertApplication).not.toHaveBeenCalled();
+  });
+
+  describe("interview slots", () => {
+    beforeEach(() => {
+      checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4 });
+      insertApplication.mockResolvedValue(STORED_APPLICATION);
+      renderToBuffer.mockResolvedValue(Buffer.from("pdf"));
+      sendApplicationNotification.mockResolvedValue("email-id-1");
+      sendApplicationConfirmation.mockResolvedValue("email-id-2");
+    });
+
+    // The server, not the client, decides NULL vs [] — see
+    // applicationFormSchema.ts and migrations/0023's own comments. A window
+    // with no interview days configured must store NULL (undefined here)
+    // regardless of what a request claims to have chosen.
+    it("stores NULL when the open window has no interview days configured, even if the request claims a slot", async () => {
+      getRecruitingWindowsWithInterviewGrid.mockResolvedValue([NO_INTERVIEW_GRID]);
+
+      const { POST } = await import("@/app/api/bewerbung/route");
+      await POST(postRequest(validPayload({ interviewSlots: ["2026-09-15T08:00:00.000Z"] })));
+
+      expect(insertApplication).toHaveBeenCalledWith(expect.objectContaining({ interviewSlots: undefined }));
+    });
+
+    it("stores an empty array when slots are offered but none are chosen", async () => {
+      getRecruitingWindowsWithInterviewGrid.mockResolvedValue([INTERVIEW_GRID_OPEN]);
+
+      const { POST } = await import("@/app/api/bewerbung/route");
+      await POST(postRequest(validPayload()));
+
+      expect(insertApplication).toHaveBeenCalledWith(expect.objectContaining({ interviewSlots: [] }));
+    });
+
+    it("stores the chosen slots sorted, regardless of the order submitted", async () => {
+      getRecruitingWindowsWithInterviewGrid.mockResolvedValue([INTERVIEW_GRID_OPEN]);
+
+      const { POST } = await import("@/app/api/bewerbung/route");
+      await POST(
+        postRequest(
+          validPayload({
+            interviewSlots: ["2026-09-16T08:00:00.000Z", "2026-09-15T08:00:00.000Z"],
+          }),
+        ),
+      );
+
+      expect(insertApplication).toHaveBeenCalledWith(
+        expect.objectContaining({
+          interviewSlots: ["2026-09-15T08:00:00.000Z", "2026-09-16T08:00:00.000Z"],
+        }),
+      );
+    });
+
+    it("rejects a slot that isn't in the currently configured grid, without writing anything", async () => {
+      getRecruitingWindowsWithInterviewGrid.mockResolvedValue([INTERVIEW_GRID_OPEN]);
+
+      const { POST } = await import("@/app/api/bewerbung/route");
+      const response = await POST(
+        postRequest(validPayload({ interviewSlots: ["2099-01-01T08:00:00.000Z"] })),
+      );
+
+      expect(response.status).toBe(400);
+      expect(await response.json()).toEqual({ ok: false, error: "invalid_interview_slot" });
+      expect(insertApplication).not.toHaveBeenCalled();
+    });
   });
 });

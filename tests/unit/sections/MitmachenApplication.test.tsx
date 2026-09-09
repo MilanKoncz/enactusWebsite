@@ -21,10 +21,10 @@ function freezeNowAt(ms: number) {
 describe("MitmachenApplication", () => {
   beforeEach(() => {
     // The component re-fetches its own data on mount (GET
-    // /api/recruiting-windows) — rejecting it here keeps every test below
-    // on the `recruitingWindows` prop it explicitly passes in, exactly as
-    // before this fetch existed. The one test that cares about a
-    // successful refresh overrides this itself.
+    // /api/recruiting-windows and GET /api/gespraechsslots) — rejecting
+    // both here keeps every test below on the props it explicitly passes
+    // in, exactly as before these fetches existed. The one test that cares
+    // about a successful refresh overrides this itself.
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("no network in tests")));
     // jsdom has no matchMedia; ApplicationForm (rendered here once the
     // window is open) reads prefers-reduced-motion for its confetti burst,
@@ -39,7 +39,7 @@ describe("MitmachenApplication", () => {
 
   it("shows the countdown and reminder sign-up before the window opens", () => {
     freezeNowAt(opensMs - 10_000);
-    renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[hws26]} />);
+    renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[hws26]} interviewWindows={[]} />);
 
     expect(screen.getByText("Das Bewerbungsfenster ist noch geschlossen")).toBeInTheDocument();
     expect(screen.getByText("Benachrichtigung zum Bewerbungsstart")).toBeInTheDocument();
@@ -48,7 +48,7 @@ describe("MitmachenApplication", () => {
 
   it("shows the WhatsApp community line while the window is closed, below the reminder sign-up", () => {
     freezeNowAt(opensMs - 10_000);
-    renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[hws26]} />);
+    renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[hws26]} interviewWindows={[]} />);
 
     const link = screen.getByRole("link", { name: "WhatsApp-Community" });
     expect(link).toHaveAttribute("href", "https://chat.whatsapp.com/FplqECI7eYL2CmoxR2OR2Q");
@@ -63,7 +63,7 @@ describe("MitmachenApplication", () => {
 
   it("shows the WhatsApp community line once the window is open, below the application form", () => {
     freezeNowAt((opensMs + closesMs) / 2);
-    renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[hws26]} />);
+    renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[hws26]} interviewWindows={[]} />);
 
     const link = screen.getByRole("link", { name: "WhatsApp-Community" });
     expect(link).toHaveAttribute("href", "https://chat.whatsapp.com/FplqECI7eYL2CmoxR2OR2Q");
@@ -95,7 +95,7 @@ describe("MitmachenApplication", () => {
       (hostTimeZone) => {
         process.env.TZ = hostTimeZone;
         freezeNowAt(opensMs - 10_000);
-        renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[hws26]} />);
+        renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[hws26]} interviewWindows={[]} />);
 
         expect(
           screen.getByText(
@@ -112,7 +112,7 @@ describe("MitmachenApplication", () => {
 
   it("shows the real application form once the window is open", () => {
     freezeNowAt((opensMs + closesMs) / 2);
-    renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[hws26]} />);
+    renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[hws26]} interviewWindows={[]} />);
 
     expect(screen.getByRole("button", { name: "Bewerbung absenden" })).toBeInTheDocument();
     expect(screen.queryByText("Das Bewerbungsfenster ist noch geschlossen")).not.toBeInTheDocument();
@@ -120,7 +120,7 @@ describe("MitmachenApplication", () => {
 
   it("shows a closed message without a countdown once the window has passed", () => {
     freezeNowAt(closesMs + 10_000);
-    renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[hws26]} />);
+    renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[hws26]} interviewWindows={[]} />);
 
     expect(screen.getByText("Das Bewerbungsfenster ist für diesen Zyklus geschlossen")).toBeInTheDocument();
     expect(screen.getByText("Benachrichtigung zum Bewerbungsstart")).toBeInTheDocument();
@@ -129,7 +129,7 @@ describe("MitmachenApplication", () => {
 
   it("shows a closed message without a countdown when no window is scheduled at all", () => {
     freezeNowAt(opensMs);
-    renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[]} />);
+    renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[]} interviewWindows={[]} />);
 
     expect(screen.getByText("Das Bewerbungsfenster ist noch geschlossen")).toBeInTheDocument();
     expect(screen.getByText("Benachrichtigung zum Bewerbungsstart")).toBeInTheDocument();
@@ -138,13 +138,13 @@ describe("MitmachenApplication", () => {
 
   it("has no accessibility violations while closed", async () => {
     freezeNowAt(opensMs - 10_000);
-    const { container } = renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[hws26]} />);
+    const { container } = renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[hws26]} interviewWindows={[]} />);
     expect(await axe(container)).toHaveNoViolations();
   });
 
   it("has no accessibility violations while open", async () => {
     freezeNowAt((opensMs + closesMs) / 2);
-    const { container } = renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[hws26]} />);
+    const { container } = renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[hws26]} interviewWindows={[]} />);
     expect(await axe(container)).toHaveNoViolations();
   });
 
@@ -156,7 +156,7 @@ describe("MitmachenApplication", () => {
     );
     // Starts closed (empty prop) — the open state only appears once the
     // mocked fetch resolves and the component adopts its result.
-    renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[]} />);
+    renderWithIntl(<MitmachenApplication projectAreas={[]} departments={[]} recruitingWindows={[]} interviewWindows={[]} />);
 
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Bewerbung absenden" })).toBeInTheDocument();

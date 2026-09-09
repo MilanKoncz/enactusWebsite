@@ -8,12 +8,14 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ApplicationForm } from "./ApplicationForm";
 import { ReminderSignupForm } from "./ReminderSignupForm";
 import { useNow } from "@/lib/useNow";
-import { recruitingPhaseAt, currentOrNextRecruitingWindow } from "@/lib/recruitingStatus";
+import { recruitingPhaseAt, currentOrNextRecruitingWindow, windowContaining } from "@/lib/recruitingStatus";
 import { siteDateTimeFormatter } from "@/lib/formatSiteDateTime";
+import { generateInterviewSlots } from "@/lib/interviewSlots";
 import { socialLinks } from "@/content/navigation";
 import type { RecruitingWindow } from "@/content/recruiting";
 import type { PublicProjectArea } from "@/lib/projectAreas";
 import type { PublicDepartment } from "@/lib/departments";
+import type { RecruitingWindowWithInterviewGrid } from "@/lib/recruitingWindows";
 
 function remainingParts(targetMs: number, nowMs: number) {
   const totalSeconds = Math.floor(Math.max(0, targetMs - nowMs) / 1000);
@@ -55,10 +57,12 @@ function CountdownUnit({ value, label }: { value: number; label: string }) {
 // regeneration.
 export function MitmachenApplication({
   recruitingWindows: initialRecruitingWindows,
+  interviewWindows: initialInterviewWindows,
   projectAreas,
   departments,
 }: {
   recruitingWindows: RecruitingWindow[];
+  interviewWindows: RecruitingWindowWithInterviewGrid[];
   projectAreas: PublicProjectArea[];
   departments: PublicDepartment[];
 }) {
@@ -66,6 +70,7 @@ export function MitmachenApplication({
   const locale = useLocale();
   const now = useNow();
   const [recruitingWindows, setRecruitingWindows] = useState(initialRecruitingWindows);
+  const [interviewWindows, setInterviewWindows] = useState(initialInterviewWindows);
 
   useEffect(() => {
     fetch("/api/recruiting-windows")
@@ -80,8 +85,27 @@ export function MitmachenApplication({
       });
   }, []);
 
+  // Same seam and the same fallback reasoning as the recruitingWindows
+  // fetch above, for the interview-availability grid instead.
+  useEffect(() => {
+    fetch("/api/gespraechsslots")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((body: { windows?: RecruitingWindowWithInterviewGrid[] } | null) => {
+        if (body?.windows) setInterviewWindows(body.windows);
+      })
+      .catch(() => {});
+  }, []);
+
   const phase = recruitingPhaseAt(now, recruitingWindows);
   const window = currentOrNextRecruitingWindow(now, recruitingWindows);
+
+  // The slots ApplicationForm actually offers — derived fresh every render
+  // from `now` and whichever interview window is currently open, not
+  // stored in its own state: there's nothing to fetch here that isn't
+  // already covered by interviewWindows above, and re-deriving is cheap
+  // (at most a few dozen slots).
+  const openInterviewWindow = windowContaining(now, interviewWindows);
+  const interviewSlots = openInterviewWindow ? generateInterviewSlots(openInterviewWindow.interviewGrid) : [];
 
   const opensAt = window ? new Date(window.start) : null;
   const closesAt = window ? new Date(window.end) : null;
@@ -101,7 +125,7 @@ export function MitmachenApplication({
         <SectionHeading eyebrow={t("eyebrow")} title={t("title")} lead={t("lead")} />
 
         {phase === "open" ? (
-          <ApplicationForm projectAreas={projectAreas} departments={departments} />
+          <ApplicationForm projectAreas={projectAreas} departments={departments} interviewSlots={interviewSlots} />
         ) : (
           <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-4">

@@ -10,9 +10,10 @@ import { checkRateLimit } from "@/lib/rateLimit";
 import { clientIp } from "@/lib/requestIp";
 import { checkFormToken } from "@/lib/formToken";
 import { resolveApplicationSemester } from "@/lib/recruitingSemester";
-import { getRecruitingWindows } from "@/lib/recruitingWindows";
-import { recruitingPhaseAt } from "@/lib/recruitingStatus";
+import { getRecruitingWindows, getRecruitingWindowsWithInterviewGrid } from "@/lib/recruitingWindows";
+import { recruitingPhaseAt, windowContaining } from "@/lib/recruitingStatus";
 import { applicationRetainUntil } from "@/lib/retentionCutoff";
+import { generateInterviewSlots } from "@/lib/interviewSlots";
 
 /**
  * The load-bearing ordering, per docs/engineering.md: validate, then write
@@ -93,6 +94,31 @@ export async function POST(request: NextRequest) {
 
   const now = new Date();
 
+  // The server, not the applicant's request, decides between "no interview
+  // grid was offered" (NULL — nothing to choose from) and "offered, nothing
+  // chosen" ([]) — see applicationFormSchema.ts and migrations/0023's own
+  // comments on why that distinction can't be left to the client. Values
+  // are compared by exact string equality: both the offered set and
+  // whatever the applicant submits are ISO instants produced by the same
+  // generateInterviewSlots, so nothing here needs Date-vs-Date comparison
+  // to notice a match, and comparing by string sidesteps any ambiguity
+  // about which instant an off-by-a-millisecond re-parse would produce.
+  const interviewWindows = await getRecruitingWindowsWithInterviewGrid();
+  const openInterviewWindow = windowContaining(now.getTime(), interviewWindows);
+  const offeredInterviewSlots = openInterviewWindow ? generateInterviewSlots(openInterviewWindow.interviewGrid) : [];
+
+  let interviewSlots: string[] | undefined;
+  if (offeredInterviewSlots.length === 0) {
+    interviewSlots = undefined;
+  } else {
+    const offeredValues = new Set(offeredInterviewSlots.map((slot) => slot.value));
+    const chosen = data.interviewSlots ?? [];
+    if (chosen.some((value) => !offeredValues.has(value))) {
+      return NextResponse.json({ ok: false, error: "invalid_interview_slot" }, { status: 400 });
+    }
+    interviewSlots = [...new Set(chosen)].sort();
+  }
+
   let application;
   try {
     application = await insertApplication({
@@ -107,6 +133,7 @@ export async function POST(request: NextRequest) {
       wantToGain: data.wantToGain,
       areaChoices: toAreaChoices(data),
       departments: data.departments ?? [],
+      interviewSlots,
       availabilityHours: data.availabilityHours,
       heardAboutUs: data.heardAboutUs,
       locale: data.locale,

@@ -1250,6 +1250,7 @@
         "previous involvement (free text)",
         "relevant skills for the chosen area of involvement (free text)",
         "what you hope to take from your time at Enactus (free text)",
+        "preferred time slots for an interview (optional, multiple selection)",
         "how you heard about us",
         "the time you gave consent"
       ],
@@ -1560,6 +1561,10 @@
         "wantToGainLabel": "(Optional) What do you hope to take away from your time at Enactus?",
         "wantToGainHint": "What do you want to be able to do, or have experienced, by the end that you can't yet?",
         "wantToGainError": "Please shorten this to {max} characters or fewer.",
+        "interviewSlotsLabel": "(Optional) Availability for an interview",
+        "interviewSlotsHint": "Check the times you'd have available for an interview. Multiple selections are fine, this makes scheduling much easier.",
+        "interviewSlotsCountLabel": "{count} selected",
+        "interviewSlotsError": "Please choose each time slot only once.",
         "heardAboutLabel": "(Optional) How did you hear about us?",
         "consentPrefix": "I have read the",
         "consentLinkLabel": "privacy policy",
@@ -1571,6 +1576,7 @@
         "submitError": "Your application couldn't be sent. Please try again, or write to us directly at {email}.",
         "submitWindowClosed": "The application window just closed. Please reload the page to see the current status.",
         "submitFormExpired": "The form was open for too long. Please reload the page and submit your application again.",
+        "submitInterviewSlotChanged": "The interview time slots on offer just changed. Please reload the page and choose again.",
         "submitRateLimited": "Too many requests have just come in from your network. Please reload the page and try again in a few minutes."
       }
     },
@@ -1631,6 +1637,7 @@
       "recruitingWindows": "Application windows",
       "projectAreas": "Project areas",
       "departments": "Departments",
+      "interviewAvailability": "Interview scheduling",
       "calendarEvents": "Calendar events",
       "jobPostings": "Jobs",
       "reminders": "Notification list",
@@ -1664,6 +1671,7 @@
         "recruitingWindows": "Create, edit, and delete application windows.",
         "projectAreas": "Maintain the \"desired area\" choices on the application form.",
         "departments": "Maintain the \"department\" choices on the application form.",
+        "interviewAvailability": "Who is available when for an interview, per semester, with a CSV export.",
         "calendarEvents": "Create, edit, and delete calendar events.",
         "jobPostings": "Create, edit, and delete our partners' job postings.",
         "reminders": "Who signed up for the application-start notification, confirmed and unconfirmed.",
@@ -1804,10 +1812,26 @@
       "errorSemesterFormat": "Format HWS26 or FSS27.",
       "errorEndBeforeStart": "The end must be after the start.",
       "errorDateRequired": "Please give a date and time.",
+      "interviewHeading": "Interview days",
+      "interviewLead": "Interviews can take place on these days and within this time range. Applicants pick their availability in the form from these time slots. No booking, just a preference survey, the board handles the actual assignment themselves.",
+      "interviewDayLabel": "Interview day {position}",
+      "addInterviewDay": "Add day",
+      "removeInterviewDay": "Remove interview day {position}",
+      "interviewStartLabel": "Start (daily)",
+      "interviewEndLabel": "End (daily)",
+      "interviewSlotMinutesLabel": "Slot length (minutes)",
+      "interviewSlotSummary": "Yields {count} time slots ({perDay} per day).",
+      "interviewNone": "none",
+      "interviewSummary": "{days} days, {start} to {end}, {minutes} min., {slots} slots",
+      "errorInterviewDuplicateDay": "Please enter each day only once.",
+      "errorInterviewTooManyDays": "Please enter at most {max} interview days.",
+      "errorInterviewRange": "The end must be after the start.",
+      "errorInterviewSlotMinutes": "Please choose a slot length that fits at least once into the time range (5 to 480 minutes).",
       "columns": {
         "semester": "Semester",
         "start": "Start",
         "end": "End",
+        "interviewDays": "Interview days",
         "action": "Action"
       }
     },
@@ -1878,6 +1902,22 @@
         "active": "Status",
         "action": "Action"
       }
+    },
+    "interviewAvailability": {
+      "title": "Interview scheduling",
+      "lead": "Who is available when for an interview, per application window. No booking, just an overview, the board handles the actual assignment themselves.",
+      "empty": "No applications in this semester.",
+      "noWindowConfigured": "No interview days are entered for this semester. Enter them under Application windows so applicants can give their availability.",
+      "downloadCsv": "Download CSV",
+      "captionLabel": "Interview availability, applicants as rows, time slots as columns",
+      "applicantColumnLabel": "Applicant",
+      "totalColumnLabel": "Σ",
+      "totalsRowLabel": "Σ available",
+      "noAnswerLabel": "no answer (application predates this field, or its window had no interview days configured)",
+      "noneChosenLabel": "nothing chosen",
+      "notConfiguredLabel": "no longer configured",
+      "availableLabel": "available",
+      "notAvailableLabel": "not available"
     },
     "calendarEvents": {
       "title": "Calendar events",

@@ -1250,6 +1250,7 @@
         "Bisheriges Engagement (Freitext)",
         "Relevante Skills für den gewünschten Einsatzbereich (Freitext)",
         "Was du aus deiner Zeit bei Enactus mitnehmen möchtest (Freitext)",
+        "gewünschte Zeitfenster für ein Bewerbungsgespräch (optional, Mehrfachauswahl)",
         "Angabe, wie du auf uns aufmerksam geworden bist",
         "Zeitpunkt deiner Einwilligung"
       ],
@@ -1560,6 +1561,10 @@
         "wantToGainLabel": "(Optional) Was möchtest du aus deiner Zeit bei Enactus mitnehmen?",
         "wantToGainHint": "Was willst du am Ende können oder erlebt haben, das heute noch nicht geht?",
         "wantToGainError": "Bitte kürze auf maximal {max} Zeichen.",
+        "interviewSlotsLabel": "(Optional) Verfügbarkeit für ein Bewerbungsgespräch",
+        "interviewSlotsHint": "Kreuze an, wann du für ein Gespräch Zeit hättest. Mehrfachauswahl möglich, das erleichtert die Terminfindung deutlich.",
+        "interviewSlotsCountLabel": "{count} ausgewählt",
+        "interviewSlotsError": "Bitte wähle jedes Zeitfenster nur einmal aus.",
         "heardAboutLabel": "(Optional) Wie bist du auf uns aufmerksam geworden?",
         "consentPrefix": "Ich habe die",
         "consentLinkLabel": "Datenschutzerklärung",
@@ -1571,6 +1576,7 @@
         "submitError": "Deine Bewerbung konnte nicht gesendet werden. Bitte versuch es noch einmal oder schreib uns direkt an {email}.",
         "submitWindowClosed": "Das Bewerbungsfenster wurde gerade eben geschlossen. Bitte lade die Seite neu, um den aktuellen Stand zu sehen.",
         "submitFormExpired": "Das Formular war zu lange geöffnet. Bitte lade die Seite neu und sende deine Bewerbung erneut ab.",
+        "submitInterviewSlotChanged": "Die angebotenen Zeitfenster für Bewerbungsgespräche haben sich gerade geändert. Bitte lade die Seite neu und wähle erneut aus.",
         "submitRateLimited": "Gerade sind zu viele Anfragen aus deinem Netzwerk eingegangen. Bitte lade die Seite neu und versuch es in ein paar Minuten erneut."
       }
     },
@@ -1631,6 +1637,7 @@
       "recruitingWindows": "Bewerbungsfenster",
       "projectAreas": "Wunschbereiche",
       "departments": "Ressorts",
+      "interviewAvailability": "Gesprächsplanung",
       "calendarEvents": "Termine",
       "jobPostings": "Jobs",
       "reminders": "Benachrichtigungsliste",
@@ -1664,6 +1671,7 @@
         "recruitingWindows": "Bewerbungsfenster anlegen, bearbeiten und löschen.",
         "projectAreas": "Die Wunschbereich-Auswahl im Bewerbungsformular pflegen.",
         "departments": "Die Ressort-Auswahl im Bewerbungsformular pflegen.",
+        "interviewAvailability": "Wer für ein Bewerbungsgespräch wann verfügbar ist, je Semester, mit CSV-Export.",
         "calendarEvents": "Termine anlegen, bearbeiten und löschen.",
         "jobPostings": "Offene Stellen unserer Partner anlegen, bearbeiten und löschen.",
         "reminders": "Wer sich für die Benachrichtigung zum Bewerbungsstart eingetragen hat, bestätigt und unbestätigt.",
@@ -1804,10 +1812,26 @@
       "errorSemesterFormat": "Format HWS26 oder FSS27.",
       "errorEndBeforeStart": "Das Ende muss nach dem Beginn liegen.",
       "errorDateRequired": "Bitte gib Datum und Uhrzeit an.",
+      "interviewHeading": "Gesprächstage",
+      "interviewLead": "An diesen Tagen und in diesem Zeitraum können Bewerbungsgespräche stattfinden. Bewerber wählen ihre Verfügbarkeit im Formular aus diesen Zeitfenstern. Keine Buchung, nur eine Präferenzabfrage, die Zuordnung macht der Vorstand selbst.",
+      "interviewDayLabel": "Gesprächstag {position}",
+      "addInterviewDay": "Tag hinzufügen",
+      "removeInterviewDay": "Gesprächstag {position} entfernen",
+      "interviewStartLabel": "Beginn (täglich)",
+      "interviewEndLabel": "Ende (täglich)",
+      "interviewSlotMinutesLabel": "Slotlänge (Minuten)",
+      "interviewSlotSummary": "Ergibt {count} Zeitfenster ({perDay} je Tag).",
+      "interviewNone": "keine",
+      "interviewSummary": "{days} Tage, {start} bis {end} Uhr, {minutes} Min., {slots} Slots",
+      "errorInterviewDuplicateDay": "Bitte trage jeden Tag nur einmal ein.",
+      "errorInterviewTooManyDays": "Bitte trage höchstens {max} Gesprächstage ein.",
+      "errorInterviewRange": "Das Ende muss nach dem Beginn liegen.",
+      "errorInterviewSlotMinutes": "Bitte wähle eine Slotlänge, die mindestens einmal in den Zeitraum passt (5 bis 480 Minuten).",
       "columns": {
         "semester": "Semester",
         "start": "Beginn",
         "end": "Ende",
+        "interviewDays": "Gesprächstage",
         "action": "Aktion"
       }
     },
@@ -1878,6 +1902,22 @@
         "active": "Status",
         "action": "Aktion"
       }
+    },
+    "interviewAvailability": {
+      "title": "Gesprächsplanung",
+      "lead": "Wer für ein Bewerbungsgespräch wann verfügbar ist, je Bewerbungsfenster. Keine Buchung, nur eine Übersicht, die Zuordnung macht der Vorstand selbst.",
+      "empty": "Keine Bewerbungen in diesem Semester.",
+      "noWindowConfigured": "Für dieses Semester sind keine Gesprächstage eingetragen. Trage sie unter Bewerbungsfenster ein, damit Bewerber ihre Verfügbarkeit angeben können.",
+      "downloadCsv": "CSV herunterladen",
+      "captionLabel": "Verfügbarkeit für Bewerbungsgespräche, Bewerber:innen als Zeilen, Zeitfenster als Spalten",
+      "applicantColumnLabel": "Bewerber:in",
+      "totalColumnLabel": "Σ",
+      "totalsRowLabel": "Σ verfügbar",
+      "noAnswerLabel": "keine Angabe (Bewerbung vor Einführung des Feldes oder ohne konfigurierte Gesprächstage)",
+      "noneChosenLabel": "nichts gewählt",
+      "notConfiguredLabel": "nicht mehr konfiguriert",
+      "availableLabel": "verfügbar",
+      "notAvailableLabel": "nicht verfügbar"
     },
     "calendarEvents": {
       "title": "Termine",

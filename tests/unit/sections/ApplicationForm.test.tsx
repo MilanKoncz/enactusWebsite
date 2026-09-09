@@ -7,6 +7,7 @@ import { mockMatchMedia } from "../../fixtures/matchMedia";
 import { ApplicationForm, MIN_FILL_MS } from "@/components/sections/ApplicationForm";
 import type { PublicProjectArea } from "@/lib/projectAreas";
 import type { PublicDepartment } from "@/lib/departments";
+import type { InterviewSlot } from "@/lib/interviewSlots";
 
 const TOKEN_ISSUED_AT = 1_700_000_000_000;
 const TOKEN = `${TOKEN_ISSUED_AT}.test-signature`;
@@ -35,8 +36,20 @@ vi.mock("@vercel/blob/client", () => ({
   upload: (...args: unknown[]) => uploadMock(...args),
 }));
 
-function renderForm(projectAreas: PublicProjectArea[] = PROJECT_AREAS, departments: PublicDepartment[] = DEPARTMENTS) {
-  return renderWithIntl(<ApplicationForm projectAreas={projectAreas} departments={departments} />);
+const INTERVIEW_SLOTS: InterviewSlot[] = [
+  { value: "2026-09-15T08:00:00.000Z", day: "2026-09-15", startTime: "10:00", endTime: "11:00" },
+  { value: "2026-09-15T09:00:00.000Z", day: "2026-09-15", startTime: "11:00", endTime: "12:00" },
+  { value: "2026-09-16T08:00:00.000Z", day: "2026-09-16", startTime: "10:00", endTime: "11:00" },
+];
+
+function renderForm(
+  projectAreas: PublicProjectArea[] = PROJECT_AREAS,
+  departments: PublicDepartment[] = DEPARTMENTS,
+  interviewSlots: InterviewSlot[] = [],
+) {
+  return renderWithIntl(
+    <ApplicationForm projectAreas={projectAreas} departments={departments} interviewSlots={interviewSlots} />,
+  );
 }
 
 function pdfFile(name = "lebenslauf.pdf") {
@@ -384,6 +397,44 @@ describe("ApplicationForm", () => {
 
     await screen.findByRole("status");
     expect(postCallBody()).toMatchObject({ departments: ["Team-Lead", "Inno-Lead"] });
+  });
+
+  it("renders no interview-availability field when no slots are offered", () => {
+    renderForm(PROJECT_AREAS, DEPARTMENTS, []);
+    expect(screen.queryByText("(Optional) Verfügbarkeit für ein Bewerbungsgespräch")).not.toBeInTheDocument();
+  });
+
+  it("groups offered interview slots by day and submits none checked, since it's optional", async () => {
+    let now = TOKEN_ISSUED_AT;
+    vi.spyOn(Date, "now").mockImplementation(() => now);
+    const user = userEvent.setup();
+    renderForm(PROJECT_AREAS, DEPARTMENTS, INTERVIEW_SLOTS);
+
+    expect(screen.getByRole("group", { name: /15\. September 2026/ })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: /16\. September 2026/ })).toBeInTheDocument();
+
+    await fillRequiredFields(user);
+    now += MIN_FILL_MS + 500;
+    await user.click(screen.getByRole("button", { name: "Bewerbung absenden" }));
+
+    await screen.findByRole("status");
+    expect(postCallBody()).toMatchObject({ interviewSlots: [] });
+  });
+
+  it("submits the checked interview slots alongside the rest of the application", async () => {
+    let now = TOKEN_ISSUED_AT;
+    vi.spyOn(Date, "now").mockImplementation(() => now);
+    const user = userEvent.setup();
+    renderForm(PROJECT_AREAS, DEPARTMENTS, INTERVIEW_SLOTS);
+
+    await fillRequiredFields(user);
+    const day15 = within(screen.getByRole("group", { name: /15\. September 2026/ }));
+    await user.click(day15.getByRole("checkbox", { name: "10:00–11:00" }));
+    now += MIN_FILL_MS + 500;
+    await user.click(screen.getByRole("button", { name: "Bewerbung absenden" }));
+
+    await screen.findByRole("status");
+    expect(postCallBody()).toMatchObject({ interviewSlots: [INTERVIEW_SLOTS[0].value] });
   });
 
   it("shows a visible notice when a pasted motivation text is longer than the limit and gets cut", async () => {

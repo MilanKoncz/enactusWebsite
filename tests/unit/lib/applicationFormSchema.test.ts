@@ -164,6 +164,29 @@ describe("applicationFormSchema (field-level rules, no cross-field refinement)",
     });
     expect(result.success).toBe(false);
   });
+
+  it("accepts interviewSlots omitted entirely", () => {
+    const result = applicationFormSchema.safeParse(validInput());
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts an empty interviewSlots array — no per-applicant cap, unlike departments", () => {
+    const result = applicationFormSchema.safeParse({ ...validInput(), interviewSlots: [] });
+    expect(result.success).toBe(true);
+  });
+
+  it("accepts multiple interviewSlots values", () => {
+    const result = applicationFormSchema.safeParse({
+      ...validInput(),
+      interviewSlots: ["2026-09-15T08:00:00.000Z", "2026-09-15T09:00:00.000Z", "2026-09-16T08:00:00.000Z"],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects an interviewSlots entry that isn't an ISO datetime", () => {
+    const result = applicationFormSchema.safeParse({ ...validInput(), interviewSlots: ["not-a-date"] });
+    expect(result.success).toBe(false);
+  });
 });
 
 describe("validatedApplicationFormSchema — department cross-field rules", () => {
@@ -177,6 +200,22 @@ describe("validatedApplicationFormSchema — department cross-field rules", () =
   it("accepts distinct departments", () => {
     const result = validatedApplicationFormSchema.safeParse(
       validInput({ departments: ["Team-Lead", "Finance-Lead"] }),
+    );
+    expect(result.success).toBe(true);
+  });
+});
+
+describe("validatedApplicationFormSchema — interview slot cross-field rules", () => {
+  it("rejects the same interview slot chosen twice", () => {
+    const result = validatedApplicationFormSchema.safeParse(
+      validInput({ interviewSlots: ["2026-09-15T08:00:00.000Z", "2026-09-15T08:00:00.000Z"] }),
+    );
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts distinct interview slots", () => {
+    const result = validatedApplicationFormSchema.safeParse(
+      validInput({ interviewSlots: ["2026-09-15T08:00:00.000Z", "2026-09-15T09:00:00.000Z"] }),
     );
     expect(result.success).toBe(true);
   });
