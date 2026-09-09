@@ -80,6 +80,14 @@ before its start, and any window overlapping an existing one (naming which).
 A change is live on `/mitmachen` immediately — the page's cache is
 invalidated by the same request that saved it.
 
+The same form also carries the window's **interview days**: a repeatable
+list of dates, a daily start/end time, and a slot length. Add or remove a
+day, adjust the times, and the form shows the resulting slot count live
+before you save. Leave the day list empty and the application form simply
+asks nothing about interview availability for that window — nothing is
+required here. Once configured, `/admin/gespraechsplanung` shows who
+selected which slot, per semester, with a CSV export.
+
 ## Update the event calendar (Termine)
 
 Events live in the `calendar_events` table, not in a content file — the same

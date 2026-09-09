@@ -87,6 +87,7 @@ describe("Datenschutz", () => {
     expect(screen.getByText("Lebenslauf als PDF-Datei (Upload)")).toBeInTheDocument();
     expect(screen.getByText(/Relevante Skills für den gewünschten Einsatzbereich/)).toBeInTheDocument();
     expect(screen.getByText(/Was du aus deiner Zeit bei Enactus mitnehmen möchtest/)).toBeInTheDocument();
+    expect(screen.getByText(/gewünschte Zeitfenster für ein Bewerbungsgespräch/)).toBeInTheDocument();
     expect(screen.getByText(/Verfügbarkeit in Stunden pro Woche/)).toBeInTheDocument();
     expect(screen.getByText(/Zeitpunkt deiner Einwilligung/)).toBeInTheDocument();
     expect(screen.queryByText(/Hochschule/)).not.toBeInTheDocument();

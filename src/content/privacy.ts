@@ -47,18 +47,22 @@ const privacyReviewStatusSchema = z
   });
 export type PrivacyReviewStatus = z.infer<typeof privacyReviewStatusSchema>;
 
-// Reviewed and confirmed 2026-08-31 by Marco Becker, Datenschutzbeauftragter
+// Reviewed and confirmed 2026-09-10 by Marco Becker, Datenschutzbeauftragter
 // Enactus Germany — covering everything this status had been sitting on
-// since flipping to draft on 2026-08-25: the Ideathon signup section
-// (Datenschutz.tsx, messages' "ideathonSignup" key) including the expanded
-// field list from migration 0015 (team members, motivation/experience,
-// dietary preference), the CV as its own data category (uploaded to Vercel
-// Blob), and sending that CV as a mail attachment to the board. Flip back
-// to `false` if any of those three areas change again before the next
-// sign-off.
+// since the previous sign-off (2026-08-31: the Ideathon signup section,
+// Datenschutz.tsx, messages' "ideathonSignup" key, including the expanded
+// field list from migration 0015 — team members, motivation/experience,
+// dietary preference — the CV as its own data category, uploaded to Vercel
+// Blob, and sending that CV as a mail attachment to the board), plus the
+// new field this review covers: Gesprächsverfügbarkeit, the interview
+// time slots an applicant may optionally select (migrations/0023,
+// Datenschutz.application.fields' own new entry) — stored on the
+// application row itself and deleted along with it, no separate retention
+// period. Flip back to `false` if any of those areas change again before
+// the next sign-off.
 export const privacyReviewStatus: PrivacyReviewStatus = privacyReviewStatusSchema.parse({
   reviewed: true,
-  reviewedAt: "2026-08-31",
+  reviewedAt: "2026-09-10",
   reviewedBy: "Marco Becker",
   reviewerRole: "Datenschutzbeauftragter Enactus Germany",
 });

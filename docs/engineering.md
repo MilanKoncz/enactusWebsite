@@ -72,6 +72,24 @@ Forms, data, privacy, performance, SEO, and testing detail.
    `src/content/privacy.ts`'s CV section and `Datenschutz.email.body.0`/
    `.application.access` describe the same fact to visitors.
 
+12. **Interview-availability preferences**, not a booking system: an
+    optional, unranked checkbox set of time slots (`interviewSlots`,
+    `lib/interviewSlots.ts`), grouped by day in the UI
+    (`InterviewAvailabilityField.tsx`, one `CheckboxGroup` per day). No cap
+    — unlike Ressorts, several interviews run in parallel, so checking every
+    offered slot is a genuinely useful answer. The days, the daily time
+    range, and the slot length all live on `recruiting_windows` (migration
+    `0023`), board-managed at `/admin/bewerbungsfenster` — never hardcoded,
+    so a new semester needs no deploy. `/api/bewerbung`, not the client,
+    decides NULL vs `[]` on the stored `applications.interview_slots`
+    column: NULL means the window had no interview grid configured at
+    submission time, `[]` means slots were offered and none were chosen —
+    the same distinction `departments` already draws, for the same reason.
+    The board's own overview lives at `/admin/gespraechsplanung`: a
+    Bewerber-by-Zeitfenster matrix with a totals row, a CSV export, and
+    columns for a value an applicant chose under a configuration the board
+    has since changed (marked, not dropped).
+
 **Hochgeladene PDFs werden nicht auf Schadsoftware geprüft.** Es läuft kein
 Virenscanner über den Store, und der Vorstand öffnet die Dateien. Das ist ein
 bewusst akzeptiertes Restrisiko: ein Scanner wäre ein weiterer

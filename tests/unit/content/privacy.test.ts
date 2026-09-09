@@ -2,14 +2,15 @@ import { describe, expect, it } from "vitest";
 import { privacyReviewStatus, privacyReviewStatusSchema } from "@/content/privacy";
 
 describe("content/privacy", () => {
-  // Reviewed and confirmed 2026-08-31 by the Enactus Germany data
+  // Reviewed and confirmed 2026-09-10 by the Enactus Germany data
   // protection officer (content/privacy.ts's own comment) — covering the
-  // Ideathon section's expanded field list (migration 0015) and the new CV
-  // data category/mail attachment together.
+  // Ideathon section's expanded field list (migration 0015), the CV data
+  // category/mail attachment, and now the interview-availability field
+  // (migrations/0023) together.
   it("is currently reviewed, with the reviewer on record", () => {
     expect(privacyReviewStatus).toEqual({
       reviewed: true,
-      reviewedAt: "2026-08-31",
+      reviewedAt: "2026-09-10",
       reviewedBy: "Marco Becker",
       reviewerRole: "Datenschutzbeauftragter Enactus Germany",
     });
