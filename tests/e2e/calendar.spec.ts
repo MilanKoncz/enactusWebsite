@@ -19,8 +19,22 @@ import type { Page } from "@playwright/test";
  * seconds away from this file's own `Date.now()` — comfortably within the
  * multi-day margins used below.
  */
+// "Today" is resolved in Europe/Berlin (SITE_TIMEZONE), the same way
+// EventCalendarGrid.tsx itself resolves it (lib/calendarAgenda.ts's
+// todayInSiteTimezone — "never in UTC ... get that wrong and the agenda
+// reshuffles for an hour or two around every midnight", that file's own
+// words). A plain UTC "today" disagrees with the page's for roughly two
+// hours every evening (Berlin runs one or two hours ahead of UTC), which
+// silently shifted every date this file computes by a day during that
+// window — discovered when a run landing there failed the roving-focus
+// test below on its very first keypress.
+function todayInBerlin(): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin" }).format(new Date());
+}
+
 function isoDate(daysFromToday: number): string {
-  const date = new Date();
+  const [year, month, day] = todayInBerlin().split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
   date.setUTCDate(date.getUTCDate() + daysFromToday);
   return date.toISOString().slice(0, 10);
 }
